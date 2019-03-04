@@ -91,34 +91,21 @@ class LoginPage extends StatefulWidget{
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return new Scaffold(
-        body: NestedScrollView(
-        controller: _scrollViewController,
-        headerSilverBuilder:
-    ),
-        /*
-     appBar: new AppBar(
-        title: new Text('Flutter login demo'),
-      ),
-      body: new Container(
-        padding: EdgeInsets.all(16.0),
-        child: new Form(
-          key: formKey,
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: buildInputs() + buildSubmitButtons(),
+      return Scaffold(
+        appBar: new AppBar(
+          title: new Text('Login'),
         ),
-      ),
-    ),
-    ); */
+        body: new SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.min,
+            children: buildInputs() + buildSubmitButtons()
+          )
+        ),
+      );
   }
 
-  Widget _buildContent(){
-    return ListView.builder(
 
-    )
-  }
 
   List<Widget> buildInputs(){
     if(_formType == FormType.login) {
