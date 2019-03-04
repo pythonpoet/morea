@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/services/auth.dart';
+import '../services/auth.dart';
 import '../services/crud.dart';
 
 class HomePage extends StatefulWidget {
@@ -68,6 +68,12 @@ class _HomePageState extends State<HomePage> {
             new UserAccountsDrawerHeader(
               accountName: new Text('Jarvis'),
               accountEmail: new Text('jarvis@morea.ch'),
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  fit: BoxFit.fill,
+                  image: new NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA')
+                )
+              ),
             ),
             new ListTile(
               title: new Text('Teleblitz'),

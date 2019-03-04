@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:morea/services/auth.dart';
+import '../services/auth.dart';
 
 
 
@@ -8,36 +8,22 @@ class LoginPage extends StatefulWidget{
   final BaseAuth auth;
   final VoidCallback onSignedIn;
 
-
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
   }
 
   enum FormType {
-   login, register
+   login,
+    register
   }
 
   class _LoginPageState extends State<LoginPage>{
 
   final formKey = new GlobalKey<FormState>();
 
-  String _email, _pfadinamen, _vorname, _nachname, _stufe,_selectedstufe;
+  String _email, _pfadinamen, _vorname, _nachname, _stufe;
   String _password;
   FormType _formType = FormType.login;
-  List<String> _stufenselect = ['Biber', 'Wölfe', 'Nahnanis','Drason','Pios'];
-
-  ScrollController _scrollViewController;
-
-  @override
-  void initState(){
-    super.initState();
-    _scrollViewController = ScrollController();
-  }
-  @override
-  void dispose(){
-    _scrollViewController.dispose();
-    super.dispose();
-  }
 
   bool validateAndSave(){
     final form = formKey.currentState;
@@ -81,31 +67,30 @@ class LoginPage extends StatefulWidget{
   }
   Map mapUserData(){
     Map<String, String> userInfo ={
-      'Pfadinamen': this._pfadinamen,
-      'Vorname': this._vorname,
-      'Nachname': this._nachname,
-      'Stufe': this._selectedstufe
+      'Pfadinamen': this._pfadinamen
     };
     return userInfo;
   }
 
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: new AppBar(
-          title: new Text('Login'),
+    // TODO: implement build
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Flutter login demo'),
+      ),
+      body: new Container(
+        padding: EdgeInsets.all(16.0),
+        child: new Form(
+          key: formKey,
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: buildInputs() + buildSubmitButtons(),
         ),
-        body: new SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.min,
-            children: buildInputs() + buildSubmitButtons()
-          )
-        ),
-      );
+      ),
+    ),
+    );
   }
-
-
 
   List<Widget> buildInputs(){
     if(_formType == FormType.login) {
@@ -159,7 +144,7 @@ class LoginPage extends StatefulWidget{
               ? 'Pfadinamen can\'t be empty'
               : null,
           keyboardType: TextInputType.text,
-          onSaved: (value) => _vorname = value,
+          onSaved: (value) => _pfadinamen = value,
         ),
         new TextFormField(
           decoration: new InputDecoration(labelText: 'Nachname'),
@@ -168,20 +153,79 @@ class LoginPage extends StatefulWidget{
               ? 'Pfadinamen can\'t be empty'
               : null,
           keyboardType: TextInputType.text,
-          onSaved: (value) => _nachname = value,
+          onSaved: (value) => _pfadinamen = value,
         ),
-        new DropdownButton<String>(
-            items: _stufenselect.map((String val) {
-            return new DropdownMenuItem<String>(
-            value: val,
-            child: new Text(val),
-            );
-            }).toList(),
-            hint: Text('Stufe wählen'),
-            onChanged: (newVal) {
-            _selectedstufe = newVal;
-            this.setState(() {});
-            })
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),
+        new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),new TextFormField(
+          decoration: new InputDecoration(labelText: 'Nachname'),
+          validator: (value) =>
+          value.isEmpty
+              ? 'Pfadinamen can\'t be empty'
+              : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _pfadinamen = value,
+        ),
+
+
+
 
       ];
     }
