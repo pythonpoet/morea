@@ -10,7 +10,7 @@ abstract class BaseAuth{
   Future<void> signOut();
   Future<void> createUserInformation(Map userInfo);
   Future<DocumentSnapshot> getUserInformation();
-  Future<String> uebunganmelden(Map anmeldedaten, String stufe);
+  Future<String> uebunganmelden(Map anmeldedaten, String stufe, String pfadiname);
 }
 class Auth implements BaseAuth {
 
@@ -65,10 +65,10 @@ class Auth implements BaseAuth {
       print(e);
     });
   }
-  Future<String> uebunganmelden(Map anmeldedaten, String stufe) async {
+  Future<String> uebunganmelden(Map anmeldedaten, String stufe, String pfadiname) async {
     String uebungsdatum = getuebungsdatum();
-    Firestore.instance.collection(stufe).document(uebungsdatum).setData(anmeldedaten).catchError((e){
-      print(e);
+    Firestore.instance.collection('uebung').document(stufe).collection(uebungsdatum).document('chunt').collection('spacer').document(pfadiname).setData(anmeldedaten).catchError((e){
+        print(e);
     });
   }
   Future<DocumentSnapshot> getUserInformation() async {
@@ -77,7 +77,12 @@ class Auth implements BaseAuth {
   }
   Future<DocumentSnapshot> getTNs(String stufe)async{
     String uebungsdatum = getuebungsdatum();
-    return await Firestore.instance.collection(stufe).document(uebungsdatum).get();
+    print('sksdfljöa');
+    var document = await Firestore.instance.document('user/${stufe}/${uebungsdatum}');
+    document.get();
+    print(document);
+    /*
+    return await Firestore.instance.collection(stufe).document(uebungsdatum).get(); */
   }
 
   Future<String> currentUser() async {

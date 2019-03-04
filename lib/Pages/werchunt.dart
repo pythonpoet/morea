@@ -30,6 +30,7 @@ class _WerChuntState extends State<WerChunt> {
 
 
 
+
   void getuserinfo(){
     auth0.getUserInformation().then((results){
       setState(() {
@@ -40,36 +41,85 @@ class _WerChuntState extends State<WerChunt> {
     });
   }
   void gettns(){
+    List<String> chunt = new List();
+    List<String> nchunt = new List();
+    /*
   auth0.getTNs(_stufe).then((results){
     dsanmeldedat = results;
-  });
+    });*/
+  /*
    TNS = dsanmeldedat.data.toString();
-
+   bool i = true;
+   int pos=1,posbis;
+   print(TNS);
+   while (i){
+     posbis  = TNS.indexOf(': Chunt',pos);
+     if(posbis == -1){
+       i = false;
+     }else {
+       chunt.add(TNS.substring(pos, posbis));
+       pos = posbis + ': Chunt'.length;
+     }
+     i = true;
+   }
+    while (i){
+      posbis  = TNS.indexOf(': NChunt',pos);
+      if(posbis == -1){
+        i = false;
+      }else {
+        nchunt.add(TNS.substring(pos, posbis));
+        pos = posbis + ': NChunt'.length;
+      }
+    }
+   print(chunt);
+   print(nchunt);
+   pos = TNS.indexOf(': Chunt',pos);
+   print('pos:'+ pos.toString());
+*/
 }
-
+  Widget _buildListItem(BuildContext context, DocumentSnapshot document){
+    return ListTile(
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+                document['name'],
+            ),
+          )
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     getuserinfo();
     gettns();
+    Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung').document(_stufe).collection(auth0.getuebungsdatum()).snapshots();
+
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Werchunt'),
       ),
-      body: new Container(
-        child: new Form(
-            key: formKey,
-            child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: TNanzeigen()
-            )
-        ),
-      ),
+      body: StreamBuilder(
+        stream: qsdata,
+        builder: (context, qsdata){
+          if(!qsdata.hasData) return Text('Loading data.. Please waint..');
+          return ListView.builder(
+            itemExtent: 80.0,
+            itemCount: snapshot.data.documents.length,
+            itemBuilder: (context, index) =>
+                _buildListItem(context, _b))
+          );
+
+        }
+      )
     );
   }
 
   List<Widget>TNanzeigen(){
     return [
-      new Text(TNS)
+      new Text(snap)
     ];
   }
   }

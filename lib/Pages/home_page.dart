@@ -34,9 +34,9 @@ class _HomePageState extends State<HomePage> {
   void submit(String anabmelden) {
     print(qsuserInfo.data['Pfadinamen']);
     anmeldeDaten = {
-      this.qsuserInfo.data['Pfadinamen']: anabmelden
+      anabmelden : this.qsuserInfo.data['Pfadinamen']
     };
-    auth0.uebunganmelden(anmeldeDaten, _stufe);
+    auth0.uebunganmelden(anmeldeDaten, _stufe,_pfadiname);
   }
  void getuserinfo(){
   auth0.getUserInformation().then((results){
@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
       ),
       new RaisedButton(
           child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
-          onPressed: () => submit('Chunt nöd')
+          onPressed: () => submit('NChunt')
       ),
     ];
 }
