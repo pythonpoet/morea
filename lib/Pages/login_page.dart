@@ -95,17 +95,7 @@ class LoginPage extends StatefulWidget{
                   children: buildInputs() + buildSubmitButtons()
               ),
             ),
-          ) /*
-      new Container(
-        padding: EdgeInsets.all(16.0),
-        child: new Form(
-          key: formKey,
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: buildInputs() + buildSubmitButtons(),
-        ),
-      ),
-    ),*/
+          )
       );
     }
     List<Widget> buildInputs(){
