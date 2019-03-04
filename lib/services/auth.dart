@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 
 abstract class BaseAuth{
   Future<String> signInWithEmailAndPassword(String email, String password);
@@ -9,11 +10,45 @@ abstract class BaseAuth{
   Future<void> signOut();
   Future<void> createUserInformation(Map userInfo);
   Future<DocumentSnapshot> getUserInformation();
-  Future<void> uebunganmelden(Map anmeldedaten);
+  Future<String> uebunganmelden(Map anmeldedaten, String stufe);
 }
 class Auth implements BaseAuth {
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  String getuebungsdatum(){
+    var now = new DateTime.now();
+    var formatter = new DateFormat('E');
+    var formatter2 = new DateFormat('dd');
+    String formatted = formatter.format(now);
+    String formatted2 = formatter2.format(now);
+    int date = int.parse(formatted2);
+    switch (formatted) {
+      case 'Sun':
+        date += 6;
+        break;
+      case 'Mon':
+        date += 5;
+        break;
+      case 'Tue':
+        date += 4;
+        break;
+      case 'Wed':
+        date += 3;
+        break;
+      case 'Thu':
+        date += 2;
+        break;
+      case 'Fri':
+        date += 1;
+        break;
+    }
+        String akdate;
+        akdate = date.toString();
+        var fixdate = new DateFormat('yyyy-MM');
+        String fixdateformatted = fixdate.format(now);
+        return fixdateformatted + '-' + akdate;
+  }
 
   Future<String> signInWithEmailAndPassword(String email, String password)async{
     FirebaseUser user = await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
@@ -30,8 +65,9 @@ class Auth implements BaseAuth {
       print(e);
     });
   }
-  Future<void> uebunganmelden(Map anmeldedaten) async {
-    Firestore.instance.collection('uebung').document('uebung1').setData(anmeldedaten).catchError((e){
+  Future<String> uebunganmelden(Map anmeldedaten, String stufe) async {
+    String uebungsdatum = getuebungsdatum();
+    Firestore.instance.collection(stufe).document(uebungsdatum).setData(anmeldedaten).catchError((e){
       print(e);
     });
   }
@@ -39,10 +75,14 @@ class Auth implements BaseAuth {
     String userUID =  await currentUser();
     return await Firestore.instance.collection('user').document(userUID).get();
   }
+  Future<DocumentSnapshot> getTNs(String stufe)async{
+    String uebungsdatum = getuebungsdatum();
+    return await Firestore.instance.collection(stufe).document(uebungsdatum).get();
+  }
 
   Future<String> currentUser() async {
     FirebaseUser user = await  _firebaseAuth.currentUser();
-    return user.uid;
+    return user != null ? user.uid : null;
   }
 
   Future<void> signOut() async {
