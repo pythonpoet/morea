@@ -40,99 +40,132 @@ class _WerChuntState extends State<WerChunt> {
     });
   }
 
-  void gettns() {
-    List<String> chunt = new List();
-    List<String> nchunt = new List();
-    /*
-  auth0.getTNs(_stufe).then((results){
-    dsanmeldedat = results;
-    });*/
-    /*
-   TNS = dsanmeldedat.data.toString();
-   bool i = true;
-   int pos=1,posbis;
-   print(TNS);
-   while (i){
-     posbis  = TNS.indexOf(': Chunt',pos);
-     if(posbis == -1){
-       i = false;
-     }else {
-       chunt.add(TNS.substring(pos, posbis));
-       pos = posbis + ': Chunt'.length;
-     }
-     i = true;
-   }
-    while (i){
-      posbis  = TNS.indexOf(': NChunt',pos);
-      if(posbis == -1){
-        i = false;
-      }else {
-        nchunt.add(TNS.substring(pos, posbis));
-        pos = posbis + ': NChunt'.length;
-      }
-    }
-   print(chunt);
-   print(nchunt);
-   pos = TNS.indexOf(': Chunt',pos);
-   print('pos:'+ pos.toString());
-*/
-  }
-
-  Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
-    return ListTile(
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              document['name'],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     getuserinfo();
-    gettns();
-    Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
-        .document(_stufe).collection(auth0.getuebungsdatum())
-        .snapshots();
-
-
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Werchunt'),
+    return new DefaultTabController(
+    length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Wer chunt?'),
+          bottom: TabBar(
+            tabs: <Widget>[
+              Tab(
+                text: 'Chunt',
+              ),
+              Tab(
+                text: 'Chunt nöd',
+              )
+            ],
+          ),
         ),
-        body: StreamBuilder(
-            stream: qsdata,
-            builder: (context, AsyncSnapshot<QuerySnapshot> qsdata) {
-              if (!qsdata.hasData) return Text('Loading data.. Please waint..');
-              return ListView.builder(
-                  itemExtent: 80.0,
-                  itemCount: qsdata.data.documents.length,
-                  itemBuilder: (context, int index) {
-                    final DocumentSnapshot _info = qsdata.data.documents[index];
-                    return new ListTile(
-                      title: new Text(_info['Anmeldename']),
-                      subtitle: new Text(_info['Anmeldung']),
-                    );
-                  }
-
-              );
-            }
-        )
+        body: TabBarView(
+          children: <Widget>[
+            chunt(),
+            chuntnoed()
+          ],
+        ),
+      ),
     );
   }
+ Widget chunt(){
+   getuserinfo();
+   Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
+       .document(_stufe).collection(auth0.getuebungsdatum())
+       .snapshots();
+   return new Scaffold(
+       body: StreamBuilder(
+           stream: qsdata,
+           builder: (context, AsyncSnapshot<QuerySnapshot> qsdata) {
+             if (!qsdata.hasData) return Text('Loading data.. Please waint..');
+             return ListView.builder(
+                 itemExtent: 80.0,
+                 itemCount: qsdata.data.documents.length,
+                 itemBuilder: (context, int index) {
+                   final DocumentSnapshot _info = qsdata.data.documents[index];
+                   if (_info['Anmeldung'] == 'Chunt') {
+                     return new ListTile(
+                         title: new Text(_info['Anmeldename'])
+                     );
+                   }else{
+                     return SizedBox();
 
+                   }
+                 }
+
+             );
+           }
+       )
+   );
+}
+Widget chuntnoed(){
+  getuserinfo();
+  Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
+      .document(_stufe).collection(auth0.getuebungsdatum())
+      .snapshots();
+  return StreamBuilder(
+      stream: qsdata,
+      builder: (context, AsyncSnapshot<QuerySnapshot> qsdata) {
+        if (!qsdata.hasData) return Text('Loading data.. Please waint..');
+        Text('Loadsdafklj');
+        return ListView.builder(
+            itemExtent: 80.0,
+            itemCount: qsdata.data.documents.length,
+            itemBuilder: (context, int index) {
+              final DocumentSnapshot _info = qsdata.data.documents[index];
+              if (_info['Anmeldung'] == 'Chunt nöd') {
+                return new ListTile(
+                    title: new Text(_info['Anmeldename'])
+                );
+              }else{
+                return SizedBox();
+              }
+            }
+        );
+      }
+
+  );
+}
 }
 
-class Chunt extends StatelessWidget{
+class Chunt extends StatelessWidget {
+  Auth auth0 = new Auth();
+  String _pfadiname, _userUID, _stufe;
+  DocumentSnapshot qsuserInfo, dsanmeldedat;
+  Map<String, String> anmeldeDaten;
+  String TNS;
+
+  void getuserinfo() {
+    auth0.getUserInformation().then((results) {
+      qsuserInfo = results;
+      _pfadiname = qsuserInfo.data['Pfadinamen'];
+      _stufe = qsuserInfo.data['Stufe'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
 
-    );
   }
 }
+
+  class Chuntnoed extends StatelessWidget{
+    Auth auth0 = new Auth();
+    String _pfadiname, _userUID, _stufe;
+    DocumentSnapshot qsuserInfo, dsanmeldedat;
+    Map<String, String> anmeldeDaten;
+    String TNS;
+
+    void getuserinfo() {
+      auth0.getUserInformation().then((results) {
+        qsuserInfo = results;
+        _pfadiname = qsuserInfo.data['Pfadinamen'];
+        _stufe = qsuserInfo.data['Stufe'];
+      });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+
+    }
+  }
