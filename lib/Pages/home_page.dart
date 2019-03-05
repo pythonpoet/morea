@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../services/auth.dart';
 import '../services/crud.dart';
 import 'werchunt.dart';
+import '../services/Getteleblitz.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -10,6 +14,7 @@ class HomePage extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback onSigedOut;
   final BasecrudMethods crud;
+
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
@@ -19,9 +24,13 @@ leiter,
   eltern
 }
 class _HomePageState extends State<HomePage> {
+
   crudMedthods crud0bj = new crudMedthods();
   Auth auth0 = new Auth();
+  Teleblitz tlbz = new Teleblitz();
+
   final formKey = new GlobalKey<FormState>();
+
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.teilnemer;
 
@@ -78,6 +87,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     getuserinfo();
     forminit();
+    var futureBuilder = new FutureBuilder(
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting: return new Text('Loading....');
+            case ConnectionState.none: return new Text('Awaitig results');
+            default:
+              if (snapshot.hasError)
+                return new Text('Error:');
+              else
+                return new Text('Result:');
+          }
+        }
+    );
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Teleblitz'),
@@ -87,15 +109,10 @@ class _HomePageState extends State<HomePage> {
           children: Navigation()
         ),
       ),
-      body: new Container(
-        child: new Form(
-            key: formKey,
-          child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: teleblitz() + anmeldebutton()
-           )
-        ),
+      body: Container(
+        child: tlbz.anzeigen(_stufe),
       ),
+
     );
   }
 
@@ -173,11 +190,7 @@ class _HomePageState extends State<HomePage> {
 
   }
 //Hier soll der Teleblitz angezeigt werden
-  List<Widget> teleblitz(){
-    return[
-      new Text('Teleblitz ${qsuserInfo.data['Stufe']}')
-    ];
-  }
+
 
   List<Widget> anmeldebutton(){
     return [
@@ -191,6 +204,6 @@ class _HomePageState extends State<HomePage> {
       ),
     ];
 }
-
 }
+
 

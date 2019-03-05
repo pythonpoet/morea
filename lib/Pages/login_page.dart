@@ -24,7 +24,7 @@ class LoginPage extends StatefulWidget{
     String _email, _pfadinamen, _vorname, _nachname, _stufe,_selectedstufe;
     String _password;
     FormType _formType = FormType.login;
-    List<String> _stufenselect = ['Biber', 'Wölfe', 'Nahnanis','Drason','Pios'];
+    List<String> _stufenselect = ['Biber', 'Wombat (Wölfe)', 'Nahani (Meitli)','Drason (Buebe)','Pios'];
 
     bool validateAndSave() {
       final form = formKey.currentState;

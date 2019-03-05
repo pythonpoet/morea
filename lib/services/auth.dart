@@ -11,6 +11,8 @@ abstract class BaseAuth{
   Future<void> createUserInformation(Map userInfo);
   Future<DocumentSnapshot> getUserInformation();
   Future<String> uebunganmelden(Map anmeldedaten, String stufe, String _userUID);
+  Future<Map> getteleblitz(_stufe);
+  Future<String> ubloadteleblitz(_stufe,data );
 }
 class Auth implements BaseAuth {
 
@@ -71,6 +73,22 @@ class Auth implements BaseAuth {
         print(e);
     });
   }
+  Future<Map> getteleblitz(_stufe) async {
+    String uebungsdatum = getuebungsdatum();
+    await Firestore.instance.collection('Teleblitz').document(_stufe).collection(uebungsdatum).document('spacer').get().then((results){
+      if(results.exists){
+        return results.data;
+      }else{
+        return null;
+      }
+    });
+  }
+  Future<String> ubloadteleblitz(_stufe,data ) async {
+    String uebungsdatum = getuebungsdatum();
+    Firestore.instance.collection('Teleblitz').document(_stufe).collection(uebungsdatum).document('spacer').setData(data).catchError((e){
+      print(e);
+    });
+  }
   Future<DocumentSnapshot> getUserInformation() async {
     String userUID =  await currentUser();
     return await Firestore.instance.collection('user').document(userUID).get();
@@ -80,8 +98,8 @@ class Auth implements BaseAuth {
     var document = await Firestore.instance.document('user/${stufe}/${uebungsdatum}');
     document.get();
     print(document);
-    /*
-    return await Firestore.instance.collection(stufe).document(uebungsdatum).get(); */
+
+    return await Firestore.instance.collection(stufe).document(uebungsdatum).get();
   }
 
   Future<String> currentUser() async {
