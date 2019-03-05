@@ -34,11 +34,15 @@ class _HomePageState extends State<HomePage> {
   void submit(String anabmelden) {
     print(qsuserInfo.data['Pfadinamen']);
     anmeldeDaten = {
-      anabmelden : this.qsuserInfo.data['Pfadinamen']
+      'Anmeldename' : this.qsuserInfo.data['Pfadinamen'],
+      'Anmeldung': anabmelden
     };
-    auth0.uebunganmelden(anmeldeDaten, _stufe,_pfadiname);
+    auth0.uebunganmelden(anmeldeDaten, _stufe,_userUID);
   }
  void getuserinfo(){
+   widget.auth.currentUser().then((userId){
+       _userUID = userId;
+   });
   auth0.getUserInformation().then((results){
   setState(() {
   qsuserInfo = results;
@@ -183,7 +187,7 @@ class _HomePageState extends State<HomePage> {
       ),
       new RaisedButton(
           child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
-          onPressed: () => submit('NChunt')
+          onPressed: () => submit('Chunt nöd')
       ),
     ];
 }

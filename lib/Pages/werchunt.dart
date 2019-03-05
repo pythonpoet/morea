@@ -20,19 +20,18 @@ enum FormType {
 class _WerChuntState extends State<WerChunt> {
   Auth auth0 = new Auth();
   final formKey = new GlobalKey<FormState>();
+
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.teilnemer;
 
-  String _pfadiname,_userUID,_stufe;
+  String _pfadiname, _userUID, _stufe;
   DocumentSnapshot qsuserInfo, dsanmeldedat;
-  Map<String,String> anmeldeDaten;
+  Map<String, String> anmeldeDaten;
   String TNS;
 
 
-
-
-  void getuserinfo(){
-    auth0.getUserInformation().then((results){
+  void getuserinfo() {
+    auth0.getUserInformation().then((results) {
       setState(() {
         qsuserInfo = results;
         _pfadiname = qsuserInfo.data['Pfadinamen'];
@@ -40,14 +39,15 @@ class _WerChuntState extends State<WerChunt> {
       });
     });
   }
-  void gettns(){
+
+  void gettns() {
     List<String> chunt = new List();
     List<String> nchunt = new List();
     /*
   auth0.getTNs(_stufe).then((results){
     dsanmeldedat = results;
     });*/
-  /*
+    /*
    TNS = dsanmeldedat.data.toString();
    bool i = true;
    int pos=1,posbis;
@@ -76,51 +76,63 @@ class _WerChuntState extends State<WerChunt> {
    pos = TNS.indexOf(': Chunt',pos);
    print('pos:'+ pos.toString());
 */
-}
-  Widget _buildListItem(BuildContext context, DocumentSnapshot document){
+  }
+
+  Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     return ListTile(
       title: Row(
         children: [
           Expanded(
             child: Text(
-                document['name'],
+              document['name'],
             ),
           )
         ],
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     getuserinfo();
     gettns();
-    Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung').document(_stufe).collection(auth0.getuebungsdatum()).snapshots();
+    Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
+        .document(_stufe).collection(auth0.getuebungsdatum())
+        .snapshots();
 
 
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Werchunt'),
-      ),
-      body: StreamBuilder(
-        stream: qsdata,
-        builder: (context, qsdata){
-          if(!qsdata.hasData) return Text('Loading data.. Please waint..');
-          return ListView.builder(
-            itemExtent: 80.0,
-            itemCount: snapshot.data.documents.length,
-            itemBuilder: (context, index) =>
-                _buildListItem(context, _b))
-          );
+        appBar: new AppBar(
+          title: new Text('Werchunt'),
+        ),
+        body: StreamBuilder(
+            stream: qsdata,
+            builder: (context, AsyncSnapshot<QuerySnapshot> qsdata) {
+              if (!qsdata.hasData) return Text('Loading data.. Please waint..');
+              return ListView.builder(
+                  itemExtent: 80.0,
+                  itemCount: qsdata.data.documents.length,
+                  itemBuilder: (context, int index) {
+                    final DocumentSnapshot _info = qsdata.data.documents[index];
+                    return new ListTile(
+                      title: new Text(_info['Anmeldename']),
+                      subtitle: new Text(_info['Anmeldung']),
+                    );
+                  }
 
-        }
-      )
+              );
+            }
+        )
     );
   }
 
-  List<Widget>TNanzeigen(){
-    return [
-      new Text(snap)
-    ];
-  }
-  }
+}
 
+class Chunt extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+
+    );
+  }
+}
