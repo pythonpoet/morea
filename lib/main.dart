@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Login',
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple
       ),
       home: new RootPage(auth: new Auth()),
     );

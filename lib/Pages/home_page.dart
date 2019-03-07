@@ -39,12 +39,24 @@ class _HomePageState extends State<HomePage> {
 
 
   void submit(String anabmelden) {
+    String anmeldung;
     print(qsuserInfo.data['Pfadinamen']);
     anmeldeDaten = {
       'Anmeldename' : this.qsuserInfo.data['Pfadinamen'],
       'Anmeldung': anabmelden
     };
+    if(anabmelden == 'Chunt'){
+      anmeldung = 'Du hast dich Angemolden';
+    }else{
+      anmeldung = 'Du hast dich Abgemolden';
+    }
     auth0.uebunganmelden(anmeldeDaten, _stufe,_userUID);
+    showDialog(context: context, child:
+    new AlertDialog(
+      title: new Text("Teleblitz"),
+      content: new Text(anmeldung),
+    )
+    );
   }
  void getuserinfo(){
    widget.auth.currentUser().then((userId){
@@ -88,6 +100,7 @@ class _HomePageState extends State<HomePage> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Teleblitz'),
+        backgroundColor: Color(0xff7a62ff),
       ),
       drawer: new Drawer(
         child: new ListView(
@@ -212,15 +225,24 @@ class _HomePageState extends State<HomePage> {
       Row(
         children: <Widget>[
           Expanded(
-            child: new RaisedButton(
-                child: new Text('Chume',style: new TextStyle(fontSize: 20)),
-                onPressed: () => submit('Chunt')
-            ),
+            child: Container(
+              child: new RaisedButton(
+                  child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
+                  onPressed: () => submit('Chunt nöd'),
+                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                color: Color(0xff7a62ff),
+                textColor: Colors.white,
+              ),
+            )
           ),
           Expanded(
-            child:new RaisedButton(
-                child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
-                onPressed: () => submit('Chunt nöd')
+            child: Container(
+              child: new RaisedButton(
+              child: new Text('Chume',style: new TextStyle(fontSize: 20)),
+              onPressed: () => submit('Chunt'),
+                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                color: Color(0xFFFF9262),
+              ),
             ),
           )
         ],

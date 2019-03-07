@@ -16,15 +16,23 @@ class LoginPage extends StatefulWidget{
    login,
     register
   }
+enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
+enum Platform {isAndroid, isIOS}
 
   class _LoginPageState extends State<LoginPage> {
+    Auth auth0 = new Auth();
 
     final formKey = new GlobalKey<FormState>();
+    final resetkey = new GlobalKey<FormState>();
 
     String _email, _pfadinamen, _vorname, _nachname, _stufe,_selectedstufe;
     String _password;
     FormType _formType = FormType.login;
+    Platform _platform = Platform.isAndroid;
     List<String> _stufenselect = ['Biber', 'Wombat (Wölfe)', 'Nahani (Meitli)','Drason (Buebe)','Pios'];
+    String error;
+
+
 
     bool validateAndSave() {
       final form = formKey.currentState;
@@ -37,6 +45,7 @@ class LoginPage extends StatefulWidget{
     }
 
     void validateAndSubmit() async {
+      Platform.isAndroid;
       if (validateAndSave()) {
         try {
           if (_formType == FormType.login) {
@@ -52,7 +61,76 @@ class LoginPage extends StatefulWidget{
           widget.onSignedIn();
         }
         catch (e) {
-          print('Error: $e');
+          print('$e');
+          authProblems errorType;
+          if (_platform == Platform.isAndroid ) {
+            switch (e.message) {
+              case 'There is no user record corresponding to this identifier. The user may have been deleted.':
+                errorType = authProblems.UserNotFound;
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Login"),
+                  content: new Text('Du bist noch nicht registriert'),
+                )
+                );
+                break;
+              case 'The password is invalid or the user does not have a password.':
+                errorType = authProblems.PasswordNotValid;
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Login"),
+                  content: new Text('Falsches Passwort'),
+                )
+                );
+                break;
+              case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
+                errorType = authProblems.NetworkError;
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Login"),
+                  content: new Text('Keine Internet Verbindung'),
+                )
+                );
+                break;
+            // ...
+              default:
+                print('Case ${e.message} is not jet implemented');
+            }
+          } else if (_platform ==Platform.isIOS) {
+            switch (e.code) {
+              case 'Error 17011':
+                errorType = authProblems.UserNotFound;
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Login"),
+                  content: new Text('Du bist noch nicht registriert'),
+                )
+                );
+                break;
+              case 'Error 17009':
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Login"),
+                  content: new Text('Falsches Passwort'),
+                )
+                );
+                errorType = authProblems.PasswordNotValid;
+                break;
+              case 'Error 17020':
+                errorType = authProblems.NetworkError;
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Login"),
+                  content: new Text('Keine Internet Verbindung'),
+                )
+                );
+                break;
+            // ...
+              default:
+                print('Case ${e.message} is not jet implemented');
+            }
+          }
+          print('The error is $errorType');
         }
       }
     }
@@ -67,6 +145,49 @@ class LoginPage extends StatefulWidget{
       setState(() {
         _formType = FormType.login;
       });
+    }
+    void passwortreset()async{
+     await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => new AlertDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          content: new Row(
+            children: <Widget>[
+              new Expanded(
+                child: new TextField(
+                  autofocus: true,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: new InputDecoration(
+                      labelText: 'Passwort zurücksetzen',
+                      hintText: 'z.B. maxi@stinkt.undso',
+                  ),
+                  onChanged: (String value){
+                    this._email = value;
+                  },
+                ),
+              )
+            ],
+          ),
+          actions: <Widget>[
+            new FlatButton(
+                child: const Text('CANCEL'),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            new FlatButton(
+                child: const Text('Zurücksetzen'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  showDialog(context: context, child:
+                  new AlertDialog(
+                    title: new Text('Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
+                  )
+                  );
+                    auth0.sendPasswordResetEmail(_email);
+                })
+          ],
+        ),
+      );
     }
 
     Map mapUserData(){
@@ -84,7 +205,7 @@ class LoginPage extends StatefulWidget{
       // TODO: implement build
       return new Scaffold(
           appBar: new AppBar(
-            title: new Text('Flutter login demo'),
+            title: new Text('Pfadi Morea'),
           ),
           body: new SingleChildScrollView(
             child: new Form(
@@ -103,7 +224,7 @@ class LoginPage extends StatefulWidget{
         return [
           new TextFormField(
             decoration: new InputDecoration(labelText: 'Email'),
-            validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
+            validator: (value) => value.isEmpty ? 'Email darf nicht leer sein' : null,
             keyboardType: TextInputType.emailAddress,
             onSaved: (value) => _email = value,
           ),
@@ -111,17 +232,19 @@ class LoginPage extends StatefulWidget{
             decoration: new InputDecoration(labelText: 'Password'),
             validator: (value) =>
             value.isEmpty
-                ? 'Password can\'t be empty'
+                ? 'Passwort darf nicht leer sein'
                 : null,
             obscureText: true,
             onSaved: (value) => _password = value,
+
           ),
+
         ];
       }else{
         return[
           new TextFormField(
             decoration: new InputDecoration(labelText: 'Email'),
-            validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
+            validator: (value) => value.isEmpty ? 'Email darf nicht leer sein' : null,
             keyboardType: TextInputType.emailAddress,
             onSaved: (value) => _email = value,
           ),
@@ -129,17 +252,13 @@ class LoginPage extends StatefulWidget{
             decoration: new InputDecoration(labelText: 'Password'),
             validator: (value) =>
             value.isEmpty
-                ? 'Password can\'t be empty'
+                ? 'Passwort darf nicht leer sein'
                 : null,
             obscureText: true,
             onSaved: (value) => _password = value,
           ),
           new TextFormField(
             decoration: new InputDecoration(labelText: 'Pfadinamen'),
-            validator: (value) =>
-            value.isEmpty
-                ? 'Pfadinamen can\'t be empty'
-                : null,
             keyboardType: TextInputType.text,
             onSaved: (value) => _pfadinamen = value,
           ),
@@ -147,7 +266,7 @@ class LoginPage extends StatefulWidget{
             decoration: new InputDecoration(labelText: 'Vorname'),
             validator: (value) =>
             value.isEmpty
-                ? 'Pfadinamen can\'t be empty'
+                ? 'Vornamen darf nicht leer sein'
                 : null,
             keyboardType: TextInputType.text,
             onSaved: (value) => _vorname = value,
@@ -156,7 +275,7 @@ class LoginPage extends StatefulWidget{
             decoration: new InputDecoration(labelText: 'Nachname'),
             validator: (value) =>
             value.isEmpty
-                ? 'Pfadinamen can\'t be empty'
+                ? 'Nachname darf nicht leer sein'
                 : null,
             keyboardType: TextInputType.text,
             onSaved: (value) => _nachname = value,
@@ -186,7 +305,10 @@ class LoginPage extends StatefulWidget{
           ),
           new FlatButton(
             child: new Text('Create an account', style: new TextStyle(fontSize: 20),),
-            onPressed: moveToRegister,)
+            onPressed: moveToRegister,),
+          new FlatButton(
+            child: new Text('Passwort vergessen?', style: new TextStyle(fontSize: 15),),
+            onPressed: passwortreset,)
         ];
       }else{
         return[
@@ -196,7 +318,7 @@ class LoginPage extends StatefulWidget{
           ),
           new FlatButton(
             child: new Text('have an account?', style: new TextStyle(fontSize: 20),),
-            onPressed: moveToLogin,)
+            onPressed: moveToLogin,),
         ];
       }
 

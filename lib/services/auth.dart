@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 abstract class BaseAuth{
   Future<String> signInWithEmailAndPassword(String email, String password);
   Future<String> createUserWithEmailAndPassword(String email, String password);
+  Future<void> sendPasswordResetEmail(String email);
   Future<String> currentUser();
   Future<void> signOut();
   Future<void> createUserInformation(Map userInfo);
@@ -62,6 +63,9 @@ class Auth implements BaseAuth {
   Future<String> createUserWithEmailAndPassword(String email, String password) async {
     FirebaseUser user = await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
     return user.uid;
+  }
+  Future<void> sendPasswordResetEmail(String email) async {
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
   Future<void> createUserInformation(Map userInfo) async {
     String userUID =  await currentUser();
