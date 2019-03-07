@@ -11,9 +11,11 @@ abstract class BaseAuth{
   Future<void> createUserInformation(Map userInfo);
   Future<DocumentSnapshot> getUserInformation();
   Future<String> uebunganmelden(Map anmeldedaten, String stufe, String _userUID);
-  Future<Map> getteleblitz(_stufe);
+  Future<DocumentSnapshot> getteleblitz(_stufe);
   Future<String> ubloadteleblitz(_stufe,data );
+  Future<bool> refreshteleblitz();
 }
+
 class Auth implements BaseAuth {
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -73,22 +75,39 @@ class Auth implements BaseAuth {
         print(e);
     });
   }
-  Future<Map> getteleblitz(_stufe) async {
-    String uebungsdatum = getuebungsdatum();
-    await Firestore.instance.collection('Teleblitz').document(_stufe).collection(uebungsdatum).document('spacer').get().then((results){
-      if(results.exists){
-        return results.data;
-      }else{
-        return null;
-      }
-    });
-  }
+
   Future<String> ubloadteleblitz(_stufe,data ) async {
     String uebungsdatum = getuebungsdatum();
-    Firestore.instance.collection('Teleblitz').document(_stufe).collection(uebungsdatum).document('spacer').setData(data).catchError((e){
+    Firestore.instance.collection('Teleblitz').document(uebungsdatum).setData(data).catchError((e){
       print(e);
     });
   }
+  Future<DocumentSnapshot> getteleblitz(_stufe) async {
+    String uebungsdatum = getuebungsdatum();
+    return await Firestore.instance.collection('Teleblitz').document(_stufe).collection(uebungsdatum).document('spacer').get();
+  }
+
+  Future<bool> refreshteleblitz() async {
+
+    var timenow = DateTime.now();
+    String uebungsdatum = getuebungsdatum();
+    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('overview').get();
+    DateTime letztesaktdat = DateTime.parse(aktdat.data['Letztesaktualisierungsdatum']);
+    //Aktuallisirungszeit festlegen
+    if(timenow.difference(letztesaktdat).inMinutes> 14){
+      Map<String,String> uploadakdat ={
+        'Letztesaktualisierungsdatum': timenow.toIso8601String()
+      };
+      print('aktuelisiert');
+      await Firestore.instance.collection('Teleblitz').document('overview').setData(uploadakdat).catchError((e){
+        print(e);
+      });
+      return true;
+    }
+
+    return false;
+  }
+
   Future<DocumentSnapshot> getUserInformation() async {
     String userUID =  await currentUser();
     return await Firestore.instance.collection('user').document(userUID).get();

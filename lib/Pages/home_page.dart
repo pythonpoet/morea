@@ -4,9 +4,7 @@ import '../services/auth.dart';
 import '../services/crud.dart';
 import 'werchunt.dart';
 import '../services/Getteleblitz.dart';
-import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -34,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.teilnemer;
 
-  String _pfadiname,_userUID,_stufe;
+  String _pfadiname = ' ',_userUID = ' ',_stufe = ' ';
   DocumentSnapshot qsuserInfo;
   Map<String,String> anmeldeDaten;
 
@@ -87,19 +85,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     getuserinfo();
     forminit();
-    var futureBuilder = new FutureBuilder(
-        builder: (BuildContext context, AsyncSnapshot snapshot){
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting: return new Text('Loading....');
-            case ConnectionState.none: return new Text('Awaitig results');
-            default:
-              if (snapshot.hasError)
-                return new Text('Error:');
-              else
-                return new Text('Result:');
-          }
-        }
-    );
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Teleblitz'),
@@ -109,10 +94,20 @@ class _HomePageState extends State<HomePage> {
           children: Navigation()
         ),
       ),
-      body: Container(
-        child: tlbz.anzeigen(_stufe),
-      ),
-
+      body:Column(
+        children: <Widget>[
+          Expanded(
+            flex: 8,
+            child: tlbz.anzeigen(_stufe),
+          ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              children: anmeldebutton(),
+            ),
+          )
+        ],
+      )
     );
   }
 
