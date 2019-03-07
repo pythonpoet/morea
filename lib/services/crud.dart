@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:morea/services/auth.dart';
 
 abstract class BasecrudMethods{
-
   Future<QuerySnapshot> getData(String dateipfad );
 }
 class crudMedthods implements BasecrudMethods {

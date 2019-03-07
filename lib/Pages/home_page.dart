@@ -98,7 +98,27 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Expanded(
             flex: 8,
-            child: tlbz.anzeigen(_stufe),
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints viewportConstraints){
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: viewportConstraints.maxHeight,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                       Container(
+                         height: 500,
+                         child: tlbz.anzeigen(_stufe),
+                       )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            )
           ),
           Expanded(
             flex: 2,
@@ -189,14 +209,22 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> anmeldebutton(){
     return [
-      new RaisedButton(
-          child: new Text('Chume',style: new TextStyle(fontSize: 20)),
-          onPressed: () => submit('Chunt')
-      ),
-      new RaisedButton(
-          child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
-          onPressed: () => submit('Chunt nöd')
-      ),
+      Row(
+        children: <Widget>[
+          Expanded(
+            child: new RaisedButton(
+                child: new Text('Chume',style: new TextStyle(fontSize: 20)),
+                onPressed: () => submit('Chunt')
+            ),
+          ),
+          Expanded(
+            child:new RaisedButton(
+                child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
+                onPressed: () => submit('Chunt nöd')
+            ),
+          )
+        ],
+      )
     ];
 }
 }
