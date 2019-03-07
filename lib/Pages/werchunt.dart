@@ -12,22 +12,15 @@ class WerChunt extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _WerChuntState();
 }
-enum FormType {
-  leiter,
-  teilnemer,
-  eltern
-}
+
 class _WerChuntState extends State<WerChunt> {
   Auth auth0 = new Auth();
   final formKey = new GlobalKey<FormState>();
 
-  //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
-  FormType _formType = FormType.teilnemer;
 
   String _pfadiname, _userUID, _stufe;
   DocumentSnapshot qsuserInfo, dsanmeldedat;
   Map<String, String> anmeldeDaten;
-  String TNS;
 
 
   void getuserinfo() {

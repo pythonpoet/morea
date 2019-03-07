@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: new Drawer(
         child: new ListView(
-          children: Navigation()
+          children: navigation()
         ),
       ),
       body:Column(
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<Widget> Navigation(){
+  List<Widget> navigation(){
     if(_formType == FormType.leiter){
       return [
         new UserAccountsDrawerHeader(
