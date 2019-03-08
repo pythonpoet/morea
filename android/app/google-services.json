@@ -1,58 +1,27 @@
 {
   "project_info": {
-    "project_number": "589956422664",
-    "firebase_url": "https://flutter-test-f0fab.firebaseio.com",
-    "project_id": "flutter-test-f0fab",
-    "storage_bucket": "flutter-test-f0fab.appspot.com"
+    "project_number": "1015173140187",
+    "firebase_url": "https://pfadi-morea-fa354.firebaseio.com",
+    "project_id": "pfadi-morea-fa354",
+    "storage_bucket": "pfadi-morea-fa354.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:589956422664:android:42027965f73bdde1",
-        "android_client_info": {
-          "package_name": "ch.morea.more"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "589956422664-i9kmqu1vt002is7pqt5qmvf4dn1fub1s.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCtYQ01GKjiQ9WoxX7-BjX06Ui-eSNKWk0"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:589956422664:android:4993eb8c17b8d3ae",
+        "mobilesdk_app_id": "1:1015173140187:android:4993eb8c17b8d3ae",
         "android_client_info": {
           "package_name": "ch.morea.morea"
         }
       },
       "oauth_client": [
         {
-          "client_id": "589956422664-i9kmqu1vt002is7pqt5qmvf4dn1fub1s.apps.googleusercontent.com",
+          "client_id": "1015173140187-puqfkoog6j891rci5qr0rtljc3hfc01d.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCtYQ01GKjiQ9WoxX7-BjX06Ui-eSNKWk0"
+          "current_key": "AIzaSyCJSh9nTShvpyFecH9vHfrlo9g9YyKLzKc"
         }
       ],
       "services": {
