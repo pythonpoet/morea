@@ -69,6 +69,10 @@ class _HomePageState extends State<HomePage> {
   try {
     _pfadiname = qsuserInfo.data['Pfadinamen'];
     _stufe = qsuserInfo.data['Stufe'];
+
+    if(_pfadiname == ' '){
+      _pfadiname = qsuserInfo.data['Vorname'];
+    }
   }catch(e){
     print(e);
   }

@@ -25,8 +25,8 @@ enum Platform {isAndroid, isIOS}
     final formKey = new GlobalKey<FormState>();
     final resetkey = new GlobalKey<FormState>();
 
-    String _email, _pfadinamen, _vorname, _nachname, _stufe,_selectedstufe;
-    String _password;
+    String _email, _pfadinamen, _vorname, _nachname, _stufe,_selectedstufe= 'Stufe wählen';
+    String _password,_adresse,_ort,_plz,_handynummer, _passwordneu;
     FormType _formType = FormType.login;
     Platform _platform = Platform.isAndroid;
     List<String> _stufenselect = ['Biber', 'Wombat (Wölfe)', 'Nahani (Meitli)','Drason (Buebe)','Pios'];
@@ -52,13 +52,27 @@ enum Platform {isAndroid, isIOS}
             String userId = await widget.auth.signInWithEmailAndPassword(
                 _email, _password);
             print('Sign in: ${userId}');
+            widget.onSignedIn();
           } else {
-            String userId = await widget.auth.createUserWithEmailAndPassword(
-                _email, _password);
-            print('Registered user: ${userId}');
-            widget.auth.createUserInformation(mapUserData());
+            if(_password == _passwordneu){
+              String userId = await widget.auth.createUserWithEmailAndPassword(
+                  _email, _password);
+              print('Registered user: ${userId}');
+              if(userId != null){
+                widget.auth.createUserInformation(mapUserData());
+                widget.onSignedIn();
+              }
+
+            }else{
+              showDialog(context: context, child:
+              new AlertDialog(
+                title: new Text("Passwörter sind nicht identisch"),
+                )
+              );
+            }
+
           }
-          widget.onSignedIn();
+
         }
         catch (e) {
           print('$e');
@@ -195,7 +209,11 @@ enum Platform {isAndroid, isIOS}
         'Pfadinamen': this._pfadinamen,
         'Vorname': this._vorname,
         'Nachname': this._nachname,
-        'Stufe': this._selectedstufe
+        'Stufe': this._selectedstufe,
+        'Adresse': this._adresse,
+        'PLZ': this._plz,
+        'Ort': this._ort,
+        'Handynummer': this._handynummer,
       };
       return userInfo;
     }
@@ -243,21 +261,6 @@ enum Platform {isAndroid, isIOS}
       }else{
         return[
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Email'),
-            validator: (value) => value.isEmpty ? 'Email darf nicht leer sein' : null,
-            keyboardType: TextInputType.emailAddress,
-            onSaved: (value) => _email = value,
-          ),
-          new TextFormField(
-            decoration: new InputDecoration(labelText: 'Password'),
-            validator: (value) =>
-            value.isEmpty
-                ? 'Passwort darf nicht leer sein'
-                : null,
-            obscureText: true,
-            onSaved: (value) => _password = value,
-          ),
-          new TextFormField(
             decoration: new InputDecoration(labelText: 'Pfadinamen'),
             keyboardType: TextInputType.text,
             onSaved: (value) => _pfadinamen = value,
@@ -287,11 +290,67 @@ enum Platform {isAndroid, isIOS}
                   child: new Text(val),
                 );
               }).toList(),
-              hint: Text('Stufe wählen'),
+              hint: Text(_selectedstufe),
               onChanged: (newVal) {
                 _selectedstufe = newVal;
                 this.setState(() {});
-              })
+              }),
+          new TextFormField(
+            decoration: new InputDecoration(labelText: 'Adresse'),
+            keyboardType: TextInputType.text,
+            onSaved: (value) => _adresse = value,
+          ),
+          new Row(
+            children: <Widget>[
+              Expanded(
+                child: new TextFormField(
+                decoration: new InputDecoration(labelText: 'PLZ'),
+                keyboardType: TextInputType.text,
+                onSaved: (value) => _plz = value,
+              )
+              ),
+              Expanded(
+                child: new TextFormField(
+                decoration: new InputDecoration(labelText: 'Ort'),
+                keyboardType: TextInputType.text,
+                onSaved: (value) => _ort = value,
+              ),
+              ),
+            ],
+          ),
+          new TextFormField(
+            decoration: new InputDecoration(labelText: 'Handy nummer'),
+            validator: (value) =>
+            value.isEmpty
+                ? 'Handynummer darf nicht leer sein'
+                : null,
+            keyboardType: TextInputType.phone,
+            onSaved: (value) => _handynummer = value,
+          ),
+          new TextFormField(
+            decoration: new InputDecoration(labelText: 'Email'),
+            validator: (value) => value.isEmpty ? 'Email darf nicht leer sein' : null,
+            keyboardType: TextInputType.emailAddress,
+            onSaved: (value) => _email = value,
+          ),
+          new TextFormField(
+            decoration: new InputDecoration(labelText: 'Password'),
+            validator: (value) =>
+            value.isEmpty
+                ? 'Passwort darf nicht leer sein'
+                : null,
+            obscureText: true,
+            onSaved: (value) => _password = value,
+          ),
+          new TextFormField(
+            decoration: new InputDecoration(labelText: 'Password erneut eingeben'),
+            validator: (value) =>
+            value.isEmpty
+                ? 'Passwort darf nicht leer sein'
+                : null,
+            obscureText: true,
+            onSaved: (value) => _passwordneu = value,
+          ),
 
         ];
       }
