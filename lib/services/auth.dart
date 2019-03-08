@@ -12,9 +12,9 @@ abstract class BaseAuth{
   Future<void> createUserInformation(Map userInfo);
   Future<DocumentSnapshot> getUserInformation();
   Future uebunganmelden(Map anmeldedaten, String stufe, String _userUID);
-  Future<DocumentSnapshot> getteleblitz();
-  Future ubloadteleblitz(data );
-  Future<bool> refreshteleblitz();
+  Future<DocumentSnapshot> getteleblitz(stufe);
+  Future ubloadteleblitz(data,stufe );
+  Future<bool> refreshteleblitz(stufe);
 }
 
 class Auth implements BaseAuth {
@@ -81,36 +81,40 @@ class Auth implements BaseAuth {
 
   }
 
-  Future ubloadteleblitz(data) async {
+  Future ubloadteleblitz(data,stufe) async {
     Map<String,String> akteleblitz= {
-      'Aktueller Teleblitz':data['items'][0]['datum'].toString().replaceAll('Samstag, ', '')
+      'Aktueller Teleblitz':data['datum'].toString().replaceAll('Samstag, ', '')
     };
-    Firestore.instance.collection('Teleblitz').document('overview').collection('Teleblitze').document(akteleblitz['Aktueller Teleblitz']).setData(data).catchError((e){
+    Firestore.instance.collection('Teleblitz').document('overview').collection(stufe).document(akteleblitz['Aktueller Teleblitz']).setData(data).catchError((e){
       print(e);
     });
-     Firestore.instance.collection('Teleblitz').document('overview').collection('info').document('Aktueller Teleblitz').setData(akteleblitz).catchError((e){
+     Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Aktueller Teleblitz').setData(akteleblitz).catchError((e){
       print(e);
     });
 
   }
-  Future<DocumentSnapshot> getteleblitz() async {
-    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('overview').collection('info').document('Aktueller Teleblitz').get();
-    return await Firestore.instance.collection('Teleblitz').document('overview').collection('Teleblitze').document((aktdat.data['Aktueller Teleblitz']).toString()).get();
+  Future<DocumentSnapshot> getteleblitz(stufe) async {
+    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Aktueller Teleblitz').get();
+    return await Firestore.instance.collection('Teleblitz').document('overview').collection(stufe).document((aktdat.data['Aktueller Teleblitz']).toString()).get();
   }
 
-  Future<bool> refreshteleblitz() async {
-
+  Future<bool> refreshteleblitz(stufe) async {
+    DateTime letztesaktdat;
     var timenow = DateTime.now();
+    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Teleblitzaktualisiert').get();
 
-    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('overview').collection('info').document('Teleblitzaktualisiert').get();
-    DateTime letztesaktdat = DateTime.parse(aktdat.data['Letztesaktualisierungsdatum']);
-    //Aktuallisirungszeit festlegen
+    if(aktdat.data != null) {
+       letztesaktdat = DateTime.parse(aktdat.data['Letztesaktualisierungsdatum']);
+      //Aktuallisirungszeit festlegen
+    }else{
+        letztesaktdat = DateTime.parse('2019-03-07T13:30:16.388642');
+    }
     if(timenow.difference(letztesaktdat).inMinutes> 1){
       Map<String,String> uploadakdat ={
         'Letztesaktualisierungsdatum': timenow.toIso8601String()
       };
       print('aktuelisiert');
-      await Firestore.instance.collection('Teleblitz').document('overview').collection('info').document('Teleblitzaktualisiert').setData(uploadakdat).catchError((e){
+      await Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Teleblitzaktualisiert').setData(uploadakdat).catchError((e){
         print(e);
       });
       return true;

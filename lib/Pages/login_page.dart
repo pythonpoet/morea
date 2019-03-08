@@ -25,7 +25,7 @@ enum Platform {isAndroid, isIOS}
     final formKey = new GlobalKey<FormState>();
     final resetkey = new GlobalKey<FormState>();
 
-    String _email, _pfadinamen, _vorname, _nachname, _stufe,_selectedstufe= 'Stufe wählen';
+    String _email, _pfadinamen = ' ', _vorname, _nachname, _stufe,_selectedstufe= 'Stufe wählen';
     String _password,_adresse,_ort,_plz,_handynummer, _passwordneu;
     FormType _formType = FormType.login;
     Platform _platform = Platform.isAndroid;
@@ -55,12 +55,21 @@ enum Platform {isAndroid, isIOS}
             widget.onSignedIn();
           } else {
             if(_password == _passwordneu){
-              String userId = await widget.auth.createUserWithEmailAndPassword(
-                  _email, _password);
-              print('Registered user: ${userId}');
-              if(userId != null){
-                widget.auth.createUserInformation(mapUserData());
-                widget.onSignedIn();
+              if(_selectedstufe != 'Stufe wählen') {
+                String userId = await widget.auth
+                    .createUserWithEmailAndPassword(
+                    _email, _password);
+                print('Registered user: ${userId}');
+                if (userId != null) {
+                  widget.auth.createUserInformation(mapUserData());
+                  widget.onSignedIn();
+                }
+              }else{
+                showDialog(context: context, child:
+                new AlertDialog(
+                  title: new Text("Bitte eine Stufe wählen!"),
+                )
+                );
               }
 
             }else{
@@ -214,6 +223,7 @@ enum Platform {isAndroid, isIOS}
         'PLZ': this._plz,
         'Ort': this._ort,
         'Handynummer': this._handynummer,
+        'Pos': 'Teilnehmer',
       };
       return userInfo;
     }
@@ -261,12 +271,21 @@ enum Platform {isAndroid, isIOS}
       }else{
         return[
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Pfadinamen'),
-            keyboardType: TextInputType.text,
+            decoration: new InputDecoration(
+              border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.perm_identity),
+                labelText: 'Pfadinamen',
+
+            ),
             onSaved: (value) => _pfadinamen = value,
           ),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Vorname'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.person),
+                labelText: 'Vorname'),
             validator: (value) =>
             value.isEmpty
                 ? 'Vornamen darf nicht leer sein'
@@ -275,7 +294,11 @@ enum Platform {isAndroid, isIOS}
             onSaved: (value) => _vorname = value,
           ),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Nachname'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.person),
+                labelText: 'Nachname'),
             validator: (value) =>
             value.isEmpty
                 ? 'Nachname darf nicht leer sein'
@@ -288,6 +311,7 @@ enum Platform {isAndroid, isIOS}
                 return new DropdownMenuItem<String>(
                   value: val,
                   child: new Text(val),
+
                 );
               }).toList(),
               hint: Text(_selectedstufe),
@@ -296,7 +320,11 @@ enum Platform {isAndroid, isIOS}
                 this.setState(() {});
               }),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Adresse'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.home),
+                labelText: 'Adresse'),
             keyboardType: TextInputType.text,
             onSaved: (value) => _adresse = value,
           ),
@@ -304,14 +332,21 @@ enum Platform {isAndroid, isIOS}
             children: <Widget>[
               Expanded(
                 child: new TextFormField(
-                decoration: new InputDecoration(labelText: 'PLZ'),
+                decoration: new InputDecoration(
+                    border: UnderlineInputBorder(),
+                    filled: true,
+                    icon: Icon(Icons.home),
+                    labelText: 'PLZ'),
                 keyboardType: TextInputType.text,
                 onSaved: (value) => _plz = value,
               )
               ),
               Expanded(
                 child: new TextFormField(
-                decoration: new InputDecoration(labelText: 'Ort'),
+                decoration: new InputDecoration(
+                    border: UnderlineInputBorder(),
+                    filled: true,
+                    labelText: 'Ort'),
                 keyboardType: TextInputType.text,
                 onSaved: (value) => _ort = value,
               ),
@@ -319,7 +354,11 @@ enum Platform {isAndroid, isIOS}
             ],
           ),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Handy nummer'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.phone),
+                labelText: 'Handy nummer'),
             validator: (value) =>
             value.isEmpty
                 ? 'Handynummer darf nicht leer sein'
@@ -328,13 +367,21 @@ enum Platform {isAndroid, isIOS}
             onSaved: (value) => _handynummer = value,
           ),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Email'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.email),
+                labelText: 'Email'),
             validator: (value) => value.isEmpty ? 'Email darf nicht leer sein' : null,
             keyboardType: TextInputType.emailAddress,
             onSaved: (value) => _email = value,
           ),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Password'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.vpn_key),
+                labelText: 'Password'),
             validator: (value) =>
             value.isEmpty
                 ? 'Passwort darf nicht leer sein'
@@ -343,7 +390,11 @@ enum Platform {isAndroid, isIOS}
             onSaved: (value) => _password = value,
           ),
           new TextFormField(
-            decoration: new InputDecoration(labelText: 'Password erneut eingeben'),
+            decoration: new InputDecoration(
+                border: UnderlineInputBorder(),
+                filled: true,
+                icon: Icon(Icons.vpn_key),
+                labelText: 'Password erneut eingeben'),
             validator: (value) =>
             value.isEmpty
                 ? 'Passwort darf nicht leer sein'
