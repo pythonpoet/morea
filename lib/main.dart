@@ -12,12 +12,12 @@ import 'services/auth.dart';
 
 Future<void> main() async {
   final FirebaseApp app = await FirebaseApp.configure(
-    name: 'Flutter test',
+    name: 'Pfadi Morea',
     options: const FirebaseOptions(
-      googleAppID: '1:79601577497:ios:5f2bcc6ba8cecddd',
-      gcmSenderID: '79601577497',
-      apiKey: 'AIzaSyDneqUcfj79l738jmYi5dlz6nqvug7rUyQ ',
-      projectID: 'flutter-test-f0fab',
+      googleAppID: '1:1015173140187:android:4993eb8c17b8d3ae',
+      gcmSenderID: '1015173140187',
+      apiKey: 'AIzaSyCJSh9nTShvpyFecH9vHfrlo9g9YyKLzKc',
+      projectID: 'pfadi-morea-fa354',
     ),
   );
   final Firestore firestore = Firestore(app: app);

@@ -4,6 +4,8 @@ import '../services/auth.dart';
 import '../services/crud.dart';
 import 'werchunt.dart';
 import '../services/Getteleblitz.dart';
+import 'events_page.dart';
+import 'profile_page.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -18,7 +20,7 @@ class HomePage extends StatefulWidget {
 }
 enum FormType {
 leiter,
-  teilnemer,
+  teilnehmer,
   eltern
 }
 class _HomePageState extends State<HomePage> {
@@ -30,9 +32,9 @@ class _HomePageState extends State<HomePage> {
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
-  FormType _formType = FormType.teilnemer;
+  FormType _formType = FormType.teilnehmer;
 
-  String _pfadiname = ' ',_userUID = ' ',_stufe = ' ';
+  String _pfadiname = ' ',_userUID = ' ',_stufe = ' ', _email=' ';
   DocumentSnapshot qsuserInfo;
   Map<String,String> anmeldeDaten;
 
@@ -58,17 +60,20 @@ class _HomePageState extends State<HomePage> {
     )
     );
   }
- void getuserinfo(){
+ void getuserinfo()async{
    widget.auth.currentUser().then((userId){
        _userUID = userId;
    });
-  auth0.getUserInformation().then((results){
+  await auth0.getUserInformation().then((results)async{
   setState(() {
   qsuserInfo = results;
   });
-  try {
+  try{
     _pfadiname = qsuserInfo.data['Pfadinamen'];
     _stufe = qsuserInfo.data['Stufe'];
+    await auth0.userEmail().then((onValue){
+      _email = onValue;
+    });
 
     if(_pfadiname == ' '){
       _pfadiname = qsuserInfo.data['Vorname'];
@@ -153,17 +158,13 @@ class _HomePageState extends State<HomePage> {
       return [
         new UserAccountsDrawerHeader(
           accountName: new Text(_pfadiname),
-          accountEmail: new Text('jarvis@morea.ch'),
+          accountEmail: new Text(_email),
           decoration: new BoxDecoration(
               image: new DecorationImage(
                   fit: BoxFit.fill,
                   image: new NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA')
               )
           ),
-        ),
-        new ListTile(
-          title: new Text('Teleblitz'),
-          trailing: new Icon(Icons.flash_on),
         ),
         new ListTile(
           title: new Text('Wer chunt?'),
@@ -173,10 +174,12 @@ class _HomePageState extends State<HomePage> {
         new ListTile(
           title: new Text('Events'),
           trailing: new Icon(Icons.event),
+            onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new EventState()))
         ),
         new ListTile(
           title: new Text('Profil'),
           trailing: new Icon(Icons.person),
+            onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new ProfilePage()))
         ),
         new Divider(),
         new ListTile(
@@ -190,7 +193,7 @@ class _HomePageState extends State<HomePage> {
         return[
         new UserAccountsDrawerHeader(
           accountName: new Text(_pfadiname),
-          accountEmail: new Text('jarvis@morea.ch'),
+          accountEmail: new Text(_email),
           decoration: new BoxDecoration(
               image: new DecorationImage(
                   fit: BoxFit.fill,
@@ -199,16 +202,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       new ListTile(
-      title: new Text('Teleblitz'),
-      trailing: new Icon(Icons.flash_on),
-      ),
-      new ListTile(
       title: new Text('Events'),
       trailing: new Icon(Icons.event),
+          onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new EventState()))
       ),
       new ListTile(
       title: new Text('Profil'),
       trailing: new Icon(Icons.person),
+          onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new ProfilePage()))
       ),
       new Divider(),
       new ListTile(
@@ -226,30 +227,34 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> anmeldebutton(){
     return [
-      Row(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              child: new RaisedButton(
-                  child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
-                  onPressed: () => submit('Chunt nöd'),
+      Container(
+        padding: EdgeInsets.all(20),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+                child: Container(
+                  child: new RaisedButton(
+                    child: new Text('Chume nöd',style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit('Chunt nöd'),
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+
+
+                  ),
+                )
+            ),
+            Expanded(
+              child: Container(
+                child: new RaisedButton(
+                  child: new Text('Chume',style: new TextStyle(fontSize: 20)),
+                  onPressed: () => submit('Chunt'),
                   shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                  color: Color(0xff7a62ff),
+                  textColor: Colors.white,
+                ),
               ),
             )
-          ),
-          Expanded(
-            child: Container(
-              child: new RaisedButton(
-              child: new Text('Chume',style: new TextStyle(fontSize: 20)),
-              onPressed: () => submit('Chunt'),
-                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xFFFF9262),
-              ),
-            ),
-          )
-        ],
+          ],
+        )
       )
     ];
 }

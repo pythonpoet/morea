@@ -24,6 +24,10 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply from: "C:/Users/davidw/flutter_windows_v1.0.0-stable/flutter/packages/flutter_tools/gradle/flutter.gradle"
 
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreproperties = new Properties()
+keystoreproperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     compileSdkVersion 27
 
@@ -40,6 +44,15 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+    }
+
+    signingConfigs{
+        release{
+            keyAlias keystoreproperties['keyAlias']
+            keyPassword keystoreproperties['keyPassword']
+            storeFile file(keystoreproperties['storeFile'])
+            storePassword keystoreproperties['storePassword']
+        }
     }
 
     buildTypes {
