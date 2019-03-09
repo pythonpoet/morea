@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/auth.dart';
 import '../services/crud.dart';
 import 'werchunt.dart';
-import '../services/Getteleblitz.dart';
+import 'change_tb.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -25,7 +25,6 @@ class _HomePageState extends State<HomePage> {
 
   crudMedthods crud0bj = new crudMedthods();
   Auth auth0 = new Auth();
-  Teleblitz tlbz = new Teleblitz();
 
   final formKey = new GlobalKey<FormState>();
 
@@ -128,7 +127,6 @@ class _HomePageState extends State<HomePage> {
                       children: <Widget>[
                        Container(
                          height: 500,
-                         child: tlbz.anzeigen(_stufe),
                        )
                       ],
                     ),
@@ -210,6 +208,11 @@ class _HomePageState extends State<HomePage> {
       title: new Text('Profil'),
       trailing: new Icon(Icons.person),
       ),
+        new ListTile(
+          title: new Text('Test'),
+          trailing: new Icon(Icons.flash_on),
+            onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new ChangeTB()))
+        ),
       new Divider(),
       new ListTile(
       title: new Text('Logout'),
