@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                        Container(
-                         height: 500,
+                         height: 600,
                          child: tlbz.anzeigen(_stufe),
                        )
                       ],
