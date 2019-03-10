@@ -10,6 +10,8 @@ class EventAddPage extends StatefulWidget{
 
 class _EventAddPageState extends State<EventAddPage>{
  int value = 2;
+ List<String> _mitnehmenadd= [' '];
+ final _addkey = new GlobalKey<FormState>();
 
   Map<String, bool> stufen ={
     'Biber' : false,
@@ -19,10 +21,22 @@ class _EventAddPageState extends State<EventAddPage>{
     'Pios' : false,
 };
  _addItem() {
-   setState(() {
-     value = value + 1;
-   });
+   if(validateAndSave(_addkey)) {
+     setState(() {
+       value = value + 1;
+     });
+   }
  }
+ bool validateAndSave(_key) {
+   final form = _key.currentState;
+   if (form.validate()) {
+     form.save();
+     return true;
+   } else {
+     return false;
+   }
+ }
+
 
   @override
   Widget build(BuildContext context) {
@@ -223,78 +237,62 @@ class _EventAddPageState extends State<EventAddPage>{
                           )
                       ),
                       Container(
-                          padding: EdgeInsets.all(10),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 3,
-                                child: Text('Beschreibung'),
-                              ),
-                              Expanded(
-                                flex: 7,
-                                child: new TextFormField(
-                                  decoration: new InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    filled: false,
-                                  ),
-                                  maxLines: 10,
-                                  //onSaved: (value) => _pfadinamen = value,
-                                ),
-                              )
-                            ],
-                          )
-                      ),
-                      Container(
-                        height: 300,
+                        height: 400,
                           padding: EdgeInsets.all(10),
                           child: Column(
                             children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Mitnehmen'),
-                                  ),
-                                  Expanded(
-                                    flex: 7,
-                                    child: ListView.builder(
-                                        itemCount: this.value,
-                                        itemBuilder: (context, index) => this._buildRow(index)),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: SizedBox(),
-                                  ),
-                                  Expanded(
-                                    flex: 5,
-                                    child: new TextFormField(
-                                      decoration: new InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        filled: false,
-                                      ),
-                                      //onSaved: (value) => _pfadinamen = value,
+                              Container(
+                                height: 300,
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text('Mitnehmen'),
                                     ),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: new RaisedButton(
-                                      child: new Text('Speichern',style: new TextStyle(fontSize: 20)),
-                                      onPressed: () => _addItem(),
-                                      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-                                      color: Color(0xff7a62ff),
-                                      textColor: Colors.white,
+                                    Expanded(
+                                      flex: 7,
+                                      child: ListView.builder(
+                                          itemCount: this._mitnehmenadd.length,
+                                          itemBuilder: (context, index) => this._buildRow(index)),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Form(
+                                key: _addkey,
+                                  child: Container(
+                                    child:  Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          flex: 3,
+                                          child: SizedBox(),
+                                        ),
+                                        Expanded(
+                                          flex: 5,
+                                          child: new TextFormField(
+                                              decoration: new InputDecoration(
+                                                border: OutlineInputBorder(),
+                                                filled: false,
+                                              ),
+                                              onSaved: (value) => _mitnehmenadd.add(value)
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: new RaisedButton(
+                                            child: new Text('Add',style: new TextStyle(fontSize: 20)),
+                                            onPressed: () => _addItem(),
+                                            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                            color: Color(0xff7a62ff),
+                                            textColor: Colors.white,
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   )
-                                ],
-                              ),
+                              )
                             ],
-
                           ),
-
                       )
                     ],
                   )
@@ -320,6 +318,21 @@ class _EventAddPageState extends State<EventAddPage>{
     );
   }
  _buildRow(int index) {
-   return Text("Item " + index.toString());
+   return Container(
+     child: Row(
+       children: <Widget>[
+         Expanded(
+           flex: 1,
+           child: Icon(Icons.brightness_1,size: 10,)
+         ),
+         Expanded(
+           flex: 2,
+           child: Text(_mitnehmenadd[index],
+             style: new TextStyle(fontSize: 15, )),
+         )
+       ],
+     )
+   );
+
  }
 }

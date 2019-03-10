@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
     String anmeldung;
     print(qsuserInfo.data['Pfadinamen']);
     anmeldeDaten = {
-      'Anmeldename' : this.qsuserInfo.data['Pfadinamen'],
+      'Anmeldename' : _pfadiname,
       'Anmeldung': anabmelden
     };
     if(anabmelden == 'Chunt'){
@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       _email = onValue;
     });
 
-    if(_pfadiname == ' '){
+    if(_pfadiname == ''){
       _pfadiname = qsuserInfo.data['Vorname'];
     }
   }catch(e){
