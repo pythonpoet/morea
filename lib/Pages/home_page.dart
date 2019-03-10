@@ -4,7 +4,7 @@ import '../services/auth.dart';
 import '../services/crud.dart';
 import 'werchunt.dart';
 import '../services/Getteleblitz.dart';
-import 'events_page.dart';
+import 'Agenda_page.dart';
 import 'profile_page.dart';
 
 
@@ -172,9 +172,9 @@ class _HomePageState extends State<HomePage> {
           onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new WerChunt()))
         ),
         new ListTile(
-          title: new Text('Events'),
+          title: new Text('Agenda'),
           trailing: new Icon(Icons.event),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new EventState()))
+            onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new AgendaState()))
         ),
         new ListTile(
           title: new Text('Profil'),
@@ -204,7 +204,7 @@ class _HomePageState extends State<HomePage> {
       new ListTile(
       title: new Text('Events'),
       trailing: new Icon(Icons.event),
-          onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new EventState()))
+          onTap: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context)=> new AgendaState()))
       ),
       new ListTile(
       title: new Text('Profil'),
