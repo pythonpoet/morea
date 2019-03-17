@@ -8,6 +8,7 @@ abstract class BasecrudMethods{
 class crudMedthods implements BasecrudMethods {
   Auth auth = new Auth();
 
+
   Future<QuerySnapshot> getData(String dateipfad ) async {
     return await Firestore.instance.collection(dateipfad).getDocuments();
   }

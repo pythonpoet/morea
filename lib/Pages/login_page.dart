@@ -25,7 +25,7 @@ enum Platform {isAndroid, isIOS}
     final formKey = new GlobalKey<FormState>();
     final resetkey = new GlobalKey<FormState>();
 
-    String _email, _pfadinamen = ' ', _vorname, _nachname, _stufe,_selectedstufe= 'Stufe wählen';
+    String _email, _pfadinamen = ' ', _vorname, _nachname, _stufe, _selectedstufe = 'Stufe wählen';
     String _password,_adresse,_ort,_plz,_handynummer, _passwordneu;
     FormType _formType = FormType.login;
     Platform _platform = Platform.isAndroid;
@@ -247,6 +247,7 @@ enum Platform {isAndroid, isIOS}
           )
       );
     }
+    
     List<Widget> buildInputs(){
       if(_formType == FormType.login) {
         return [

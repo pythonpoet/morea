@@ -15,7 +15,9 @@ abstract class BaseAuth{
   Future<DocumentSnapshot> getteleblitz(stufe);
   Future ubloadteleblitz(data,stufe );
   Future<bool> refreshteleblitz(stufe);
-  Future<QuerySnapshot> getAgenda(stufe);
+  Stream<QuerySnapshot> getAgenda(stufe);
+  Future uploadtoAgenda(stufe,datum,data);
+  Future deletedocument(String path, String document);
 }
 
 class Auth implements BaseAuth {
@@ -120,7 +122,6 @@ class Auth implements BaseAuth {
       });
       return true;
     }
-
     return false;
   }
 
@@ -149,7 +150,19 @@ class Auth implements BaseAuth {
   Future<void> signOut() async {
     return  _firebaseAuth.signOut();
   }
-  Future<QuerySnapshot> getAgenda(stufe) async {
-    return await Firestore.instance.collection('Stufen').document(stufe).collection('Agenda').getDocuments();
+  Stream<QuerySnapshot> getAgenda(stufe)  {
+    return Firestore.instance.collection('Stufen').document(stufe).collection('Agenda').snapshots();
   }
+
+  Future uploadtoAgenda(stufe,datum,data)async{
+    await Firestore.instance.collection('Stufen').document(stufe).collection('Agenda').document(datum).setData(data).catchError((e){
+      print(e);
+    });
+  }
+  Future deletedocument(String path, String document) async{
+    await Firestore.instance.collection(path).document(document).delete().catchError((e){
+      print(e);
+    });
+  }
+  
 }
