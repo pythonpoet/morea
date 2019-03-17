@@ -1,4 +1,4 @@
-# morea
+# Morea
 
 Teleblitz app
 
