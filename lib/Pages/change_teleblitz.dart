@@ -12,15 +12,15 @@ class ChangeTeleblitz extends StatefulWidget {
   final VoidCallback onSignedOut;
   final BasecrudMethods crud;
 
-  ChangeTeleblitz({this.auth, this.crud, this.onSignedOut,this.stufe});
+  ChangeTeleblitz({this.auth, this.crud, this.onSignedOut, this.stufe});
 
   @override
   State<StatefulWidget> createState() => _ChangeTeleblitzState();
 }
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
-  String _stufe;
 
+  String _stufe;
   final _formKey = GlobalKey<FormState>();
   final datumController = TextEditingController();
   final antretenController = TextEditingController();

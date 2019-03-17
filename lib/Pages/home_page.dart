@@ -8,6 +8,7 @@ import 'Agenda_page.dart';
 import 'profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'change_teleblitz.dart';
+import 'select_stufe.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -173,7 +174,7 @@ class _HomePageState extends State<HomePage> {
             title: new Text("Teleblitz ändern"),
             trailing: new Icon(Icons.flash_on),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-builder: (BuildContext context) => new ChangeTeleblitz()))),
+builder: (BuildContext context) => new SelectStufe()))),
         new ListTile(
             title: new Text('Wer chunt?'),
             trailing: new Icon(Icons.people),
