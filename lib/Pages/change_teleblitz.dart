@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ChangeTeleblitz extends StatefulWidget {
-  String stufe;
+  final String stufe;
   final BaseAuth auth;
   final VoidCallback onSignedOut;
   final BasecrudMethods crud;
