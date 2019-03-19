@@ -236,6 +236,7 @@ enum Platform {isAndroid, isIOS}
             title: new Text('Pfadi Morea'),
           ),
           body: new SingleChildScrollView(
+            padding: EdgeInsets.all(20),
             child: new Form(
               key: formKey,
               child: Column(
