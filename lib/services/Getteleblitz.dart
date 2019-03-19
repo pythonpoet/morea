@@ -212,6 +212,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
@@ -252,6 +253,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
@@ -282,6 +284,7 @@ class Info {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
               width: this._sizeleft,
@@ -301,6 +304,7 @@ class Info {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
@@ -331,6 +335,7 @@ class Info {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
@@ -361,6 +366,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,

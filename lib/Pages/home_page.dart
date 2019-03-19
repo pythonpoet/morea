@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../services/auth.dart';
 import '../services/crud.dart';
@@ -7,7 +6,6 @@ import '../services/Getteleblitz.dart';
 import 'Agenda_page.dart';
 import 'profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'change_teleblitz.dart';
 import 'select_stufe.dart';
 
 class HomePage extends StatefulWidget {
@@ -60,12 +58,12 @@ class _HomePageState extends State<HomePage> {
       _userUID = userId;
     });
     await auth0.getUserInformation().then((results) async {
-        setState(() {
-          qsuserInfo = results;
-          _pfadiname = qsuserInfo.data['Pfadinamen'];
-          _stufe = qsuserInfo.data['Stufe'];
-          forminit();
-        });
+      setState(() {
+        qsuserInfo = results;
+        _pfadiname = qsuserInfo.data['Pfadinamen'];
+        _stufe = qsuserInfo.data['Stufe'];
+        forminit();
+      });
       try {
         await auth0.userEmail().then((onValue) {
           _email = onValue;
@@ -89,11 +87,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
- forminit() {
+  forminit() {
     try {
       switch (qsuserInfo.data['Pos']) {
         case 'Leiter':
-        print('leiter');
+          print('leiter');
           _formType = FormType.leiter;
           break;
       }
@@ -101,13 +99,13 @@ class _HomePageState extends State<HomePage> {
       print(e);
     }
   }
-  
+
   @override
-  void initState(){
+  void initState() {
     print('init Start:${DateTime.now()}');
     super.initState();
-     getuserinfo();
-     print('init End:${DateTime.now()}');
+    getuserinfo();
+    print('init End:${DateTime.now()}');
   }
 
   @override
@@ -124,11 +122,11 @@ class _HomePageState extends State<HomePage> {
         body: Column(
           children: <Widget>[
             Expanded(
-                flex: 8,
+                flex: 6,
                 child: LayoutBuilder(
                   builder: (BuildContext context,
                       BoxConstraints viewportConstraints) {
-                        print('SingleChildScollView Start:${DateTime.now()}');
+                    print('SingleChildScollView Start:${DateTime.now()}');
                     return SingleChildScrollView(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
@@ -139,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             Container(
-                              height: 600,
+                              height: 800,
                               child: tlbz.anzeigen(_stufe),
                             )
                           ],
@@ -149,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 )),
             Expanded(
-              flex: 2,
+              flex: 1,
               child: Column(
                 children: anmeldebutton(),
               ),
@@ -174,7 +172,7 @@ class _HomePageState extends State<HomePage> {
             title: new Text("Teleblitz ändern"),
             trailing: new Icon(Icons.flash_on),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-builder: (BuildContext context) => new SelectStufe()))),
+                builder: (BuildContext context) => new SelectStufe()))),
         new ListTile(
             title: new Text('Wer chunt?'),
             trailing: new Icon(Icons.people),
@@ -184,7 +182,9 @@ builder: (BuildContext context) => new SelectStufe()))),
             title: new Text('Agenda'),
             trailing: new Icon(Icons.event),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new AgendaState(userInfo: qsuserInfo.data,)))),
+                builder: (BuildContext context) => new AgendaState(
+                      userInfo: qsuserInfo.data,
+                    )))),
         new ListTile(
             title: new Text('Profil'),
             trailing: new Icon(Icons.person),
@@ -212,7 +212,8 @@ builder: (BuildContext context) => new SelectStufe()))),
             title: new Text('Agenda'),
             trailing: new Icon(Icons.event),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new AgendaState(userInfo: qsuserInfo.data)))),
+                builder: (BuildContext context) =>
+                    new AgendaState(userInfo: qsuserInfo.data)))),
         new ListTile(
             title: new Text('Profil'),
             trailing: new Icon(Icons.person),
@@ -227,6 +228,7 @@ builder: (BuildContext context) => new SelectStufe()))),
       ];
     }
   }
+
 //Hier soll der Teleblitz angezeigt werden
 
   List<Widget> anmeldebutton() {
@@ -234,6 +236,7 @@ builder: (BuildContext context) => new SelectStufe()))),
       Container(
           padding: EdgeInsets.all(20),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Expanded(
                   child: Container(
@@ -243,8 +246,12 @@ builder: (BuildContext context) => new SelectStufe()))),
                   onPressed: () => submit('Chunt nöd'),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
+                  highlightColor: Color(0xff614ecc),
                 ),
               )),
+              SizedBox(
+                width: 20,
+              ),
               Expanded(
                 child: Container(
                   child: new RaisedButton(
@@ -254,6 +261,7 @@ builder: (BuildContext context) => new SelectStufe()))),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Color(0xff7a62ff),
+                    highlightColor: Color(0xff614ecc),
                     textColor: Colors.white,
                   ),
                 ),
