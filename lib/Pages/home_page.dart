@@ -47,10 +47,14 @@ class _HomePageState extends State<HomePage> {
     auth0.uebunganmelden(anmeldeDaten, _stufe, _userUID);
     showDialog(
         context: context,
+        // ignore: deprecated_member_use
         child: new AlertDialog(
-          title: new Text("Teleblitz"),
-          content: new Text(anmeldung),
-        ));
+
+                title: new Text("Teleblitz"),
+
+                content: new Text(anmeldung),
+
+              ));
   }
 
   getuserinfo() async {

@@ -79,11 +79,6 @@ class Teleblitz implements BaseTeleblitz {
 
     return info;
   }
-  Widget teleblitz(String _stufe){
-    return StreamBuilder(
-
-    );
-  }
 
   Widget anzeigen(String _stufe) {
     print('anzeigen Start:${DateTime.now()}');

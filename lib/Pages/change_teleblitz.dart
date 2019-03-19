@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth.dart';
 import '../services/crud.dart';
-import '../services/Getteleblitz.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
