@@ -4,8 +4,8 @@ import '../services/auth.dart';
 import '../services/crud.dart';
 
 class WerChunt extends StatefulWidget {
-  WerChunt({this.auth, this.onSigedOut, this.crud});
-
+  WerChunt({this.auth, this.onSigedOut, this.crud, this.userInfo});
+  var userInfo;
   final BaseAuth auth;
   final VoidCallback onSigedOut;
   final BasecrudMethods crud;
@@ -21,10 +21,11 @@ class _WerChuntState extends State<WerChunt> {
   String _pfadiname, _userUID, _stufe;
   DocumentSnapshot qsuserInfo, dsanmeldedat;
   Map<String, String> anmeldeDaten;
+  List<String> lchunt, lchuntnoed;
 
 
-  void getuserinfo() {
-    auth0.getUserInformation().then((results) {
+  void getuserinfo()async {
+   await auth0.getUserInformation().then((results) {
       setState(() {
         qsuserInfo = results;
         _pfadiname = qsuserInfo.data['Pfadinamen'];
@@ -32,10 +33,37 @@ class _WerChuntState extends State<WerChunt> {
       });
     });
   }
+  void sortlist()async{
+    print(widget.userInfo['Stufe']);
+    QuerySnapshot qsdata = await Firestore.instance.collection('uebung')
+       .document(widget.userInfo['Stufe']).collection(auth0.getuebungsdatum())
+      .getDocuments();
+      
+      print(qsdata.documents.length);
+      for(int i; i < qsdata.documents.length; i++){
+        print(i);
+        if(qsdata.documents[i]['Anmeldung']=='Chunt'){
+          lchunt.add(qsdata.documents[i]['Anmledename']);
+        }else if(qsdata.documents[i]['Anmeldung']=='Chunt nöd'){
+          lchuntnoed.add(qsdata.documents[i]['Anmledename']);
+        }else{
+          print('Firesotre für uebung anmelden ist komisch');
+        }
+        
+      }
+      print(lchunt);
+      print(lchuntnoed);      
+  }
+  @override
+  void initState() {
+    super.initState();
+     getuserinfo();
+    sortlist();
+  }
 
   @override
   Widget build(BuildContext context) {
-    getuserinfo();
+    
     return new DefaultTabController(
     length: 2,
       child: Scaffold(
@@ -62,7 +90,6 @@ class _WerChuntState extends State<WerChunt> {
     );
   }
  Widget chunt(){
-   getuserinfo();
    Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
        .document(_stufe).collection(auth0.getuebungsdatum())
        .snapshots();
@@ -92,7 +119,6 @@ class _WerChuntState extends State<WerChunt> {
    );
 }
 Widget chuntnoed(){
-  getuserinfo();
   Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
       .document(_stufe).collection(auth0.getuebungsdatum())
       .snapshots();

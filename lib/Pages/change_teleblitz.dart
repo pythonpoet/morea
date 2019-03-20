@@ -15,10 +15,10 @@ class ChangeTeleblitz extends StatefulWidget {
   ChangeTeleblitz({this.auth, this.crud, this.onSignedOut,this.stufe});
 
   @override
-  State<StatefulWidget> createState() => _ChangeTeleblitzState();
+  State<StatefulWidget> createState() => ChangeTeleblitzState();
 }
 
-class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
+class ChangeTeleblitzState extends State<ChangeTeleblitz> {
   String _stufe;
 
   final _formKey = GlobalKey<FormState>();
@@ -74,6 +74,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
             return new Scaffold(
               appBar: AppBar(
                 title: Text("Teleblitz Ändern"),
+                backgroundColor:  Color(0xff7a62ff),
               ),
               body: ListView(
                 children: [
@@ -223,6 +224,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
             return Scaffold(
               appBar: AppBar(
                 title: Text("Loading"),
+                backgroundColor: Color(0xff7a62ff),
               ),
               body: Center(
                 child: CircularProgressIndicator(),
@@ -289,6 +291,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       print(result.body);
     });
   }
+    
 }
 
 class TeleblitzInfo {
@@ -440,4 +443,6 @@ class TeleblitzInfo {
       return _inhalt[key];
     }
   }
+  
+
 }

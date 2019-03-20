@@ -79,21 +79,10 @@ class Teleblitz implements BaseTeleblitz {
 
     return info;
   }
-  Widget teleblitz(String _stufe){
-    return StreamBuilder(
-
-    );
-  }
-
-  Widget anzeigen(String _stufe) {
-    print('anzeigen Start:${DateTime.now()}');
-    try{
-        return new FutureBuilder(
-        future: _getInfos(_stufe),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print('server zügs ende${DateTime.now()}');
-          if (snapshot.data == null) {
-            return Container(
+  /*Widget teleblitz(String _stufe){
+    AsyncSnapshot snapshot = _getInfos(_stufe);
+    if()==null){
+      return Container(
               child: Center(
                   child: Container(
                 padding: EdgeInsets.all(120),
@@ -110,6 +99,55 @@ class Teleblitz implements BaseTeleblitz {
           } else {
             return Column(children: [
               Container(
+                  margin: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(15),
+                  child: Column(
+                    children: <Widget>[
+                      Info.getTitel(),
+                      info.getDatum(),
+                      getAntreten(),
+                      getAbtreten(),
+                      getMitnehmen(),
+                      getBemerkung(),
+                      getSender(),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.16),
+                          offset: Offset(3, 3),
+                          blurRadius: 40)
+                    ],
+                  )),
+              Expanded(child: Container()),
+            ]);
+    }
+  }
+*/
+  Widget anzeigen(String _stufe) {
+    try{
+        return new FutureBuilder(
+        future: _getInfos(_stufe),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return Container(
+              child: Center(
+                  child: Container(
+                padding: EdgeInsets.all(120),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: new Text('Loading...'),
+                    ),
+                    Expanded(child: new CircularProgressIndicator())
+                  ],
+                ),
+              )),
+            );
+          } else {
+            return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
                   child: Column(
@@ -131,9 +169,7 @@ class Teleblitz implements BaseTeleblitz {
                           offset: Offset(3, 3),
                           blurRadius: 40)
                     ],
-                  )),
-              Expanded(child: Container()),
-            ]);
+                  ));
           }
         });
     }catch(e){

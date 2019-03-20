@@ -87,8 +87,8 @@ class _EventAddPageState extends State<EventAddPage>{
      if(stufen['Pios']) {
        aut0.uploadtoAgenda('Pios', datum, Event);
      }
-     showDialog(context: context, child:
-     new AlertDialog(
+     showDialog(context: context, 
+     child: new AlertDialog(
        title: new Text("Event wurde hinzugefügt"),
      )
      );

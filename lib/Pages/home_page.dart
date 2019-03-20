@@ -26,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   crudMedthods crud0bj = new crudMedthods();
   Auth auth0 = new Auth();
   Teleblitz tlbz = new Teleblitz();
+  ChangeTeleblitzState chtlbz = new ChangeTeleblitzState();
 
   final formKey = new GlobalKey<FormState>();
 
@@ -51,6 +52,7 @@ class _HomePageState extends State<HomePage> {
         child: new AlertDialog(
           title: new Text("Teleblitz"),
           content: new Text(anmeldung),
+
         ));
   }
 
@@ -103,16 +105,18 @@ class _HomePageState extends State<HomePage> {
   
   @override
   void initState(){
-    print('init Start:${DateTime.now()}');
     super.initState();
      getuserinfo();
-     print('init End:${DateTime.now()}');
   }
 
   @override
   Widget build(BuildContext context) {
-    print('Build Start:${DateTime.now()}');
-    return new Scaffold(
+    return teleblitzwidget();
+  }
+
+  Widget teleblitzwidget(){
+    if(_formType == FormType.leiter){    
+     return Scaffold(
         appBar: new AppBar(
           title: new Text('Teleblitz'),
           backgroundColor: Color(0xff7a62ff),
@@ -120,14 +124,9 @@ class _HomePageState extends State<HomePage> {
         drawer: new Drawer(
           child: new ListView(children: navigation()),
         ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-                flex: 8,
-                child: LayoutBuilder(
+        body:  LayoutBuilder(
                   builder: (BuildContext context,
                       BoxConstraints viewportConstraints) {
-                        print('SingleChildScollView Start:${DateTime.now()}');
                     return SingleChildScrollView(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
@@ -138,7 +137,6 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             Container(
-                              height: 600,
                               child: tlbz.anzeigen(_stufe),
                             )
                           ],
@@ -146,15 +144,46 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   },
-                )),
-            Expanded(
-              flex: 2,
-              child: Column(
-                children: anmeldebutton(),
-              ),
-            )
-          ],
-        ));
+        ),
+        floatingActionButton: new FloatingActionButton(
+          elevation: 1.0,
+          child: new Icon(Icons.edit),
+          backgroundColor: Color(0xff7a62ff),
+          onPressed: () => Navigator.of(context).push(new MaterialPageRoute(
+                builder: (BuildContext context) => new ChangeTeleblitz(stufe: _stufe))))
+    
+        );
+    }else{
+      return Scaffold(
+        appBar: new AppBar(
+          title: new Text('Teleblitz'),
+          backgroundColor: Color(0xff7a62ff),
+        ),
+        drawer: new Drawer(
+          child: new ListView(children: navigation()),
+        ),
+        body: LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: viewportConstraints.maxHeight,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: <Widget>[
+                               tlbz.anzeigen(_stufe),
+                               anmeldebutton()
+                            ],
+                          )
+                        )
+                      ),
+                    );
+                  },
+                ),
+        );
+    }
   }
 
   List<Widget> navigation() {
@@ -170,15 +199,10 @@ class _HomePageState extends State<HomePage> {
                       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
         ),
         new ListTile(
-            title: new Text("Teleblitz ändern"),
-            trailing: new Icon(Icons.flash_on),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-builder: (BuildContext context) => new ChangeTeleblitz()))),
-        new ListTile(
             title: new Text('Wer chunt?'),
             trailing: new Icon(Icons.people),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new WerChunt()))),
+                builder: (BuildContext context) => new WerChunt(userInfo: qsuserInfo.data,)))),
         new ListTile(
             title: new Text('Agenda'),
             trailing: new Icon(Icons.event),
@@ -228,9 +252,8 @@ builder: (BuildContext context) => new ChangeTeleblitz()))),
   }
 //Hier soll der Teleblitz angezeigt werden
 
-  List<Widget> anmeldebutton() {
-    return [
-      Container(
+ Widget anmeldebutton() {
+    return Container(
           padding: EdgeInsets.all(20),
           child: Row(
             children: <Widget>[
@@ -247,8 +270,7 @@ builder: (BuildContext context) => new ChangeTeleblitz()))),
               Expanded(
                 child: Container(
                   child: new RaisedButton(
-                    child:
-                        new Text('Chume', style: new TextStyle(fontSize: 20)),
+                    child: new Text('Chume', style: new TextStyle(fontSize: 20)),
                     onPressed: () => submit('Chunt'),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
@@ -258,7 +280,6 @@ builder: (BuildContext context) => new ChangeTeleblitz()))),
                 ),
               )
             ],
-          ))
-    ];
+          ));
   }
 }
