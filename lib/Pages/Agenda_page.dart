@@ -19,21 +19,23 @@ class _AgendaStatePage extends State<AgendaState> {
 
   Stream<QuerySnapshot> qsagenda;
 
- _getAgenda(_stufe) async {
+ _getAgenda(stufe) async {
+   String xstufe =auth0.formatstring(stufe);
   
    qsagenda = Firestore.instance
         .collection('Stufen')
-        .document(_stufe)
+        .document(xstufe)
         .collection('Agenda')
         .orderBy("Order")
         .snapshots();
   }
   altevernichten(_agedatiteldatum,stufe){
+    String xstufe =auth0.formatstring(stufe);
     String somdate = _agedatiteldatum.split('-')[2]+'-'+_agedatiteldatum.split('-')[1]+'-'+_agedatiteldatum.split('-')[0];
     DateTime _agdatum = DateTime.parse(somdate+' 00:00:00.000');
     DateTime now = DateTime.now();
     if(_agdatum.difference(now).inDays< 0){
-      auth0.deletedocument('/Stufen/$stufe/Agenda', _agedatiteldatum);
+      auth0.deletedocument('/Stufen/$xstufe/Agenda', _agedatiteldatum);
     }
   }
   bool istLeiter(){

@@ -13,11 +13,12 @@ abstract class BaseAuth{
   Future<DocumentSnapshot> getUserInformation();
   Future uebunganmelden(Map anmeldedaten, String stufe, String _userUID);
   Future<DocumentSnapshot> getteleblitz(stufe);
-  Future ubloadteleblitz(data,stufe );
+  Future ubloadteleblitz(data,stufe);
   Future<bool> refreshteleblitz(stufe);
   Stream<QuerySnapshot> getAgenda(stufe);
   Future uploadtoAgenda(stufe,datum,data);
   Future deletedocument(String path, String document);
+  Future<void> uploaddevtocken(stufe,token, userUID);
 }
 
 class Auth implements BaseAuth {
@@ -57,6 +58,16 @@ class Auth implements BaseAuth {
         String fixdateformatted = fixdate.format(now);
         return fixdateformatted + '-' + akdate;
   }
+  String formatstring(String str){
+    RegExp exp = new RegExp(r"(\w)");
+        Iterable<Match> matches = exp.allMatches(str);
+        List<String> charakters=['%'];
+        for (Match m in matches) {
+        charakters.add(m.group(0));
+      }
+      charakters.remove('%');
+      return charakters.join().toString();
+  }
 
   Future<String> signInWithEmailAndPassword(String email, String password)async{
     FirebaseUser user = await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
@@ -77,6 +88,7 @@ class Auth implements BaseAuth {
     });
   }
   Future uebunganmelden(Map anmeldedaten, String stufe, String _userUID) async {
+    stufe = formatstring(stufe);
     String uebungsdatum = getuebungsdatum();
     Firestore.instance.collection('uebung').document(stufe).collection(uebungsdatum).document(_userUID).setData(anmeldedaten).catchError((e){
         print(e);
@@ -85,23 +97,31 @@ class Auth implements BaseAuth {
   }
 
   Future ubloadteleblitz(data,stufe) async {
+    stufe = formatstring(stufe);
     Map<String,String> akteleblitz= {
-      'Aktueller Teleblitz':data['datum'].toString().replaceAll('Samstag, ', '')
+      'AktuellerTeleblitz' : data['datum'].toString().replaceAll('Samstag, ', ''),
+      'Stufe': stufe
     };
-    Firestore.instance.collection('Teleblitz').document('overview').collection(stufe).document(akteleblitz['Aktueller Teleblitz']).setData(data).catchError((e){
+    Firestore.instance.collection('Teleblitz').document('overview').collection(stufe).document(akteleblitz['AktuellerTeleblitz']).setData(data).catchError((e){
       print(e);
     });
-     Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Aktueller Teleblitz').setData(akteleblitz).catchError((e){
+     Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('AktuellerTeleblitz').setData(akteleblitz).catchError((e){
       print(e);
     });
 
   }
   Future<DocumentSnapshot> getteleblitz(stufe) async {
-    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Aktueller Teleblitz').get();
-    return await Firestore.instance.collection('Teleblitz').document('overview').collection(stufe).document((aktdat.data['Aktueller Teleblitz']).toString()).get();
+    
+    if(stufe!= null){
+    stufe = formatstring(stufe);
+    DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('AktuellerTeleblitz').get();
+    return await Firestore.instance.collection('Teleblitz').document('overview').collection(stufe).document((aktdat.data['AktuellerTeleblitz']).toString()).get();
+    }
   }
 
+
   Future<bool> refreshteleblitz(stufe) async {
+    stufe = formatstring(stufe);
     DateTime letztesaktdat;
     var timenow = DateTime.now();
     DocumentSnapshot aktdat = await Firestore.instance.collection('Teleblitz').document('info').collection(stufe).document('Teleblitzaktualisiert').get();
@@ -130,6 +150,7 @@ class Auth implements BaseAuth {
     return await Firestore.instance.collection('user').document(userUID).get();
   }
   Future<DocumentSnapshot> getTNs(String stufe)async{
+    stufe = formatstring(stufe);
     String uebungsdatum = getuebungsdatum();
     var document = Firestore.instance.document('user/${stufe}/${uebungsdatum}');
     document.get();
@@ -155,12 +176,23 @@ class Auth implements BaseAuth {
   }
 
   Future uploadtoAgenda(stufe,datum,data)async{
+    stufe = formatstring(stufe);
     await Firestore.instance.collection('Stufen').document(stufe).collection('Agenda').document(datum).setData(data).catchError((e){
       print(e);
     });
   }
   Future deletedocument(String path, String document) async{
     await Firestore.instance.collection(path).document(document).delete().catchError((e){
+      print(e);
+    });
+  }
+  Future<void> uploaddevtocken(stufe,token, userUID) async {
+    stufe = formatstring(stufe);
+    Map<String,String> tokendata = {
+      'devtoken' : token,
+      'UID' : userUID
+    };
+    await Firestore.instance.collection('Stufen').document(stufe).collection('Devices').document(token.toString()).setData(tokendata).catchError((e){
       print(e);
     });
   }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../services/auth.dart';
 import '../services/crud.dart';
+import 'package:async/async.dart';
 
 class WerChunt extends StatefulWidget {
   WerChunt({this.auth, this.onSigedOut, this.crud, this.userInfo});
@@ -21,7 +22,7 @@ class _WerChuntState extends State<WerChunt> {
   String _pfadiname, _userUID, _stufe;
   DocumentSnapshot qsuserInfo, dsanmeldedat;
   Map<String, String> anmeldeDaten;
-  List<String> lchunt, lchuntnoed;
+  List<String> lchunt=[' '], lchuntnoed=[' '];
 
 
   void getuserinfo()async {
@@ -33,26 +34,29 @@ class _WerChuntState extends State<WerChunt> {
       });
     });
   }
-  void sortlist()async{
-    print(widget.userInfo['Stufe']);
+ sortlist()async{
+    String stufe = auth0.formatstring(widget.userInfo['Stufe']);
     QuerySnapshot qsdata = await Firestore.instance.collection('uebung')
-       .document(widget.userInfo['Stufe']).collection(auth0.getuebungsdatum())
+       .document(stufe).collection(auth0.getuebungsdatum())
       .getDocuments();
       
-      print(qsdata.documents.length);
-      for(int i; i < qsdata.documents.length; i++){
-        print(i);
-        if(qsdata.documents[i]['Anmeldung']=='Chunt'){
-          lchunt.add(qsdata.documents[i]['Anmledename']);
-        }else if(qsdata.documents[i]['Anmeldung']=='Chunt nöd'){
-          lchuntnoed.add(qsdata.documents[i]['Anmledename']);
+      for(int i=0; i < qsdata.documents.length; i++){
+        if(qsdata.documents[i].data['Anmeldung']=='Chunt'){
+          if(lchunt[0]==' '){
+            lchunt[0]=qsdata.documents[i].data['Anmeldename'];
+          }else{
+            lchunt.add(qsdata.documents[i].data['Anmeldename']);
+          }  
+        }else if(qsdata.documents[i].data['Anmeldung']=='Chunt nöd'){
+          if(lchuntnoed[0]==' '){
+            lchuntnoed[0]= qsdata.documents[i].data['Anmeldename'];
+          }else{
+             lchuntnoed.add(qsdata.documents[i].data['Anmeldename']);
+          }           
         }else{
           print('Firesotre für uebung anmelden ist komisch');
         }
-        
       }
-      print(lchunt);
-      print(lchuntnoed);      
   }
   @override
   void initState() {
@@ -63,8 +67,7 @@ class _WerChuntState extends State<WerChunt> {
 
   @override
   Widget build(BuildContext context) {
-    
-    return new DefaultTabController(
+    return DefaultTabController(
     length: 2,
       child: Scaffold(
         appBar: AppBar(
@@ -89,60 +92,30 @@ class _WerChuntState extends State<WerChunt> {
       ),
     );
   }
- Widget chunt(){
-   Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
-       .document(_stufe).collection(auth0.getuebungsdatum())
-       .snapshots();
-   return new Scaffold(
-       body: StreamBuilder(
-           stream: qsdata,
-           builder: (context, AsyncSnapshot<QuerySnapshot> qsdata) {
-             if (!qsdata.hasData) return Text('Loading data.. Please waint..');
-             return ListView.builder(
-                 itemExtent: 80.0,
-                 itemCount: qsdata.data.documents.length,
-                 itemBuilder: (context, int index) {
-                   final DocumentSnapshot _info = qsdata.data.documents[index];
-                   if (_info['Anmeldung'] == 'Chunt') {
-                     return new ListTile(
-                         title: new Text(_info['Anmeldename'])
-                     );
-                   }else{
-                     return SizedBox();
+  Widget chunt(){
+    return Container(
+              child: ListView.builder(
+                itemCount: lchunt.length,
+                itemBuilder: (context , int index){
+                  return new ListTile(
+                    title: new Text(lchunt[index]),
+                  );
+                }
+              ),
+            );
+  }
+  Widget chuntnoed(){
+    return new Container(
+      child: ListView.builder(
+        itemCount: lchuntnoed.length,
+        itemBuilder: (context , int index){
+          return new ListTile(
+            title: new Text(lchuntnoed[index]),
+          );
+        }
+      ),
+    );
+  }
 
-                   }
-                 }
 
-             );
-           }
-       )
-   );
-}
-Widget chuntnoed(){
-  Stream<QuerySnapshot> qsdata = Firestore.instance.collection('uebung')
-      .document(_stufe).collection(auth0.getuebungsdatum())
-      .snapshots();
-  return StreamBuilder(
-      stream: qsdata,
-      builder: (context, AsyncSnapshot<QuerySnapshot> qsdata) {
-        if (!qsdata.hasData) return Text('Loading data.. Please waint..');
-        Text('Loadsdafklj');
-        return ListView.builder(
-            itemExtent: 80.0,
-            itemCount: qsdata.data.documents.length,
-            itemBuilder: (context, int index) {
-              final DocumentSnapshot _info = qsdata.data.documents[index];
-              if (_info['Anmeldung'] == 'Chunt nöd') {
-                return new ListTile(
-                    title: new Text(_info['Anmeldename'])
-                );
-              }else{
-                return SizedBox();
-              }
-            }
-        );
-      }
-
-  );
-}
 }
