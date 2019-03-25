@@ -1,41 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth.dart';
 import '../services/crud.dart';
-import '../services/Getteleblitz.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ChangeTeleblitz extends StatefulWidget {
-  String stufe;
+  final String stufe;
   final BaseAuth auth;
   final VoidCallback onSignedOut;
   final BasecrudMethods crud;
 
-  ChangeTeleblitz({this.auth, this.crud, this.onSignedOut,this.stufe});
+  ChangeTeleblitz({this.auth, this.crud, this.onSignedOut, this.stufe});
 
   @override
-  State<StatefulWidget> createState() => ChangeTeleblitzState();
+  State<StatefulWidget> createState() => _ChangeTeleblitzState();
 }
 
-class ChangeTeleblitzState extends State<ChangeTeleblitz> {
+class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   String _stufe;
-
   final _formKey = GlobalKey<FormState>();
   final datumController = TextEditingController();
   final antretenController = TextEditingController();
   final abtretenController = TextEditingController();
   Map<String, TextEditingController> mitnehmenControllerMap =
-  Map<String, TextEditingController>();
+      Map<String, TextEditingController>();
   List<TextEditingController> mitnehmenControllerList =
-  List<TextEditingController>();
+      List<TextEditingController>();
   final bemerkungController = TextEditingController();
   final senderController = TextEditingController();
   var aktteleblitz;
 
   void initState() {
     super.initState();
-    _stufe =widget.stufe;
+    _stufe = widget.stufe;
     this.aktteleblitz = downloadInfo(_stufe);
   }
 
@@ -58,7 +55,7 @@ class ChangeTeleblitzState extends State<ChangeTeleblitz> {
               print(u);
               if (!(this.mitnehmenControllerMap.containsKey(u))) {
                 TextEditingController controller =
-                TextEditingController(text: u);
+                    TextEditingController(text: u);
                 this.mitnehmenControllerMap[u] = controller;
               }
             }
@@ -74,7 +71,6 @@ class ChangeTeleblitzState extends State<ChangeTeleblitz> {
             return new Scaffold(
               appBar: AppBar(
                 title: Text("Teleblitz Ändern"),
-                backgroundColor:  Color(0xff7a62ff),
               ),
               body: ListView(
                 children: [
@@ -86,128 +82,227 @@ class ChangeTeleblitzState extends State<ChangeTeleblitz> {
                           key: _formKey,
                           child: Column(
                             children: <Widget>[
-                              ListTile(
-                                title: Text("Datum"),
-                                trailing: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: Icon(Icons.date_range),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.black26),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
-                              ),
-                              ListTile(
-                                title: TextField(
-                                  controller: datumController,
-                                ),
-                                trailing: IconButton(
-                                  onPressed: null,
-                                  icon: Icon(Icons.cancel),
-                                ),
-                              ),
-                              ListTile(
-                                title: Text("Antreten"),
-                                trailing: Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Icon(Icons.flag),
-                                ),
-                              ),
-                              ListTile(
-                                title: TextField(
-                                  controller: antretenController,
-                                ),
-                                trailing: IconButton(
-                                  onPressed: null,
-                                  icon: Icon(Icons.cancel),
-                                ),
-                              ),
-                              ListTile(
-                                title: Text("Abtreten"),
-                                trailing: Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Icon(Icons.flag),
-                                ),
-                              ),
-                              ListTile(
-                                title: TextField(
-                                  controller: abtretenController,
-                                ),
-                                trailing: IconButton(
-                                  onPressed: null,
-                                  icon: Icon(Icons.cancel),
-                                ),
-                              ),
-                              ListTile(
-                                title: Text("Mitnehmen"),
-                                trailing: Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Icon(Icons.assignment),
-                                ),
-                              ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: this.mitnehmenControllerList.length,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return new ListTile(
-                                    title: TextField(
-                                      controller:
-                                      mitnehmenControllerList[index],
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(
+                                        "Datum",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      trailing: Icon(Icons.date_range),
                                     ),
-                                    trailing: IconButton(
-                                        icon: Icon(Icons.cancel),
-                                        onPressed: null),
-                                  );
-                                },
+                                    ListTile(
+                                      title: TextField(
+                                        style: TextStyle(fontSize: 18),
+                                        controller: datumController,
+                                        decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Color.fromRGBO(
+                                                153, 255, 255, 0.3)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              ListTile(
-                                title: RaisedButton.icon(
-                                    onPressed: () {
-                                      this.setState(() {
-                                        mitnehmenControllerList
-                                            .add(TextEditingController());
-                                      });
-                                    },
-                                    icon: Icon(Icons.add),
-                                    label: Text("Element hinzufügen")),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.black26),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(
+                                        "Antreten",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      trailing: Icon(Icons.flag),
+                                    ),
+                                    ListTile(
+                                      title: TextField(
+                                        style: TextStyle(fontSize: 18),
+                                        controller: antretenController,
+                                        decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Color.fromRGBO(
+                                                153, 255, 255, 0.3)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              ListTile(
-                                title: Text("Bemerkung"),
-                                trailing: Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Icon(Icons.note),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.black26),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(
+                                        "Abtreten",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      trailing: Icon(Icons.flag),
+                                    ),
+                                    ListTile(
+                                      title: TextField(
+                                        style: TextStyle(fontSize: 18),
+                                        controller: abtretenController,
+                                        decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Color.fromRGBO(
+                                                153, 255, 255, 0.3)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.black26),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(
+                                        "Mitnehmen",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      trailing: Icon(Icons.assignment),
+                                    ),
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          this.mitnehmenControllerList.length,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return new ListTile(
+                                          title: TextField(
+                                            controller:
+                                                mitnehmenControllerList[index],
+                                            style: TextStyle(fontSize: 18),
+                                            decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: Color.fromRGBO(
+                                                    153, 255, 255, 0.3)),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ListTile(
+                                      title: RaisedButton.icon(
+                                        onPressed: () {
+                                          this.setState(() {
+                                            mitnehmenControllerList
+                                                .add(TextEditingController());
+                                          });
+                                        },
+                                        icon: Icon(Icons.add, color: Colors.white,),
+                                        label: Text("Element hinzufügen", style: TextStyle(color: Colors.white),),
+                                        color: Color(0xffff9262),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.black26),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(
+                                        "Bemerkung",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      trailing: Icon(Icons.note),
+                                    ),
+                                    ListTile(
+                                      title: TextField(
+                                        style: TextStyle(fontSize: 18),
+                                        controller: bemerkungController,
+                                        decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Color.fromRGBO(
+                                                153, 255, 255, 0.3)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.black26),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(
+                                        "Sender",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                      trailing: Icon(Icons.contacts),
+                                    ),
+                                    ListTile(
+                                      title: TextField(
+                                        style: TextStyle(fontSize: 18),
+                                        controller: senderController,
+                                        decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Color.fromRGBO(
+                                                153, 255, 255, 0.3)),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               ListTile(
-                                title: TextField(
-                                  controller: bemerkungController,
-                                ),
-                                trailing: IconButton(
-                                  onPressed: null,
-                                  icon: Icon(Icons.cancel),
-                                ),
-                              ),
-                              ListTile(
-                                title: Text("Sender"),
-                                trailing: Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Icon(Icons.perm_contact_calendar),
-                                ),
-                              ),
-                              ListTile(
-                                title: TextField(
-                                  controller: senderController,
-                                ),
-                                trailing: IconButton(
-                                  onPressed: null,
-                                  icon: Icon(Icons.cancel),
-                                ),
-                              ),
-                              ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 25),
                                 title: RaisedButton.icon(
                                   //TODO change to a variable stufe later
                                   onPressed: () {
-                                    this.uploadTeleblitz(_stufe, snapshot.data.getID());
+                                    this.uploadTeleblitz(
+                                        _stufe, snapshot.data.getID());
                                   },
-                                  icon: Icon(Icons.update),
-                                  label: Text("Teleblitz ändern"),
+                                  icon: Icon(Icons.update, color: Colors.white,),
+                                  label: Text("Teleblitz ändern", style: TextStyle(color: Colors.white),),
+                                  color: Color(0xffff9262),
                                 ),
                               )
                             ],
@@ -224,7 +319,6 @@ class ChangeTeleblitzState extends State<ChangeTeleblitz> {
             return Scaffold(
               appBar: AppBar(
                 title: Text("Loading"),
-                backgroundColor: Color(0xff7a62ff),
               ),
               body: Center(
                 child: CircularProgressIndicator(),
@@ -270,41 +364,48 @@ class ChangeTeleblitzState extends State<ChangeTeleblitz> {
         senderController.text,
         _id,
         _mitnehmen);
-    var jsonMap = {
-      "fields": newteleblitz.toJson()
-    };
+    var jsonMap = {"fields": newteleblitz.toJson()};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
     header["Authorization"] =
-    "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de"
-    ;
+        "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
     header["accept-version"] = "1.0.0";
     header["Content-Type"] = "application/json";
-    http.put(
+    http
+        .put(
       "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" +
-          _id+
+          _id +
           "?live=true",
       headers: header,
       body: jsonStr,
-    ).then((result){
+    )
+        .then((result) {
       print(result.statusCode);
       print(result.body);
     });
   }
-    
 }
 
 class TeleblitzInfo {
   Map<String, dynamic> _inhalt;
 
-  String _titel, _datum, _antreten, _abtreten, _bemerkung, _sender, _stufe, _id, _jsonMitnehmen;
+  String _titel,
+      _datum,
+      _antreten,
+      _abtreten,
+      _bemerkung,
+      _sender,
+      _stufe,
+      _id,
+      _jsonMitnehmen;
 
   List<String> _mitnehmen;
   bool _keineaktivitaet, _ferien;
 
   TeleblitzInfo();
 
-  TeleblitzInfo.fromString(String titel,
+  TeleblitzInfo.fromString(
+      String titel,
       String datum,
       String antreten,
       String abtreten,
@@ -347,8 +448,7 @@ class TeleblitzInfo {
     this._inhalt = Map.from(json);
   }
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'name': _titel,
         'datum': _datum,
         'antreten': _antreten,
@@ -363,9 +463,9 @@ class TeleblitzInfo {
         '_draft': false,
       };
 
-  void createJsonMitnehmen(){
+  void createJsonMitnehmen() {
     _jsonMitnehmen = "<ul>";
-    for (var u in _mitnehmen){
+    for (var u in _mitnehmen) {
       _jsonMitnehmen = _jsonMitnehmen + "<li>" + u + "</li>";
     }
     _jsonMitnehmen = _jsonMitnehmen + '</ul>';
@@ -443,6 +543,4 @@ class TeleblitzInfo {
       return _inhalt[key];
     }
   }
-  
-
 }

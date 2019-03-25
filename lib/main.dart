@@ -24,7 +24,7 @@ Future<void> main() async {
   await firestore.settings(timestampsInSnapshotsEnabled: true);
 
   runApp(MaterialApp(
-      title: 'Firestore Example', home: MyApp(firestore: firestore)));
+      title: 'Firestore Example', theme: ThemeData(fontFamily: 'Raleway'), home: MyApp(firestore: firestore)));
 }
 
 class MyApp extends StatelessWidget {
