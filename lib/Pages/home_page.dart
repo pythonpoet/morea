@@ -8,6 +8,8 @@ import 'Agenda_page.dart';
 import 'profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'change_teleblitz.dart';
+import 'personen_verzeichniss_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -26,7 +28,9 @@ class _HomePageState extends State<HomePage> {
   crudMedthods crud0bj = new crudMedthods();
   Auth auth0 = new Auth();
   Teleblitz tlbz = new Teleblitz();
-  ChangeTeleblitzState chtlbz = new ChangeTeleblitzState();
+  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+
+
 
   final formKey = new GlobalKey<FormState>();
 
@@ -55,6 +59,11 @@ class _HomePageState extends State<HomePage> {
 
         ));
   }
+  
+void getdevtoken()async{
+  var token = await firebaseMessaging.getToken();
+  auth0.uploaddevtocken(_stufe, token, _userUID);
+}
 
   getuserinfo() async {
     widget.auth.currentUser().then((userId) {
@@ -66,6 +75,7 @@ class _HomePageState extends State<HomePage> {
           _pfadiname = qsuserInfo.data['Pfadinamen'];
           _stufe = qsuserInfo.data['Stufe'];
           forminit();
+          getdevtoken();
         });
       try {
         await auth0.userEmail().then((onValue) {
@@ -209,10 +219,10 @@ class _HomePageState extends State<HomePage> {
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                 builder: (BuildContext context) => new AgendaState(userInfo: qsuserInfo.data,)))),
         new ListTile(
-            title: new Text('Profil'),
-            trailing: new Icon(Icons.person),
+            title: new Text('Personen'),
+            trailing: new Icon(Icons.people),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new ProfilePage()))),
+                builder: (BuildContext context) => new PersonenVerzeichnisState()))),
         new Divider(),
         new ListTile(
           title: new Text('Logout'),
@@ -240,7 +250,7 @@ class _HomePageState extends State<HomePage> {
             title: new Text('Profil'),
             trailing: new Icon(Icons.person),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new ProfilePage()))),
+                builder: (BuildContext context) => new ProfilePageState(profile: qsuserInfo.data,)))),
         new Divider(),
         new ListTile(
           title: new Text('Logout'),

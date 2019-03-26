@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});
@@ -16,6 +17,7 @@ enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
   Auth auth0 = new Auth();
+  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -26,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
       _nachname,
       _stufe,
       _selectedstufe = 'Stufe wählen';
-  String _password, _adresse, _ort, _plz, _handynummer, _passwordneu;
+  String _password, _adresse, _ort, _plz, _handynummer, _passwordneu, userId,error;
   FormType _formType = FormType.login;
   Platform _platform = Platform.isAndroid;
   List<String> _stufenselect = [
@@ -36,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     'Drason (Buebe)',
     'Pios'
   ];
-  String error;
+  bool _load = false;
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -48,41 +50,85 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  updatedevtoken()async{
+    List devtoken;
+    await auth0.getUserInformation().then((userInfo){
+      try{
+        List devtoken_old = userInfo.data['devtoken'];
+        if(devtoken_old == null){
+          firebaseMessaging.getToken().then((token){
+          devtoken = [token];
+          Map<String, List> devtokens ={
+            'devtoken':devtoken
+          };
+          userInfo.data.addAll(devtokens);
+          auth0.createUserInformation(userInfo.data);
+        });
+        }else{
+          firebaseMessaging.getToken().then((token){
+        if(devtoken_old[0] == 'leer'){
+          devtoken = [token];
+        }else{
+          for(int i=0;i<devtoken_old.length;i++){
+            if(devtoken_old[i]==token){
+              return;
+            }
+          }
+          devtoken = new List.from(devtoken_old)..add(token);
+        }
+        
+        userInfo.data['devtoken'] = devtoken;
+
+        auth0.createUserInformation(userInfo.data);
+        });
+        }
+        
+
+      }catch(e){
+        
+        print(e);
+      }
+       
+    
+    
+    
+    });
+    
+  }
+  
+          
+
   void validateAndSubmit() async {
     Platform.isAndroid;
     if (validateAndSave()) {
       try {
         if (_formType == FormType.login) {
-          showDialog(
-                  context: context,
-                  child: new AlertDialog(
-                    title: new Text("Bitte eine Stufe wählen!"),
-                  ));
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              child: new Dialog(
-                child: new Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    new CircularProgressIndicator(),
-                    new Text("Loading"),
-                  ],
-                ),
-              ),
-            );
+          setState(() {
+           _load =true; 
+          });
           String userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
           print('Sign in: ${userId}');
+          setState(() {
+           _load =false; 
+          });
+          updatedevtoken();
           widget.onSignedIn();
+           
         } else {
           if(_password.length >= 6){
             if (_password == _passwordneu){
             if (_selectedstufe != 'Stufe wählen') {
-              String userId = await widget.auth
+              setState(() {
+           _load =true; 
+            });
+               userId = await widget.auth
                   .createUserWithEmailAndPassword(_email, _password);
               print('Registered user: ${userId}');
               if (userId != null) {
-                widget.auth.createUserInformation(mapUserData());
+                widget.auth.createUserInformation(await mapUserData());
+               setState(() {
+              _load = false; 
+              });
                 widget.onSignedIn();
               }
             } else {
@@ -240,8 +286,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Map mapUserData() {
-    Map<String, String> userInfo = {
+ Future<Map> mapUserData() async {
+    var token = await firebaseMessaging.getToken();
+         List devtoken = [token];
+    Map<String, dynamic> userInfo = {
       'Pfadinamen': this._pfadinamen,
       'Vorname': this._vorname,
       'Nachname': this._nachname,
@@ -251,19 +299,29 @@ class _LoginPageState extends State<LoginPage> {
       'Ort': this._ort,
       'Handynummer': this._handynummer,
       'Pos': 'Teilnehmer',
+      'UID': this.userId,
+      'Email': this._email,
+      'devtoken' : devtoken
     };
     return userInfo;
+    
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    Widget loadingIndicator =_load? new Container(
+      width: 70.0,
+      height: 70.0,
+      child: new Padding(padding: const EdgeInsets.all(5.0),child: new Center(child: new CircularProgressIndicator())),
+    ):new Container();
     return new Scaffold(
         appBar: new AppBar(
           title: new Text('Pfadi Morea'),
           backgroundColor: Color(0xff7a62ff),
         ),
-        body: Container(
+        body: Stack(
+          children: <Widget>[
+            Container(
           color: Colors.white70,
          child: new SingleChildScrollView(
           child: new Form(
@@ -274,6 +332,9 @@ class _LoginPageState extends State<LoginPage> {
                 children: buildInputs() + buildSubmitButtons()),
           ),
         )
+        ),
+        new Align(child: loadingIndicator,alignment: FractionalOffset.center,),
+          ],
         ));
   }
 

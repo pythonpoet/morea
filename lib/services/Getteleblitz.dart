@@ -19,15 +19,13 @@ class Teleblitz implements BaseTeleblitz {
     var info = new Info();
     String stufe = filter;
     if (filter != null) {
-      print('refreshteleblitz Start:${DateTime.now()}');
       if (await auth.refreshteleblitz(stufe) == true) {
-        print('refreshteleblitz end:${DateTime.now()}');
-        print('webflow Start:${DateTime.now()}');
         data = await http.get(
             "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
-        print('webflow end:${DateTime.now()}');
         jsonData = json.decode(data.body);
+
         Map<String, String> telblitz;
+
         for (var u in jsonData["items"]) {
           if (u["name"] == stufe) {
             info.setTitel(u["name"]);
@@ -51,16 +49,11 @@ class Teleblitz implements BaseTeleblitz {
               'name-des-senders': info.sender,
               'mitnehmen-test': info.mitnehmen
             };
-          print('ubloadteleblitz Start:${DateTime.now()}');
             auth.ubloadteleblitz(telblitz, stufe);
-            print('upload end:${DateTime.now()}');
           }
         }
       } else {
-        print('refreshteleblitz end:${DateTime.now()}');
-        print('getteleblitz start:${DateTime.now()}');
         await auth.getteleblitz(stufe).then((result) async {
-            print('getteleblitz end:${DateTime.now()}');
           info.setTitel(stufe);
           info.setDatum(result.data["datum"]);
           if (result.data['keine-aktivitat'] == 'false') {
@@ -79,53 +72,7 @@ class Teleblitz implements BaseTeleblitz {
 
     return info;
   }
-  /*Widget teleblitz(String _stufe){
-    AsyncSnapshot snapshot = _getInfos(_stufe);
-    if()==null){
-      return Container(
-              child: Center(
-                  child: Container(
-                padding: EdgeInsets.all(120),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: new Text('Loading...'),
-                    ),
-                    Expanded(child: new CircularProgressIndicator())
-                  ],
-                ),
-              )),
-            );
-          } else {
-            return Column(children: [
-              Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    children: <Widget>[
-                      Info.getTitel(),
-                      info.getDatum(),
-                      getAntreten(),
-                      getAbtreten(),
-                      getMitnehmen(),
-                      getBemerkung(),
-                      getSender(),
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.16),
-                          offset: Offset(3, 3),
-                          blurRadius: 40)
-                    ],
-                  )),
-              Expanded(child: Container()),
-            ]);
-    }
-  }
-*/
+  
   Widget anzeigen(String _stufe) {
     try{
         return new FutureBuilder(

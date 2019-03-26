@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'edit_userprofile_page.dart';
 
-class ProfilePageState extends StatelessWidget {
-  ProfilePageState({this.profile});
+class ViewUserProfilePageState extends StatelessWidget {
+  ViewUserProfilePageState({this.profile});
   var profile;
 
   @override
@@ -24,7 +25,13 @@ class ProfilePageState extends StatelessWidget {
                 ));
               },
             ),
-            ));
+            floatingActionButton: new FloatingActionButton(
+              elevation: 1.0,
+              child: new Icon(Icons.edit),
+              backgroundColor: Color(0xff7a62ff),
+              onPressed: () => Navigator.of(context).push(new MaterialPageRoute(
+                builder: (BuildContext context) => new EditUserProfilePage(profile: profile,)))
+            )));
   }
 
   Widget viewprofile() {
@@ -97,6 +104,25 @@ class ProfilePageState extends StatelessWidget {
                           child: Container(
                               child: Text(
                         profile['Pfadinamen'],
+                        style: TextStyle(fontSize: 20),
+                      ))),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: Text(
+                          'Rolle:',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )),
+                      Expanded(
+                          child: Container(
+                              child: Text(
+                        profile['Pos'],
                         style: TextStyle(fontSize: 20),
                       ))),
                     ],
@@ -233,16 +259,7 @@ class ProfilePageState extends StatelessWidget {
                 ),
               ],
             ),
-            ),       
-          ),
-          SizedBox(height: 24,),
-          Container(
-            child: Center(
-              child: Text(
-                'Sind deine Angaben nicht korrekt?\nWende dich bitte an deine Leiter',
-                style: new TextStyle(fontSize: 20),
-              ),
-            ),
+            )
           )
         ],
       ),

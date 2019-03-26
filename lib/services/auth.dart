@@ -10,6 +10,7 @@ abstract class BaseAuth{
   Future<String> currentUser();
   Future<void> signOut();
   Future<void> createUserInformation(Map userInfo);
+  Future<void> updateUserInformation(Map userInfo, String userUID);
   Future<DocumentSnapshot> getUserInformation();
   Future uebunganmelden(Map anmeldedaten, String stufe, String _userUID);
   Future<DocumentSnapshot> getteleblitz(stufe);
@@ -83,6 +84,12 @@ class Auth implements BaseAuth {
   }
   Future<void> createUserInformation(Map userInfo) async {
     String userUID =  await currentUser();
+    await Firestore.instance.collection('user').document(userUID).setData(userInfo).catchError((e){
+      print(e);
+    });
+  }
+  Future<void> updateUserInformation(Map userInfo, String userUID) async {
+    userUID = formatstring(userUID);
     Firestore.instance.collection('user').document(userUID).setData(userInfo).catchError((e){
       print(e);
     });
@@ -182,6 +189,7 @@ class Auth implements BaseAuth {
     });
   }
   Future deletedocument(String path, String document) async{
+    document = formatstring(document);
     await Firestore.instance.collection(path).document(document).delete().catchError((e){
       print(e);
     });

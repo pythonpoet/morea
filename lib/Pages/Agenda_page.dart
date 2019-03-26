@@ -74,7 +74,7 @@ class _AgendaStatePage extends State<AgendaState> {
         child: new FloatingActionButton(
           elevation: 0.0,
           child: new Icon(Icons.add),
-          backgroundColor: Colors.deepPurple,
+          backgroundColor:  Color(0xff7a62ff),
           onPressed: () => routetoAddevent()),
       ),
     ));
