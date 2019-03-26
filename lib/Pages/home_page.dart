@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.teilnehmer;
 
-  String _pfadiname = ' ', _userUID = ' ', _stufe = ' ', _email = ' ';
+  String _pfadiname = ' ', _userUID = ' ', _stufe = '@', _email = ' ';
   DocumentSnapshot qsuserInfo;
   Map<String, String> anmeldeDaten;
 
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
 
         ));
   }
-  
+
 void getdevtoken()async{
   var token = await firebaseMessaging.getToken();
   auth0.uploaddevtocken(_stufe, token, _userUID);

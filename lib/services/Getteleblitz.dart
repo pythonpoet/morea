@@ -18,7 +18,8 @@ class Teleblitz implements BaseTeleblitz {
     var data;
     var info = new Info();
     String stufe = filter;
-    if (filter != null) {
+  
+    if (stufe!= '@') {
       if (await auth.refreshteleblitz(stufe) == true) {
         data = await http.get(
             "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
@@ -68,9 +69,8 @@ class Teleblitz implements BaseTeleblitz {
           }
         });
       }
+      return info;
     }
-
-    return info;
   }
   
   Widget anzeigen(String _stufe) {
