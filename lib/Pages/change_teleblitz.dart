@@ -222,8 +222,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                 .add(TextEditingController());
                                           });
                                         },
-                                        icon: Icon(Icons.add, color: Colors.white,),
-                                        label: Text("Element hinzufügen", style: TextStyle(color: Colors.white),),
+                                        icon: Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                        label: Text(
+                                          "Element hinzufügen",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                         color: Color(0xffff9262),
                                       ),
                                     ),
@@ -293,15 +299,24 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 ),
                               ),
                               ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 25),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 25),
                                 title: RaisedButton.icon(
                                   //TODO change to a variable stufe later
                                   onPressed: () {
                                     this.uploadTeleblitz(
-                                        _stufe, snapshot.data.getID());
+                                        _stufe,
+                                        snapshot.data.getID(),
+                                        snapshot.data.getSlug());
                                   },
-                                  icon: Icon(Icons.update, color: Colors.white,),
-                                  label: Text("Teleblitz ändern", style: TextStyle(color: Colors.white),),
+                                  icon: Icon(
+                                    Icons.update,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    "Teleblitz ändern",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                   color: Color(0xffff9262),
                                 ),
                               )
@@ -345,9 +360,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     return teleblitz;
   }
 
-  void uploadTeleblitz(String filter, String id) {
+  void uploadTeleblitz(String filter, String id, String slug) {
     String _stufe = filter;
     String _id = id;
+    String _slug = slug;
 
     List<String> _mitnehmen = List<String>();
 
@@ -356,14 +372,16 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     }
 
     TeleblitzInfo newteleblitz = TeleblitzInfo.fromString(
-        _stufe,
-        datumController.text,
-        antretenController.text,
-        abtretenController.text,
-        bemerkungController.text,
-        senderController.text,
-        _id,
-        _mitnehmen);
+      _stufe,
+      datumController.text,
+      antretenController.text,
+      abtretenController.text,
+      bemerkungController.text,
+      senderController.text,
+      _id,
+      _mitnehmen,
+      _slug,
+    );
     var jsonMap = {"fields": newteleblitz.toJson()};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
@@ -397,6 +415,7 @@ class TeleblitzInfo {
       _sender,
       _stufe,
       _id,
+      _slug,
       _jsonMitnehmen;
 
   List<String> _mitnehmen;
@@ -412,7 +431,8 @@ class TeleblitzInfo {
       String bemerkung,
       String sender,
       String id,
-      List<String> mitnehmen) {
+      List<String> mitnehmen,
+      String slug) {
     _titel = titel;
     _datum = datum;
     _antreten = antreten;
@@ -423,6 +443,7 @@ class TeleblitzInfo {
     _mitnehmen = mitnehmen;
     _keineaktivitaet = false;
     _ferien = false;
+    _slug = slug;
     this.createJsonMitnehmen();
   }
 
@@ -436,7 +457,8 @@ class TeleblitzInfo {
         _stufe = json['name'],
         _id = json['_id'],
         _keineaktivitaet = json['keine-aktivitat'],
-        _ferien = json['ferien'] {
+        _ferien = json['ferien'],
+        _slug = json['slug'] {
     this._mitnehmen = json["mitnehmen-test"]
         .replaceFirst("<ul>", "")
         .replaceFirst('<' + '/' + 'ul>', "")
@@ -458,9 +480,9 @@ class TeleblitzInfo {
         'name-des-senders': _sender,
         'keine-aktivitat': _keineaktivitaet,
         'ferien': _ferien,
-        'slug': _stufe,
         '_archived': false,
         '_draft': false,
+        'slug': _slug,
       };
 
   void createJsonMitnehmen() {
@@ -506,6 +528,10 @@ class TeleblitzInfo {
 
   String getID() {
     return this._id;
+  }
+
+  String getSlug() {
+    return this._slug;
   }
 
   void setDatum(String datum) {
