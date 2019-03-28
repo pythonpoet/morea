@@ -3,6 +3,7 @@ import '../services/auth.dart';
 import '../services/crud.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'home_page.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
@@ -17,15 +18,16 @@ class ChangeTeleblitz extends StatefulWidget {
 }
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
+  Auth auth0 = Auth();
   String _stufe;
   final _formKey = GlobalKey<FormState>();
   final datumController = TextEditingController();
   final antretenController = TextEditingController();
   final abtretenController = TextEditingController();
   Map<String, TextEditingController> mitnehmenControllerMap =
-      Map<String, TextEditingController>();
+  Map<String, TextEditingController>();
   List<TextEditingController> mitnehmenControllerList =
-      List<TextEditingController>();
+  List<TextEditingController>();
   final bemerkungController = TextEditingController();
   final senderController = TextEditingController();
   var aktteleblitz;
@@ -55,7 +57,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
               print(u);
               if (!(this.mitnehmenControllerMap.containsKey(u))) {
                 TextEditingController controller =
-                    TextEditingController(text: u);
+                TextEditingController(text: u);
                 this.mitnehmenControllerMap[u] = controller;
               }
             }
@@ -88,7 +90,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -119,7 +121,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -150,7 +152,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -181,7 +183,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -196,15 +198,15 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                     ListView.builder(
                                       shrinkWrap: true,
                                       itemCount:
-                                          this.mitnehmenControllerList.length,
+                                      this.mitnehmenControllerList.length,
                                       physics:
-                                          const NeverScrollableScrollPhysics(),
+                                      const NeverScrollableScrollPhysics(),
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return new ListTile(
                                           title: TextField(
                                             controller:
-                                                mitnehmenControllerList[index],
+                                            mitnehmenControllerList[index],
                                             style: TextStyle(fontSize: 18),
                                             decoration: InputDecoration(
                                                 filled: true,
@@ -242,7 +244,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -273,7 +275,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -300,9 +302,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                               ),
                               ListTile(
                                 contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
+                                EdgeInsets.symmetric(horizontal: 25),
                                 title: RaisedButton.icon(
-                                  //TODO change to a variable stufe later
                                   onPressed: () {
                                     this.uploadTeleblitz(
                                         _stufe,
@@ -364,8 +365,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String _stufe = filter;
     String _id = id;
     String _slug = slug;
+    String _jsonMitnehmen;
 
     List<String> _mitnehmen = List<String>();
+
 
     for (var u in mitnehmenControllerList) {
       _mitnehmen.add(u.text);
@@ -386,7 +389,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
     header["Authorization"] =
-        "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
+    "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
     header["accept-version"] = "1.0.0";
     header["Content-Type"] = "application/json";
     http
@@ -401,6 +404,23 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       print(result.statusCode);
       print(result.body);
     });
+    _jsonMitnehmen = "<ul>";
+    for (var u in _mitnehmen) {
+      _jsonMitnehmen = _jsonMitnehmen + "<li>" + u + "</li>";
+    }
+    _jsonMitnehmen = _jsonMitnehmen + '</ul>';
+
+    Map<String, dynamic> data = {
+      "abtreten": abtretenController.text,
+      "antreten": antretenController.text,
+      "bemerkung": bemerkungController.text,
+      "datum": datumController.text,
+      "keine-aktivität": "false",
+      "mitnehmen-test": _jsonMitnehmen,
+      "name-des-senders": senderController.text,
+    };
+    auth0.ubloadteleblitz(data, _stufe);
+    Navigator.pop(context);
   }
 }
 
@@ -423,8 +443,7 @@ class TeleblitzInfo {
 
   TeleblitzInfo();
 
-  TeleblitzInfo.fromString(
-      String titel,
+  TeleblitzInfo.fromString(String titel,
       String datum,
       String antreten,
       String abtreten,
@@ -470,7 +489,8 @@ class TeleblitzInfo {
     this._inhalt = Map.from(json);
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         'name': _titel,
         'datum': _datum,
         'antreten': _antreten,
