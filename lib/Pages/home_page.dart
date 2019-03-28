@@ -130,6 +130,12 @@ void getdevtoken()async{
         appBar: new AppBar(
           title: new Text('Teleblitz'),
           backgroundColor: Color(0xff7a62ff),
+          actions: <Widget>[
+            IconButton(icon: Icon(Icons.refresh), onPressed: () {setState(() {
+              tlbz = Teleblitz();
+              tlbz.getInfos(_stufe);
+            });})
+          ],
         ),
         drawer: new Drawer(
           child: new ListView(children: navigation()),

@@ -13,7 +13,7 @@ class Teleblitz implements BaseTeleblitz {
   Auth auth = new Auth();
   bool block = false;
 
-  Future<Info> _getInfos(String filter) async {
+  Future<Info> getInfos(String filter) async {
     var jsonData;
     var data;
     var info = new Info();
@@ -76,7 +76,7 @@ class Teleblitz implements BaseTeleblitz {
   Widget anzeigen(String _stufe) {
     try{
         return new FutureBuilder(
-        future: _getInfos(_stufe),
+        future: getInfos(_stufe),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return Container(
@@ -138,7 +138,7 @@ class Info {
   String sender;
   String mitnehmen;
   bool keineaktivitat;
-  double _sizeleft = 120;
+  double _sizeleft = 110;
 
   void setTitel(String titel) {
     this.titel = titel;
@@ -195,6 +195,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
@@ -235,6 +236,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
@@ -265,6 +267,7 @@ class Info {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
               width: this._sizeleft,
@@ -284,6 +287,7 @@ class Info {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
@@ -314,6 +318,7 @@ class Info {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
@@ -344,6 +349,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
