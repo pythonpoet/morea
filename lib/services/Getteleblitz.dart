@@ -9,6 +9,8 @@ abstract class BaseTeleblitz {
   Widget anzeigen(String _stufe);
 }
 
+
+
 class Teleblitz implements BaseTeleblitz {
   Auth auth = new Auth();
   bool block = false;

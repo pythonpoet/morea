@@ -125,6 +125,7 @@ void getdevtoken()async{
   }
 
   Widget teleblitzwidget(){
+    print("rebuilding...");
     if(_formType == FormType.leiter){    
      return Scaffold(
         appBar: new AppBar(
@@ -132,8 +133,8 @@ void getdevtoken()async{
           backgroundColor: Color(0xff7a62ff),
           actions: <Widget>[
             IconButton(icon: Icon(Icons.refresh), onPressed: () {setState(() {
-              tlbz = Teleblitz();
-              tlbz.getInfos(_stufe);
+              var newtlbz = new Teleblitz();
+              tlbz = newtlbz;
             });})
           ],
         ),
