@@ -30,7 +30,9 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   List<TextEditingController>();
   final bemerkungController = TextEditingController();
   final senderController = TextEditingController();
+  final formKey = new GlobalKey<FormState>();
   var aktteleblitz;
+  
 
   void initState() {
     super.initState();
@@ -344,6 +346,17 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
         });
   }
 
+  bool validateAndSave() {
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
   Future<TeleblitzInfo> downloadInfo(String filter) async {
     var jsonDecode;
     var jsonString;
@@ -368,7 +381,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String _jsonMitnehmen;
 
     List<String> _mitnehmen = List<String>();
-
+    validateAndSave();
 
     for (var u in mitnehmenControllerList) {
       _mitnehmen.add(u.text);
