@@ -3,7 +3,6 @@ import '../services/auth.dart';
 import '../services/crud.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'home_page.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
@@ -75,6 +74,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
             return new Scaffold(
               appBar: AppBar(
                 title: Text("Teleblitz Ändern"),
+                backgroundColor: Color(0xff7a62ff),
               ),
               body: ListView(
                 children: [

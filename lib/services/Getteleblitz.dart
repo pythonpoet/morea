@@ -288,17 +288,37 @@ class Info {
     if ((keineaktivitat == false) || (this?.bemerkung?.isNotEmpty ?? false)) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-          child: Row(
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(bottom: 10),
+                child:  Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
-                  child: Text("Bemerkung", style: this._getStyleLeft())),
+                  child: Text("Bemerkung:", style: this._getStyleLeft())),
+              /*Expanded(
+                  child: Text(
+                this.bemerkung,
+                style: this._getStyleRight(),
+              ))*/
+            ],
+          ),
+              ),
+             Container(
+                child:  Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              
               Expanded(
                   child: Text(
                 this.bemerkung,
                 style: this._getStyleRight(),
               ))
+            ],
+          ),
+              ),
             ],
           ));
     } else {
@@ -350,12 +370,24 @@ class Info {
     if ((keineaktivitat == false) || (this?.antreten?.isNotEmpty ?? false)) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-        child: Row(
+        child: Column(
+  
+          children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(bottom: 10),
+                child: Row(
+                
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Mitnehmen", style: this._getStyleLeft())),
+                child: Text("Mitnehmen:", style: this._getStyleLeft())),
+          ],
+        ),
+              ),
+         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
             Expanded(
                 child: Html(
               data: this.mitnehmen,
@@ -363,6 +395,9 @@ class Info {
             ))
           ],
         ),
+          ],
+        )
+        
       );
     } else {
       return Container(
