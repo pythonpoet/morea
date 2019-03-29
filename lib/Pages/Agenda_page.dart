@@ -118,7 +118,7 @@ class _AgendaStatePage extends State<AgendaState> {
                           ],
                         )),
                         onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (BuildContext context) => new ViewEventPageState(info: _info,pos: widget.userInfo['Pos'],))),
+                                  builder: (BuildContext context) => new ViewEventPageState(info: _info ,pos: widget.userInfo['Pos'],))),
                         );
                 }else if(_info['Lager']){
                    return new ListTile(
@@ -157,7 +157,7 @@ class _AgendaStatePage extends State<AgendaState> {
                           ],
                         )),
                         onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (BuildContext context) => new ViewLagerPageState(info: _info,))),
+                                  builder: (BuildContext context) => new ViewLagerPageState(info: _info, pos: widget.userInfo['Pos']))),
                         );
                 }
                

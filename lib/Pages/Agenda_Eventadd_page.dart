@@ -5,23 +5,34 @@ import 'package:intl/intl.dart';
 
 
 class EventAddPage extends StatefulWidget{
+  EventAddPage({this.eventinfo, this.agendaModus});
+  var eventinfo;
+  AgendaModus agendaModus;
   @override
-  State<StatefulWidget> createState() => _EventAddPageState();
+  State<StatefulWidget> createState() => EventAddPageState();
+}
+enum AgendaModus {
+  lager,
+  event,
+  beides
 }
 
 
-class _EventAddPageState extends State<EventAddPage>{
+class EventAddPageState extends State<EventAddPage>{
   Auth aut0 = new Auth();
  int value = 2;
  List<String> mitnehemen= ['Pfadihämpt'];
- final _addkey = new GlobalKey<FormState>();
+ final _addkey    = new GlobalKey<FormState>();
  final _changekey = new GlobalKey<FormState>();
- final _addEvent = new GlobalKey<FormState>();
- final _addLager = new GlobalKey<FormState>();
+ final _addEvent  = new GlobalKey<FormState>();
+ final _addLager  = new GlobalKey<FormState>();
 
  String eventname = ' ', datum = 'Datum wählen', anfangzeit = 'Zeit wählen', anfangort = ' ', schlusszeit = 'Zeit wählen', schlussort = ' ', beschreibung = ' ', pfadiname = ' ', email = ' ';
  String lagername = ' ', datumvon = 'Datum wählen', datumbis = 'Datum wählen', lagerort = ' ';
  int order;
+
+ 
+
 
  Map<String, dynamic> Event;
  Map<String, dynamic> Lager;
@@ -118,7 +129,7 @@ class _EventAddPageState extends State<EventAddPage>{
        'Stufen' : stufen,
        'Beschreibung': beschreibung,
        'Kontakt' : kontakt,
-       'Mitnehmen' : mitnehemen
+       'Mitnehmen' : mitnehemen,
      };
       if(stufen['Biber']) {
         aut0.uploadtoAgenda('Biber', datumvon, Lager);
@@ -204,11 +215,28 @@ if (picked != null && picked != datumvon)
    });
  }
  
+  @override
+  void initState() {
+    datumvon    = widget.eventinfo['Datum'];
+    datumbis    = widget.eventinfo['Datum bis'];
+    datum       = widget.eventinfo['Datum'];
 
+    anfangzeit  = widget.eventinfo['Anfangszeit'];
+    schlusszeit = widget.eventinfo['Schlusszeit'];
+
+    stufen      = Map.from(widget.eventinfo['Stufen']);
+    mitnehemen  = List<String>.from(widget.eventinfo['Mitnehmen']);
+    order       = widget.eventinfo['Order'];
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+
+    switch (widget.agendaModus) {
+      case AgendaModus.beides:
+        return DefaultTabController(
       length: 2,
       child: new Scaffold(
         appBar: new AppBar(
@@ -233,6 +261,48 @@ if (picked != null && picked != datumvon)
         ),
       ),
     );
+        break;
+      case AgendaModus.event:
+        return Scaffold(
+          appBar: new AppBar(
+            title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
+            backgroundColor: Color(0xff7a62ff),
+          ),
+          body: LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: viewportConstraints.maxHeight,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: <Widget>[
+                              event()
+                               
+                            ],
+                          )
+                        )
+                      ),
+                    );
+                  },
+                ),
+          );
+        
+          break;
+      case AgendaModus.lager:
+       return Scaffold(
+        appBar: new AppBar(
+          title: new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
+          backgroundColor: Color(0xff7a62ff),
+        ),
+        body: lager()
+        );
+        break;
+
+    }
+    
   }
   void changemitnehmen(int index){
    String zwischensp;
@@ -288,11 +358,12 @@ if (picked != null && picked != datumvon)
                             children: <Widget>[
                               Expanded(
                                 flex: 3,
-                                child: Text('Lager Name'),
+                                child: Text('Lagername'),
                               ),
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Lagername'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -351,6 +422,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Lagerort'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -380,6 +452,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 3,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Anfangsort'],
                                   decoration: new InputDecoration(
                                       border: OutlineInputBorder(),
                                       filled: false,
@@ -409,6 +482,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 3,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Schlussort'],
                                   decoration: new InputDecoration(
                                       border: OutlineInputBorder(),
                                       filled: false,
@@ -459,6 +533,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Beschreibung'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -481,6 +556,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 3,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Kontakt']['Pfadiname'],
                                   decoration: new InputDecoration(
                                     hintText: 'Pfadiname',
                                     border: OutlineInputBorder(),
@@ -493,6 +569,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 4,
                                 child: new TextFormField(
+                                   initialValue: widget.eventinfo['Kontakt']['Email'],
                                   decoration: new InputDecoration(
                                     hintText: 'Email',
                                     border: OutlineInputBorder(),
@@ -585,6 +662,7 @@ if (picked != null && picked != datumvon)
 
   Widget event(){
     return new Container(
+      height: 700,
      child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
           return SingleChildScrollView(
@@ -609,6 +687,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Eventname'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -656,6 +735,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 3,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Anfangsort'],
                                   decoration: new InputDecoration(
                                       border: OutlineInputBorder(),
                                       filled: false,
@@ -685,6 +765,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 3,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Schlussort'],
                                   decoration: new InputDecoration(
                                       border: OutlineInputBorder(),
                                       filled: false,
@@ -735,6 +816,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Beschreibung'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -757,6 +839,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 3,
                                 child: new TextFormField(
+                                  initialValue: widget.eventinfo['Kontakt']['Pfadiname'],
                                   decoration: new InputDecoration(
                                     hintText: 'Pfadiname',
                                     border: OutlineInputBorder(),
@@ -769,6 +852,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                 flex: 4,
                                 child: new TextFormField(
+                                   initialValue: widget.eventinfo['Kontakt']['Email'],
                                   decoration: new InputDecoration(
                                     hintText: 'Email',
                                     border: OutlineInputBorder(),

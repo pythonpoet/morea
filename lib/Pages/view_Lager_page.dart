@@ -1,8 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/Agenda_Eventadd_page.dart';
 
 class ViewLagerPageState extends StatelessWidget {
-  ViewLagerPageState({this.info});
+
+ ViewLagerPageState({this.info, this.pos});
   var info;
+  String pos;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -10,6 +16,7 @@ class ViewLagerPageState extends StatelessWidget {
     return Container(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color(0xff7a62ff),
           title: Text(info['Lagername'].toString()),
         ),
         body: LayoutBuilder(
@@ -23,8 +30,17 @@ class ViewLagerPageState extends StatelessWidget {
                   child: viewLager(),
                 ));
               },
-            )
-      ),
+            ),
+            floatingActionButton: Opacity(
+              opacity: istLeiter() ? 1.0 : 0.0 ,
+              child: new FloatingActionButton(
+                elevation: 0.0,
+                child: new Icon(Icons.edit),
+                backgroundColor:  Color(0xff7a62ff),
+                onPressed: () => routeToLagerbearb(context),
+                ),
+             ),
+      )
     );
   }
   Widget viewLager(){
@@ -326,6 +342,20 @@ class ViewLagerPageState extends StatelessWidget {
             ],
           ),
         );
+  }
+
+  bool istLeiter(){
+    if(pos=='Leiter'){
+      return true;
+    }else{
+      return false;
+    }
+  }
+ void routeToLagerbearb(context){
+    Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) => EventAddPage(eventinfo: info, agendaModus: AgendaModus.lager,))).then((onValue){
+
+                    });
   }
 }
 

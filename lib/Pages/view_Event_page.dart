@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/Agenda_Eventadd_page.dart';
 
 class ViewEventPageState extends StatelessWidget {
   ViewEventPageState({this.info, this.pos});
@@ -10,6 +11,7 @@ class ViewEventPageState extends StatelessWidget {
     return Container(
         child: Scaffold(
             appBar: AppBar(
+              backgroundColor: Color(0xff7a62ff),
               title: Text(info['Eventname'].toString()),
             ),
             body: LayoutBuilder(
@@ -23,7 +25,15 @@ class ViewEventPageState extends StatelessWidget {
                   child: viewEvent(),
                 ));
               },
-            )));
+            ),floatingActionButton: Opacity(
+              opacity: istLeiter() ? 1.0 : 0.0 ,
+              child: new FloatingActionButton(
+                elevation: 0.0,
+                child: new Icon(Icons.edit),
+                backgroundColor:  Color(0xff7a62ff),
+                onPressed: () => routeToLagerbearb(context),
+                ),
+             ),));
   }
 
   Widget viewEvent() {
@@ -274,5 +284,18 @@ class ViewEventPageState extends StatelessWidget {
         ],
       ),
     );
+  }
+  bool istLeiter(){
+    if(pos=='Leiter'){
+      return true;
+    }else{
+      return false;
+    }
+  }
+ void routeToLagerbearb(context){
+    Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) => EventAddPage(eventinfo: info, agendaModus: AgendaModus.event,))).then((onValue){
+
+                    });
   }
 }

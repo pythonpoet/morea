@@ -411,7 +411,6 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
             onPressed: () => {
               deleteuseraccount()
             },
-         
         ),
         SizedBox(height: 15,)
       ];
