@@ -9,6 +9,7 @@ import 'profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'change_teleblitz.dart';
 import 'personen_verzeichniss_page.dart';
+import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePage extends StatefulWidget {
@@ -160,7 +161,9 @@ void getdevtoken()async{
           child: new Icon(Icons.edit),
           backgroundColor: Color(0xff7a62ff),
           onPressed: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new ChangeTeleblitz(stufe: _stufe))))
+          builder: (BuildContext context) => new SelectStufe())).then((onValue){
+            setState((){});
+          }))
     
         );
     }else{

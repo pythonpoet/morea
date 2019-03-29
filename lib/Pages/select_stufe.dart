@@ -94,7 +94,9 @@ class SelectStufe extends StatelessWidget {
                           builder: (BuildContext context) =>
                           new ChangeTeleblitz(
                             stufe: "Drason (Buebe)",
-                          ))),
+                          ))).then((onValue){
+                            Navigator.pop(context);
+                          }),
                 ),
               ),
             ],

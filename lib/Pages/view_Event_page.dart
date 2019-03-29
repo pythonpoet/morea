@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ViewEventPageState extends StatelessWidget {
-  ViewEventPageState({this.info});
+  ViewEventPageState({this.info, this.pos});
   var info;
+  String pos;
 
   @override
   Widget build(BuildContext context) {

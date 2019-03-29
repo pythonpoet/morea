@@ -9,11 +9,13 @@ abstract class BaseTeleblitz {
   Widget anzeigen(String _stufe);
 }
 
+
+
 class Teleblitz implements BaseTeleblitz {
   Auth auth = new Auth();
   bool block = false;
 
-  Future<Info> _getInfos(String filter) async {
+  Future<Info> getInfos(String filter) async {
     var jsonData;
     var data;
     var info = new Info();
@@ -25,7 +27,7 @@ class Teleblitz implements BaseTeleblitz {
             "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
         jsonData = json.decode(data.body);
 
-        Map<String, String> telblitz;
+        Map<String, dynamic> telblitz;
 
         for (var u in jsonData["items"]) {
           if (u["name"] == stufe) {
@@ -43,7 +45,7 @@ class Teleblitz implements BaseTeleblitz {
             }
             telblitz = {
               'datum': info.datum,
-              'keine-aktivitat': info.keineaktivitat.toString(),
+              'keine-aktivität': info.keineaktivitat,
               'antreten': info.antreten,
               'abtreten': info.abtreten,
               'bemerkung': info.bemerkung,
@@ -54,10 +56,10 @@ class Teleblitz implements BaseTeleblitz {
           }
         }
       } else {
-        await auth.getteleblitz(stufe).then((result) async {
+        await auth.getteleblitz(stufe).then((result) {
           info.setTitel(stufe);
           info.setDatum(result.data["datum"]);
-          if (result.data['keine-aktivitat'] == 'false') {
+          if (!result.data["keine-aktivität"]) {
             info.setAntreten(result.data["antreten"]);
             info.setAbtreten(result.data["abtreten"]);
             info.setBemerkung(result.data["bemerkung"]);
@@ -76,7 +78,7 @@ class Teleblitz implements BaseTeleblitz {
   Widget anzeigen(String _stufe) {
     try{
         return new FutureBuilder(
-        future: _getInfos(_stufe),
+        future: getInfos(_stufe),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return Container(
@@ -138,7 +140,7 @@ class Info {
   String sender;
   String mitnehmen;
   bool keineaktivitat;
-  double _sizeleft = 120;
+  double _sizeleft = 110;
 
   void setTitel(String titel) {
     this.titel = titel;
@@ -195,6 +197,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
@@ -235,6 +238,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
@@ -265,6 +269,7 @@ class Info {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
               width: this._sizeleft,
@@ -284,6 +289,7 @@ class Info {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
@@ -314,6 +320,7 @@ class Info {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
@@ -344,6 +351,7 @@ class Info {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
