@@ -7,10 +7,10 @@ import '../services/Getteleblitz.dart';
 import 'Agenda_page.dart';
 import 'profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'change_teleblitz.dart';
 import 'personen_verzeichniss_page.dart';
 import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'select_stufe.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -126,11 +126,18 @@ void getdevtoken()async{
   }
 
   Widget teleblitzwidget(){
+    print("rebuilding...");
     if(_formType == FormType.leiter){    
      return Scaffold(
         appBar: new AppBar(
           title: new Text('Teleblitz'),
           backgroundColor: Color(0xff7a62ff),
+          actions: <Widget>[
+            IconButton(icon: Icon(Icons.refresh), onPressed: () {setState(() {
+              var newtlbz = new Teleblitz();
+              tlbz = newtlbz;
+            });})
+          ],
         ),
         drawer: new Drawer(
           child: new ListView(children: navigation()),
