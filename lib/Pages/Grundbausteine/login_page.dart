@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
 
   updatedevtoken()async{
     List devtoken;
-    await auth0.getUserInformation().then((userInfo){
+    await auth0.getUserInformation(userId).then((userInfo){
       try{
         List devtoken_old = userInfo.data['devtoken'];
         if(devtoken_old == null){
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
           String userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
           print('Sign in: ${userId}');
           setState(() {
-           _load =false; 
+           _load = false; 
           });
           updatedevtoken();
           widget.onSignedIn();

@@ -18,7 +18,7 @@ class Teleblitz implements BaseTeleblitz {
   Future<Info> getInfos(String filter) async {
     var jsonData;
     var data;
-    var info = new Info();
+    var info =  new Info();
     String stufe = filter;
   
     if (stufe!= '@') {
@@ -26,7 +26,6 @@ class Teleblitz implements BaseTeleblitz {
         data = await http.get(
             "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
         jsonData = json.decode(data.body);
-
         Map<String, dynamic> telblitz;
 
         for (var u in jsonData["items"]) {
@@ -52,7 +51,7 @@ class Teleblitz implements BaseTeleblitz {
               'name-des-senders': info.sender,
               'mitnehmen-test': info.mitnehmen
             };
-            auth.ubloadteleblitz(telblitz, stufe);
+            auth.uploadteleblitz(telblitz, stufe);
           }
         }
       } else {
@@ -132,6 +131,11 @@ class Teleblitz implements BaseTeleblitz {
 }
 
 class Info {
+  static Info _instance;
+  factory Info() => _instance ??= new Info._();
+
+  Info._();
+
   String titel;
   String antreten;
   String abtreten;

@@ -84,19 +84,19 @@ class EventAddPageState extends State<EventAddPage>{
        'Mitnehmen' : mitnehemen
      };
       if(stufen['Biber']) {
-        aut0.uploadtoAgenda('Biber', datum, Event);
+        aut0.uploadtoAgenda('Biber', datum+eventname, Event);
       }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datum, Event);
+       aut0.uploadtoAgenda('Nahani (Meitli)', datum+eventname, Event);
      }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datum, Event);
+       aut0.uploadtoAgenda('Nahani (Meitli)', datum+eventname , Event);
      }
      if(stufen['Drason (Buebe)']) {
-       aut0.uploadtoAgenda('Drason (Buebe)', datum, Event);
+       aut0.uploadtoAgenda('Drason (Buebe)', datum+eventname, Event);
      }
      if(stufen['Pios']) {
-       aut0.uploadtoAgenda('Pios', datum, Event);
+       aut0.uploadtoAgenda('Pios', datum+eventname, Event);
      }
      showDialog(context: context, 
      child: new AlertDialog(
@@ -132,25 +132,21 @@ class EventAddPageState extends State<EventAddPage>{
        'Mitnehmen' : mitnehemen,
      };
       if(stufen['Biber']) {
-        aut0.uploadtoAgenda('Biber', datumvon, Lager);
+        aut0.uploadtoAgenda('Biber', datumvon+lagername, Lager);
       }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datumvon, Lager);
+       aut0.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
      }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datumvon, Lager);
+       aut0.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
      }
      if(stufen['Drason (Buebe)']) {
-       aut0.uploadtoAgenda('Drason (Buebe)', datumvon, Lager);
+       aut0.uploadtoAgenda('Drason (Buebe)', datumvon+lagername, Lager);
      }
      if(stufen['Pios']) {
-       aut0.uploadtoAgenda('Pios', datumvon, Lager);
+       aut0.uploadtoAgenda('Pios', datumvon+lagername, Lager);
      }
-     showDialog(context: context, child:
-     new AlertDialog(
-       title: new Text("Event wurde hinzugefügt"),
-     )
-     );
+     Navigator.pop(context);
    }
  }
  Future<Null> _selectDatum(BuildContext context)async{
@@ -214,7 +210,39 @@ if (picked != null && picked != datumvon)
      schlusszeit = picked.hour.toString() + ':' + picked.minute.toString();
    });
  }
- 
+ void lagerdelete()async{
+   bool delete = false;
+   await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => new AlertDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          content: Container(
+            child: Text('Lager wirklich löschen?'),
+          ),
+          actions: <Widget>[
+            new RaisedButton(
+                child:  Text('Löschen', style: TextStyle(color: Colors.white),),
+                onPressed: () {
+                  delete=true;
+                  
+                  Navigator.pop(context);
+                }),
+          ],
+        ),
+      
+    );
+    if(delete){
+      String name = aut0.formatstring(widget.eventinfo['Datum']+widget.eventinfo['Lagername']);
+      aut0.deletedocument('Stufen/Biber/Agenda', name);
+      aut0.deletedocument('Stufen/WombatWlfe/Agenda', name);
+      aut0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
+      aut0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
+      aut0.deletedocument('Stufen/Pios/Agenda', name);
+      Navigator.pop(context);
+    }
+    
+
+ }
   @override
   void initState() {
     datumvon    = widget.eventinfo['Datum'];
@@ -233,7 +261,6 @@ if (picked != null && picked != datumvon)
 
   @override
   Widget build(BuildContext context) {
-
     switch (widget.agendaModus) {
       case AgendaModus.beides:
         return DefaultTabController(
@@ -326,7 +353,7 @@ if (picked != null && picked != datumvon)
           ),
           actions: <Widget>[
             new RaisedButton(
-                child: const Text('OK'),
+                child: new Text('OK',style: TextStyle(color: Colors.white),),
                 onPressed: () {
                   validateAndSave(_changekey);
                   Navigator.pop(context);
@@ -506,6 +533,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                   flex: 7,
                                   child: new ListView(
+                                    physics: NeverScrollableScrollPhysics(),
                                     children: stufen.keys.map((String key) {
                                       return new CheckboxListTile(
                                         title: new Text(key),
@@ -645,6 +673,14 @@ if (picked != null && picked != datumvon)
                                   color: Color(0xff7a62ff),
                                   textColor: Colors.white,
                                   onPressed: () => lagerHinzufuegen(_addLager),
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Center(
+                                child: new FlatButton(
+                                  child: new Text('Lager löschen',style: TextStyle(fontSize: 25, color: Colors.red)),
+                                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                  onPressed: () => lagerdelete(),
                                 ),
                               )
                             ],
@@ -789,6 +825,7 @@ if (picked != null && picked != datumvon)
                               Expanded(
                                   flex: 7,
                                   child: new ListView(
+                                    physics: NeverScrollableScrollPhysics(),
                                     children: stufen.keys.map((String key) {
                                       return new CheckboxListTile(
                                         title: new Text(key),

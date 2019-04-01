@@ -25,11 +25,14 @@ class HomePage extends StatefulWidget {
 
 enum FormType { leiter, teilnehmer, eltern }
 
+enum Anmeldung {angemolden, abgemolden, verchilt}
+
 class HomePageState extends State<HomePage> {
   crudMedthods crud0bj = new crudMedthods();
   Auth auth0 = new Auth();
   Teleblitz tlbz = new Teleblitz();
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  Info teleblitzinfo = new Info();
 
 
 
@@ -37,6 +40,7 @@ class HomePageState extends State<HomePage> {
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.teilnehmer;
+  Anmeldung _anmeldung = Anmeldung.verchilt;
 
   String _pfadiname = ' ', _userUID = ' ', _stufe = '@', _email = ' ';
   DocumentSnapshot qsuserInfo;
@@ -66,11 +70,11 @@ void getdevtoken()async{
   auth0.uploaddevtocken(_stufe, token, _userUID);
 }
 
-  getuserinfo() async {
-    widget.auth.currentUser().then((userId) {
+   getuserinfo() async {
+    await widget.auth.currentUser().then((userId) {
       _userUID = userId;
     });
-    await auth0.getUserInformation().then((results) async {
+    await auth0.getUserInformation(_userUID).then((results) async {
         setState(() {
           qsuserInfo = results;
           _pfadiname = qsuserInfo.data['Pfadinamen'];
@@ -131,13 +135,7 @@ void getdevtoken()async{
      return Scaffold(
         appBar: new AppBar(
           title: new Text('Teleblitz'),
-          backgroundColor: Color(0xff7a62ff),
-          actions: <Widget>[
-            IconButton(icon: Icon(Icons.refresh), onPressed: () {setState(() {
-              var newtlbz = new Teleblitz();
-              tlbz = newtlbz;
-            });})
-          ],
+          backgroundColor: Color(0xff7a62ff)
         ),
         drawer: new Drawer(
           child: new ListView(children: navigation()),

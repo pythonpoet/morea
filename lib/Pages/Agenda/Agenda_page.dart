@@ -17,6 +17,33 @@ class _AgendaStatePage extends State<AgendaState> {
   Auth auth0 = new Auth();
 
   Stream<QuerySnapshot> qsagenda;
+  Map stufen ={
+    'Biber':false,
+    'Pios':false,
+    'Nahani (Meitli)':false,
+    'Drason (Buebe)':false,
+    'Wombat (Wölfe)':false,
+  };
+  Map kontakt = {
+    'Email': '',
+    'Pfadiname': ''
+  };
+  List mitnehmen = ['Pfadihämpt'];
+
+  Map<String,dynamic> quickfix ={
+    'Eventname': '',
+    'Datum':'Datum wählen',
+    'Datum bis': 'Datum wählen',
+    'Anfangszeit':'von',
+    'Anfangsort':'',
+    'Schlussort':'',
+    'Schlusszeit':'bis',
+    'Stufen': '',
+    'Beschreiben':'',
+    'Kontakt':'',
+    'Mitnehmen':'',
+    'Lagername':''
+  };
 
  _getAgenda(stufe) async {
    String xstufe =auth0.formatstring(stufe);
@@ -47,7 +74,7 @@ class _AgendaStatePage extends State<AgendaState> {
   routetoAddevent(){
     if(istLeiter()){
       Navigator.of(context).push(new MaterialPageRoute(
-              builder: (BuildContext context) => EventAddPage()));
+              builder: (BuildContext context) => EventAddPage(eventinfo: quickfix,agendaModus: AgendaModus.beides,)));
     }
   }
   
@@ -55,6 +82,9 @@ class _AgendaStatePage extends State<AgendaState> {
   @override
   void initState() {
     _getAgenda(widget.userInfo['Stufe']);
+    quickfix['Stufen'] = stufen;
+    quickfix['Kontakt'] = kontakt;
+    quickfix['Mitnehmen']= mitnehmen;
     super.initState();
   }
 

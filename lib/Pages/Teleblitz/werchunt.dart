@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:async/async.dart';
@@ -17,27 +18,19 @@ class WerChunt extends StatefulWidget {
 class _WerChuntState extends State<WerChunt> {
   Auth auth0 = new Auth();
   final formKey = new GlobalKey<FormState>();
+  Info teleblitzinfo = new Info();
 
-
-  String _pfadiname, _userUID, _stufe;
   DocumentSnapshot qsuserInfo, dsanmeldedat;
   Map<String, String> anmeldeDaten;
   List<String> lchunt=[' '], lchuntnoed=[' '];
 
 
-  void getuserinfo()async {
-   await auth0.getUserInformation().then((results) {
-      setState(() {
-        qsuserInfo = results;
-        _pfadiname = qsuserInfo.data['Pfadinamen'];
-        _stufe = qsuserInfo.data['Stufe'];
-      });
-    });
-  }
  sortlist()async{
     String stufe = auth0.formatstring(widget.userInfo['Stufe']);
+    String datum = auth0.formatstring(teleblitzinfo.datum);
+
     QuerySnapshot qsdata = await Firestore.instance.collection('uebung')
-       .document(stufe).collection(auth0.getuebungsdatum())
+      .document(stufe).collection(datum)
       .getDocuments();
       
       for(int i=0; i < qsdata.documents.length; i++){
@@ -56,13 +49,15 @@ class _WerChuntState extends State<WerChunt> {
         }else{
           print('Firesotre für uebung anmelden ist komisch');
         }
+        setState(() {
+          
+        });
       }
-  }
+}
   @override
   void initState() {
-    super.initState();
-     getuserinfo();
     sortlist();
+    super.initState();
   }
 
   @override
@@ -72,6 +67,7 @@ class _WerChuntState extends State<WerChunt> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Wer chunt?'),
+          backgroundColor: Color(0xff7a62ff),
           bottom: TabBar(
             tabs: <Widget>[
               Tab(

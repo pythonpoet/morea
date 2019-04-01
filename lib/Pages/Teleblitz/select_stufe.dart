@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'change_teleblitz.dart';
 
 class SelectStufe extends StatelessWidget {
@@ -10,6 +9,7 @@ class SelectStufe extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Stufe wählen"),
+        backgroundColor: Color(0xff7a62ff)
       ),
       body: Container(
         child: Container(

@@ -105,13 +105,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       trailing: Icon(Icons.date_range),
                                     ),
                                     ListTile(
-                                      title: TextField(
+                                      title: TextFormField(
+                                        initialValue: datumController.text,
                                         style: TextStyle(fontSize: 18),
-                                        controller: datumController,
                                         decoration: InputDecoration(
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
+                                                onSaved: (value)=> datumController.text = value,
                                       ),
                                     ),
                                   ],
@@ -136,13 +137,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       trailing: Icon(Icons.flag),
                                     ),
                                     ListTile(
-                                      title: TextField(
+                                      title: TextFormField(
+                                        initialValue: antretenController.text,
                                         style: TextStyle(fontSize: 18),
-                                        controller: antretenController,
                                         decoration: InputDecoration(
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
+                                                onSaved: (value)=> antretenController.text = value,
                                       ),
                                     ),
                                   ],
@@ -167,13 +169,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       trailing: Icon(Icons.flag),
                                     ),
                                     ListTile(
-                                      title: TextField(
+                                      title: TextFormField(
+                                        initialValue: abtretenController.text,
                                         style: TextStyle(fontSize: 18),
-                                        controller: abtretenController,
                                         decoration: InputDecoration(
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
+                                                onSaved: (value)=> abtretenController.text = value,
                                       ),
                                     ),
                                   ],
@@ -206,16 +209,16 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return new ListTile(
-                                          title: TextField(
-                                            controller:
-                                            mitnehmenControllerList[index],
-                                            style: TextStyle(fontSize: 18),
-                                            decoration: InputDecoration(
-                                                filled: true,
-                                                fillColor: Color.fromRGBO(
-                                                    153, 255, 255, 0.3)),
-                                          ),
-                                        );
+                                      title: TextFormField(
+                                        initialValue: mitnehmenControllerList[index].text,
+                                        style: TextStyle(fontSize: 18),
+                                        decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Color.fromRGBO(
+                                                153, 255, 255, 0.3)),
+                                                onSaved: (value)=> mitnehmenControllerList[index].text = value,
+                                      ),
+                                    );
                                       },
                                     ),
                                     ListTile(
@@ -259,13 +262,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       trailing: Icon(Icons.note),
                                     ),
                                     ListTile(
-                                      title: TextField(
+                                      title: TextFormField(
+                                        initialValue: bemerkungController.text,
                                         style: TextStyle(fontSize: 18),
-                                        controller: bemerkungController,
                                         decoration: InputDecoration(
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
+                                                onSaved: (value)=> bemerkungController.text = value,
                                       ),
                                     ),
                                   ],
@@ -290,13 +294,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       trailing: Icon(Icons.contacts),
                                     ),
                                     ListTile(
-                                      title: TextField(
+                                      title: TextFormField(
+                                        initialValue: senderController.text,
                                         style: TextStyle(fontSize: 18),
-                                        controller: senderController,
                                         decoration: InputDecoration(
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
+                                                onSaved: (value)=> senderController.text = value,
                                       ),
                                     ),
                                   ],
@@ -337,6 +342,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
             return Scaffold(
               appBar: AppBar(
                 title: Text("Loading"),
+                backgroundColor: Color(0xff7a62ff)
               ),
               body: Center(
                 child: CircularProgressIndicator(),
@@ -381,7 +387,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String _jsonMitnehmen;
 
     List<String> _mitnehmen = List<String>();
-    validateAndSave();
+      validateAndSave();
 
 
     for (var u in mitnehmenControllerList) {
@@ -433,7 +439,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       "mitnehmen-test": _jsonMitnehmen,
       "name-des-senders": senderController.text,
     };
-    auth0.ubloadteleblitz(data, _stufe);
+    auth0.uploadteleblitz(data, _stufe);
     Navigator.pop(context);
   }
 }
