@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
            _load =true; 
           });
-          String userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
+         userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
           print('Sign in: ${userId}');
           setState(() {
            _load = false; 
