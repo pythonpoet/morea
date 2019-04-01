@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:morea/services/auth.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});

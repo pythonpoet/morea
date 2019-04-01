@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/auth.dart';
-import '../services/crud.dart';
+import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

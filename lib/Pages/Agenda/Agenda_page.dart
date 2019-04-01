@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'package:morea/services/auth.dart';
 import 'Agenda_Eventadd_page.dart';
-import '../services/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'view_Lager_page.dart';
 import 'view_Event_page.dart';

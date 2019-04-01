@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Agenda_Eventadd_page.dart';
+import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
+
 
 class ViewEventPageState extends StatelessWidget {
   ViewEventPageState({this.info, this.pos});

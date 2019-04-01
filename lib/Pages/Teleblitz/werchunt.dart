@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../services/auth.dart';
-import '../services/crud.dart';
+import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'package:async/async.dart';
 
 class WerChunt extends StatefulWidget {

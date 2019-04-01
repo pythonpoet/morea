@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Agenda_Eventadd_page.dart';
+import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 
 class ViewLagerPageState extends StatelessWidget {
 

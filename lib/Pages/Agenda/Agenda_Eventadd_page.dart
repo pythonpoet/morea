@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/auth.dart';
+import 'package:morea/services/auth.dart';
 import 'package:intl/intl.dart';
 
 

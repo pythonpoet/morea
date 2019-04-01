@@ -1,6 +1,7 @@
+import 'package:morea/services/auth.dart';
+
 import 'view_userprofile_page.dart';
 import 'package:flutter/material.dart';
-import '../services/auth.dart';
 
 class EditUserProfilePage extends StatefulWidget {
   EditUserProfilePage({this.profile,this.auth});

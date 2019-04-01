@@ -1,16 +1,16 @@
 
 import 'package:flutter/material.dart';
-import '../services/auth.dart';
-import '../services/crud.dart';
+import 'package:morea/Pages/Agenda/Agenda_page.dart';
+import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
+import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/services/Getteleblitz.dart';
+import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
-import '../services/Getteleblitz.dart';
-import 'Agenda_page.dart';
-import 'profile_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'personen_verzeichniss_page.dart';
 import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'select_stufe.dart';
+
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -20,12 +20,12 @@ class HomePage extends StatefulWidget {
   final BasecrudMethods crud;
 
   @override
-  State<StatefulWidget> createState() => _HomePageState();
+  State<StatefulWidget> createState() => HomePageState();
 }
 
 enum FormType { leiter, teilnehmer, eltern }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   crudMedthods crud0bj = new crudMedthods();
   Auth auth0 = new Auth();
   Teleblitz tlbz = new Teleblitz();
@@ -269,8 +269,8 @@ void getdevtoken()async{
         )
       ];
     }
-  }
-//Hier soll der Teleblitz angezeigt werden
+}
+
 
  Widget anmeldebutton() {
     return Container(

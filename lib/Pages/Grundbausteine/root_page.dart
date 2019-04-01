@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/login_page.dart';
+import 'package:morea/Pages/Grundbausteine/login_page.dart';
+import 'package:morea/Pages/Teleblitz/home_page.dart';
+
 import 'package:morea/services/auth.dart';
-import 'package:morea/Pages/home_page.dart';
+
 
 
 class RootPage extends StatefulWidget{
