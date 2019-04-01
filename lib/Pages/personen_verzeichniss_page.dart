@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/view_userprofile_page.dart';
 import '../services/auth.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -79,6 +80,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('User'),
+          backgroundColor: Color(0xff7a62ff),
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -119,10 +121,12 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
                 itemBuilder: (context , int index){
                   if(woelfe[index]['Pfadinamen'].toString()== ''){
                     return new ListTile(
-                    title: new Text(woelfe[index]['Vorname'].toString()));
+                    title: new Text(woelfe[index]['Vorname'].toString()),
+                    onTap: () => navigatetoprofile(woelfe[index]));
                   }else{
                     return new ListTile(
-                    title: new Text(woelfe[index]['Pfadinamen'].toString()));
+                    title: new Text(woelfe[index]['Pfadinamen'].toString()),
+                    onTap: () => navigatetoprofile(woelfe[index]));
                   }
                   
                 }
@@ -136,17 +140,19 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
     
   }
   Widget nahanisstufe(){
-    if(woelfe[0] !=' '){
+    if(nahani[0] !=' '){
       return Container(
               child: ListView.builder(
                 itemCount: nahani.length,
                 itemBuilder: (context , int index){
                   if(nahani[index]['Pfadinamen'].toString()== ''){
                     return new ListTile(
-                    title: new Text(nahani[index]['Vorname'].toString()));
+                    title: new Text(nahani[index]['Vorname'].toString()),
+                    onTap: () => navigatetoprofile(nahani[index]));
                   }else{
                     return new ListTile(
-                    title: new Text(nahani[index]['Pfadinamen'].toString()));
+                    title: new Text(nahani[index]['Pfadinamen'].toString()),
+                    onTap: () => navigatetoprofile(nahani[index]));
                   }
                   
                 }
@@ -166,10 +172,14 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
                 itemBuilder: (context , int index){
                   if(drason[index]['Pfadinamen'].toString()== ''){
                     return new ListTile(
-                    title: new Text(drason[index]['Vorname'].toString()));
+                    title: new Text(drason[index]['Vorname'].toString()),
+                    onTap: () => navigatetoprofile(drason[index])
+                    );
                   }else{
                     return new ListTile(
-                    title: new Text(drason[index]['Pfadinamen'].toString()));
+                    title: new Text(drason[index]['Pfadinamen'].toString()),
+                    onTap: () => navigatetoprofile(drason[index])
+                    );
                   }
                   
                 }
@@ -189,10 +199,12 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
                 itemBuilder: (context , int index){
                   if(biber[index]['Pfadinamen'].toString()== ''){
                     return new ListTile(
-                    title: new Text(biber[index]['Vorname'].toString()));
+                    title: new Text(biber[index]['Vorname'].toString()),
+                    onTap: () => navigatetoprofile(biber[index]));
                   }else{
                     return new ListTile(
-                    title: new Text(biber[index]['Pfadinamen'].toString()));
+                    title: new Text(biber[index]['Pfadinamen'].toString()),
+                    onTap: () => navigatetoprofile(biber[index]));
                   }
                   
                 }
@@ -212,10 +224,12 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
                 itemBuilder: (context , int index){
                   if(pios[index]['Pfadinamen'].toString() == ''){
                     return new ListTile(
-                    title: new Text(pios[index]['Vorname'].toString()));
+                    title: new Text(pios[index]['Vorname'].toString()),
+                    onTap: () => navigatetoprofile(pios[index]));
                   }else{
                     return new ListTile(
-                    title: new Text(pios[index]['Pfadinamen'].toString()));
+                    title: new Text(pios[index]['Pfadinamen'].toString()),
+                    onTap: () => navigatetoprofile(pios[index]));
                   }
                   
                 }
@@ -226,5 +240,9 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
         child: new Text('Für diese Stufe ist niemand registriert', style: TextStyle(fontSize: 20)),
       );
     }
+  }
+  navigatetoprofile(userdata){
+    Navigator.of(context).push(new MaterialPageRoute(
+                builder: (BuildContext context) => new ViewUserProfilePageState(profile: userdata,)));
   }
 }
