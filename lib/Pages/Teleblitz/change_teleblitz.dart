@@ -209,16 +209,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return new ListTile(
-                                      title: TextFormField(
-                                        initialValue: mitnehmenControllerList[index].text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                                onSaved: (value)=> mitnehmenControllerList[index].text = value,
-                                      ),
-                                    );
+                                          title: TextFormField(
+                                            initialValue: mitnehmenControllerList[index]
+                                                .text,
+                                            style: TextStyle(fontSize: 18),
+                                            decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: Color.fromRGBO(
+                                                    153, 255, 255, 0.3)),
+                                            onSaved: (value) =>
+                                            mitnehmenControllerList[index]
+                                                .text = value,
+                                          ),
+                                        );
                                       },
                                     ),
                                     ListTile(
