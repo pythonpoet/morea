@@ -10,6 +10,7 @@ import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:share/share.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -135,7 +136,15 @@ void getdevtoken()async{
      return Scaffold(
         appBar: new AppBar(
           title: new Text('Teleblitz'),
-          backgroundColor: Color(0xff7a62ff)
+          backgroundColor: Color(0xff7a62ff),
+          actions: <Widget>[
+            FlatButton(
+              child: Icon(Icons.share, color: Colors.white,),
+              onPressed: (){
+                Share.share('Chum au id Pfadi https://www.morea.ch/ ');
+              },
+            )
+          ],
         ),
         drawer: new Drawer(
           child: new ListView(children: navigation()),

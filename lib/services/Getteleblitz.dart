@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:morea/services/url_launcher.dart';
 import 'dart:convert';
 import 'auth.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -14,6 +15,8 @@ abstract class BaseTeleblitz {
 class Teleblitz implements BaseTeleblitz {
   Auth auth = new Auth();
   bool block = false;
+  
+
 
   Future<Info> getInfos(String filter) async {
     var jsonData;
@@ -34,10 +37,12 @@ class Teleblitz implements BaseTeleblitz {
             info.setDatum(u["datum"]);
             if (u['keine-aktivitat'] == false) {
               info.setAntreten(u["antreten"]);
+              info.setAntretenMaps(u['google-map']);
               info.setAbtreten(u["abtreten"]);
+              info.setAbtretenMaps(u['map-abtreten']);
               info.setBemerkung(u["bemerkung"]);
               info.setSender(u["name-des-senders"]);
-              info.setMitnehmen(u['mitnehmen-test']);
+              info.setMitnehmen(u['mitnehmen-test']);            
               info.setkeineAktivitat(false);
             } else {
               info.setkeineAktivitat(true);
@@ -46,7 +51,9 @@ class Teleblitz implements BaseTeleblitz {
               'datum': info.datum,
               'keine-aktivität': info.keineaktivitat,
               'antreten': info.antreten,
+              'google-map': info.antretenMap,
               'abtreten': info.abtreten,
+              'map-abtreten': info.abtretenMap,
               'bemerkung': info.bemerkung,
               'name-des-senders': info.sender,
               'mitnehmen-test': info.mitnehmen
@@ -60,7 +67,9 @@ class Teleblitz implements BaseTeleblitz {
           info.setDatum(result.data["datum"]);
           if (!result.data["keine-aktivität"]) {
             info.setAntreten(result.data["antreten"]);
+            info.setAntretenMaps(result.data["google-map"]);
             info.setAbtreten(result.data["abtreten"]);
+            info.setAbtretenMaps(result.data["map-abtreten"]);
             info.setBemerkung(result.data["bemerkung"]);
             info.setSender(result.data["name-des-senders"]);
             info.setMitnehmen(result.data['mitnehmen-test']);
@@ -135,10 +144,13 @@ class Info {
   factory Info() => _instance ??= new Info._();
 
   Info._();
+  Urllauncher urllauncher = new Urllauncher();
 
   String titel;
   String antreten;
+  String antretenMap;
   String abtreten;
+  String abtretenMap;
   String datum;
   String bemerkung;
   String sender;
@@ -153,9 +165,16 @@ class Info {
   void setAntreten(String antreten) {
     this.antreten = antreten;
   }
+  void setAntretenMaps(String antretenMaps){
+    this.antretenMap = antretenMaps;
+  }
 
   void setAbtreten(String abtreten) {
     this.abtreten = abtreten;
+  }
+  
+  void setAbtretenMaps(String abtretenMaps){
+    this.abtretenMap = abtretenMaps;
   }
 
   void setDatum(String datum) {
@@ -177,6 +196,7 @@ class Info {
   void setkeineAktivitat(bool aktv) {
     this.keineaktivitat = aktv;
   }
+
 
   Container getTitel() {
     return Container(
@@ -207,10 +227,21 @@ class Info {
                 width: this._sizeleft,
                 child: Text("Antreten", style: this._getStyleLeft())),
             Expanded(
-                child: Text(
-              this.antreten,
-              style: this._getStyleRight(),
-            ))
+                child: InkWell(
+                  child: Text(
+                    this.antreten,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromARGB(255, 0, 0, 255),
+                      decoration: TextDecoration.underline
+                    ),
+                  ),
+                  onTap: (){
+                    urllauncher.openlinkMaps(this.antretenMap);
+                  } ,
+                ),
+                )
           ],
         ),
         /*child: Center(
@@ -248,10 +279,20 @@ class Info {
                 width: this._sizeleft,
                 child: Text("Abtreten", style: this._getStyleLeft())),
             Expanded(
-                child: Text(
+                child: InkWell(
+                  child: Text(
               this.abtreten,
-              style: this._getStyleRight(),
-            ))
+              style:  TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromARGB(255, 0, 0, 255),
+                      decoration: TextDecoration.underline
+                    ),
+                   ),
+                   onTap:  (){
+                    urllauncher.openlinkMaps(this.abtretenMap);
+                  },
+                ))
           ],
         ),
       );
