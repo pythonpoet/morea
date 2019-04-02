@@ -1,28 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:morea/services/url_launcher.dart';
 import 'edit_userprofile_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+ 
 
 class ViewUserProfilePageState extends StatelessWidget {
   ViewUserProfilePageState({this.profile});
   var profile;
-
-  _launchphone(phonenumber)async{
-    String url = 'tel:<$phonenumber>';
-    if(await canLaunch(url)){
-      await launch(url);
-    }else{
-      throw 'Could not launch $url';
-    }
-  }
-  _launchemail(email)async{
-    String url = 'mailto:<$email>';
-    if(await canLaunch(url)){
-      await launch(url);
-    }else{
-      throw 'Could not launch $url';
-    }
-  }
-
+  Urllauncher urllauncher = new Urllauncher();
+ 
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -183,7 +169,7 @@ class ViewUserProfilePageState extends StatelessWidget {
                           color: Color.fromARGB(255, 0, 0, 255),
                           decoration: TextDecoration.underline),
                       )),
-                      onTap: () =>_launchphone(profile['Handynummer']),
+                      onTap: () =>urllauncher.openPhone(profile['Handynummer']),
                           ),)
                     ],
                   ),
@@ -208,7 +194,7 @@ class ViewUserProfilePageState extends StatelessWidget {
                         color: Color.fromARGB(255, 0, 0, 255),
                           decoration: TextDecoration.underline),
                       )),
-                      onTap: () => _launchemail(profile['Email']),
+                      onTap: () => urllauncher.openMail(profile['Email']),
                           ))
                     ],
                   ),
