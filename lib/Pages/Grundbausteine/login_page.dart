@@ -403,7 +403,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   List<Widget> buildInputs() {
-    _formType =FormType.register;
     if (_formType == FormType.login) {
       return [
         Container(
@@ -444,7 +443,10 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                   onSaved: (value) => _password = value,
                 ),
-                SizedBox(height: 24,)
+                SizedBox(height: 24,),
+                Column(
+                  children: buildSubmitButtons(),
+                )
               ],
             ))
       ];

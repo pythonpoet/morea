@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
 import 'edit_userprofile_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ViewUserProfilePageState extends StatelessWidget {
   ViewUserProfilePageState({this.profile});
   var profile;
+
+  _launchphone(phonenumber)async{
+    String url = 'tel:<$phonenumber>';
+    if(await canLaunch(url)){
+      await launch(url);
+    }else{
+      throw 'Could not launch $url';
+    }
+  }
+  _launchemail(email)async{
+    String url = 'mailto:<$email>';
+    if(await canLaunch(url)){
+      await launch(url);
+    }else{
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,11 +174,17 @@ class ViewUserProfilePageState extends StatelessWidget {
                         ),
                       )),
                       Expanded(
-                          child: Container(
+                          child: InkWell(
+                            child:  Container(
                               child: Text(
                         profile['Handynummer'],
-                        style: TextStyle(fontSize: 20),
-                      )))
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color.fromARGB(255, 0, 0, 255),
+                          decoration: TextDecoration.underline),
+                      )),
+                      onTap: () =>_launchphone(profile['Handynummer']),
+                          ),)
                     ],
                   ),
                 ),
@@ -171,15 +195,21 @@ class ViewUserProfilePageState extends StatelessWidget {
                           child: Container(
                         child: Text(
                           'Email:',
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 20,
+                          ),
                         ),
                       )),
                       Expanded(
-                          child: Container(
+                          child: InkWell(
+                            child: Container(
                               child: Text(
                         profile['Email'],
-                        style: TextStyle(fontSize: 20),
-                      )))
+                        style: TextStyle(fontSize: 20,
+                        color: Color.fromARGB(255, 0, 0, 255),
+                          decoration: TextDecoration.underline),
+                      )),
+                      onTap: () => _launchemail(profile['Email']),
+                          ))
                     ],
                   ),
                 ),
@@ -265,4 +295,5 @@ class ViewUserProfilePageState extends StatelessWidget {
       ),
     );
   }
+  
 }
