@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/bubble_indication_painter.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});
@@ -39,6 +40,10 @@ class _LoginPageState extends State<LoginPage> {
     'Pios'
   ];
   bool _load = false;
+
+  PageController pageController;
+  Color left = Colors.black;
+  Color right = Colors.white;
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -308,12 +313,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    pageController = PageController();
+  }
+  @override
   Widget build(BuildContext context) {
     Widget loadingIndicator =_load? new Container(
       width: 70.0,
       height: 70.0,
       child: new Padding(padding: const EdgeInsets.all(5.0),child: new Center(child: new CircularProgressIndicator())),
     ):new Container();
+
     return new Scaffold(
         appBar: new AppBar(
           title: new Text('Pfadi Morea'),
@@ -326,10 +337,16 @@ class _LoginPageState extends State<LoginPage> {
          child: new SingleChildScrollView(
           child: new Form(
             key: formKey,
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: buildInputs() + buildSubmitButtons()),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height >= 900.0
+                    ? MediaQuery.of(context).size.height
+                    : 900.0,
+              child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: buildInputs(),
+            ),
+            )
           ),
         )
         ),
@@ -337,8 +354,56 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ));
   }
+  Widget buildMenuBar(BuildContext context){
+    return Container(
+      width: 300.0,
+      height: 50.0,
+      decoration: BoxDecoration(
+        color:  Color(0xffff9262),
+        borderRadius: BorderRadius.all(Radius.circular(25.0))
+      ),
+      child: CustomPaint(
+        painter: TabIndicationPainter(pageController: pageController),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Flexible(
+              fit: FlexFit.loose,
+              child: FlatButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onPressed:  _registerAsTeilnehmer,
+                child: Text(
+                  'Teilnehmer',
+                  style: TextStyle(
+                    color: left,
+                    fontSize: 16.0
+                  )),
+              ),
+            ),
+            Flexible(
+              fit: FlexFit.loose,
+              child: FlatButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onPressed: _registerAsElternteil,
+                child: Text(
+                  'Elternteil',
+                  style: TextStyle(
+                    color: right,
+                    fontSize: 16.0
+                  )),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   List<Widget> buildInputs() {
+    _formType =FormType.register;
     if (_formType == FormType.login) {
       return [
         Container(
@@ -385,7 +450,57 @@ class _LoginPageState extends State<LoginPage> {
       ];
     } else {
       return [
-        Container(
+          Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: buildMenuBar(context),
+                ),
+          
+               Expanded(
+
+                      flex: 2,
+                      child: PageView(
+                        controller: pageController,
+                        onPageChanged: (i) {
+                          if (i == 0) {
+                            setState(() {
+                              right = Colors.white;
+                              left = Colors.black;
+                            });
+                          } else if (i == 1) {
+                            setState(() {
+                              right = Colors.black;
+                              left = Colors.white;
+                            });
+                          }
+                        },
+                        children: <Widget>[
+                          Container(
+                            child: Column(
+                              children: <Widget>[
+                                buildRegisterTeilnehmer(context),
+                                Column(
+                                  children: buildSubmitButtons()
+                                  )
+                               
+                              ],
+                            ),
+                          ),
+                             Center(
+                                child: Text('A dere Stell chönt mer s Registragtionsformular fürd Eltere anefeze z.B', style: TextStyle(fontSize: 50),),
+                              )
+                        ],
+                      ),
+                    )
+       
+      ];
+    }
+  }
+  Widget buildRegisterTeilnehmer(BuildContext context){
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+             Container(
           padding: EdgeInsets.all(10),
           child: Row(
             children: <Widget>[
@@ -629,9 +744,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           
         SizedBox(height: 24,)
-        
-      ];
-    }
+          ],
+      ),
+    );
   }
 
   List<Widget> buildSubmitButtons() {
@@ -679,5 +794,14 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ];
     }
+  }
+  void _registerAsTeilnehmer() {
+    pageController.animateToPage(0,
+        duration: Duration(milliseconds: 700), curve: Curves.decelerate);
+  }
+
+  void _registerAsElternteil() {
+    pageController?.animateToPage(1,
+        duration: Duration(milliseconds: 700), curve: Curves.decelerate);
   }
 }
