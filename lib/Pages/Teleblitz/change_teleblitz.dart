@@ -435,7 +435,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       "antreten": antretenController.text,
       "bemerkung": bemerkungController.text,
       "datum": datumController.text,
-      "keine-aktivität": false,
+      "keine-aktivitat": 'false',
       "mitnehmen-test": _jsonMitnehmen,
       "name-des-senders": senderController.text,
     };

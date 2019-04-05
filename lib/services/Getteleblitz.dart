@@ -43,13 +43,13 @@ class Teleblitz implements BaseTeleblitz {
               info.setBemerkung(u["bemerkung"]);
               info.setSender(u["name-des-senders"]);
               info.setMitnehmen(u['mitnehmen-test']);            
-              info.setkeineAktivitat(false);
+              info.setkeineAktivitat('false');
             } else {
-              info.setkeineAktivitat(true);
+              info.setkeineAktivitat('true');
             }
             telblitz = {
               'datum': info.datum,
-              'keine-aktivität': info.keineaktivitat,
+              'keine-aktivitat': info.keineaktivitat,
               'antreten': info.antreten,
               'google-map': info.antretenMap,
               'abtreten': info.abtreten,
@@ -65,7 +65,7 @@ class Teleblitz implements BaseTeleblitz {
         await auth.getteleblitz(stufe).then((result) {
           info.setTitel(stufe);
           info.setDatum(result.data["datum"]);
-          if (!result.data["keine-aktivität"]) {
+          if (result.data["keine-aktivitat"]=='false') {
             info.setAntreten(result.data["antreten"]);
             info.setAntretenMaps(result.data["google-map"]);
             info.setAbtreten(result.data["abtreten"]);
@@ -73,9 +73,9 @@ class Teleblitz implements BaseTeleblitz {
             info.setBemerkung(result.data["bemerkung"]);
             info.setSender(result.data["name-des-senders"]);
             info.setMitnehmen(result.data['mitnehmen-test']);
-            info.setkeineAktivitat(false);
+            info.setkeineAktivitat('false');
           } else {
-            info.setkeineAktivitat(true);
+            info.setkeineAktivitat('true');
           }
         });
       }
@@ -155,7 +155,7 @@ class Info {
   String bemerkung;
   String sender;
   String mitnehmen;
-  bool keineaktivitat;
+  String keineaktivitat;
   double _sizeleft = 110;
 
   void setTitel(String titel) {
@@ -193,7 +193,7 @@ class Info {
     this.mitnehmen = mitnehmen;
   }
 
-  void setkeineAktivitat(bool aktv) {
+  void setkeineAktivitat(String aktv) {
     this.keineaktivitat = aktv;
   }
 
@@ -217,7 +217,7 @@ class Info {
   }
 
   Container getAntreten() {
-    if ((keineaktivitat == false) || (this?.antreten?.isNotEmpty ?? false)) {
+    if ((keineaktivitat == 'false') || (this?.antreten?.isNotEmpty ?? false)) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
