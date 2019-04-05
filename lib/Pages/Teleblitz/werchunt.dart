@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'package:async/async.dart';
+import 'package:morea/services/dwi_format.dart';
 
 class WerChunt extends StatefulWidget {
   WerChunt({this.auth, this.onSigedOut, this.crud, this.userInfo});
   var userInfo;
   final BaseAuth auth;
   final VoidCallback onSigedOut;
-  final BasecrudMethods crud;
+  final BaseCrudMethods crud;
   @override
   State<StatefulWidget> createState() => _WerChuntState();
 }
@@ -19,6 +21,8 @@ class _WerChuntState extends State<WerChunt> {
   Auth auth0 = new Auth();
   final formKey = new GlobalKey<FormState>();
   Info teleblitzinfo = new Info();
+  MoreaFirebase moreafire = new MoreaFirebase();
+  DWIFormat dwiFormat = new DWIFormat();
 
   DocumentSnapshot qsuserInfo, dsanmeldedat;
   Map<String, String> anmeldeDaten;
@@ -26,12 +30,10 @@ class _WerChuntState extends State<WerChunt> {
 
 
  sortlist()async{
-    String stufe = auth0.formatstring(widget.userInfo['Stufe']);
-    String datum = auth0.formatstring(teleblitzinfo.datum);
+    String stufe = dwiFormat.simplestring(widget.userInfo['Stufe']);
+    String datum = dwiFormat.simplestring(teleblitzinfo.datum);
 
-    QuerySnapshot qsdata = await Firestore.instance.collection('uebung')
-      .document(stufe).collection(datum)
-      .getDocuments();
+    QuerySnapshot qsdata = await moreafire.getTNs(stufe, datum);
       
       for(int i=0; i < qsdata.documents.length; i++){
         if(qsdata.documents[i].data['Anmeldung']=='Chunt'){

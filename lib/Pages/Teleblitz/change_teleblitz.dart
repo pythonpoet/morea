@@ -3,12 +3,13 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:morea/services/morea_firestore.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
   final BaseAuth auth;
   final VoidCallback onSignedOut;
-  final BasecrudMethods crud;
+  final BaseCrudMethods crud;
 
   ChangeTeleblitz({this.auth, this.crud, this.onSignedOut, this.stufe});
 
@@ -18,6 +19,7 @@ class ChangeTeleblitz extends StatefulWidget {
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   Auth auth0 = Auth();
+  MoreaFirebase moreafire = MoreaFirebase();
   String _stufe;
   final _formKey = GlobalKey<FormState>();
   final datumController = TextEditingController();
@@ -439,7 +441,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       "mitnehmen-test": _jsonMitnehmen,
       "name-des-senders": senderController.text,
     };
-    auth0.uploadteleblitz(data, _stufe);
+    moreafire.uploadteleblitz(_stufe, data);
     Navigator.pop(context);
   }
 }

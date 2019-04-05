@@ -6,6 +6,7 @@ import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
@@ -18,7 +19,7 @@ class HomePage extends StatefulWidget {
 
   final BaseAuth auth;
   final VoidCallback onSigedOut;
-  final BasecrudMethods crud;
+  final BaseCrudMethods crud;
 
   @override
   State<StatefulWidget> createState() => HomePageState();
@@ -28,9 +29,10 @@ enum FormType { leiter, teilnehmer, eltern }
 
 enum Anmeldung {angemolden, abgemolden, verchilt}
 
-class HomePageState extends State<HomePage> {
-  crudMedthods crud0bj = new crudMedthods();
+class HomePageState extends State<HomePage>{
+  CrudMedthods crud0bj = new CrudMedthods();
   Auth auth0 = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
   Teleblitz tlbz = new Teleblitz();
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Info teleblitzinfo = new Info();
@@ -56,7 +58,7 @@ class HomePageState extends State<HomePage> {
     } else {
       anmeldung = 'Du hast dich Abgemolden';
     }
-    auth0.uebunganmelden(anmeldeDaten, _stufe, _userUID);
+    moreafire.uebunganmelden(_stufe, _userUID, anmeldeDaten);
     showDialog(
         context: context,
         child: new AlertDialog(
@@ -68,45 +70,9 @@ class HomePageState extends State<HomePage> {
 
 void getdevtoken()async{
   var token = await firebaseMessaging.getToken();
-  auth0.uploaddevtocken(_stufe, token, _userUID);
+  moreafire.uploaddevtocken(_stufe, token, _userUID);
 }
-
-   getuserinfo() async {
-    await widget.auth.currentUser().then((userId) {
-      _userUID = userId;
-    });
-    await auth0.getUserInformation(_userUID).then((results) async {
-        setState(() {
-          qsuserInfo = results;
-          _pfadiname = qsuserInfo.data['Pfadinamen'];
-          _stufe = qsuserInfo.data['Stufe'];
-          forminit();
-          getdevtoken();
-        });
-      try {
-        await auth0.userEmail().then((onValue) {
-          _email = onValue;
-        });
-
-        if (_pfadiname == '') {
-          _pfadiname = qsuserInfo.data['Vorname'];
-        }
-      } catch (e) {
-        print(e);
-      }
-    });
-  }
-
-  void _signedOut() async {
-    try {
-      await widget.auth.signOut();
-      widget.onSigedOut();
-    } catch (e) {
-      print(e);
-    }
-  }
-
- forminit() {
+void forminit() {
     try {
       switch (qsuserInfo.data['Pos']) {
         case 'Leiter':
@@ -118,7 +84,34 @@ void getdevtoken()async{
       print(e);
     }
   }
-  
+void getuserinfo() async {
+     _userUID = await auth0.currentUser();
+    var results = await moreafire.getUserInformation(_userUID);
+    setState(() {
+      qsuserInfo = results;
+      _pfadiname = qsuserInfo.data['Pfadinamen'];
+      _stufe = qsuserInfo.data['Stufe'];
+      _email = qsuserInfo.data['Email'];
+      try {
+      if (_pfadiname == '') {
+          _pfadiname = qsuserInfo.data['Vorname'];
+        }
+      } catch (e) {
+        print(e);
+      }
+      forminit();
+      getdevtoken();
+    });
+}
+void _signedOut() async {
+    try {
+      await widget.auth.signOut();
+      widget.onSigedOut();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void initState(){
     super.initState();
@@ -212,7 +205,6 @@ void getdevtoken()async{
         );
     }
   }
-
   List<Widget> navigation() {
     if (_formType == FormType.leiter) {
       return [
@@ -227,7 +219,7 @@ void getdevtoken()async{
         ),
         new ListTile(
             title: new Text('Wer chunt?'),
-            trailing: new Icon(Icons.people),
+            trailing: new Icon(Icons.thumbs_up_down),
             onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                 builder: (BuildContext context) => new WerChunt(userInfo: qsuserInfo.data,)))),
         new ListTile(
@@ -277,9 +269,7 @@ void getdevtoken()async{
       ];
     }
 }
-
-
- Widget anmeldebutton() {
+  Widget anmeldebutton() {
     return Container(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -310,3 +300,6 @@ void getdevtoken()async{
           ));
   }
 }
+ 
+
+

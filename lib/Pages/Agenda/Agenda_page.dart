@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
+import 'package:morea/services/dwi_format.dart';
 import 'Agenda_Eventadd_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'view_Lager_page.dart';
 import 'view_Event_page.dart';
-import 'package:intl/intl.dart';
+import 'package:morea/services/morea_firestore.dart';
 
 class AgendaState extends StatefulWidget {
   AgendaState({this.userInfo});
@@ -14,8 +15,11 @@ class AgendaState extends StatefulWidget {
 }
 
 class _AgendaStatePage extends State<AgendaState> {
-  Auth auth0 = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
+  DWIFormat dwiformat = new DWIFormat();
+  CrudMedthods crud0 = new CrudMedthods();
 
+  String pos = 'Teilnehmer';
   Stream<QuerySnapshot> qsagenda;
   Map stufen ={
     'Biber':false,
@@ -46,32 +50,28 @@ class _AgendaStatePage extends State<AgendaState> {
   };
 
  _getAgenda(stufe) async {
-   String xstufe =auth0.formatstring(stufe);
-  
-   qsagenda = Firestore.instance
-        .collection('Stufen')
-        .document(xstufe)
-        .collection('Agenda')
-        .orderBy("Order")
-        .snapshots();
-  }
+   stufe=dwiformat.simplestring(stufe);
+   qsagenda = moreafire.getAgenda(stufe);
+ }
+
   altevernichten(_agedatiteldatum,stufe){
-    String xstufe =auth0.formatstring(stufe);
+    stufe = dwiformat.simplestring(stufe);
     String somdate = _agedatiteldatum.split('-')[2]+'-'+_agedatiteldatum.split('-')[1]+'-'+_agedatiteldatum.split('-')[0];
     DateTime _agdatum = DateTime.parse(somdate+' 00:00:00.000');
     DateTime now = DateTime.now();
     if(_agdatum.difference(now).inDays< 0){
-      auth0.deletedocument('/Stufen/$xstufe/Agenda', _agedatiteldatum);
+      crud0.deletedocument('/Stufen/$stufe/Agenda', _agedatiteldatum);
     }
   }
   bool istLeiter(){
-    if(widget.userInfo['Pos']=='Leiter'){
+    if(pos=='Leiter'){
       return true;
     }else{
       return false;
     }
   }
   routetoAddevent(){
+    if(istLeiter()){
       Navigator.of(context).push(new MaterialPageRoute(
               builder: (BuildContext context) => EventAddPage(eventinfo: quickfix,agendaModus: AgendaModus.beides,)));
     }
@@ -84,13 +84,14 @@ class _AgendaStatePage extends State<AgendaState> {
     quickfix['Stufen'] = stufen;
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen']= mitnehmen;
+    pos=widget.userInfo['Pos'];
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('tp0');
-    return new Container(
+    if(istLeiter()){
+      return new Container(
         child: new Scaffold(
       appBar: new AppBar(
         title: new Text('Agenda'),
@@ -106,6 +107,17 @@ class _AgendaStatePage extends State<AgendaState> {
           onPressed: () => routetoAddevent()),
       ),
     ));
+    }else{
+      return new Container(
+        child: new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Agenda'),
+        backgroundColor: Color(0xff7a62ff),
+      ),
+      body: Agenda(widget.userInfo['Stufe']),
+    ));
+    }
+    
   }
 
   Widget Agenda(stufe) {

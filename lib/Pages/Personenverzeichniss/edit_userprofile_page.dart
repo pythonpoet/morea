@@ -1,5 +1,6 @@
 import 'package:morea/services/auth.dart';
-
+import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/crud.dart';
 import 'view_userprofile_page.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,8 @@ class EditUserProfilePage extends StatefulWidget {
 
 class EditUserPoriflePageState extends State<EditUserProfilePage> {
   Auth auth0 = new Auth();
+  MoreaFirebase moreafire = MoreaFirebase();
+  CrudMedthods crud0 = CrudMedthods();
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -55,7 +58,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
       try {
             if (_selectedstufe != 'Stufe wählen') {
               var userdata=mapUserData();
-              await auth0.updateUserInformation(userdata, userdata['UID']).then((onValue){
+              await moreafire.updateUserInformation(userdata['UID'], userdata).then((onValue){
                 
               });
               
@@ -91,7 +94,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
                     color: Colors.redAccent
                   ),),
                   onPressed: () {
-                    auth0.deletedocument('user', widget.profile['UID']);
+                    crud0.deletedocument('user', widget.profile['UID']);
                     Navigator.pop(context);
                   })
             ],

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/bubble_indication_painter.dart';
+import 'package:morea/services/dwi_format.dart';
+import 'package:morea/services/morea_firestore.dart';
+import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});
@@ -18,7 +21,10 @@ enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
   Auth auth0 = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
+  DWIFormat dwiFormat = new DWIFormat();
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  Datenschutz datenschutz = new Datenschutz();
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -57,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
 
   updatedevtoken()async{
     List devtoken;
-    await auth0.getUserInformation(userId).then((userInfo){
+    var userInfo = await moreafire.getUserInformation(userId);
       try{
         List devtoken_old = userInfo.data['devtoken'];
         if(devtoken_old == null){
@@ -67,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
             'devtoken':devtoken
           };
           userInfo.data.addAll(devtokens);
-          auth0.createUserInformation(userInfo.data);
+          moreafire.createUserInformation(userInfo.data);
         });
         }else{
           firebaseMessaging.getToken().then((token){
@@ -84,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
         
         userInfo.data['devtoken'] = devtoken;
 
-        auth0.createUserInformation(userInfo.data);
+        moreafire.createUserInformation(userInfo.data);
         });
         }
         
@@ -97,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
     
     
     
-    });
+    
     
   }
   
@@ -105,13 +111,14 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateAndSubmit() async {
     Platform.isAndroid;
+    
     if (validateAndSave()) {
       try {
         if (_formType == FormType.login) {
           setState(() {
            _load =true; 
           });
-         userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
+         userId = await auth0.signInWithEmailAndPassword(_email, _password);
           print('Sign in: ${userId}');
           setState(() {
            _load = false; 
@@ -126,11 +133,12 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {
            _load =true; 
             });
-               userId = await widget.auth
-                  .createUserWithEmailAndPassword(_email, _password);
+            await datenschutz.morea_datenschutzerklaerung(context);
+               userId = await auth0
+                        .createUserWithEmailAndPassword(_email, _password);
               print('Registered user: ${userId}');
               if (userId != null) {
-                widget.auth.createUserInformation(await mapUserData());
+                moreafire.createUserInformation(await mapUserData());
                setState(() {
               _load = false; 
               });

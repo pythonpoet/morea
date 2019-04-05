@@ -9,7 +9,8 @@ class ViewEventPageState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    if(istLeiter()){
+      return Container(
         child: Scaffold(
             appBar: AppBar(
               backgroundColor: Color(0xff7a62ff),
@@ -35,6 +36,27 @@ class ViewEventPageState extends StatelessWidget {
                 onPressed: () => routeToLagerbearb(context),
                 ),
              ),));
+    }else{
+      return Container(
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Color(0xff7a62ff),
+              title: Text(info['Eventname'].toString()),
+            ),
+            body: LayoutBuilder(
+              builder:
+                  (BuildContext context, BoxConstraints viewportConstraints) {
+                return SingleChildScrollView(
+                    child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.maxHeight,
+                  ),
+                  child: viewEvent(),
+                ));
+              },
+            )));
+    }
+    
   }
 
   Widget viewEvent() {
