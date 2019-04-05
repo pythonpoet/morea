@@ -24,7 +24,6 @@ abstract class BaseAuth{
 }
 
 class Auth implements BaseAuth {
-
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   Info teleblitzinfo =  new Info();
 

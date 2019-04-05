@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:morea/services/auth.dart';
 
-abstract class BasecrudMethods{
-  Future<QuerySnapshot> getData(String dateipfad );
-}
+  Future<DocumentSnapshot> getDocument(String path, String document) async{
+    document = dwiformat.simplestring(document);
+    path = dwiformat.pathstring(path);
+    return await Firestore.instance.collection(path).document(document).get();
+  }
 class crudMedthods implements BasecrudMethods {
   Auth auth = new Auth();
 

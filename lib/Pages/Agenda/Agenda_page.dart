@@ -72,7 +72,6 @@ class _AgendaStatePage extends State<AgendaState> {
     }
   }
   routetoAddevent(){
-    if(istLeiter()){
       Navigator.of(context).push(new MaterialPageRoute(
               builder: (BuildContext context) => EventAddPage(eventinfo: quickfix,agendaModus: AgendaModus.beides,)));
     }
