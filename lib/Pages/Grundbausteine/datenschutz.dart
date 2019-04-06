@@ -3,38 +3,78 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 // generiert mit https://datenschutz-generator.de/
 abstract class BaseDatenschutz{
-  Future<void> morea_datenschutzerklaerung(BuildContext context);
+  Future<bool> morea_datenschutzerklaerung(BuildContext context);
 }
 
 
 class Datenschutz implements BaseDatenschutz{
-Textdatenschutz textdatenschutz = new Textdatenschutz();
+  static Datenschutz _instance;
+  factory Datenschutz() => _instance ??= new Datenschutz._();
 
-  Future<void> morea_datenschutzerklaerung(BuildContext context)async{
+  Datenschutz._();
+Textdatenschutz textdatenschutz = new Textdatenschutz();
+bool akzeptiert = false;
+
+  Future<bool> morea_datenschutzerklaerung(BuildContext context)async{
     await showDialog<String>(
       context: context,
-      builder: (BuildContext context) => new AlertDialog(
-            //contentPadding: const EdgeInsets.all(16.0),
-            content: new Card(
-              child: SingleChildScrollView(
-                child:  new Html(data: textdatenschutz.morea_v01,),
-              ),              
+      barrierDismissible: false,
+      builder: (BuildContext context) => Container(
+        padding: EdgeInsets.all(15),
+        child: new Card(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+          children: <Widget>[
+            Expanded(
+              flex: 100,
+              child: Scrollbar(
+                child: new SingleChildScrollView(
+                controller: ScrollController(),
+                child: new Html(data: textdatenschutz.morea_v01,),
+              ),
+              )
             ),
-            actions: <Widget>[
-              new FlatButton(
-                  child: const Text('Ablehnen', style:  TextStyle(color: Color(0xff7a62ff))),
-                  onPressed: () {
-                   exit(0);
-                  }),
-              new RaisedButton(
+            Expanded(
+              flex: 1,
+              child: new Divider(),
+            ),
+            Expanded(
+              flex: 8,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[ 
+                  Expanded(
+                    flex: 1,
+                    child: SizedBox(),
+                  ),
+                  Expanded(
+                    child:new FlatButton(
+                      child: const Text('Ablehnen', style:  TextStyle(color: Color(0xff7a62ff))),
+                      onPressed: () {
+                     Navigator.pop(context);
+                      }),
+                  ),
+                  Expanded(
+                    child: new RaisedButton(
                   child: const Text('Akzeptieren',style: TextStyle(color: Colors.white),),
                   color: Color(0xff7a62ff),
                   onPressed: () {
+                    akzeptiert = true;
                     Navigator.pop(context);
-                    return null;
-                  })
-            ],
-          ),
+                    
+                  }),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+        )
+      ),
+      ) 
     );
   }
 }

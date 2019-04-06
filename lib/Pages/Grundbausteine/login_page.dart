@@ -98,20 +98,14 @@ class _LoginPageState extends State<LoginPage> {
       }catch(e){
         
         print(e);
-      }
-       
-    
-    
-    
-    
-    
+      }  
   }
   
           
 
   void validateAndSubmit() async {
     Platform.isAndroid;
-    
+      
     if (validateAndSave()) {
       try {
         if (_formType == FormType.login) {
@@ -120,12 +114,18 @@ class _LoginPageState extends State<LoginPage> {
           });
          userId = await auth0.signInWithEmailAndPassword(_email, _password);
           print('Sign in: ${userId}');
-          setState(() {
+          if(userId != null){
+            updatedevtoken();
+            setState(() {
            _load = false; 
           });
-          updatedevtoken();
           widget.onSignedIn();
-           
+          }else{
+            setState(() {
+           _load = false; 
+          });
+          }
+        
         } else {
           if(_password.length >= 6){
             if (_password == _passwordneu){
@@ -134,15 +134,20 @@ class _LoginPageState extends State<LoginPage> {
            _load =true; 
             });
             await datenschutz.morea_datenschutzerklaerung(context);
-               userId = await auth0
+            if(datenschutz.akzeptiert){
+              userId = await auth0
                         .createUserWithEmailAndPassword(_email, _password);
               print('Registered user: ${userId}');
               if (userId != null) {
                 moreafire.createUserInformation(await mapUserData());
-               setState(() {
-              _load = false; 
-              });
                 widget.onSignedIn();
+            }
+             
+              }else{
+                setState(() {
+                  _load =false; 
+                });
+                return null;
               }
             } else {
               showDialog(
@@ -240,6 +245,9 @@ class _LoginPageState extends State<LoginPage> {
         print('The error is $errorType');
       }
     }
+    setState(() {
+              _load = false; 
+              });
   }
 
   void moveToRegister() {
@@ -347,9 +355,9 @@ class _LoginPageState extends State<LoginPage> {
             key: formKey,
             child: Container(
               width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= 900.0
+                height: MediaQuery.of(context).size.height >= 1050
                     ? MediaQuery.of(context).size.height
-                    : 900.0,
+                    : 1050.0,
               child: Column(
               mainAxisSize: MainAxisSize.min,
               children: buildInputs(),
