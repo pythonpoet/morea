@@ -11,7 +11,7 @@ class Parents extends StatefulWidget {
 }
 
 class ParentsState extends State<Parents> {
-  List<String> _elternPending = [];
+  Map<String, dynamic> _elternPending = {};
   Auth auth = Auth();
 
   @override
@@ -30,20 +30,26 @@ class ParentsState extends State<Parents> {
           margin: EdgeInsets.all(20),
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: this._elternPending.length,
+            itemCount: this._elternPending.keys.length,
             itemBuilder: (BuildContext context, int index) {
               return new ListTile(
-                title: Text(this._elternPending[index]),
+                title: Text(List.of(this._elternPending.keys)[index]),
                 trailing: RaisedButton(
                   onPressed: () {
+                    var parentuid = List.of(this._elternPending.keys)[index];
                     if (widget.profile["Eltern"] == null) {
-                      widget.profile["Eltern"] = [this._elternPending[index]];
+                      widget.profile["Eltern"] = this._elternPending;
                     } else {
-                      widget.profile["Eltern"].add(this._elternPending[index]);
+                      widget.profile["Eltern"][List.of(
+                          this._elternPending.keys)[index]] =
+                      List.of(this._elternPending.values)[index];
                     }
-                    this._elternPending.removeAt(index);
+                    this._elternPending.remove(
+                        List.of(this._elternPending.keys)[index]);
                     widget.profile["Eltern-pending"] = this._elternPending;
-                    auth.updateUserInformation(mapUserData(), widget.profile['UID']);
+                    auth.updateUserInformation(
+                        mapUserData(), widget.profile['UID']);
+                    auth.setChildToParent(parentuid, widget.profile['Vorname'], widget.profile['UID']);
                   },
                   child: Text("Annehmen"),
                 ),
@@ -56,8 +62,8 @@ class ParentsState extends State<Parents> {
   createList(info) {
     var eltern = info;
     if (eltern != null) {
-      for (var u in eltern) {
-        this._elternPending.add(u);
+      for (var u in eltern.keys) {
+        this._elternPending[u] = eltern[u];
       }
     } else {
       print("Error");
@@ -77,7 +83,8 @@ class ParentsState extends State<Parents> {
       'Email': widget.profile['Email'],
       'devtoken': widget.profile['devtoken'],
       'Eltern-pending': this._elternPending,
-      'Eltern': widget.profile['Eltern']
+      'Eltern': widget.profile['Eltern'],
+      'Stufe': widget.profile['Stufe']
     };
     return userInfo;
   }

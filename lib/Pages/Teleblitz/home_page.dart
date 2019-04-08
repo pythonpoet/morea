@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Pages/Personenverzeichniss/parents.dart';
-import 'package:morea/Pages/Grundbausteine/to_child_navigation.dart';
+import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -37,7 +37,7 @@ class HomePageState extends State<HomePage> {
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
-  FormType _formType = FormType.eltern;
+  FormType _formType = FormType.teilnehmer;
   Anmeldung _anmeldung = Anmeldung.verchilt;
 
   String _pfadiname = 'Loading...',
@@ -74,8 +74,10 @@ class HomePageState extends State<HomePage> {
                 shrinkWrap: true,
                 itemCount: qsuserInfo.data['Kinder'].length,
                 itemBuilder: (BuildContext context, int index) {
-                  var namekind = List.from(qsuserInfo.data['Kinder'].keys)[index];
-                  var uidkind = List.from(qsuserInfo.data['Kinder'].values)[index];
+                  var namekind =
+                      List.from(qsuserInfo.data['Kinder'].keys)[index];
+                  var uidkind =
+                      List.from(qsuserInfo.data['Kinder'].values)[index];
                   return ListTile(
                     title: Text(namekind),
                     onTap: () {
@@ -119,11 +121,8 @@ class HomePageState extends State<HomePage> {
       setState(() {
         qsuserInfo = results;
         _pfadiname = qsuserInfo.data['Pfadinamen'];
-        if (qsuserInfo.data['Stufe'] != null) {
-          _stufe = qsuserInfo.data['Stufe'];
-        } else {
-          _stufe = 'Eltern';
-        }
+        _stufe = qsuserInfo.data['Stufe'];
+        print(_stufe);
         forminit();
         getdevtoken();
       });
@@ -133,6 +132,8 @@ class HomePageState extends State<HomePage> {
         });
         setState(() {
           if (_pfadiname == '') {
+            _pfadiname = qsuserInfo.data['Vorname'];
+          } else if (_pfadiname == 'Loading...') {
             _pfadiname = qsuserInfo.data['Vorname'];
           }
         });
@@ -359,7 +360,6 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-
   List<Widget> navigation() {
     switch (_formType) {
       case FormType.leiter:
@@ -466,6 +466,13 @@ class HomePageState extends State<HomePage> {
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: qsuserInfo.data,
                       )))),
+          ListTile(
+            title: Text('Kind hinzufügen'),
+            trailing: Icon(Icons.person_add),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    AddChild(auth0, qsuserInfo.data))),
+          ),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -515,19 +522,20 @@ class HomePageState extends State<HomePage> {
             children: <Widget>[
               Expanded(
                   child: Container(
-                    child: new RaisedButton(
-                      child:
+                child: new RaisedButton(
+                  child:
                       new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
-                      onPressed: () => submit(anabmelden: 'Chunt nöd', stufe: stufe),
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0)),
-                    ),
-                  )),
+                  onPressed: () =>
+                      submit(anabmelden: 'Chunt nöd', stufe: stufe),
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                ),
+              )),
               Expanded(
                 child: Container(
                   child: new RaisedButton(
                     child:
-                    new Text('Chume', style: new TextStyle(fontSize: 20)),
+                        new Text('Chume', style: new TextStyle(fontSize: 20)),
                     onPressed: () => submit(anabmelden: 'Chunt', stufe: stufe),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),

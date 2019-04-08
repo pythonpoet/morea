@@ -206,5 +206,34 @@ class Auth implements BaseAuth {
       print(e);
     });
   }
-  
+
+  Stream<QuerySnapshot> getChildren() {
+    return  Firestore.instance.collection('user').snapshots();
+  }
+
+  Future<void> pendParent(childuid, parent, parentuid) async{
+    var old = await Firestore.instance.collection('user').document(childuid).get();
+    Map<dynamic, dynamic> parentMap = {};
+
+    for(var u in old.data['Eltern-pending'].keys){
+      parentMap[u] = old[u];
+    }
+    parentMap[parent] = parentuid;
+    await Firestore.instance.collection('user').document(childuid).updateData({
+      'Eltern-pending': parentMap
+    });
+  }
+
+  Future<void> setChildToParent(parentuid, childname, childuid) async {
+    var old = await Firestore.instance.collection('user').document(parentuid).get();
+    Map<dynamic, dynamic> childmap = {};
+
+    for(var u in old.data['Kinder'].keys){
+      childmap[u] = old[u];
+    }
+    childmap[childname] = childuid;
+    await Firestore.instance.collection('user').document(parentuid).updateData({
+      'Kinder': childmap
+    });
+  }
 }
