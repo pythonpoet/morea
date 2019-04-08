@@ -37,29 +37,73 @@ class HomePageState extends State<HomePage> {
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
-  FormType _formType = FormType.teilnehmer;
+  FormType _formType = FormType.eltern;
   Anmeldung _anmeldung = Anmeldung.verchilt;
 
-  String _pfadiname = ' ', _userUID = ' ', _stufe = '@', _email = ' ';
+  String _pfadiname = 'Loading...',
+      _userUID = ' ',
+      _stufe = '@',
+      _email = 'Loading...';
   DocumentSnapshot qsuserInfo;
   Map<String, String> anmeldeDaten;
 
-  void submit(String anabmelden) {
-    String anmeldung;
-    print(qsuserInfo.data['Pfadinamen']);
-    anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
-    if (anabmelden == 'Chunt') {
-      anmeldung = 'Du hast dich Angemolden';
+  void submit({@required String anabmelden, String stufe}) {
+    if (_formType != FormType.eltern) {
+      String anmeldung;
+      print(qsuserInfo.data['Pfadinamen']);
+      anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
+      if (anabmelden == 'Chunt') {
+        anmeldung = 'Du hast dich Angemolden';
+      } else {
+        anmeldung = 'Du hast dich Abgemolden';
+      }
+      auth0.uebunganmelden(anmeldeDaten, _stufe, _userUID);
+      showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: new Text("Teleblitz"),
+            content: new Text(anmeldung),
+          ));
     } else {
-      anmeldung = 'Du hast dich Abgemolden';
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Kind auswählen'),
+              content: ListView.builder(
+                shrinkWrap: true,
+                itemCount: qsuserInfo.data['Kinder'].length,
+                itemBuilder: (BuildContext context, int index) {
+                  var namekind = List.from(qsuserInfo.data['Kinder'].keys)[index];
+                  var uidkind = List.from(qsuserInfo.data['Kinder'].values)[index];
+                  return ListTile(
+                    title: Text(namekind),
+                    onTap: () {
+                      String anmeldung;
+                      print(qsuserInfo.data['Pfadinamen']);
+                      anmeldeDaten = {
+                        'Anmeldename': namekind,
+                        'Anmeldung': anabmelden
+                      };
+                      if (anabmelden == 'Chunt') {
+                        anmeldung = 'Du hast dich Angemolden';
+                      } else {
+                        anmeldung = 'Du hast dich Abgemolden';
+                      }
+                      auth0.uebunganmelden(anmeldeDaten, stufe, uidkind);
+                      showDialog(
+                          context: context,
+                          child: new AlertDialog(
+                            title: new Text("Teleblitz"),
+                            content: new Text(anmeldung),
+                          ));
+                    },
+                  );
+                },
+              ),
+            );
+          });
     }
-    auth0.uebunganmelden(anmeldeDaten, _stufe, _userUID);
-    showDialog(
-        context: context,
-        child: new AlertDialog(
-          title: new Text("Teleblitz"),
-          content: new Text(anmeldung),
-        ));
   }
 
   void getdevtoken() async {
@@ -77,6 +121,8 @@ class HomePageState extends State<HomePage> {
         _pfadiname = qsuserInfo.data['Pfadinamen'];
         if (qsuserInfo.data['Stufe'] != null) {
           _stufe = qsuserInfo.data['Stufe'];
+        } else {
+          _stufe = 'Eltern';
         }
         forminit();
         getdevtoken();
@@ -85,10 +131,11 @@ class HomePageState extends State<HomePage> {
         await auth0.userEmail().then((onValue) {
           _email = onValue;
         });
-
-        if (_pfadiname == '') {
-          _pfadiname = qsuserInfo.data['Vorname'];
-        }
+        setState(() {
+          if (_pfadiname == '') {
+            _pfadiname = qsuserInfo.data['Vorname'];
+          }
+        });
       } catch (e) {
         print(e);
       }
@@ -213,7 +260,101 @@ class HomePageState extends State<HomePage> {
         );
         break;
       case FormType.eltern:
-        return selectStufe();
+        return DefaultTabController(
+            length: 4,
+            child: Scaffold(
+              appBar: new AppBar(
+                title: new Text('Teleblitz'),
+                backgroundColor: Color(0xff7a62ff),
+                bottom: TabBar(tabs: [
+                  Tab(text: "Biber"),
+                  Tab(
+                    text: 'Wölfe',
+                  ),
+                  Tab(
+                    text: 'Meitli',
+                  ),
+                  Tab(text: 'Buebe')
+                ]),
+              ),
+              drawer: new Drawer(
+                child: new ListView(children: navigation()),
+              ),
+              body: TabBarView(children: [
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Biber'),
+                              anmeldebutton(stufe: 'Biber')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Wombat (Wölfe)'),
+                              anmeldebutton(stufe: 'Wombat (Wölfe)')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Nahani (Meitli)'),
+                              anmeldebutton(stufe: 'Nahani (Meitli)')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Drason (Buebe)'),
+                              anmeldebutton(stufe: 'Drason (Buebe)')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+              ]),
+            ));
         break;
     }
   }
@@ -221,7 +362,8 @@ class HomePageState extends State<HomePage> {
   Widget selectStufe() {
     return Scaffold(
       appBar: AppBar(
-          title: Text("Kind auswählen/hinzufügen"), backgroundColor: Color(0xff7a62ff)),
+          title: Text("Kind auswählen/hinzufügen"),
+          backgroundColor: Color(0xff7a62ff)),
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
@@ -278,10 +420,9 @@ class HomePageState extends State<HomePage> {
                   List.from(qsuserInfo.data['Kinder'].keys)[index],
                   style: TextStyle(fontSize: 18),
                 ),
-                onPressed: () =>
-                    Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(
-                            ))),
+                onPressed: () => Navigator.of(context).push(
+                    new MaterialPageRoute(
+                        builder: (BuildContext context) => HomePage())),
               ),
             );
           });
@@ -373,10 +514,12 @@ class HomePageState extends State<HomePage> {
         ];
         break;
       case FormType.eltern:
+        print(this._pfadiname);
+        print(this._email);
         return [
           new UserAccountsDrawerHeader(
-            accountName: new Text(_pfadiname),
-            accountEmail: new Text(_email),
+            accountName: Text(this._pfadiname),
+            accountEmail: Text(this._email),
             decoration: new BoxDecoration(
                 image: new DecorationImage(
                     fit: BoxFit.fill,
@@ -407,34 +550,67 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Widget anmeldebutton() {
-    return Container(
-        padding: EdgeInsets.all(20),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Container(
-              child: new RaisedButton(
-                child:
-                    new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
-                onPressed: () => submit('Chunt nöd'),
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-              ),
-            )),
-            Expanded(
-              child: Container(
+  Widget anmeldebutton({String stufe}) {
+    if (stufe == null) {
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                  child: Container(
                 child: new RaisedButton(
-                  child: new Text('Chume', style: new TextStyle(fontSize: 20)),
-                  onPressed: () => submit('Chunt'),
+                  child:
+                      new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
+                  onPressed: () => submit(anabmelden: 'Chunt nöd'),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
-                  textColor: Colors.white,
                 ),
-              ),
-            )
-          ],
-        ));
+              )),
+              Expanded(
+                child: Container(
+                  child: new RaisedButton(
+                    child:
+                        new Text('Chume', style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit(anabmelden: 'Chunt'),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    color: Color(0xff7a62ff),
+                    textColor: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ));
+    } else {
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                  child: Container(
+                    child: new RaisedButton(
+                      child:
+                      new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
+                      onPressed: () => submit(anabmelden: 'Chunt nöd', stufe: stufe),
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                    ),
+                  )),
+              Expanded(
+                child: Container(
+                  child: new RaisedButton(
+                    child:
+                    new Text('Chume', style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit(anabmelden: 'Chunt', stufe: stufe),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    color: Color(0xff7a62ff),
+                    textColor: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ));
+    }
   }
 }
