@@ -14,11 +14,6 @@ class ParentsState extends State<Parents> {
   Map<String, dynamic> _elternPending = {};
   Auth auth = Auth();
 
-  @override
-  void initState() {
-    super.initState();
-    this.createList(widget.profile["Eltern-pending"]);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,40 +21,71 @@ class ParentsState extends State<Parents> {
         appBar: AppBar(
           title: Text("Eltern bestätigen"),
         ),
-        body: Container(
-          margin: EdgeInsets.all(20),
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: this._elternPending.keys.length,
-            itemBuilder: (BuildContext context, int index) {
-              return new ListTile(
-                title: Text(List.of(this._elternPending.keys)[index]),
-                trailing: RaisedButton(
-                  onPressed: () {
-                    var parentuid = List.of(this._elternPending.keys)[index];
-                    if (widget.profile["Eltern"] == null) {
-                      widget.profile["Eltern"] = this._elternPending;
-                    } else {
-                      widget.profile["Eltern"][List.of(
-                          this._elternPending.keys)[index]] =
-                      List.of(this._elternPending.values)[index];
-                    }
-                    this._elternPending.remove(
-                        List.of(this._elternPending.keys)[index]);
-                    widget.profile["Eltern-pending"] = this._elternPending;
-                    auth.updateUserInformation(
-                        mapUserData(), widget.profile['UID']);
-                    auth.setChildToParent(parentuid, widget.profile['Vorname'], widget.profile['UID']);
-                  },
-                  child: Text("Annehmen"),
-                ),
-              );
-            },
-          ),
-        ));
+        body: StreamBuilder(
+            stream: auth.getPendingParents(widget.profile['UID']),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: Text('Loading...'),
+                );
+              } else {
+                var elternpending = snapshot.data['Eltern-pending'];
+                return Container(
+                  margin: EdgeInsets.all(20),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: elternpending.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return new ListTile(
+                        title: Text(List.of(elternpending.keys)[index]),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            RaisedButton(
+                              onPressed: () {
+                                var parentuid =
+                                List.of(elternpending.values)[index];
+                                var parentname =
+                                List.of(elternpending.keys)[index];
+                                if (widget.profile["Eltern"] == null) {
+                                  widget.profile["Eltern"] = elternpending;
+                                } else {
+                                  widget.profile["Eltern"][parentname] = parentuid;
+                                }
+                                this.createList(snapshot.data['Eltern-pending']);
+                                this._elternPending.remove(parentname);
+                                auth.updateUserInformation(
+                                    mapUserData(), widget.profile['UID']);
+                                auth.setChildToParent(
+                                    parentuid,
+                                    widget.profile['Vorname'],
+                                    widget.profile['UID']);
+                              },
+                              child: Text("Annehmen"),
+                            ),
+                            Container(
+                              width: 20,
+                            ),
+                            RaisedButton(
+                              onPressed: (){
+                                this.createList(snapshot.data['Eltern-pending']);
+                                this._elternPending.remove(List.of(elternpending.keys)[index]);
+                                auth.updateUserInformation(mapUserData(), widget.profile['UID']);
+                              },
+                              child: Text('Ablehnen'),
+                            )
+                          ],
+                        )
+                      );
+                    },
+                  ),
+                );
+              }
+            }));
   }
 
   createList(info) {
+    this._elternPending.clear();
     var eltern = info;
     if (eltern != null) {
       for (var u in eltern.keys) {
@@ -84,7 +110,8 @@ class ParentsState extends State<Parents> {
       'devtoken': widget.profile['devtoken'],
       'Eltern-pending': this._elternPending,
       'Eltern': widget.profile['Eltern'],
-      'Stufe': widget.profile['Stufe']
+      'Stufe': widget.profile['Stufe'],
+      'Pfadinamen': widget.profile['Pfadinamen']
     };
     return userInfo;
   }
