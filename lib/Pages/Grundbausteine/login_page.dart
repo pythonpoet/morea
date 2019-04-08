@@ -362,6 +362,8 @@ class _LoginPageState extends State<LoginPage> {
         break;
       case FormType.registereltern:
         Map<String, dynamic> userInfo = {
+          'Pfadinamen': '',
+          'Kinder': <dynamic, dynamic> {},
           'Vorname': this._vorname,
           'Nachname': this._nachname,
           'Adresse': this._adresse,
