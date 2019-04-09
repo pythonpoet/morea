@@ -24,6 +24,9 @@ dependencies:
   url_launcher: any
   share: any
   expandable: any
+  qr_flutter: any
+  qrcode_reader: any
+  random_string: any
 
 
   shared_preferences: any

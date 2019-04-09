@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'parents.dart';
 
 class ProfilePageState extends StatelessWidget {
+  MergeChildParent mergeChildParent = new MergeChildParent();
   ProfilePageState({this.profile});
   var profile;
 
   @override
   Widget build(BuildContext context) {
+    BuildContext context;
     return Container(
         child: Scaffold(
             appBar: AppBar(
@@ -20,14 +23,14 @@ class ProfilePageState extends StatelessWidget {
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.maxHeight,
                   ),
-                  child: viewprofile(),
+                  child: viewprofile(context),
                 ));
               },
             ),
             ));
   }
 
-  Widget viewprofile() {
+  Widget viewprofile(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(15),
       child: Column(
@@ -235,6 +238,14 @@ class ProfilePageState extends StatelessWidget {
             ),
             ),       
           ),
+          Container(
+            child: RaisedButton(
+              child: Text('Mit Elternteil Koppeln'),
+              onPressed: () => mergeChildParent.parentReadsQrCode(context)//mergeChildParent.childShowQrCode(profile['UID'], context),
+            ),
+          ),
+
+
           SizedBox(height: 24,),
           Container(
             child: Center(

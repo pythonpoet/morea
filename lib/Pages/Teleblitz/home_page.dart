@@ -416,13 +416,13 @@ void getuserinfo() async {
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: qsuserInfo.data,
                       )))),
-          ListTile(
+          /*ListTile(
             title: Text('Eltern bestätigen'),
             trailing: Icon(Icons.pregnant_woman),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) =>
                     Parents(profile: qsuserInfo.data))),
-          ),
+          ),*/
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
