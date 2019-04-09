@@ -10,6 +10,9 @@ abstract class BaseAuth{
   Future<void> sendPasswordResetEmail(String email);
   Future<String> currentUser();
   Future<void> signOut();
+  /*String checkForErrors(Error e){
+
+  }*/
 }
 
 class Auth implements BaseAuth {

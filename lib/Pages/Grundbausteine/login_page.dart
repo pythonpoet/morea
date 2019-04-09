@@ -118,6 +118,119 @@ class _LoginPageState extends State<LoginPage> {
       
     if (validateAndSave()) {
       try {
+        switch (_formType) {
+          case FormType.login:
+              setState(() {
+              _load =true; 
+              });
+            userId = await auth0.signInWithEmailAndPassword(_email, _password);
+              print('Sign in: ${userId}');
+              if(userId != null){
+                updatedevtoken();
+                setState(() {
+              _load = false; 
+              });
+              widget.onSignedIn();
+              }else{
+                setState(() {
+              _load = false; 
+              });
+              }            
+            break;
+          case FormType.register:
+          if(_password.length >= 6){
+            if (_password == _passwordneu){
+            if (_selectedstufe != 'Stufe wählen') {
+              setState(() {
+           _load =true; 
+            });
+            await datenschutz.morea_datenschutzerklaerung(context);
+            if(datenschutz.akzeptiert){
+              userId = await auth0
+                        .createUserWithEmailAndPassword(_email, _password);
+              print('Registered user: ${userId}');
+              if (userId != null) {
+                moreafire.createUserInformation(await mapUserData());
+                widget.onSignedIn();
+            }
+             
+              }else{
+                setState(() {
+                  _load =false; 
+                });
+                return null;
+              }
+            } else {
+              showDialog(
+                  context: context,
+                  child: new AlertDialog(
+                    title: new Text("Bitte eine Stufe wählen!"),
+                  ));
+            }
+          } else {
+            showDialog(
+                context: context,
+                child: new AlertDialog(
+                  title: new Text("Passwörter sind nicht identisch"),
+                ));
+          }
+          }else{
+            showDialog(
+                context: context,
+                child: new AlertDialog(
+                  title: new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
+                ));
+          }
+          
+            break;
+          case FormType.registereltern:
+          if (_password.length >= 6) {
+              if (_password == _passwordneu) {
+                if (_selectedverwandtschaft != "Verwandtschaftsgrad wählen") {
+                  setState(() {
+                    _load = true;
+                  });
+                  await datenschutz.morea_datenschutzerklaerung(context);
+                  if(datenschutz.akzeptiert){
+                  userId = await widget.auth
+                      .createUserWithEmailAndPassword(_email, _password);
+                  print('Registered user: ${userId}');
+                  if (userId != null) {
+                    moreafire.createUserInformation(await mapUserData());
+                    setState(() {
+                      _load = false;
+                    });
+                    widget.onSignedIn();
+                  }
+                  }
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Verwandtschaftsgrad wählen"),
+                        );
+                      });
+                }
+              } else {
+                showDialog(
+                    context: context,
+                    child: new AlertDialog(
+                      title: new Text("Passwörter sind nicht identisch"),
+                    ));
+              }
+            } else {
+              showDialog(
+                  context: context,
+                  child: new AlertDialog(
+                    title: new Text(
+                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
+                  ));
+            }
+            break;
+         
+        }
+        /*
         if (_formType == FormType.login) {
           setState(() {
            _load =true; 
@@ -179,11 +292,12 @@ class _LoginPageState extends State<LoginPage> {
                 child: new AlertDialog(
                   title: new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
                 ));
-          }
+          } 
           
-        }
+        }*/
       } catch (e) {
         print('$e');
+        print('error type = ${e.runtimeType}');
         authProblems errorType;
         if (_platform == Platform.isAndroid) {
           switch (e.message) {
