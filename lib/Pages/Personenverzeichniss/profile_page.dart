@@ -241,7 +241,7 @@ class ProfilePageState extends StatelessWidget {
           Container(
             child: RaisedButton(
               child: Text('Mit Elternteil Koppeln'),
-              onPressed: () => mergeChildParent.parentReadsQrCode(context)//mergeChildParent.childShowQrCode(profile['UID'], context),
+              onPressed: () => mergeChildParent.childShowQrCode(profile['UID'], context),
             ),
           ),
 
