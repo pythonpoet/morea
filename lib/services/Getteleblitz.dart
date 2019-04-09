@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:morea/services/url_launcher.dart';
 import 'dart:convert';
 import 'auth.dart';
+import 'morea_firestore.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 abstract class BaseTeleblitz {
@@ -12,8 +14,10 @@ abstract class BaseTeleblitz {
 
 
 class Teleblitz implements BaseTeleblitz {
-  Auth auth = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
   bool block = false;
+  
+
 
   Future<Info> getInfos(String filter) async {
     var jsonData;
@@ -22,7 +26,7 @@ class Teleblitz implements BaseTeleblitz {
     String stufe = filter;
   
     if (stufe!= '@') {
-      if (await auth.refreshteleblitz(stufe) == true) {
+      if (await moreafire.refreshteleblitz(stufe) == true) {
         data = await http.get(
             "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
         jsonData = json.decode(data.body);
@@ -34,39 +38,45 @@ class Teleblitz implements BaseTeleblitz {
             info.setDatum(u["datum"]);
             if (u['keine-aktivitat'] == false) {
               info.setAntreten(u["antreten"]);
+              info.setAntretenMaps(u['google-map']);
               info.setAbtreten(u["abtreten"]);
+              info.setAbtretenMaps(u['map-abtreten']);
               info.setBemerkung(u["bemerkung"]);
               info.setSender(u["name-des-senders"]);
-              info.setMitnehmen(u['mitnehmen-test']);
-              info.setkeineAktivitat(false);
+              info.setMitnehmen(u['mitnehmen-test']);            
+              info.setkeineAktivitat('false');
             } else {
-              info.setkeineAktivitat(true);
+              info.setkeineAktivitat('true');
             }
             telblitz = {
               'datum': info.datum,
-              'keine-aktivität': info.keineaktivitat,
+              'keine-aktivitat': info.keineaktivitat,
               'antreten': info.antreten,
+              'google-map': info.antretenMap,
               'abtreten': info.abtreten,
+              'map-abtreten': info.abtretenMap,
               'bemerkung': info.bemerkung,
               'name-des-senders': info.sender,
               'mitnehmen-test': info.mitnehmen
             };
-            auth.uploadteleblitz(telblitz, stufe);
+           moreafire.uploadteleblitz(stufe, telblitz);
           }
         }
       } else {
-        await auth.getteleblitz(stufe).then((result) {
+        await moreafire.getteleblitz(stufe).then((result) {
           info.setTitel(stufe);
           info.setDatum(result.data["datum"]);
-          if (!result.data["keine-aktivität"]) {
+          if (result.data["keine-aktivitat"]=='false') {
             info.setAntreten(result.data["antreten"]);
+            info.setAntretenMaps(result.data["google-map"]);
             info.setAbtreten(result.data["abtreten"]);
+            info.setAbtretenMaps(result.data["map-abtreten"]);
             info.setBemerkung(result.data["bemerkung"]);
             info.setSender(result.data["name-des-senders"]);
             info.setMitnehmen(result.data['mitnehmen-test']);
-            info.setkeineAktivitat(false);
+            info.setkeineAktivitat('false');
           } else {
-            info.setkeineAktivitat(true);
+            info.setkeineAktivitat('true');
           }
         });
       }
@@ -135,15 +145,18 @@ class Info {
   factory Info() => _instance ??= new Info._();
 
   Info._();
+  Urllauncher urllauncher = new Urllauncher();
 
   String titel;
   String antreten;
+  String antretenMap;
   String abtreten;
+  String abtretenMap;
   String datum;
   String bemerkung;
   String sender;
   String mitnehmen;
-  bool keineaktivitat;
+  String keineaktivitat;
   double _sizeleft = 110;
 
   void setTitel(String titel) {
@@ -153,9 +166,16 @@ class Info {
   void setAntreten(String antreten) {
     this.antreten = antreten;
   }
+  void setAntretenMaps(String antretenMaps){
+    this.antretenMap = antretenMaps;
+  }
 
   void setAbtreten(String abtreten) {
     this.abtreten = abtreten;
+  }
+  
+  void setAbtretenMaps(String abtretenMaps){
+    this.abtretenMap = abtretenMaps;
   }
 
   void setDatum(String datum) {
@@ -174,9 +194,10 @@ class Info {
     this.mitnehmen = mitnehmen;
   }
 
-  void setkeineAktivitat(bool aktv) {
+  void setkeineAktivitat(String aktv) {
     this.keineaktivitat = aktv;
   }
+
 
   Container getTitel() {
     return Container(
@@ -197,7 +218,7 @@ class Info {
   }
 
   Container getAntreten() {
-    if ((keineaktivitat == false) || (this?.antreten?.isNotEmpty ?? false)) {
+    if ((keineaktivitat == 'false') || (this?.antreten?.isNotEmpty ?? false)) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -207,10 +228,21 @@ class Info {
                 width: this._sizeleft,
                 child: Text("Antreten", style: this._getStyleLeft())),
             Expanded(
-                child: Text(
-              this.antreten,
-              style: this._getStyleRight(),
-            ))
+                child: InkWell(
+                  child: Text(
+                    this.antreten,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromARGB(255, 0, 0, 255),
+                      decoration: TextDecoration.underline
+                    ),
+                  ),
+                  onTap: (){
+                    urllauncher.openlinkMaps(this.antretenMap);
+                  } ,
+                ),
+                )
           ],
         ),
         /*child: Center(
@@ -248,10 +280,20 @@ class Info {
                 width: this._sizeleft,
                 child: Text("Abtreten", style: this._getStyleLeft())),
             Expanded(
-                child: Text(
+                child: InkWell(
+                  child: Text(
               this.abtreten,
-              style: this._getStyleRight(),
-            ))
+              style:  TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromARGB(255, 0, 0, 255),
+                      decoration: TextDecoration.underline
+                    ),
+                   ),
+                   onTap:  (){
+                    urllauncher.openlinkMaps(this.abtretenMap);
+                  },
+                ))
           ],
         ),
       );

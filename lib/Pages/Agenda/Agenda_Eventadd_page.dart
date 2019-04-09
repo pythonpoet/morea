@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:morea/services/auth.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/dwi_format.dart';
+import 'package:morea/services/crud.dart';
 
 
 
@@ -19,7 +21,10 @@ enum AgendaModus {
 
 
 class EventAddPageState extends State<EventAddPage>{
-  Auth aut0 = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
+  DWIFormat dwiFormat= new DWIFormat();
+  CrudMedthods crud0 = new CrudMedthods();
+
  int value = 2;
  List<String> mitnehemen= ['Pfadihämpt'];
  final _addkey    = new GlobalKey<FormState>();
@@ -83,20 +88,20 @@ class EventAddPageState extends State<EventAddPage>{
        'Kontakt' :kontakt,
        'Mitnehmen' : mitnehemen
      };
-      if(stufen['Biber']) {
-        aut0.uploadtoAgenda('Biber', datum+eventname, Event);
-      }
-     if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datum+eventname, Event);
+     if(stufen['Biber']) {
+      moreafire.uploadtoAgenda('Biber', datum+eventname, Event);
      }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datum+eventname , Event);
+      moreafire.uploadtoAgenda('Nahani (Meitli)', datum+eventname, Event);
+     }
+     if(stufen['Nahani (Meitli)']) {
+      moreafire.uploadtoAgenda('Nahani (Meitli)', datum+eventname , Event);
      }
      if(stufen['Drason (Buebe)']) {
-       aut0.uploadtoAgenda('Drason (Buebe)', datum+eventname, Event);
+      moreafire.uploadtoAgenda('Drason (Buebe)', datum+eventname, Event);
      }
      if(stufen['Pios']) {
-       aut0.uploadtoAgenda('Pios', datum+eventname, Event);
+      moreafire.uploadtoAgenda('Pios', datum+eventname, Event);
      }
      showDialog(context: context, 
      child: new AlertDialog(
@@ -131,20 +136,20 @@ class EventAddPageState extends State<EventAddPage>{
        'Kontakt' : kontakt,
        'Mitnehmen' : mitnehemen,
      };
-      if(stufen['Biber']) {
-        aut0.uploadtoAgenda('Biber', datumvon+lagername, Lager);
+     if(stufen['Biber']) {
+      moreafire.uploadtoAgenda('Biber', datumvon+lagername, Lager);
       }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
+      moreafire.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
      }
      if(stufen['Nahani (Meitli)']) {
-       aut0.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
+      moreafire.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
      }
      if(stufen['Drason (Buebe)']) {
-       aut0.uploadtoAgenda('Drason (Buebe)', datumvon+lagername, Lager);
+      moreafire.uploadtoAgenda('Drason (Buebe)', datumvon+lagername, Lager);
      }
      if(stufen['Pios']) {
-       aut0.uploadtoAgenda('Pios', datumvon+lagername, Lager);
+      moreafire.uploadtoAgenda('Pios', datumvon+lagername, Lager);
      }
      Navigator.pop(context);
    }
@@ -232,16 +237,45 @@ if (picked != null && picked != datumvon)
       
     );
     if(delete){
-      String name = aut0.formatstring(widget.eventinfo['Datum']+widget.eventinfo['Lagername']);
-      aut0.deletedocument('Stufen/Biber/Agenda', name);
-      aut0.deletedocument('Stufen/WombatWlfe/Agenda', name);
-      aut0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
-      aut0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
-      aut0.deletedocument('Stufen/Pios/Agenda', name);
+      String name = dwiFormat.simplestring(widget.eventinfo['Datum']+widget.eventinfo['Lagername']);
+      crud0.deletedocument('Stufen/Biber/Agenda', name);
+      crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
+      crud0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
+      crud0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
+      crud0.deletedocument('Stufen/Pios/Agenda', name);
       Navigator.pop(context);
     }
-    
-
+ }
+ void eventdelete()async{
+   bool delete = false;
+   await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => new AlertDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          content: Container(
+            child: Text('Event wirklich löschen?'),
+          ),
+          actions: <Widget>[
+            new RaisedButton(
+                child:  Text('Löschen', style: TextStyle(color: Colors.white),),
+                onPressed: () {
+                  delete=true;
+                  
+                  Navigator.pop(context);
+                }),
+          ],
+        ),
+      
+    );
+    if(delete){
+      String name = dwiFormat.simplestring(widget.eventinfo['Datum']+widget.eventinfo['Eventname']);
+      crud0.deletedocument('Stufen/Biber/Agenda', name);
+      crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
+      crud0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
+      crud0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
+      crud0.deletedocument('Stufen/Pios/Agenda', name);
+      Navigator.pop(context);
+    }
  }
   @override
   void initState() {
@@ -965,6 +999,14 @@ if (picked != null && picked != datumvon)
                                   color: Color(0xff7a62ff),
                                   textColor: Colors.white,
                                   onPressed: () => eventHinzufuegen(_addEvent),
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Center(
+                                child: new FlatButton(
+                                  child: new Text('Event löschen',style: TextStyle(fontSize: 25, color: Colors.red)),
+                                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                                  onPressed: () => eventdelete(),
                                 ),
                               )
                             ],

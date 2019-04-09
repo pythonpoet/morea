@@ -22,6 +22,7 @@ dependencies:
   intl: any
   cloud_firestore: any
   url_launcher: any
+  share: any
 
 
 

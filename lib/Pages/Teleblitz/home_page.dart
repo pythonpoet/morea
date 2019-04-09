@@ -5,19 +5,21 @@ import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Pages/Personenverzeichniss/parents.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
+import 'package:share/share.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
 
   final BaseAuth auth;
   final VoidCallback onSigedOut;
-  final BasecrudMethods crud;
+  final BaseCrudMethods crud;
 
   @override
   State<StatefulWidget> createState() => HomePageState();
@@ -27,9 +29,10 @@ enum FormType { leiter, teilnehmer, eltern }
 
 enum Anmeldung { angemolden, abgemolden, verchilt }
 
-class HomePageState extends State<HomePage> {
-  crudMedthods crud0bj = new crudMedthods();
+class HomePageState extends State<HomePage>{
+  CrudMedthods crud0bj = new CrudMedthods();
   Auth auth0 = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
   Teleblitz tlbz = new Teleblitz();
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Info teleblitzinfo = new Info();
@@ -92,32 +95,33 @@ class HomePageState extends State<HomePage> {
                       } else {
                         anmeldung = 'Du hast dich Abgemolden';
                       }
-                      auth0.uebunganmelden(anmeldeDaten, stufe, uidkind);
-                      showDialog(
-                          context: context,
-                          child: new AlertDialog(
-                            title: new Text("Teleblitz"),
-                            content: new Text(anmeldung),
-                          ));
-                    },
+                      moreafire.uebunganmelden(_stufe, _userUID, anmeldeDaten);
+    showDialog(
+        context: context,
+        child: new AlertDialog(
+          title: new Text("Teleblitz"),
+          content: new Text(anmeldung),
+
+        ));
+  },
                   );
                 },
               ),
             );
           });
     }
+
   }
 
-  void getdevtoken() async {
-    var token = await firebaseMessaging.getToken();
-    auth0.uploaddevtocken(_stufe, token, _userUID);
-  }
+  void getdevtoken()async{
+  var token = await firebaseMessaging.getToken();
+  moreafire.uploaddevtocken(_stufe, token, _userUID);
+}
 
   getuserinfo() async {
-    await widget.auth.currentUser().then((userId) {
-      _userUID = userId;
-    });
-    await auth0.getUserInformation(_userUID).then((results) async {
+    
+     _userUID = await auth0.currentUser();
+    var results = await moreafire.getUserInformation(_userUID);
       setState(() {
         qsuserInfo = results;
         _pfadiname = qsuserInfo.data['Pfadinamen'];
@@ -136,14 +140,14 @@ class HomePageState extends State<HomePage> {
           } else if (_pfadiname == 'Loading...') {
             _pfadiname = qsuserInfo.data['Vorname'];
           }
-        });
       } catch (e) {
         print(e);
       }
+      forminit();
+      getdevtoken();
     });
-  }
-
-  void _signedOut() async {
+}
+void _signedOut() async {
     try {
       await widget.auth.signOut();
       widget.onSigedOut();
@@ -151,7 +155,7 @@ class HomePageState extends State<HomePage> {
       print(e);
     }
   }
-
+      
   forminit() {
     try {
       switch (qsuserInfo.data['Pos']) {
@@ -176,7 +180,7 @@ class HomePageState extends State<HomePage> {
       print(e);
     }
   }
-
+      
   @override
   void initState() {
     super.initState();
@@ -283,6 +287,7 @@ class HomePageState extends State<HomePage> {
               ),
               body: TabBarView(children: [
                 LayoutBuilder(
+
                   builder: (BuildContext context,
                       BoxConstraints viewportConstraints) {
                     return SingleChildScrollView(
@@ -359,7 +364,6 @@ class HomePageState extends State<HomePage> {
         break;
     }
   }
-
   List<Widget> navigation() {
     switch (_formType) {
       case FormType.leiter:
@@ -549,3 +553,6 @@ class HomePageState extends State<HomePage> {
     }
   }
 }
+ 
+
+

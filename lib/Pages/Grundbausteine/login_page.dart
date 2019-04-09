@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/bubble_indication_painter.dart';
+import 'package:morea/services/dwi_format.dart';
+import 'package:morea/services/morea_firestore.dart';
+import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});
@@ -19,7 +22,10 @@ enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
   Auth auth0 = new Auth();
+  MoreaFirebase moreafire = new MoreaFirebase();
+  DWIFormat dwiFormat = new DWIFormat();
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  Datenschutz datenschutz = new Datenschutz();
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -72,57 +78,64 @@ class _LoginPageState extends State<LoginPage> {
 
   updatedevtoken() async {
     List devtoken;
-    await auth0.getUserInformation(userId).then((userInfo) {
-      try {
+    var userInfo = await moreafire.getUserInformation(userId);
+      try{
         List devtoken_old = userInfo.data['devtoken'];
-        if (devtoken_old == null) {
-          firebaseMessaging.getToken().then((token) {
-            devtoken = [token];
-            Map<String, List> devtokens = {'devtoken': devtoken};
-            userInfo.data.addAll(devtokens);
-            auth0.createUserInformation(userInfo.data);
-          });
-        } else {
-          firebaseMessaging.getToken().then((token) {
-            if (devtoken_old[0] == 'leer') {
-              devtoken = [token];
-            } else {
-              for (int i = 0; i < devtoken_old.length; i++) {
-                if (devtoken_old[i] == token) {
-                  return;
-                }
-              }
-              devtoken = new List.from(devtoken_old)..add(token);
+        if(devtoken_old == null){
+          firebaseMessaging.getToken().then((token){
+          devtoken = [token];
+          Map<String, List> devtokens ={
+            'devtoken':devtoken
+          };
+          userInfo.data.addAll(devtokens);
+          moreafire.createUserInformation(userInfo.data);
+        });
+        }else{
+          firebaseMessaging.getToken().then((token){
+        if(devtoken_old[0] == 'leer'){
+          devtoken = [token];
+        }else{
+          for(int i=0;i<devtoken_old.length;i++){
+            if(devtoken_old[i]==token){
+              return;
             }
 
-            userInfo.data['devtoken'] = devtoken;
+        moreafire.createUserInformation(userInfo.data);
+        });
+        }
+        
 
             auth0.createUserInformation(userInfo.data);
           });
         }
       } catch (e) {
         print(e);
-      }
-    });
+      }  
   }
 
   void validateAndSubmit() async {
     Platform.isAndroid;
+      
     if (validateAndSave()) {
       try {
         switch (_formType) {
           case FormType.login:
             setState(() {
-              _load = true;
-            });
-            userId =
-                await widget.auth.signInWithEmailAndPassword(_email, _password);
-            print('Sign in: ${userId}');
-            setState(() {
-              _load = false;
-            });
+           _load =true; 
+          });
+         userId = await auth0.signInWithEmailAndPassword(_email, _password);
+          print('Sign in: ${userId}');
+          if(userId != null){
             updatedevtoken();
-            widget.onSignedIn();
+            setState(() {
+           _load = false; 
+          });
+          widget.onSignedIn();
+          }else{
+            setState(() {
+           _load = false; 
+          });
+          }
             break;
           case FormType.register:
             if (_password.length >= 6) {
@@ -131,6 +144,22 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _load = true;
                   });
+                  
+            await datenschutz.morea_datenschutzerklaerung(context);
+                  if(datenschutz.akzeptiert){
+              userId = await auth0
+                        .createUserWithEmailAndPassword(_email, _password);
+              print('Registered user: ${userId}');
+              if (userId != null) {
+                moreafire.createUserInformation(await mapUserData());
+                widget.onSignedIn();
+            }
+             
+              }else{
+                setState(() {
+                  _load =false; 
+                });
+                return null;
                   userId = await widget.auth
                       .createUserWithEmailAndPassword(_email, _password);
                   print('Registered user: ${userId}');
@@ -154,6 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: new AlertDialog(
                       title: new Text("Passwörter sind nicht identisch"),
                     ));
+            
               }
             } else {
               showDialog(
@@ -280,6 +310,9 @@ class _LoginPageState extends State<LoginPage> {
         print('The error is $errorType');
       }
     }
+    setState(() {
+              _load = false; 
+              });
   }
 
   void moveToRegister() {
@@ -408,24 +441,18 @@ class _LoginPageState extends State<LoginPage> {
         body: Stack(
           children: <Widget>[
             Container(
-                color: Colors.white70,
-                child: new SingleChildScrollView(
-                  child: new Form(
-                      key: formKey,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height >= 900.0
-                            ? MediaQuery.of(context).size.height
-                            : 900.0,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: buildInputs(),
-                        ),
-                      )),
-                )),
-            new Align(
-              child: loadingIndicator,
-              alignment: FractionalOffset.center,
+          color: Colors.white70,
+         child: new SingleChildScrollView(
+          child: new Form(
+            key: formKey,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height >= 1050
+                    ? MediaQuery.of(context).size.height
+                    : 1050.0,
+              child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: buildInputs(),
             ),
           ],
         ));
