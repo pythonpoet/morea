@@ -143,6 +143,13 @@ class _AgendaStatePage extends State<AgendaState> {
                           borderRadius: new BorderRadius.all(
                             Radius.circular(4.0),
                           ),
+                          boxShadow:  [
+                          BoxShadow(
+                
+                          color: Color.fromRGBO(0, 0, 0, 0.16),
+                          offset: Offset(3, 3),
+                          blurRadius: 40)
+                          ],
                         ),
                         child: new Row(
                           children: <Widget>[

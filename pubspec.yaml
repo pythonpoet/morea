@@ -23,7 +23,7 @@ dependencies:
   cloud_firestore: any
   url_launcher: any
   share: any
-
+  expandable: any
 
 
   shared_preferences: any
