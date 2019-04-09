@@ -41,6 +41,21 @@ class MoreaFirebase extends BaseMoreaFirebase{
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
     return await crud0.getDocument('user', userUID);
   }
+  Stream<QuerySnapshot> getChildren(){
+    return crud0.streamCollection('user');
+  }
+  //Funktioniert das wück?
+  Future<void> pendParent(String child_UID, String parent_UID, String parent)async{
+    Map<String, dynamic> parentMap = {};
+    var old = await getUserInformation(child_UID);
+    for (var u in old.data['Eltern-pending'].keys) {
+      parentMap[u] = old[u];
+    }
+    if(parentMap[parent] ==  null){
+      parentMap[parent] = parent_UID;
+      updateUserInformation(child_UID, parentMap);
+    }
+  }
 
   Future<void> uebunganmelden(String stufe, String _userUID, Map anmeldedaten) async {
     String uebungsdatum = dwiformat.simplestring(teleblitzinfo.datum);
