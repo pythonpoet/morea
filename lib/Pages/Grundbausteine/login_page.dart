@@ -6,8 +6,10 @@ import 'package:morea/services/dwi_format.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'datenschutz.dart';
 
+
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});
+
   final BaseAuth auth;
   final VoidCallback onSignedIn;
 
@@ -15,7 +17,7 @@ class LoginPage extends StatefulWidget {
   State<StatefulWidget> createState() => new _LoginPageState();
 }
 
-enum FormType { login, register }
+enum FormType { login, register, registereltern }
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 enum Platform { isAndroid, isIOS }
 
@@ -34,8 +36,16 @@ class _LoginPageState extends State<LoginPage> {
       _vorname,
       _nachname,
       _stufe,
-      _selectedstufe = 'Stufe wählen';
-  String _password, _adresse, _ort, _plz, _handynummer, _passwordneu, userId,error;
+      _selectedstufe = 'Stufe wählen',
+      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
+  String _password,
+      _adresse,
+      _ort,
+      _plz,
+      _handynummer,
+      _passwordneu,
+      userId,
+      error;
   FormType _formType = FormType.login;
   Platform _platform = Platform.isAndroid;
   List<String> _stufenselect = [
@@ -44,6 +54,12 @@ class _LoginPageState extends State<LoginPage> {
     'Nahani (Meitli)',
     'Drason (Buebe)',
     'Pios'
+  ];
+  List<String> _verwandtschaft = [
+    'Mutter',
+    'Vater',
+    'Erziehungsberechtigter',
+    'Erziehungsberechtigte'
   ];
   bool _load = false;
 
@@ -61,47 +77,41 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  updatedevtoken()async{
+  updatedevtoken() async {
     List devtoken;
-    var userInfo = await moreafire.getUserInformation(userId);
-      try{
+    await moreafire.getUserInformation(userId).then((userInfo) {
+      try {
         List devtoken_old = userInfo.data['devtoken'];
-        if(devtoken_old == null){
-          firebaseMessaging.getToken().then((token){
-          devtoken = [token];
-          Map<String, List> devtokens ={
-            'devtoken':devtoken
-          };
-          userInfo.data.addAll(devtokens);
-          moreafire.createUserInformation(userInfo.data);
-        });
-        }else{
-          firebaseMessaging.getToken().then((token){
-        if(devtoken_old[0] == 'leer'){
-          devtoken = [token];
-        }else{
-          for(int i=0;i<devtoken_old.length;i++){
-            if(devtoken_old[i]==token){
-              return;
+        if (devtoken_old == null) {
+          firebaseMessaging.getToken().then((token) {
+            devtoken = [token];
+            Map<String, List> devtokens = {'devtoken': devtoken};
+            userInfo.data.addAll(devtokens);
+            auth0.createUserInformation(userInfo.data);
+          });
+        } else {
+          firebaseMessaging.getToken().then((token) {
+            if (devtoken_old[0] == 'leer') {
+              devtoken = [token];
+            } else {
+              for (int i = 0; i < devtoken_old.length; i++) {
+                if (devtoken_old[i] == token) {
+                  return;
+                }
+              }
+              devtoken = new List.from(devtoken_old)..add(token);
             }
-          }
-          devtoken = new List.from(devtoken_old)..add(token);
-        }
-        
-        userInfo.data['devtoken'] = devtoken;
 
-        moreafire.createUserInformation(userInfo.data);
-        });
-        }
-        
+            userInfo.data['devtoken'] = devtoken;
 
-      }catch(e){
-        
+            auth0.createUserInformation(userInfo.data);
+          });
+        }
+      } catch (e) {
         print(e);
-      }  
+      }
+    });
   }
-  
-          
 
   void validateAndSubmit() async {
     Platform.isAndroid;
@@ -307,25 +317,47 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
- Future<Map> mapUserData() async {
+  Future<Map> mapUserData() async {
     var token = await firebaseMessaging.getToken();
-         List devtoken = [token];
-    Map<String, dynamic> userInfo = {
-      'Pfadinamen': this._pfadinamen,
-      'Vorname': this._vorname,
-      'Nachname': this._nachname,
-      'Stufe': this._selectedstufe,
-      'Adresse': this._adresse,
-      'PLZ': this._plz,
-      'Ort': this._ort,
-      'Handynummer': this._handynummer,
-      'Pos': 'Teilnehmer',
-      'UID': this.userId,
-      'Email': this._email,
-      'devtoken' : devtoken
-    };
-    return userInfo;
-    
+    List devtoken = [token];
+    switch (_formType) {
+      case FormType.register:
+        Map<String, dynamic> userInfo = {
+          'Pfadinamen': this._pfadinamen,
+          'Vorname': this._vorname,
+          'Nachname': this._nachname,
+          'Stufe': this._selectedstufe,
+          'Adresse': this._adresse,
+          'PLZ': this._plz,
+          'Ort': this._ort,
+          'Handynummer': this._handynummer,
+          'Pos': 'Teilnehmer',
+          'UID': this.userId,
+          'Email': this._email,
+          'devtoken': devtoken
+        };
+        return userInfo;
+        break;
+      case FormType.registereltern:
+        Map<String, dynamic> userInfo = {
+          'Pfadinamen': '',
+          'Kinder': <dynamic, dynamic> {},
+          'Vorname': this._vorname,
+          'Nachname': this._nachname,
+          'Adresse': this._adresse,
+          'PLZ': this._plz,
+          'Ort': this._ort,
+          'Handynummer': this._handynummer,
+          'Pos': this._selectedverwandtschaft,
+          'UID': this.userId,
+          'Email': this._email,
+          'devtoken': devtoken
+        };
+        return userInfo;
+        break;
+      case FormType.login:
+        break;
+    }
   }
 
   @override
@@ -333,13 +365,18 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     pageController = PageController();
   }
+
   @override
   Widget build(BuildContext context) {
-    Widget loadingIndicator =_load? new Container(
-      width: 70.0,
-      height: 70.0,
-      child: new Padding(padding: const EdgeInsets.all(5.0),child: new Center(child: new CircularProgressIndicator())),
-    ):new Container();
+    Widget loadingIndicator = _load
+        ? new Container(
+            width: 70.0,
+            height: 70.0,
+            child: new Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: new Center(child: new CircularProgressIndicator())),
+          )
+        : new Container();
 
     return new Scaffold(
         appBar: new AppBar(
@@ -349,35 +386,36 @@ class _LoginPageState extends State<LoginPage> {
         body: Stack(
           children: <Widget>[
             Container(
-          color: Colors.white70,
-         child: new SingleChildScrollView(
-          child: new Form(
-            key: formKey,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= 1050
-                    ? MediaQuery.of(context).size.height
-                    : 1050.0,
-              child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: buildInputs(),
+                color: Colors.white70,
+                child: new SingleChildScrollView(
+                  child: new Form(
+                      key: formKey,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height >= 900.0
+                            ? MediaQuery.of(context).size.height
+                            : 900.0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: buildInputs(),
+                        ),
+                      )),
+                )),
+            new Align(
+              child: loadingIndicator,
+              alignment: FractionalOffset.center,
             ),
-            )
-          ),
-        )
-        ),
-        new Align(child: loadingIndicator,alignment: FractionalOffset.center,),
           ],
         ));
   }
-  Widget buildMenuBar(BuildContext context){
+
+  Widget buildMenuBar(BuildContext context) {
     return Container(
       width: 300.0,
       height: 50.0,
       decoration: BoxDecoration(
-        color:  Color(0xffff9262),
-        borderRadius: BorderRadius.all(Radius.circular(25.0))
-      ),
+          color: Color(0xffff9262),
+          borderRadius: BorderRadius.all(Radius.circular(25.0))),
       child: CustomPaint(
         painter: TabIndicationPainter(pageController: pageController),
         child: Row(
@@ -389,13 +427,9 @@ class _LoginPageState extends State<LoginPage> {
               child: FlatButton(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                onPressed:  _registerAsTeilnehmer,
-                child: Text(
-                  'Teilnehmer',
-                  style: TextStyle(
-                    color: left,
-                    fontSize: 16.0
-                  )),
+                onPressed: _registerAsTeilnehmer,
+                child: Text('Teilnehmer',
+                    style: TextStyle(color: left, fontSize: 16.0)),
               ),
             ),
             Flexible(
@@ -404,12 +438,8 @@ class _LoginPageState extends State<LoginPage> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onPressed: _registerAsElternteil,
-                child: Text(
-                  'Elternteil',
-                  style: TextStyle(
-                    color: right,
-                    fontSize: 16.0
-                  )),
+                child: Text('Elternteil',
+                    style: TextStyle(color: right, fontSize: 16.0)),
               ),
             )
           ],
@@ -429,17 +459,16 @@ class _LoginPageState extends State<LoginPage> {
                   height: 200,
                   image: new AssetImage('assets/images/Logo_gross_weiss.jpeg'),
                 ),
-                new SizedBox(height: 34,),
+                new SizedBox(
+                  height: 34,
+                ),
                 new TextFormField(
                   decoration: new InputDecoration(
-                      labelText: 'Email',
-                      border: UnderlineInputBorder(
-                        borderSide: new BorderSide(
-                          width: 4,
-                          color: Colors.black
-                        ),
-                      ),
+                    labelText: 'Email',
+                    border: UnderlineInputBorder(
+                      borderSide: new BorderSide(width: 4, color: Colors.black),
                     ),
+                  ),
                   validator: (value) =>
                       value.isEmpty ? 'Email darf nicht leer sein' : null,
                   keyboardType: TextInputType.emailAddress,
@@ -449,17 +478,16 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: new InputDecoration(
                     labelText: 'Passwort',
                     border: UnderlineInputBorder(
-                      borderSide: new BorderSide(
-                        color: Colors.black
-                      )
-                    ),
-                    ),
+                        borderSide: new BorderSide(color: Colors.black)),
+                  ),
                   validator: (value) =>
                       value.isEmpty ? 'Passwort darf nicht leer sein' : null,
                   obscureText: true,
                   onSaved: (value) => _password = value,
                 ),
-                SizedBox(height: 24,),
+                SizedBox(
+                  height: 24,
+                ),
                 Column(
                   children: buildSubmitButtons(),
                 )
@@ -468,136 +496,63 @@ class _LoginPageState extends State<LoginPage> {
       ];
     } else {
       return [
-          Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: buildMenuBar(context),
+        Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: buildMenuBar(context),
+        ),
+        Expanded(
+          flex: 2,
+          child: PageView(
+            controller: pageController,
+            onPageChanged: (i) {
+              if (i == 0) {
+                setState(() {
+                  right = Colors.white;
+                  left = Colors.black;
+                });
+              } else if (i == 1) {
+                setState(() {
+                  right = Colors.black;
+                  left = Colors.white;
+                });
+              }
+            },
+            children: <Widget>[
+              Container(
+                child: Column(
+                  children: <Widget>[
+                    buildRegisterTeilnehmer(context),
+                    Column(children: buildSubmitButtons())
+                  ],
                 ),
-          
-               Expanded(
-
-                      flex: 2,
-                      child: PageView(
-                        controller: pageController,
-                        onPageChanged: (i) {
-                          if (i == 0) {
-                            setState(() {
-                              right = Colors.white;
-                              left = Colors.black;
-                            });
-                          } else if (i == 1) {
-                            setState(() {
-                              right = Colors.black;
-                              left = Colors.white;
-                            });
-                          }
-                        },
-                        children: <Widget>[
-                          Container(
-                            child: Column(
-                              children: <Widget>[
-                                buildRegisterTeilnehmer(context),
-                                Column(
-                                  children: buildSubmitButtons()
-                                  )
-                               
-                              ],
-                            ),
-                          ),
-                             Center(
-                                child: Text('A dere Stell chönt mer s Registragtionsformular fürd Eltere anefeze z.B', style: TextStyle(fontSize: 50),),
-                              )
-                        ],
-                      ),
-                    )
-       
+              ),
+              Container(
+                child: Column(
+                  children: <Widget>[
+                    buildRegisterEltern(context),
+                    Column(children: buildSubmitButtons())
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
       ];
     }
   }
-  Widget buildRegisterTeilnehmer(BuildContext context){
+
+  Widget buildRegisterEltern(BuildContext context) {
     return Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-             Container(
-          padding: EdgeInsets.all(10),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-              child: Icon(Icons.person),
-              flex: 1,
-            ),
-            Expanded(
-              flex: 9,
-              child: Container(
-          alignment: Alignment.center, //
-          decoration: new BoxDecoration(
-            border: new Border.all(color: Colors.black, width: 2),
-            borderRadius: new BorderRadius.all(
-              Radius.circular(4.0),
-            ),
-          ),
-          child: Column(
-            children: <Widget>[
-              new TextFormField(
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              filled: true,
-              labelText: 'Pfadinamen',
-            ),
-            onSaved: (value) => _pfadinamen = value,
-          ),
-          new TextFormField(
-            decoration: new InputDecoration(
-                border: UnderlineInputBorder(),
-                filled: true,
-                labelText: 'Vorname'),
-            validator: (value) =>
-                value.isEmpty ? 'Vornamen darf nicht leer sein' : null,
-            keyboardType: TextInputType.text,
-            onSaved: (value) => _vorname = value,
-          ),
-          new TextFormField(
-            decoration: new InputDecoration(
-                border: UnderlineInputBorder(),
-                filled: true,
-                labelText: 'Nachname'),
-            validator: (value) =>
-                value.isEmpty ? 'Nachname darf nicht leer sein' : null,
-            keyboardType: TextInputType.text,
-            onSaved: (value) => _nachname = value,
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 12),
-            width: 1000,
-            color: Colors.grey[200],
-            child: new DropdownButton<String>(
-              items: _stufenselect.map((String val) {
-                return new DropdownMenuItem<String>(
-                  value: val,
-                  child: new Text(val),
-                );
-              }).toList(),
-              hint: Text(_selectedstufe),
-              onChanged: (newVal) {
-                _selectedstufe = newVal;
-                this.setState(() {});
-              }),
-          )
-                            ],
-                          ),
-                          ),
-            )
-                          ],
-          
-            ),
-          ),
+        children: <Widget>[
           Container(
             padding: EdgeInsets.all(10),
             child: Row(
               children: <Widget>[
                 Expanded(
+                  child: Icon(Icons.person),
                   flex: 1,
-                  child: Icon(Icons.home),
                 ),
                 Expanded(
                   flex: 9,
@@ -612,40 +567,105 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       children: <Widget>[
                         new TextFormField(
-            decoration: new InputDecoration(
-                border: UnderlineInputBorder(),
-                filled: true,
-                labelText: 'Adresse'),
-            keyboardType: TextInputType.text,
-            onSaved: (value) => _adresse = value,
-          ),
-          new Row(
-            children: <Widget>[
-              Expanded(
-                  child: new TextFormField(
-                decoration: new InputDecoration(
-                    border: UnderlineInputBorder(),
-                    filled: true,
-                    labelText: 'PLZ'),
-                keyboardType: TextInputType.text,
-                onSaved: (value) => _plz = value,
-              )),
-              Expanded(
-                child: new TextFormField(
-                  decoration: new InputDecoration(
-                      border: UnderlineInputBorder(),
-                      filled: true,
-                      labelText: 'Ort'),
-                  keyboardType: TextInputType.text,
-                  onSaved: (value) => _ort = value,
-                ),
-              ),
-            ],
-          ),
+                          decoration: new InputDecoration(
+                              border: UnderlineInputBorder(),
+                              filled: true,
+                              labelText: 'Vorname'),
+                          validator: (value) => value.isEmpty
+                              ? 'Vornamen darf nicht leer sein'
+                              : null,
+                          keyboardType: TextInputType.text,
+                          onSaved: (value) => _vorname = value,
+                        ),
+                        new TextFormField(
+                          decoration: new InputDecoration(
+                              border: UnderlineInputBorder(),
+                              filled: true,
+                              labelText: 'Nachname'),
+                          validator: (value) => value.isEmpty
+                              ? 'Nachname darf nicht leer sein'
+                              : null,
+                          keyboardType: TextInputType.text,
+                          onSaved: (value) => _nachname = value,
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: _verwandtschaft.map((String val) {
+                                return new DropdownMenuItem<String>(
+                                  value: val,
+                                  child: new Text(val),
+                                );
+                              }).toList(),
+                              hint: Text(_selectedverwandtschaft),
+                              onChanged: (newVal) {
+                                _selectedverwandtschaft = newVal;
+                                this.setState(() {});
+                              }),
+                        )
                       ],
                     ),
-                  )
+                  ),
                 )
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Icon(Icons.home),
+                ),
+                Expanded(
+                    flex: 9,
+                    child: Container(
+                      alignment: Alignment.center, //
+                      decoration: new BoxDecoration(
+                        border: new Border.all(color: Colors.black, width: 2),
+                        borderRadius: new BorderRadius.all(
+                          Radius.circular(4.0),
+                        ),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          new TextFormField(
+                            decoration: new InputDecoration(
+                                border: UnderlineInputBorder(),
+                                filled: true,
+                                labelText: 'Adresse'),
+                            keyboardType: TextInputType.text,
+                            onSaved: (value) => _adresse = value,
+                          ),
+                          new Row(
+                            children: <Widget>[
+                              Expanded(
+                                  child: new TextFormField(
+                                decoration: new InputDecoration(
+                                    border: UnderlineInputBorder(),
+                                    filled: true,
+                                    labelText: 'PLZ'),
+                                keyboardType: TextInputType.text,
+                                onSaved: (value) => _plz = value,
+                              )),
+                              Expanded(
+                                child: new TextFormField(
+                                  decoration: new InputDecoration(
+                                      border: UnderlineInputBorder(),
+                                      filled: true,
+                                      labelText: 'Ort'),
+                                  keyboardType: TextInputType.text,
+                                  onSaved: (value) => _ort = value,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ))
               ],
             ),
           ),
@@ -661,26 +681,28 @@ class _LoginPageState extends State<LoginPage> {
                   flex: 9,
                   child: Container(
                     alignment: Alignment.center, //
-                      decoration: new BoxDecoration(
-                        border: new Border.all(color: Colors.black, width: 2),
-                        borderRadius: new BorderRadius.all(
-                          Radius.circular(4.0),
-                        ),
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
                       ),
+                    ),
                     child: new TextFormField(
-              decoration: new InputDecoration(
-                  border: UnderlineInputBorder(),
-                  filled: true,
-                  labelText: 'Handy nummer'),
-              validator: (value) =>
-                  value.isEmpty ? 'Handynummer darf nicht leer sein' : null,
-              keyboardType: TextInputType.phone,
-              onSaved: (value) => _handynummer = value,
-            ),
+                      decoration: new InputDecoration(
+                          border: UnderlineInputBorder(),
+                          filled: true,
+                          labelText: 'Handy nummer'),
+                      validator: (value) => value.isEmpty
+                          ? 'Handynummer darf nicht leer sein'
+                          : null,
+                      keyboardType: TextInputType.phone,
+                      onSaved: (value) => _handynummer = value,
+                    ),
                   ),
                 )
               ],
-            ),),
+            ),
+          ),
           Container(
             padding: EdgeInsets.all(10),
             child: Row(
@@ -700,14 +722,13 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     child: new TextFormField(
-                      decoration: new InputDecoration(
-                          filled: true,
-                          labelText: 'Email'),
+                      decoration:
+                          new InputDecoration(filled: true, labelText: 'Email'),
                       validator: (value) =>
                           value.isEmpty ? 'Email darf nicht leer sein' : null,
                       keyboardType: TextInputType.emailAddress,
                       onSaved: (value) => _email = value,
-                   ),
+                    ),
                   ),
                 )
               ],
@@ -733,13 +754,14 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: <Widget>[
-                          new TextFormField(
+                        new TextFormField(
                           decoration: new InputDecoration(
                               border: UnderlineInputBorder(),
                               filled: true,
                               labelText: 'Password'),
-                          validator: (value) =>
-                              value.isEmpty ? 'Passwort darf nicht leer sein' : null,
+                          validator: (value) => value.isEmpty
+                              ? 'Passwort darf nicht leer sein'
+                              : null,
                           obscureText: true,
                           onSaved: (value) => _password = value,
                         ),
@@ -748,8 +770,9 @@ class _LoginPageState extends State<LoginPage> {
                               border: UnderlineInputBorder(),
                               filled: true,
                               labelText: 'Password erneut eingeben'),
-                          validator: (value) =>
-                              value.isEmpty ? 'Passwort darf nicht leer sein' : null,
+                          validator: (value) => value.isEmpty
+                              ? 'Passwort darf nicht leer sein'
+                              : null,
                           obscureText: true,
                           onSaved: (value) => _passwordneu = value,
                         ),
@@ -760,9 +783,268 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
-          
-        SizedBox(height: 24,)
-          ],
+          SizedBox(
+            height: 24,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildRegisterTeilnehmer(BuildContext context) {
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Icon(Icons.person),
+                  flex: 1,
+                ),
+                Expanded(
+                  flex: 9,
+                  child: Container(
+                    alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        new TextFormField(
+                          decoration: new InputDecoration(
+                            border: UnderlineInputBorder(),
+                            filled: true,
+                            labelText: 'Pfadinamen',
+                          ),
+                          onSaved: (value) => _pfadinamen = value,
+                        ),
+                        new TextFormField(
+                          decoration: new InputDecoration(
+                              border: UnderlineInputBorder(),
+                              filled: true,
+                              labelText: 'Vorname'),
+                          validator: (value) => value.isEmpty
+                              ? 'Vornamen darf nicht leer sein'
+                              : null,
+                          keyboardType: TextInputType.text,
+                          onSaved: (value) => _vorname = value,
+                        ),
+                        new TextFormField(
+                          decoration: new InputDecoration(
+                              border: UnderlineInputBorder(),
+                              filled: true,
+                              labelText: 'Nachname'),
+                          validator: (value) => value.isEmpty
+                              ? 'Nachname darf nicht leer sein'
+                              : null,
+                          keyboardType: TextInputType.text,
+                          onSaved: (value) => _nachname = value,
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: _stufenselect.map((String val) {
+                                return new DropdownMenuItem<String>(
+                                  value: val,
+                                  child: new Text(val),
+                                );
+                              }).toList(),
+                              hint: Text(_selectedstufe),
+                              onChanged: (newVal) {
+                                _selectedstufe = newVal;
+                                this.setState(() {});
+                              }),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Icon(Icons.home),
+                ),
+                Expanded(
+                    flex: 9,
+                    child: Container(
+                      alignment: Alignment.center, //
+                      decoration: new BoxDecoration(
+                        border: new Border.all(color: Colors.black, width: 2),
+                        borderRadius: new BorderRadius.all(
+                          Radius.circular(4.0),
+                        ),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          new TextFormField(
+                            decoration: new InputDecoration(
+                                border: UnderlineInputBorder(),
+                                filled: true,
+                                labelText: 'Adresse'),
+                            keyboardType: TextInputType.text,
+                            onSaved: (value) => _adresse = value,
+                          ),
+                          new Row(
+                            children: <Widget>[
+                              Expanded(
+                                  child: new TextFormField(
+                                decoration: new InputDecoration(
+                                    border: UnderlineInputBorder(),
+                                    filled: true,
+                                    labelText: 'PLZ'),
+                                keyboardType: TextInputType.text,
+                                onSaved: (value) => _plz = value,
+                              )),
+                              Expanded(
+                                child: new TextFormField(
+                                  decoration: new InputDecoration(
+                                      border: UnderlineInputBorder(),
+                                      filled: true,
+                                      labelText: 'Ort'),
+                                  keyboardType: TextInputType.text,
+                                  onSaved: (value) => _ort = value,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ))
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Icon(Icons.phone),
+                ),
+                Expanded(
+                  flex: 9,
+                  child: Container(
+                    alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+                    child: new TextFormField(
+                      decoration: new InputDecoration(
+                          border: UnderlineInputBorder(),
+                          filled: true,
+                          labelText: 'Handy nummer'),
+                      validator: (value) => value.isEmpty
+                          ? 'Handynummer darf nicht leer sein'
+                          : null,
+                      keyboardType: TextInputType.phone,
+                      onSaved: (value) => _handynummer = value,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Icon(Icons.email),
+                ),
+                Expanded(
+                  flex: 9,
+                  child: Container(
+                    alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+                    child: new TextFormField(
+                      decoration:
+                          new InputDecoration(filled: true, labelText: 'Email'),
+                      validator: (value) =>
+                          value.isEmpty ? 'Email darf nicht leer sein' : null,
+                      keyboardType: TextInputType.emailAddress,
+                      onSaved: (value) => _email = value,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Icon(Icons.vpn_key),
+                ),
+                Expanded(
+                  flex: 9,
+                  child: Container(
+                    alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        new TextFormField(
+                          decoration: new InputDecoration(
+                              border: UnderlineInputBorder(),
+                              filled: true,
+                              labelText: 'Password'),
+                          validator: (value) => value.isEmpty
+                              ? 'Passwort darf nicht leer sein'
+                              : null,
+                          obscureText: true,
+                          onSaved: (value) => _password = value,
+                        ),
+                        new TextFormField(
+                          decoration: new InputDecoration(
+                              border: UnderlineInputBorder(),
+                              filled: true,
+                              labelText: 'Password erneut eingeben'),
+                          validator: (value) => value.isEmpty
+                              ? 'Passwort darf nicht leer sein'
+                              : null,
+                          obscureText: true,
+                          onSaved: (value) => _passwordneu = value,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 24,
+          )
+        ],
       ),
     );
   }
@@ -771,13 +1053,13 @@ class _LoginPageState extends State<LoginPage> {
     if (_formType == FormType.login) {
       return [
         new RaisedButton(
-                    child: new Text('Anmelden', style: new TextStyle(fontSize: 20)),
-                    onPressed: validateAndSubmit,
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    color: Color(0xff7a62ff),
-                    textColor: Colors.white,
-                  ),
+          child: new Text('Anmelden', style: new TextStyle(fontSize: 20)),
+          onPressed: validateAndSubmit,
+          shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0)),
+          color: Color(0xff7a62ff),
+          textColor: Colors.white,
+        ),
         new FlatButton(
           child: new Text(
             'Noch kein Konto? Hier registrieren',
@@ -796,13 +1078,13 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       return [
         new RaisedButton(
-                    child: new Text('Registrieren', style: new TextStyle(fontSize: 20)),
-                    onPressed: validateAndSubmit,
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    color: Color(0xff7a62ff),
-                    textColor: Colors.white,
-                  ),
+          child: new Text('Registrieren', style: new TextStyle(fontSize: 20)),
+          onPressed: validateAndSubmit,
+          shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0)),
+          color: Color(0xff7a62ff),
+          textColor: Colors.white,
+        ),
         new FlatButton(
           child: new Text(
             'Ich habe bereits ein Konto',
@@ -813,13 +1095,16 @@ class _LoginPageState extends State<LoginPage> {
       ];
     }
   }
+
   void _registerAsTeilnehmer() {
     pageController.animateToPage(0,
         duration: Duration(milliseconds: 700), curve: Curves.decelerate);
+    _formType = FormType.register;
   }
 
   void _registerAsElternteil() {
     pageController?.animateToPage(1,
         duration: Duration(milliseconds: 700), curve: Curves.decelerate);
+    _formType = FormType.registereltern;
   }
 }

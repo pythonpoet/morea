@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
@@ -6,13 +5,13 @@ import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/morea_firestore.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:share/share.dart';
-
+import 'package:morea/Pages/Personenverzeichniss/parents.dart';
+import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
+import 'package:morea/services/morea_firestore.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -27,9 +26,9 @@ class HomePage extends StatefulWidget {
 
 enum FormType { leiter, teilnehmer, eltern }
 
-enum Anmeldung {angemolden, abgemolden, verchilt}
+enum Anmeldung { angemolden, abgemolden, verchilt }
 
-class HomePageState extends State<HomePage>{
+class HomePageState extends State<HomePage> {
   CrudMedthods crud0bj = new CrudMedthods();
   Auth auth0 = new Auth();
   MoreaFirebase moreafire = new MoreaFirebase();
@@ -37,53 +36,85 @@ class HomePageState extends State<HomePage>{
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Info teleblitzinfo = new Info();
 
-
-
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.teilnehmer;
   Anmeldung _anmeldung = Anmeldung.verchilt;
 
-  String _pfadiname = ' ', _userUID = ' ', _stufe = '@', _email = ' ';
+  String _pfadiname = 'Loading...',
+      _userUID = ' ',
+      _stufe = '@',
+      _email = 'Loading...';
   DocumentSnapshot qsuserInfo;
   Map<String, String> anmeldeDaten;
 
-  void submit(String anabmelden) {
-    String anmeldung;
-    print(qsuserInfo.data['Pfadinamen']);
-    anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
-    if (anabmelden == 'Chunt') {
-      anmeldung = 'Du hast dich Angemolden';
+  void submit({@required String anabmelden, String stufe}) {
+    if (_formType != FormType.eltern) {
+      String anmeldung;
+      print(qsuserInfo.data['Pfadinamen']);
+      anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
+      if (anabmelden == 'Chunt') {
+        anmeldung = 'Du hast dich Angemolden';
+      } else {
+        anmeldung = 'Du hast dich Abgemolden';
+      }
+      moreafire.uebunganmelden( _stufe, _userUID,anmeldeDaten);
+      showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: new Text("Teleblitz"),
+            content: new Text(anmeldung),
+          ));
     } else {
-      anmeldung = 'Du hast dich Abgemolden';
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Kind auswählen'),
+              content: ListView.builder(
+                shrinkWrap: true,
+                itemCount: qsuserInfo.data['Kinder'].length,
+                itemBuilder: (BuildContext context, int index) {
+                  var namekind =
+                      List.from(qsuserInfo.data['Kinder'].keys)[index];
+                  var uidkind =
+                      List.from(qsuserInfo.data['Kinder'].values)[index];
+                  return ListTile(
+                    title: Text(namekind),
+                    onTap: () {
+                      String anmeldung;
+                      print(qsuserInfo.data['Pfadinamen']);
+                      anmeldeDaten = {
+                        'Anmeldename': namekind,
+                        'Anmeldung': anabmelden
+                      };
+                      if (anabmelden == 'Chunt') {
+                        anmeldung = 'Du hast dich Angemolden';
+                      } else {
+                        anmeldung = 'Du hast dich Abgemolden';
+                      }
+                      moreafire.uebunganmelden( stufe, uidkind, anmeldeDaten);
+                      showDialog(
+                          context: context,
+                          child: new AlertDialog(
+                            title: new Text("Teleblitz"),
+                            content: new Text(anmeldung),
+                          ));
+                    },
+                  );
+                },
+              ),
+            );
+          });
     }
-    moreafire.uebunganmelden(_stufe, _userUID, anmeldeDaten);
-    showDialog(
-        context: context,
-        child: new AlertDialog(
-          title: new Text("Teleblitz"),
-          content: new Text(anmeldung),
-
-        ));
   }
 
-void getdevtoken()async{
+  void getdevtoken()async{
   var token = await firebaseMessaging.getToken();
   moreafire.uploaddevtocken(_stufe, token, _userUID);
 }
-void forminit() {
-    try {
-      switch (qsuserInfo.data['Pos']) {
-        case 'Leiter':
-        print('leiter');
-          _formType = FormType.leiter;
-          break;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+
 void getuserinfo() async {
      _userUID = await auth0.currentUser();
     var results = await moreafire.getUserInformation(_userUID);
@@ -103,7 +134,8 @@ void getuserinfo() async {
       getdevtoken();
     });
 }
-void _signedOut() async {
+
+  void _signedOut() async {
     try {
       await widget.auth.signOut();
       widget.onSigedOut();
@@ -112,10 +144,34 @@ void _signedOut() async {
     }
   }
 
+ void forminit() {
+    try {
+      switch (qsuserInfo.data['Pos']) {
+        case 'Leiter':
+          _formType = FormType.leiter;
+          break;
+        case 'Mutter':
+          _formType = FormType.eltern;
+          break;
+        case 'Vater':
+          _formType = FormType.eltern;
+          break;
+        case 'Erziehungsberechtigter':
+          _formType = FormType.eltern;
+          break;
+        case 'Erziehungsberechtigte':
+          _formType = FormType.eltern;
+          break;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
-     getuserinfo();
+    getuserinfo();
   }
 
   @override
@@ -124,153 +180,304 @@ void _signedOut() async {
   }
 
   Widget teleblitzwidget(){
-    print("rebuilding...");
-    if(_formType == FormType.leiter){    
-     return Scaffold(
-        appBar: new AppBar(
-          title: new Text('Teleblitz'),
-          backgroundColor: Color(0xff7a62ff),
-          actions: <Widget>[
-            FlatButton(
-              child: Icon(Icons.share, color: Colors.white,),
-              onPressed: (){
-                Share.share('Chum au id Pfadi https://www.morea.ch/ ');
-              },
-            )
-          ],
-        ),
-        drawer: new Drawer(
-          child: new ListView(children: navigation()),
-        ),
-        body:  LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: viewportConstraints.maxHeight,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Container(
-                              child: tlbz.anzeigen(_stufe),
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-        ),
-        floatingActionButton: new FloatingActionButton(
-          elevation: 1.0,
-          child: new Icon(Icons.edit),
-          backgroundColor: Color(0xff7a62ff),
-          onPressed: () => Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => new SelectStufe())).then((onValue){
-            setState((){});
-          }))
-    
-        );
-    }else{
-      return Scaffold(
-        appBar: new AppBar(
-          title: new Text('Teleblitz'),
-          backgroundColor: Color(0xff7a62ff),
-        ),
-        drawer: new Drawer(
-          child: new ListView(children: navigation()),
-        ),
-        body: LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: viewportConstraints.maxHeight,
-                        ),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: <Widget>[
-                               tlbz.anzeigen(_stufe),
-                               anmeldebutton()
-                            ],
-                          )
+    switch (_formType) {
+      case FormType.leiter:
+        return Scaffold(
+            appBar: new AppBar(
+                title: new Text('Teleblitz'),
+                backgroundColor: Color(0xff7a62ff)),
+            drawer: new Drawer(
+              child: new ListView(children: navigation()),
+            ),
+            body: LayoutBuilder(
+              builder:
+                  (BuildContext context, BoxConstraints viewportConstraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: viewportConstraints.maxHeight,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Container(
+                          child: tlbz.anzeigen(_stufe),
                         )
-                      ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            floatingActionButton: new FloatingActionButton(
+                elevation: 1.0,
+                child: new Icon(Icons.edit),
+                backgroundColor: Color(0xff7a62ff),
+                onPressed: () => Navigator.of(context)
+                        .push(new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                new SelectStufe()))
+                        .then((onValue) {
+                      setState(() {});
+                    })));
+        break;
+      case FormType.teilnehmer:
+        return Scaffold(
+          appBar: new AppBar(
+            title: new Text('Teleblitz'),
+            backgroundColor: Color(0xff7a62ff),
+          ),
+          drawer: new Drawer(
+            child: new ListView(children: navigation()),
+          ),
+          body: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: viewportConstraints.maxHeight,
+                    ),
+                    child: SingleChildScrollView(
+                        child: Column(
+                      children: <Widget>[
+                        tlbz.anzeigen(_stufe),
+                        anmeldebutton()
+                      ],
+                    ))),
+              );
+            },
+          ),
+        );
+        break;
+      case FormType.eltern:
+        return DefaultTabController(
+            length: 4,
+            child: Scaffold(
+              appBar: new AppBar(
+                title: new Text('Teleblitz'),
+                backgroundColor: Color(0xff7a62ff),
+                bottom: TabBar(tabs: [
+                  Tab(text: "Biber"),
+                  Tab(
+                    text: 'Wölfe',
+                  ),
+                  Tab(
+                    text: 'Meitli',
+                  ),
+                  Tab(text: 'Buebe')
+                ]),
+              ),
+              drawer: new Drawer(
+                child: new ListView(children: navigation()),
+              ),
+              body: TabBarView(children: [
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Biber'),
+                              anmeldebutton(stufe: 'Biber')
+                            ],
+                          ))),
                     );
                   },
                 ),
-        );
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Wombat (Wölfe)'),
+                              anmeldebutton(stufe: 'Wombat (Wölfe)')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Nahani (Meitli)'),
+                              anmeldebutton(stufe: 'Nahani (Meitli)')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+                LayoutBuilder(
+                  builder: (BuildContext context,
+                      BoxConstraints viewportConstraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: viewportConstraints.maxHeight,
+                          ),
+                          child: SingleChildScrollView(
+                              child: Column(
+                            children: <Widget>[
+                              tlbz.anzeigen('Drason (Buebe)'),
+                              anmeldebutton(stufe: 'Drason (Buebe)')
+                            ],
+                          ))),
+                    );
+                  },
+                ),
+              ]),
+            ));
+        break;
     }
   }
+
   List<Widget> navigation() {
-    if (_formType == FormType.leiter) {
-      return [
-        new UserAccountsDrawerHeader(
-          accountName: new Text(_pfadiname),
-          accountEmail: new Text(_email),
-          decoration: new BoxDecoration(
-              image: new DecorationImage(
-                  fit: BoxFit.fill,
-                  image: new NetworkImage(
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
-        ),
-        new ListTile(
-            title: new Text('Wer chunt?'),
-            trailing: new Icon(Icons.thumbs_up_down),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new WerChunt(userInfo: qsuserInfo.data,)))),
-        new ListTile(
-            title: new Text('Agenda'),
-            trailing: new Icon(Icons.event),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new AgendaState(userInfo: qsuserInfo.data,)))),
-        new ListTile(
-            title: new Text('Personen'),
-            trailing: new Icon(Icons.people),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new PersonenVerzeichnisState()))),
-        new Divider(),
-        new ListTile(
-          title: new Text('Logout'),
-          trailing: new Icon(Icons.cancel),
-          onTap: _signedOut,
-        )
-      ];
-    } else {
-      return [
-        new UserAccountsDrawerHeader(
-          accountName: new Text(_pfadiname),
-          accountEmail: new Text(_email),
-          decoration: new BoxDecoration(
-              image: new DecorationImage(
-                  fit: BoxFit.fill,
-                  image: new NetworkImage(
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
-        ),
-        new ListTile(
-            title: new Text('Agenda'),
-            trailing: new Icon(Icons.event),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new AgendaState(userInfo: qsuserInfo.data)))),
-        new ListTile(
-            title: new Text('Profil'),
-            trailing: new Icon(Icons.person),
-            onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new ProfilePageState(profile: qsuserInfo.data,)))),
-        new Divider(),
-        new ListTile(
-          title: new Text('Logout'),
-          trailing: new Icon(Icons.cancel),
-          onTap: _signedOut,
-        )
-      ];
+    switch (_formType) {
+      case FormType.leiter:
+        return [
+          new UserAccountsDrawerHeader(
+            accountName: new Text(_pfadiname),
+            accountEmail: new Text(_email),
+            decoration: new BoxDecoration(
+                image: new DecorationImage(
+                    fit: BoxFit.fill,
+                    image: new NetworkImage(
+                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+          ),
+          new ListTile(
+              title: new Text('Wer chunt?'),
+              trailing: new Icon(Icons.people),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new WerChunt(
+                        userInfo: qsuserInfo.data,
+                      )))),
+          new ListTile(
+              title: new Text('Agenda'),
+              trailing: new Icon(Icons.event),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AgendaState(
+                        userInfo: qsuserInfo.data,
+                      )))),
+          new ListTile(
+              title: new Text('Personen'),
+              trailing: new Icon(Icons.people),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new PersonenVerzeichnisState()))),
+          new Divider(),
+          new ListTile(
+            title: new Text('Logout'),
+            trailing: new Icon(Icons.cancel),
+            onTap: _signedOut,
+          )
+        ];
+        break;
+      case FormType.teilnehmer:
+        return [
+          new UserAccountsDrawerHeader(
+            accountName: new Text(_pfadiname),
+            accountEmail: new Text(_email),
+            decoration: new BoxDecoration(
+                image: new DecorationImage(
+                    fit: BoxFit.fill,
+                    image: new NetworkImage(
+                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+          ),
+          new ListTile(
+              title: new Text('Agenda'),
+              trailing: new Icon(Icons.event),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AgendaState(userInfo: qsuserInfo.data)))),
+          new ListTile(
+              title: new Text('Profil'),
+              trailing: new Icon(Icons.person),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ProfilePageState(
+                        profile: qsuserInfo.data,
+                      )))),
+          ListTile(
+            title: Text('Eltern bestätigen'),
+            trailing: Icon(Icons.pregnant_woman),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    Parents(profile: qsuserInfo.data))),
+          ),
+          new Divider(),
+          new ListTile(
+            title: new Text('Logout'),
+            trailing: new Icon(Icons.cancel),
+            onTap: _signedOut,
+          )
+        ];
+        break;
+      case FormType.eltern:
+        print(this._pfadiname);
+        print(this._email);
+        return [
+          new UserAccountsDrawerHeader(
+            accountName: Text(this._pfadiname),
+            accountEmail: Text(this._email),
+            decoration: new BoxDecoration(
+                image: new DecorationImage(
+                    fit: BoxFit.fill,
+                    image: new NetworkImage(
+                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+          ),
+          new ListTile(
+              title: new Text('Agenda'),
+              trailing: new Icon(Icons.event),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AgendaState(userInfo: qsuserInfo.data)))),
+          new ListTile(
+              title: new Text('Profil'),
+              trailing: new Icon(Icons.person),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ProfilePageState(
+                        profile: qsuserInfo.data,
+                      )))),
+          ListTile(
+            title: Text('Kind hinzufügen'),
+            trailing: Icon(Icons.person_add),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    AddChild(auth0, qsuserInfo.data))),
+          ),
+          new Divider(),
+          new ListTile(
+            title: new Text('Logout'),
+            trailing: new Icon(Icons.cancel),
+            onTap: _signedOut,
+          )
+        ];
+        break;
     }
-}
-  Widget anmeldebutton() {
-    return Container(
+  }
+
+  Widget anmeldebutton({String stufe}) {
+    if (stufe == null) {
+      return Container(
           padding: EdgeInsets.all(20),
           child: Row(
             children: <Widget>[
@@ -279,7 +486,7 @@ void _signedOut() async {
                 child: new RaisedButton(
                   child:
                       new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
-                  onPressed: () => submit('Chunt nöd'),
+                  onPressed: () => submit(anabmelden: 'Chunt nöd'),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                 ),
@@ -287,8 +494,9 @@ void _signedOut() async {
               Expanded(
                 child: Container(
                   child: new RaisedButton(
-                    child: new Text('Chume', style: new TextStyle(fontSize: 20)),
-                    onPressed: () => submit('Chunt'),
+                    child:
+                        new Text('Chume', style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit(anabmelden: 'Chunt'),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Color(0xff7a62ff),
@@ -298,8 +506,37 @@ void _signedOut() async {
               )
             ],
           ));
+    } else {
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                  child: Container(
+                child: new RaisedButton(
+                  child:
+                      new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
+                  onPressed: () =>
+                      submit(anabmelden: 'Chunt nöd', stufe: stufe),
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                ),
+              )),
+              Expanded(
+                child: Container(
+                  child: new RaisedButton(
+                    child:
+                        new Text('Chume', style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit(anabmelden: 'Chunt', stufe: stufe),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    color: Color(0xff7a62ff),
+                    textColor: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ));
+    }
   }
 }
- 
-
-

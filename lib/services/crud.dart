@@ -7,8 +7,10 @@ abstract class BaseCrudMethods{
   Future<QuerySnapshot> getCollection(String path);
   Stream<QuerySnapshot> streamCollection(String path);
   Stream<QuerySnapshot> streamOrderCollection(String path, String order);
-  Future<DocumentSnapshot> getDocument(String path, String document);
 
+  Future<DocumentSnapshot> getDocument(String path, String document);
+  Stream<DocumentSnapshot> streamDocument(String path, String document);
+  
   Future<void> setData(String path, String document, Map data);
 
   Future deletedocument(String path, String document);
@@ -34,7 +36,9 @@ class CrudMedthods implements BaseCrudMethods {
     path = dwiformat.pathstring(path);
     return await Firestore.instance.collection(path).document(document).get();
   }
-  
+  Stream<DocumentSnapshot> streamDocument(String path, String document){
+    return Firestore.instance.collection(path).document(document).snapshots();
+  }
 
   Future<void> setData(String path, String document, Map data) async {
     document = dwiformat.simplestring(document);

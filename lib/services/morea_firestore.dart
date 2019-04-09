@@ -8,6 +8,10 @@ abstract class BaseMoreaFirebase{
   Future<void> createUserInformation(Map userInfo);
   Future<void> updateUserInformation(String userUID, Map userInfo);
   Future<DocumentSnapshot> getUserInformation(String userUID);
+  Stream<QuerySnapshot> getChildren();
+  Future<void> pendParent(String child_UID, String parent_UID, String parent_name);
+  Stream<DocumentSnapshot> streamPendingParents(String child_UID);
+  Future<void> setChildToParent(String child_UID, String parent_UID, String child_name);
 
   Future uebunganmelden(String stufe, String _userUID, Map anmeldedaten);
   Future<DocumentSnapshot> getteleblitz(String stufe);
@@ -45,16 +49,29 @@ class MoreaFirebase extends BaseMoreaFirebase{
     return crud0.streamCollection('user');
   }
   //Funktioniert das wück?
-  Future<void> pendParent(String child_UID, String parent_UID, String parent)async{
+  Future<void> pendParent(String childUID, String parentUID, String parentName)async{
     Map<String, dynamic> parentMap = {};
-    var old = await getUserInformation(child_UID);
+    var old = await getUserInformation(childUID);
     for (var u in old.data['Eltern-pending'].keys) {
       parentMap[u] = old[u];
     }
-    if(parentMap[parent] ==  null){
-      parentMap[parent] = parent_UID;
-      updateUserInformation(child_UID, parentMap);
+    if(parentMap[parentName] ==  null){
+      parentMap[parentName] = parentUID;
+      updateUserInformation(childUID, parentMap);
     }
+  }
+  Stream<DocumentSnapshot> streamPendingParents(String childUID){
+    return crud0.streamDocument('user', childUID);
+  }
+  Future<void> setChildToParent(String childUID, String parentUID, String childName)async{
+    Map<dynamic, dynamic> childMap = {};
+    var old = await getUserInformation(parentUID);
+
+    for (var u in old.data['Kinder'].keys) {
+      childMap[u] = old[u];
+    }
+    childMap[childName] = childUID;
+    updateUserInformation(parentUID, childMap);
   }
 
   Future<void> uebunganmelden(String stufe, String _userUID, Map anmeldedaten) async {
