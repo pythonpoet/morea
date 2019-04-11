@@ -29,89 +29,24 @@ class _AddChildState extends State<AddChild> {
   MoreaFirebase moreafire = new MoreaFirebase();
   Teleblitz tlbz = new Teleblitz();
   Info teleblitzinfo = new Info();
-
+  MergeChildParent mergeChildParent = new MergeChildParent();
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Kind hinzufügen'),
+    return Container(
+      child: new Card(
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Text('Scanne den Qr-Code, auf dem Display deines Kindes, um die Kopplung abzuschliessen'),
+              RaisedButton(
+                child: Text('Verstanden'),
+                onPressed: () => mergeChildParent.parentReadsQrCode(context, widget.profile['UID'], widget.profile['Vorname']),
+              )
+            ],
+          ),
         ),
-        body: StreamBuilder(
-            stream: moreafire.getChildren(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData)
-                return Center(
-                    child: Text(
-                  'Laden... einen Moment bitte',
-                  style: TextStyle(fontSize: 20),
-                ));
-              else {
-                return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (context, int index) {
-                      var child = snapshot.data.documents[index];
-                      if (child['Pos'] == 'Teilnehmer') {
-                        return ListTile(
-                          title:
-                              Text(child["Vorname"] + ', ' + child['Nachname']),
-                          trailing: Icon(Icons.person_add),
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title:
-                                        Text(child['Vorname'] + ' hinzufügen?'),
-                                    content: Row(
-                                      children: <Widget>[
-                                        Expanded(
-                                            child: Container(
-                                          margin: EdgeInsets.only(right: 20),
-                                          child: new RaisedButton(
-                                            child: new Text('Ja',
-                                                style: new TextStyle(
-                                                    fontSize: 20)),
-                                            onPressed: () {
-                                              moreafire.pendParent(
-                                                  child['UID'],
-                                                  widget.profile['UID'],
-                                                  widget.profile['Vorname']);
-                                              Navigator.of(context).pop();
-                                            },
-                                            shape: new RoundedRectangleBorder(
-                                                borderRadius:
-                                                    new BorderRadius.circular(
-                                                        30.0)),
-                                          ),
-                                        )),
-                                        Expanded(
-                                          child: Container(
-                                            child: new RaisedButton(
-                                              child: new Text('Nein',
-                                                  style: new TextStyle(
-                                                      fontSize: 20)),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              shape: new RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                          30.0)),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                });
-                          },
-                        );
-                      } else {
-                        return Container();
-                      }
-                    });
-              }
-            }));
+      ),
+    );
   }
 }

@@ -52,26 +52,37 @@ class MoreaFirebase extends BaseMoreaFirebase{
   Future<void> pendParent(String childUID, String parentUID, String parentName)async{
     Map<String, dynamic> parentMap = {};
     var old = await getUserInformation(childUID);
-    for (var u in old.data['Eltern-pending'].keys) {
-      parentMap[u] = old[u];
+
+    if(old.data['Eltern-pending'] != null){
+       for (var u in old.data['Eltern-pending']) {
+       parentMap[u] = old[u];
+      }
     }
     if(parentMap[parentName] ==  null){
       parentMap[parentName] = parentUID;
-      updateUserInformation(childUID, parentMap);
+      Map newUserData = old.data;
+      newUserData['Eltern-pending'] = parentMap;
+      updateUserInformation(childUID, newUserData);
     }
   }
   Stream<DocumentSnapshot> streamPendingParents(String childUID){
     return crud0.streamDocument('user', childUID);
   }
   Future<void> setChildToParent(String childUID, String parentUID, String childName)async{
-    Map<dynamic, dynamic> childMap = {};
+    Map<String, dynamic> childMap = {};
     var old = await getUserInformation(parentUID);
-
-    for (var u in old.data['Kinder'].keys) {
+    if(old.data['Kinder'] != null){
+      for (var u in old.data['Kinder'].keys) {
       childMap[u] = old[u];
+      }
     }
-    childMap[childName] = childUID;
-    updateUserInformation(parentUID, childMap);
+    if(childMap[childName] == null){
+      childMap[childName] = childUID;
+      Map newUserData = old.data;
+      newUserData['Kinder'] = childMap;
+      updateUserInformation(parentUID, newUserData);
+    }
+    
   }
 
   Future<void> uebunganmelden(String stufe, String _userUID, Map anmeldedaten) async {
