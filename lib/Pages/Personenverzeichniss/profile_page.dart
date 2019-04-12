@@ -24,10 +24,10 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   CrudMedthods crud0 = new CrudMedthods();
   
 
-  bool hatEltern = false;
+  bool hatEltern = false, display = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
-  bool display = false;
+  List elternMapList = ['Liam Bebecho'];
 
   void reload()async{
     value = controller.stream;
@@ -37,23 +37,21 @@ class ProfilePageStatePage extends State<ProfilePageState> {
       print('tp1');
       var newData = await moreaFire.getUserInformation(widget.profile['UID']);
         if(newData.data != widget.profile){
-          setState(() {
-            print('profil akt');
+            display = false;
             widget.profile = newData.data;    
             erziungsberechtigte();
-            display = false;
-
-            });
         }
     }
   }
-  void erziungsberechtigte(){
+  Future<void> erziungsberechtigte()async{
     if((widget.profile['Eltern-pending'] != null)&&(widget.profile['Eltern-pending'].length != 0)){
+      await getElternMap();
       hatEltern = true;
-      print('hat eltern');
+      setState(() { 
+      });
+      
     }else{
       hatEltern = false;
-      print('hat keine Eltern');
     }
   }
   void aktuallisieren(){
@@ -63,6 +61,18 @@ class ProfilePageStatePage extends State<ProfilePageState> {
       display = true;
     }
     setState(() {});
+  }
+  Future<void> getElternMap()async{
+    List elternUID = List.from(widget.profile['Eltern-pending'].values);
+    for(int i = 0; i < elternUID.length; i++){
+      var elternData = await moreaFire.getUserInformation(elternUID[i]);
+      if(i == 0){
+        elternMapList[0] = elternData.data;
+      }else{
+        elternMapList.add(elternData.data);
+      }
+    }
+    return null;
   }
   @override
   void initState() {
@@ -315,18 +325,18 @@ class ProfilePageStatePage extends State<ProfilePageState> {
             ),       
           ),
           hatEltern? 
-          Container(
-            height: 200,
-            color: Colors.red)
+           elternAnzegen()
             :
-            Container(
-            height: 200,
-            color: Colors.blue,
-            ),
+            Container(),
+          SizedBox(height: 10,),
           Container(
             child: RaisedButton(
-              child: Text('Mit Elternteil Koppeln'),
-              onPressed: () =>  aktuallisieren()
+              child: Text('Mit Elternteil Koppeln', style: TextStyle(fontSize: 20),),
+              onPressed: () =>  aktuallisieren(),
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+                  color: Color(0xff7a62ff),
+                  textColor: Colors.white,
             ),
           ),
 
@@ -343,5 +353,119 @@ class ProfilePageStatePage extends State<ProfilePageState> {
         ],
       ),
     );
+  }
+  Widget elternAnzegen(){
+    if(elternMapList[0] != 'Liam Bebecho'){
+      return Column(
+      children: <Widget>[
+        SizedBox(height: 15,),
+        Container(
+        height: 130*(elternMapList.length).toDouble(),
+             alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: elternMapList.length,
+                itemExtent: 130,
+                itemBuilder: (context, int index)  {
+                  
+                  Map<String,dynamic> elternMap = Map<String,dynamic>.from(elternMapList[index]);
+                  return Container(
+                    
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('${elternMap['Pos']}:', 
+                        style: TextStyle(fontSize: 20)),
+                        Row(
+                        children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: Text(
+                          'Vorname:',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )),
+                      Expanded(
+                          child: Container(
+                              child: Text(
+                        elternMap['Vorname'],
+                        style: TextStyle(fontSize: 20),
+                      )))
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: Text(
+                          'Nachname:',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )),
+                      Expanded(
+                          child: Container(
+                              child: Text(
+                        elternMap['Nachname'],
+                        style: TextStyle(fontSize: 20),
+                      )))
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: Text(
+                          'Email:',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )),
+                      Expanded(
+                          child: Container(
+                              child: Text(
+                        elternMap['Email'],
+                        style: TextStyle(fontSize: 20),
+                      )))
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: Text(
+                          'Telefon:',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )),
+                      Expanded(
+                          child: Container(
+                              child: Text(
+                       elternMap['Handynummer'],
+                        style: TextStyle(fontSize: 20),
+                      )))
+                    ],
+                  ),
+                      ],
+                    ),
+                  );
+                }
+            ) 
+         ),       
+      )
+      ],
+    );
+    }else{
+      return Container();
+    }
+    
   }
 }
