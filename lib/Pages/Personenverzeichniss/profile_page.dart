@@ -1,21 +1,89 @@
-import 'package:flutter/material.dart';
-import 'parents.dart';
+import 'dart:async';
 
-class ProfilePageState extends StatelessWidget {
-  MergeChildParent mergeChildParent = new MergeChildParent();
+import 'package:flutter/material.dart';
+import 'package:morea/services/crud.dart';
+import 'parents.dart';
+import 'chilld_Qr_code.dart';
+import 'package:morea/services/morea_firestore.dart';
+class ProfilePageState extends StatefulWidget{
   ProfilePageState({this.profile});
   var profile;
+  MergeChildParent mergeChildParent = new MergeChildParent();
+
+  @override
+  State<StatefulWidget> createState() => ProfilePageStatePage();
+}
+
+class ProfilePageStatePage extends State<ProfilePageState> {
+  static ProfilePageStatePage _instance;
+  factory ProfilePageStatePage() => _instance ??= new ProfilePageStatePage._();
+  ProfilePageStatePage._();
+
+  //MergeChildParent mergeChildParent = new MergeChildParent();
+  MoreaFirebase moreaFire = MoreaFirebase();
+  CrudMedthods crud0 = new CrudMedthods();
+  
+
+  bool hatEltern = false;
+  Stream<bool> value;
+  var controller = new StreamController<bool>();
+  bool display = false;
+
+  void reload()async{
+    value = controller.stream;
+    controller.add(false);
+    while(true){
+      await crud0.waitOnDocumentChanged('user', 'document');
+      print('tp1');
+      var newData = await moreaFire.getUserInformation(widget.profile['UID']);
+        if(newData.data != widget.profile){
+          setState(() {
+            print('profil akt');
+            widget.profile = newData.data;    
+            erziungsberechtigte();
+            display = false;
+
+            });
+        }
+    }
+  }
+  void erziungsberechtigte(){
+    if((widget.profile['Eltern-pending'] != null)&&(widget.profile['Eltern-pending'].length != 0)){
+      hatEltern = true;
+      print('hat eltern');
+    }else{
+      hatEltern = false;
+      print('hat keine Eltern');
+    }
+  }
+  void aktuallisieren(){
+    if(display){
+      display = false;
+    }else{
+      display = true;
+    }
+    setState(() {});
+  }
+  @override
+  void initState() {
+    reload();
+    erziungsberechtigte();
+    super.initState();
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
-    BuildContext context;
     return Container(
         child: Scaffold(
             appBar: AppBar(
-              title: Text(profile['Vorname'].toString()),
+              title: Text(widget.profile['Vorname'].toString()),
                backgroundColor: Color(0xff7a62ff),
             ),
-            body: LayoutBuilder(
+            body: Stack(
+              children: <Widget>[
+                LayoutBuilder(
               builder:
                   (BuildContext context, BoxConstraints viewportConstraints) {
                 return SingleChildScrollView(
@@ -27,6 +95,14 @@ class ProfilePageState extends StatelessWidget {
                 ));
               },
             ),
+            new Align(
+              child: display? 
+              widget.mergeChildParent.childShowQrCode(widget.profile['UID'], context)
+              :
+              Container(),
+            )
+              ],
+            )
             ));
   }
 
@@ -60,7 +136,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Vorname'],
+                        widget.profile['Vorname'],
                         style: TextStyle(fontSize: 20),
                       )))
                     ],
@@ -79,7 +155,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Nachname'],
+                        widget.profile['Nachname'],
                         style: TextStyle(fontSize: 20),
                       ))),
                       
@@ -99,7 +175,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Pfadinamen'],
+                        widget.profile['Pfadinamen'],
                         style: TextStyle(fontSize: 20),
                       ))),
                     ],
@@ -135,7 +211,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Handynummer'],
+                        widget.profile['Handynummer'],
                         style: TextStyle(fontSize: 20),
                       )))
                     ],
@@ -154,7 +230,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Email'],
+                        widget.profile['Email'],
                         style: TextStyle(fontSize: 20),
                       )))
                     ],
@@ -190,7 +266,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Adresse'],
+                        widget.profile['Adresse'],
                         style: TextStyle(fontSize: 20),
                       )))
                     ],
@@ -209,7 +285,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['Ort'],
+                        widget.profile['Ort'],
                         style: TextStyle(fontSize: 20),
                       )))
                     ],
@@ -228,7 +304,7 @@ class ProfilePageState extends StatelessWidget {
                       Expanded(
                           child: Container(
                               child: Text(
-                        profile['PLZ'],
+                        widget.profile['PLZ'],
                         style: TextStyle(fontSize: 20),
                       )))
                     ],
@@ -238,10 +314,19 @@ class ProfilePageState extends StatelessWidget {
             ),
             ),       
           ),
+          hatEltern? 
+          Container(
+            height: 200,
+            color: Colors.red)
+            :
+            Container(
+            height: 200,
+            color: Colors.blue,
+            ),
           Container(
             child: RaisedButton(
               child: Text('Mit Elternteil Koppeln'),
-              onPressed: () => mergeChildParent.childShowQrCode(profile['UID'], context),
+              onPressed: () =>  aktuallisieren()
             ),
           ),
 

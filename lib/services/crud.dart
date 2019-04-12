@@ -10,6 +10,7 @@ abstract class BaseCrudMethods{
 
   Future<DocumentSnapshot> getDocument(String path, String document);
   Stream<DocumentSnapshot> streamDocument(String path, String document);
+  Future<bool> waitOnDocumentChanged(String path, String document);
   
   Future<void> setData(String path, String document, Map<dynamic,dynamic> data);
 
@@ -38,6 +39,26 @@ class CrudMedthods implements BaseCrudMethods {
   }
   Stream<DocumentSnapshot> streamDocument(String path, String document){
     return Firestore.instance.collection(path).document(document).snapshots();
+  }
+
+  Future<bool> waitOnDocumentChanged(String path, String document)async{
+    Stream<bool> value;
+    var controller = new StreamController<bool>();
+    
+    value = controller.stream;
+    controller.add(false);
+    Firestore.instance.collection(path).snapshots().listen((onData){
+       onData.documentChanges.forEach((change)async{
+         if(change.oldIndex == change.newIndex){
+           controller.add(true);
+           
+         }
+      });
+     });
+    
+    return value.firstWhere((bool item) => item); 
+     
+
   }
 
   Future<void> setData(String path, String document, Map<dynamic,dynamic> data) async {

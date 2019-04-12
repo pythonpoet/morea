@@ -53,10 +53,8 @@ class MoreaFirebase extends BaseMoreaFirebase{
     Map<String, dynamic> parentMap = {};
     var old = await getUserInformation(childUID);
 
-    if(old.data['Eltern-pending'] != null){
-       for (var u in old.data['Eltern-pending']) {
-       parentMap[u] = old[u];
-      }
+    if((old.data['Eltern-pending'] != null)&&(old.data['Eltern-pending'].length != 0)){
+       parentMap = Map<String,dynamic>.from(old.data['Eltern-pending']);
     }
     if(parentMap[parentName] ==  null){
       parentMap[parentName] = parentUID;
@@ -71,10 +69,9 @@ class MoreaFirebase extends BaseMoreaFirebase{
   Future<void> setChildToParent(String childUID, String parentUID, String childName)async{
     Map<String, dynamic> childMap = {};
     var old = await getUserInformation(parentUID);
-    if(old.data['Kinder'] != null){
-      for (var u in old.data['Kinder'].keys) {
-      childMap[u] = old[u];
-      }
+    
+    if((old.data['Kinder'] != null)&&(old.data['Kinder'].length != 0)){
+      childMap = Map<String,dynamic>.from(old.data['Kinder']);
     }
     if(childMap[childName] == null){
       childMap[childName] = childUID;
