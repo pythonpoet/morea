@@ -26,14 +26,13 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   final antretenController = TextEditingController();
   final abtretenController = TextEditingController();
   Map<String, TextEditingController> mitnehmenControllerMap =
-  Map<String, TextEditingController>();
+      Map<String, TextEditingController>();
   List<TextEditingController> mitnehmenControllerList =
-  List<TextEditingController>();
+      List<TextEditingController>();
   final bemerkungController = TextEditingController();
   final senderController = TextEditingController();
   final formKey = new GlobalKey<FormState>();
   var aktteleblitz;
-  
 
   void initState() {
     super.initState();
@@ -53,26 +52,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
         future: this.aktteleblitz,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            datumController.text = snapshot.data.getDatum();
-            antretenController.text = snapshot.data.getAntreten();
-            abtretenController.text = snapshot.data.getAbtreten();
-            for (var u in snapshot.data.getMitnehmen()) {
-              print(u);
-              if (!(this.mitnehmenControllerMap.containsKey(u))) {
-                TextEditingController controller =
-                TextEditingController(text: u);
-                this.mitnehmenControllerMap[u] = controller;
-              }
-            }
-
-            for (var u in mitnehmenControllerMap.values) {
-              if (!mitnehmenControllerList.contains(u)) {
-                mitnehmenControllerList.add(u);
-              }
-            }
-            bemerkungController.text = snapshot.data.getBemerkung();
-            senderController.text = snapshot.data.getSender();
-
             return new Scaffold(
               appBar: AppBar(
                 title: Text("Teleblitz Ändern"),
@@ -94,7 +73,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -114,7 +93,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
-                                                onSaved: (value)=> datumController.text = value,
+                                        onSaved: (value) =>
+                                            datumController.text = value,
                                       ),
                                     ),
                                   ],
@@ -126,7 +106,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -146,7 +126,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
-                                                onSaved: (value)=> antretenController.text = value,
+                                        onSaved: (value) =>
+                                            antretenController.text = value,
                                       ),
                                     ),
                                   ],
@@ -158,7 +139,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -178,7 +159,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
-                                                onSaved: (value)=> abtretenController.text = value,
+                                        onSaved: (value) =>
+                                            abtretenController.text = value,
                                       ),
                                     ),
                                   ],
@@ -190,7 +172,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -205,22 +187,27 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                     ListView.builder(
                                       shrinkWrap: true,
                                       itemCount:
-                                      this.mitnehmenControllerList.length,
+                                          this.mitnehmenControllerList.length,
                                       physics:
-                                      const NeverScrollableScrollPhysics(),
+                                          const NeverScrollableScrollPhysics(),
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return new ListTile(
-                                      title: TextFormField(
-                                        initialValue: mitnehmenControllerList[index].text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                                onSaved: (value)=> mitnehmenControllerList[index].text = value,
-                                      ),
-                                    );
+                                          title: TextFormField(
+                                            initialValue:
+                                                mitnehmenControllerList[index]
+                                                    .text,
+                                            style: TextStyle(fontSize: 18),
+                                            decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: Color.fromRGBO(
+                                                    153, 255, 255, 0.3)),
+                                            onSaved: (value) =>
+                                                mitnehmenControllerList[index]
+                                                    .text = value,
+                                          ),
+
+                                        );
                                       },
                                     ),
                                     ListTile(
@@ -242,6 +229,25 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                         color: Color(0xffff9262),
                                       ),
                                     ),
+                                    ListTile(
+                                      title: RaisedButton.icon(
+                                        onPressed: () {
+                                          this.setState(() {
+                                            mitnehmenControllerList
+                                                .removeLast();
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.clear,
+                                          color: Colors.white,
+                                        ),
+                                        label: Text(
+                                          "Element entfernen",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        color: Color(0xffff9262),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -251,7 +257,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -271,7 +277,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
-                                                onSaved: (value)=> bemerkungController.text = value,
+                                        onSaved: (value) =>
+                                            bemerkungController.text = value,
                                       ),
                                     ),
                                   ],
@@ -283,7 +290,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   border: Border.all(
                                       width: 1, color: Colors.black26),
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 ),
                                 padding: EdgeInsets.all(10),
                                 child: Column(
@@ -303,7 +310,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                             filled: true,
                                             fillColor: Color.fromRGBO(
                                                 153, 255, 255, 0.3)),
-                                                onSaved: (value)=> senderController.text = value,
+                                        onSaved: (value) =>
+                                            senderController.text = value,
                                       ),
                                     ),
                                   ],
@@ -311,7 +319,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                               ),
                               ListTile(
                                 contentPadding:
-                                EdgeInsets.symmetric(horizontal: 25),
+                                    EdgeInsets.symmetric(horizontal: 25),
                                 title: RaisedButton.icon(
                                   onPressed: () {
                                     this.uploadTeleblitz(
@@ -343,9 +351,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text("Loading"),
-                backgroundColor: Color(0xff7a62ff)
-              ),
+                  title: Text("Loading"), backgroundColor: Color(0xff7a62ff)),
               body: Center(
                 child: CircularProgressIndicator(),
               ),
@@ -364,7 +370,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     }
   }
 
-
   Future<TeleblitzInfo> downloadInfo(String filter) async {
     var jsonDecode;
     var jsonString;
@@ -379,6 +384,25 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       }
     }
     var teleblitz = TeleblitzInfo.fromJson(infos);
+    datumController.text = teleblitz.getDatum();
+    antretenController.text = teleblitz.getAntreten();
+    abtretenController.text = teleblitz.getAbtreten();
+    for (var u in teleblitz.getMitnehmen()) {
+      print(u);
+      if (!(this.mitnehmenControllerMap.containsKey(u))) {
+        TextEditingController controller = TextEditingController(text: u);
+        this.mitnehmenControllerMap[u] = controller;
+      }
+    }
+
+    for (var u in mitnehmenControllerMap.values) {
+      if (!mitnehmenControllerList.contains(u)) {
+        mitnehmenControllerList.add(u);
+      }
+    }
+    bemerkungController.text = teleblitz.getBemerkung();
+    senderController.text = teleblitz.getSender();
+
     return teleblitz;
   }
 
@@ -389,8 +413,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String _jsonMitnehmen;
 
     List<String> _mitnehmen = List<String>();
-      validateAndSave();
-
+    validateAndSave();
 
     for (var u in mitnehmenControllerList) {
       _mitnehmen.add(u.text);
@@ -411,7 +434,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
     header["Authorization"] =
-    "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
+        "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
     header["accept-version"] = "1.0.0";
     header["Content-Type"] = "application/json";
     http
@@ -465,7 +488,8 @@ class TeleblitzInfo {
 
   TeleblitzInfo();
 
-  TeleblitzInfo.fromString(String titel,
+  TeleblitzInfo.fromString(
+      String titel,
       String datum,
       String antreten,
       String abtreten,
@@ -511,8 +535,7 @@ class TeleblitzInfo {
     this._inhalt = Map.from(json);
   }
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'name': _titel,
         'datum': _datum,
         'antreten': _antreten,

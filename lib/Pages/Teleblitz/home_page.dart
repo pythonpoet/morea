@@ -59,7 +59,7 @@ class HomePageState extends State<HomePage> {
       } else {
         anmeldung = 'Du hast dich Abgemolden';
       }
-      moreafire.uebunganmelden( _stufe, _userUID,anmeldeDaten);
+      moreafire.uebunganmelden(_stufe, _userUID, anmeldeDaten);
       showDialog(
           context: context,
           child: new AlertDialog(
@@ -94,7 +94,7 @@ class HomePageState extends State<HomePage> {
                       } else {
                         anmeldung = 'Du hast dich Abgemolden';
                       }
-                      moreafire.uebunganmelden( stufe, uidkind, anmeldeDaten);
+                      moreafire.uebunganmelden(stufe, uidkind, anmeldeDaten);
                       showDialog(
                           context: context,
                           child: new AlertDialog(
@@ -110,13 +110,13 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void getdevtoken()async{
-  var token = await firebaseMessaging.getToken();
-  moreafire.uploaddevtocken(_stufe, token, _userUID);
-}
+  void getdevtoken() async {
+    var token = await firebaseMessaging.getToken();
+    moreafire.uploaddevtocken(_stufe, token, _userUID);
+  }
 
-void getuserinfo() async {
-     _userUID = await auth0.currentUser();
+  void getuserinfo() async {
+    _userUID = await auth0.currentUser();
     var results = await moreafire.getUserInformation(_userUID);
     setState(() {
       qsuserInfo = results;
@@ -124,7 +124,7 @@ void getuserinfo() async {
       _stufe = qsuserInfo.data['Stufe'];
       _email = qsuserInfo.data['Email'];
       try {
-      if (_pfadiname == '') {
+        if (_pfadiname == '') {
           _pfadiname = qsuserInfo.data['Vorname'];
         }
       } catch (e) {
@@ -133,7 +133,7 @@ void getuserinfo() async {
       forminit();
       getdevtoken();
     });
-}
+  }
 
   void _signedOut() async {
     try {
@@ -144,7 +144,7 @@ void getuserinfo() async {
     }
   }
 
- void forminit() {
+  void forminit() {
     try {
       switch (qsuserInfo.data['Pos']) {
         case 'Leiter':
@@ -179,48 +179,111 @@ void getuserinfo() async {
     return teleblitzwidget();
   }
 
-  Widget teleblitzwidget(){
+  Widget teleblitzwidget() {
     switch (_formType) {
       case FormType.leiter:
-        return Scaffold(
-            appBar: new AppBar(
-                title: new Text('Teleblitz'),
-                backgroundColor: Color(0xff7a62ff)),
-            drawer: new Drawer(
-              child: new ListView(children: navigation()),
-            ),
-            body: LayoutBuilder(
-              builder:
-                  (BuildContext context, BoxConstraints viewportConstraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: viewportConstraints.maxHeight,
+        return DefaultTabController(
+            length: 4,
+            child: Scaffold(
+                appBar: new AppBar(
+                  title: new Text('Teleblitz'),
+                  backgroundColor: Color(0xff7a62ff),
+                  bottom: TabBar(tabs: [
+                    Tab(text: "Biber"),
+                    Tab(
+                      text: 'Wölfe',
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        Container(
-                          child: tlbz.anzeigen(_stufe),
-                        )
-                      ],
+                    Tab(
+                      text: 'Meitli',
                     ),
+                    Tab(text: 'Buebe')
+                  ]),
+                ),
+                drawer: new Drawer(
+                  child: new ListView(children: navigation()),
+                ),
+                body: TabBarView(children: [
+                  LayoutBuilder(
+                    builder: (BuildContext context,
+                        BoxConstraints viewportConstraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight,
+                            ),
+                            child: SingleChildScrollView(
+                                child: Column(
+                              children: <Widget>[
+                                tlbz.anzeigen('Biber'),
+                              ],
+                            ))),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            floatingActionButton: new FloatingActionButton(
-                elevation: 1.0,
-                child: new Icon(Icons.edit),
-                backgroundColor: Color(0xff7a62ff),
-                onPressed: () => Navigator.of(context)
-                        .push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                new SelectStufe()))
-                        .then((onValue) {
-                      setState(() {});
-                    })));
+                  LayoutBuilder(
+                    builder: (BuildContext context,
+                        BoxConstraints viewportConstraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight,
+                            ),
+                            child: SingleChildScrollView(
+                                child: Column(
+                              children: <Widget>[
+                                tlbz.anzeigen('Wombat (Wölfe)'),
+                              ],
+                            ))),
+                      );
+                    },
+                  ),
+                  LayoutBuilder(
+                    builder: (BuildContext context,
+                        BoxConstraints viewportConstraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight,
+                            ),
+                            child: SingleChildScrollView(
+                                child: Column(
+                              children: <Widget>[
+                                tlbz.anzeigen('Nahani (Meitli)'),
+                              ],
+                            ))),
+                      );
+                    },
+                  ),
+                  LayoutBuilder(
+                    builder: (BuildContext context,
+                        BoxConstraints viewportConstraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight,
+                            ),
+                            child: SingleChildScrollView(
+                                child: Column(
+                              children: <Widget>[
+                                tlbz.anzeigen('Drason (Buebe)'),
+                              ],
+                            ))),
+                      );
+                    },
+                  ),
+                ]),
+                floatingActionButton: new FloatingActionButton(
+                    elevation: 1.0,
+                    child: new Icon(Icons.edit),
+                    backgroundColor: Color(0xff7a62ff),
+                    onPressed: () => Navigator.of(context)
+                            .push(new MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    new SelectStufe()))
+                            .then((onValue) {
+                          setState(() {});
+                        }))));
+
         break;
       case FormType.teilnehmer:
         return Scaffold(
