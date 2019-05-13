@@ -11,21 +11,17 @@ abstract class BaseTeleblitz {
   Widget anzeigen(String _stufe);
 }
 
-
-
 class Teleblitz implements BaseTeleblitz {
   MoreaFirebase moreafire = new MoreaFirebase();
   bool block = false;
-  
-
 
   Future<Info> getInfos(String filter) async {
     var jsonData;
     var data;
-    var info =  new Info();
+    var info = new Info();
     String stufe = filter;
-  
-    if (stufe!= '@') {
+
+    if (stufe != '@') {
       if (await moreafire.refreshteleblitz(stufe) == true) {
         data = await http.get(
             "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
@@ -43,10 +39,17 @@ class Teleblitz implements BaseTeleblitz {
               info.setAbtretenMaps(u['map-abtreten']);
               info.setBemerkung(u["bemerkung"]);
               info.setSender(u["name-des-senders"]);
-              info.setMitnehmen(u['mitnehmen-test']);            
+              info.setMitnehmen(u['mitnehmen-test']);
               info.setkeineAktivitat('false');
             } else {
               info.setkeineAktivitat('true');
+              info.setAntreten('');
+              info.setAbtreten('');
+              info.setAntretenMaps('');
+              info.setAbtretenMaps('');
+              info.setBemerkung('');
+              info.setSender('');
+              info.setMitnehmen('');
             }
             telblitz = {
               'datum': info.datum,
@@ -59,53 +62,49 @@ class Teleblitz implements BaseTeleblitz {
               'name-des-senders': info.sender,
               'mitnehmen-test': info.mitnehmen
             };
-           moreafire.uploadteleblitz(stufe, telblitz);
+            moreafire.uploadteleblitz(stufe, telblitz);
           }
         }
       } else {
         await moreafire.getteleblitz(stufe).then((result) {
           info.setTitel(stufe);
           info.setDatum(result.data["datum"]);
-          if (result.data["keine-aktivitat"]=='false') {
-            info.setAntreten(result.data["antreten"]);
-            info.setAntretenMaps(result.data["google-map"]);
-            info.setAbtreten(result.data["abtreten"]);
-            info.setAbtretenMaps(result.data["map-abtreten"]);
-            info.setBemerkung(result.data["bemerkung"]);
-            info.setSender(result.data["name-des-senders"]);
-            info.setMitnehmen(result.data['mitnehmen-test']);
-            info.setkeineAktivitat('false');
-          } else {
-            info.setkeineAktivitat('true');
-          }
+          info.setAntreten(result.data["antreten"]);
+          info.setAntretenMaps(result.data["google-map"]);
+          info.setAbtreten(result.data["abtreten"]);
+          info.setAbtretenMaps(result.data["map-abtreten"]);
+          info.setBemerkung(result.data["bemerkung"]);
+          info.setSender(result.data["name-des-senders"]);
+          info.setMitnehmen(result.data['mitnehmen-test']);
+          info.setkeineAktivitat(result.data['keine-aktivitat']);
         });
       }
       return info;
     }
   }
-  
+
   Widget anzeigen(String _stufe) {
-    try{
-        return new FutureBuilder(
-        future: getInfos(_stufe),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return Container(
-              child: Center(
-                  child: Container(
-                padding: EdgeInsets.all(120),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: new Text('Loading...'),
-                    ),
-                    Expanded(child: new CircularProgressIndicator())
-                  ],
-                ),
-              )),
-            );
-          } else {
-            return Container(
+    try {
+      return new FutureBuilder(
+          future: getInfos(_stufe),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.data == null) {
+              return Container(
+                child: Center(
+                    child: Container(
+                  padding: EdgeInsets.all(120),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: new Text('Loading...'),
+                      ),
+                      Expanded(child: new CircularProgressIndicator())
+                    ],
+                  ),
+                )),
+              );
+            } else {
+              return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
                   child: Column(
@@ -128,23 +127,27 @@ class Teleblitz implements BaseTeleblitz {
                           blurRadius: 40)
                     ],
                   ));
-          }
-        });
-    }catch(e){
-      print(e); 
+            }
+          });
+    } catch (e) {
+      print(e);
       return Center(
-        child: Text('Internet?',style: TextStyle(fontSize: 20),),
+        child: Text(
+          'Internet?',
+          style: TextStyle(fontSize: 20),
+        ),
       );
     }
-    
   }
 }
 
 class Info {
   static Info _instance;
+
   factory Info() => _instance ??= new Info._();
 
   Info._();
+
   Urllauncher urllauncher = new Urllauncher();
 
   String titel;
@@ -166,15 +169,16 @@ class Info {
   void setAntreten(String antreten) {
     this.antreten = antreten;
   }
-  void setAntretenMaps(String antretenMaps){
+
+  void setAntretenMaps(String antretenMaps) {
     this.antretenMap = antretenMaps;
   }
 
   void setAbtreten(String abtreten) {
     this.abtreten = abtreten;
   }
-  
-  void setAbtretenMaps(String abtretenMaps){
+
+  void setAbtretenMaps(String abtretenMaps) {
     this.abtretenMap = abtretenMaps;
   }
 
@@ -197,7 +201,6 @@ class Info {
   void setkeineAktivitat(String aktv) {
     this.keineaktivitat = aktv;
   }
-
 
   Container getTitel() {
     return Container(
@@ -228,21 +231,20 @@ class Info {
                 width: this._sizeleft,
                 child: Text("Antreten", style: this._getStyleLeft())),
             Expanded(
-                child: InkWell(
-                  child: Text(
-                    this.antreten,
-                    style: TextStyle(
+              child: InkWell(
+                child: Text(
+                  this.antreten,
+                  style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
                       color: Color.fromARGB(255, 0, 0, 255),
-                      decoration: TextDecoration.underline
-                    ),
-                  ),
-                  onTap: (){
-                    urllauncher.openlinkMaps(this.antretenMap);
-                  } ,
+                      decoration: TextDecoration.underline),
                 ),
-                )
+                onTap: () {
+                  urllauncher.openlinkMaps(this.antretenMap);
+                },
+              ),
+            )
           ],
         ),
         /*child: Center(
@@ -281,19 +283,18 @@ class Info {
                 child: Text("Abtreten", style: this._getStyleLeft())),
             Expanded(
                 child: InkWell(
-                  child: Text(
-              this.abtreten,
-              style:  TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromARGB(255, 0, 0, 255),
-                      decoration: TextDecoration.underline
-                    ),
-                   ),
-                   onTap:  (){
-                    urllauncher.openlinkMaps(this.abtretenMap);
-                  },
-                ))
+              child: Text(
+                this.abtreten,
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromARGB(255, 0, 0, 255),
+                    decoration: TextDecoration.underline),
+              ),
+              onTap: () {
+                urllauncher.openlinkMaps(this.abtretenMap);
+              },
+            ))
           ],
         ),
       );
@@ -338,32 +339,31 @@ class Info {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(bottom: 10),
-                child:  Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                  width: this._sizeleft,
-                  child: Text("Bemerkung:", style: this._getStyleLeft())),
-              /*Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                        width: this._sizeleft,
+                        child: Text("Bemerkung:", style: this._getStyleLeft())),
+                    /*Expanded(
                   child: Text(
                 this.bemerkung,
                 style: this._getStyleRight(),
               ))*/
-            ],
-          ),
+                  ],
+                ),
               ),
-             Container(
-                child:  Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              
-              Expanded(
-                  child: Text(
-                this.bemerkung,
-                style: this._getStyleRight(),
-              ))
-            ],
-          ),
+              Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                        child: Text(
+                      this.bemerkung,
+                      style: this._getStyleRight(),
+                    ))
+                  ],
+                ),
               ),
             ],
           ));
@@ -415,36 +415,32 @@ class Info {
   Container getMitnehmen() {
     if ((keineaktivitat == false) || (this?.antreten?.isNotEmpty ?? false)) {
       return Container(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-        child: Column(
-  
-          children: <Widget>[
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+          child: Column(
+            children: <Widget>[
               Container(
                 padding: EdgeInsets.only(bottom: 10),
                 child: Row(
-                
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-                width: this._sizeleft,
-                child: Text("Mitnehmen:", style: this._getStyleLeft())),
-          ],
-        ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                        width: this._sizeleft,
+                        child: Text("Mitnehmen:", style: this._getStyleLeft())),
+                  ],
+                ),
               ),
-         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-                child: Html(
-              data: this.mitnehmen,
-              defaultTextStyle: _getStyleRight(),
-            ))
-          ],
-        ),
-          ],
-        )
-        
-      );
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                      child: Html(
+                    data: this.mitnehmen,
+                    defaultTextStyle: _getStyleRight(),
+                  ))
+                ],
+              ),
+            ],
+          ));
     } else {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
