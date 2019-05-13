@@ -31,7 +31,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       List<TextEditingController>();
   final bemerkungController = TextEditingController();
   final senderController = TextEditingController();
+  final mapAntretenController = TextEditingController();
+  final mapAbtretenController = TextEditingController();
   final formKey = new GlobalKey<FormState>();
+  bool _noActivity = false;
   var aktteleblitz;
 
   void initState() {
@@ -52,302 +55,570 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
         future: this.aktteleblitz,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return new Scaffold(
-              appBar: AppBar(
-                title: Text("Teleblitz Ändern"),
-                backgroundColor: Color(0xff7a62ff),
-              ),
-              body: ListView(
-                children: [
-                  Column(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(20),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        "Datum",
-                                        style: TextStyle(fontSize: 24),
+            if (!(_noActivity)) {
+              return new Scaffold(
+                appBar: AppBar(
+                  title: Text("Teleblitz ändern"),
+                  backgroundColor: Color(0xff7a62ff),
+                ),
+                body: ListView(
+                  children: [
+                    Column(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.all(20),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Keine Aktivität",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.date_range),
                                       ),
-                                      trailing: Icon(Icons.date_range),
-                                    ),
-                                    ListTile(
-                                      title: TextFormField(
-                                        initialValue: datumController.text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                        onSaved: (value) =>
-                                            datumController.text = value,
+                                      ListTile(
+                                        title: Switch(
+                                          value: _noActivity,
+                                          onChanged: (bool newValue) {
+                                            setState(() {
+                                              _noActivity = newValue;
+                                            });
+                                          },
+                                          activeColor: Color(0xff7a62ff),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        "Antreten",
-                                        style: TextStyle(fontSize: 24),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Datum",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.date_range),
                                       ),
-                                      trailing: Icon(Icons.flag),
-                                    ),
-                                    ListTile(
-                                      title: TextFormField(
-                                        initialValue: antretenController.text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                        onSaved: (value) =>
-                                            antretenController.text = value,
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue: datumController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              datumController.text = value,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        "Abtreten",
-                                        style: TextStyle(fontSize: 24),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Antreten",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.flag),
                                       ),
-                                      trailing: Icon(Icons.flag),
-                                    ),
-                                    ListTile(
-                                      title: TextFormField(
-                                        initialValue: abtretenController.text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                        onSaved: (value) =>
-                                            abtretenController.text = value,
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue: antretenController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              antretenController.text = value,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        "Mitnehmen",
-                                        style: TextStyle(fontSize: 24),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Antreten Map",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.map),
                                       ),
-                                      trailing: Icon(Icons.assignment),
-                                    ),
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount:
-                                          this.mitnehmenControllerList.length,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return new ListTile(
-                                          title: TextFormField(
-                                            initialValue:
-                                                mitnehmenControllerList[index]
-                                                    .text,
-                                            style: TextStyle(fontSize: 18),
-                                            decoration: InputDecoration(
-                                                filled: true,
-                                                fillColor: Color.fromRGBO(
-                                                    153, 255, 255, 0.3)),
-                                            onSaved: (value) =>
-                                                mitnehmenControllerList[index]
-                                                    .text = value,
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue:
+                                              mapAntretenController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              mapAntretenController.text =
+                                                  value,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Abtreten",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.flag),
+                                      ),
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue: abtretenController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              abtretenController.text = value,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Abtreten Map",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.map),
+                                      ),
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue:
+                                              mapAbtretenController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              mapAbtretenController.text =
+                                                  value,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Mitnehmen",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.assignment),
+                                      ),
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount:
+                                            this.mitnehmenControllerList.length,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return new ListTile(
+                                            title: TextFormField(
+                                              initialValue:
+                                                  mitnehmenControllerList[index]
+                                                      .text,
+                                              style: TextStyle(fontSize: 18),
+                                              decoration: InputDecoration(
+                                                  filled: true,
+                                                  fillColor: Color.fromRGBO(
+                                                      153, 255, 255, 0.3),
+                                                  border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10)))),
+                                              onSaved: (value) =>
+                                                  mitnehmenControllerList[index]
+                                                      .text = value,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      ListTile(
+                                        title: RaisedButton.icon(
+                                          onPressed: () {
+                                            this.setState(() {
+                                              mitnehmenControllerList
+                                                  .add(TextEditingController());
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.add,
+                                            color: Colors.white,
                                           ),
-
-                                        );
-                                      },
-                                    ),
-                                    ListTile(
-                                      title: RaisedButton.icon(
-                                        onPressed: () {
-                                          this.setState(() {
-                                            mitnehmenControllerList
-                                                .add(TextEditingController());
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.add,
-                                          color: Colors.white,
+                                          label: Text(
+                                            "Element hinzufügen",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          color: Color(0xff7a62ff),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5))),
                                         ),
-                                        label: Text(
-                                          "Element hinzufügen",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Color(0xffff9262),
                                       ),
-                                    ),
-                                    ListTile(
-                                      title: RaisedButton.icon(
-                                        onPressed: () {
-                                          this.setState(() {
-                                            mitnehmenControllerList
-                                                .removeLast();
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          color: Colors.white,
-                                        ),
-                                        label: Text(
-                                          "Element entfernen",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Color(0xffff9262),
+                                      ListTile(
+                                        title: RaisedButton.icon(
+                                            onPressed: () {
+                                              this.setState(() {
+                                                mitnehmenControllerList
+                                                    .removeLast();
+                                              });
+                                            },
+                                            icon: Icon(
+                                              Icons.clear,
+                                              color: Colors.white,
+                                            ),
+                                            label: Text(
+                                              "Element entfernen",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            color: Color(0xff7a62ff),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(5)))),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        "Bemerkung",
-                                        style: TextStyle(fontSize: 24),
-                                      ),
-                                      trailing: Icon(Icons.note),
-                                    ),
-                                    ListTile(
-                                      title: TextFormField(
-                                        initialValue: bemerkungController.text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                        onSaved: (value) =>
-                                            bemerkungController.text = value,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  children: <Widget>[
-                                    ListTile(
-                                      title: Text(
-                                        "Sender",
-                                        style: TextStyle(fontSize: 24),
-                                      ),
-                                      trailing: Icon(Icons.contacts),
-                                    ),
-                                    ListTile(
-                                      title: TextFormField(
-                                        initialValue: senderController.text,
-                                        style: TextStyle(fontSize: 18),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: Color.fromRGBO(
-                                                153, 255, 255, 0.3)),
-                                        onSaved: (value) =>
-                                            senderController.text = value,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ListTile(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 25),
-                                title: RaisedButton.icon(
-                                  onPressed: () {
-                                    this.uploadTeleblitz(
-                                        _stufe,
-                                        snapshot.data.getID(),
-                                        snapshot.data.getSlug());
-                                  },
-                                  icon: Icon(
-                                    Icons.update,
-                                    color: Colors.white,
+                                    ],
                                   ),
-                                  label: Text(
-                                    "Teleblitz ändern",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  color: Color(0xffff9262),
                                 ),
-                              )
-                            ],
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Bemerkung",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.note),
+                                      ),
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue:
+                                              bemerkungController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              bemerkungController.text = value,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Sender",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.contacts),
+                                      ),
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue: senderController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              senderController.text = value,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ListTile(
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 25),
+                                  title: RaisedButton.icon(
+                                    onPressed: () {
+                                      this.abtretenController.text = '';
+                                      this.antretenController.text = '';
+                                      this.bemerkungController.text = '';
+                                      this.senderController.text = '';
+                                      this.uploadTeleblitz(
+                                          _stufe,
+                                          snapshot.data.getID(),
+                                          snapshot.data.getSlug());
+                                    },
+                                    icon: Icon(
+                                      Icons.update,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      "Teleblitz ändern",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    color: Color(0xff7a62ff),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    Container(),
+                  ],
+                ),
+              );
+            } else {
+              return Scaffold(
+                  appBar: AppBar(
+                    title: Text('Teleblitz ändern'),
+                    backgroundColor: Color(0xff7a62ff),
                   ),
-                  Container(),
-                ],
-              ),
-            );
+                  body: ListView(children: [
+                    Column(children: <Widget>[
+                      Container(
+                          margin: EdgeInsets.all(20),
+                          child: Form(
+                              key: _formKey,
+                              child: Column(children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Keine Aktivität",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.date_range),
+                                      ),
+                                      ListTile(
+                                        title: Switch(
+                                          value: _noActivity,
+                                          onChanged: (bool newValue) {
+                                            setState(() {
+                                              _noActivity = newValue;
+                                            });
+                                          },
+                                          activeColor: Color(0xff7a62ff),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(
+                                          "Datum",
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        trailing: Icon(Icons.date_range),
+                                      ),
+                                      ListTile(
+                                        title: TextFormField(
+                                          initialValue: datumController.text,
+                                          style: TextStyle(fontSize: 18),
+                                          decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: Color.fromRGBO(
+                                                  153, 255, 255, 0.3),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10)))),
+                                          onSaved: (value) =>
+                                              datumController.text = value,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ListTile(
+                                  contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 25),
+                                  title: RaisedButton.icon(
+                                    onPressed: () {
+                                      this.uploadTeleblitz(
+                                          _stufe,
+                                          snapshot.data.getID(),
+                                          snapshot.data.getSlug());
+                                    },
+                                    icon: Icon(
+                                      Icons.update,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      "Teleblitz ändern",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    color: Color(0xff7a62ff),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                  ),
+                                )
+                              ])))
+                    ])
+                  ]));
+            }
           } else {
             return Scaffold(
               appBar: AppBar(
@@ -402,6 +673,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     }
     bemerkungController.text = teleblitz.getBemerkung();
     senderController.text = teleblitz.getSender();
+    mapAntretenController.text = teleblitz.getMapAntreten();
+    mapAbtretenController.text = teleblitz.getMapAbtreten();
 
     return teleblitz;
   }
@@ -420,16 +693,18 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     }
 
     TeleblitzInfo newteleblitz = TeleblitzInfo.fromString(
-      _stufe,
-      datumController.text,
-      antretenController.text,
-      abtretenController.text,
-      bemerkungController.text,
-      senderController.text,
-      _id,
-      _mitnehmen,
-      _slug,
-    );
+        _stufe,
+        datumController.text,
+        antretenController.text,
+        abtretenController.text,
+        bemerkungController.text,
+        senderController.text,
+        _id,
+        _mitnehmen,
+        _slug,
+        mapAntretenController.text,
+        mapAbtretenController.text,
+        _noActivity);
     var jsonMap = {"fields": newteleblitz.toJson()};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
@@ -454,16 +729,32 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       _jsonMitnehmen = _jsonMitnehmen + "<li>" + u + "</li>";
     }
     _jsonMitnehmen = _jsonMitnehmen + '</ul>';
-
-    Map<String, dynamic> data = {
-      "abtreten": abtretenController.text,
-      "antreten": antretenController.text,
-      "bemerkung": bemerkungController.text,
-      "datum": datumController.text,
-      "keine-aktivitat": 'false',
-      "mitnehmen-test": _jsonMitnehmen,
-      "name-des-senders": senderController.text,
-    };
+    Map<String, dynamic> data;
+    if (!(_noActivity)) {
+      data = {
+            "abtreten": abtretenController.text,
+            "antreten": antretenController.text,
+            "bemerkung": bemerkungController.text,
+            "datum": datumController.text,
+            "keine-aktivitat": 'false',
+            "mitnehmen-test": _jsonMitnehmen,
+            "name-des-senders": senderController.text,
+            "google-map": mapAntretenController.text,
+            "map-abtreten": mapAbtretenController.text,
+          };
+    } else {
+      data = {
+        'abtreten': '',
+        'antreten': '',
+        'bemerkung': '',
+        'datum': datumController.text,
+        'keine-aktivitat': 'true',
+        'mitnehmen-test': '',
+        'name-des-senders': '',
+        "google-map": '',
+        "map-abtreten": '',
+      };
+    }
     moreafire.uploadteleblitz(_stufe, data);
     Navigator.pop(context);
   }
@@ -481,7 +772,10 @@ class TeleblitzInfo {
       _stufe,
       _id,
       _slug,
-      _jsonMitnehmen;
+      _jsonMitnehmen,
+      _mapAntreten,
+      _mapAbtreten;
+  bool _noActivity;
 
   List<String> _mitnehmen;
   bool _keineaktivitaet, _ferien;
@@ -497,7 +791,10 @@ class TeleblitzInfo {
       String sender,
       String id,
       List<String> mitnehmen,
-      String slug) {
+      String slug,
+      String mapAntreten,
+      String mapAbtreten,
+      bool noActivity) {
     _titel = titel;
     _datum = datum;
     _antreten = antreten;
@@ -506,9 +803,11 @@ class TeleblitzInfo {
     _sender = sender;
     _id = id;
     _mitnehmen = mitnehmen;
-    _keineaktivitaet = false;
+    _keineaktivitaet = noActivity;
     _ferien = false;
     _slug = slug;
+    _mapAntreten = mapAntreten;
+    _mapAbtreten = mapAbtreten;
     this.createJsonMitnehmen();
   }
 
@@ -523,7 +822,9 @@ class TeleblitzInfo {
         _id = json['_id'],
         _keineaktivitaet = json['keine-aktivitat'],
         _ferien = json['ferien'],
-        _slug = json['slug'] {
+        _slug = json['slug'],
+        _mapAntreten = json['google-map'],
+        _mapAbtreten = json['map-abtreten'] {
     this._mitnehmen = json["mitnehmen-test"]
         .replaceFirst("<ul>", "")
         .replaceFirst('<' + '/' + 'ul>', "")
@@ -548,6 +849,8 @@ class TeleblitzInfo {
         '_archived': false,
         '_draft': false,
         'slug': _slug,
+        'google-map': _mapAntreten,
+        'map-abtreten': _mapAbtreten,
       };
 
   void createJsonMitnehmen() {
@@ -599,6 +902,14 @@ class TeleblitzInfo {
     return this._slug;
   }
 
+  String getMapAntreten() {
+    return this._mapAntreten;
+  }
+
+  String getMapAbtreten() {
+    return this._mapAbtreten;
+  }
+
   void setDatum(String datum) {
     this._datum = datum;
   }
@@ -625,6 +936,14 @@ class TeleblitzInfo {
 
   void setID(String id) {
     this._id = id;
+  }
+
+  void setMapAntreten(String mapAntreten) {
+    this._mapAntreten = mapAntreten;
+  }
+
+  void setMapAbtreten(String mapAbtreten) {
+    this._mapAbtreten = mapAbtreten;
   }
 
   String getFromMap(String key) {

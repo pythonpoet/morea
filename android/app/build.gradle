@@ -23,9 +23,9 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 //Maxi
-//apply from: "C:/Users/Maxi/flutter/packages/flutter_tools/gradle/flutter.gradle"
+apply from: "C:/Users/Maxi/flutter/packages/flutter_tools/gradle/flutter.gradle"
 //David
-apply from: "C:/Users/davidw/flutter_windows_v1.0.0-stable/flutter/packages/flutter_tools/gradle/flutter.gradle"
+//apply from: "C:/Users/davidw/flutter_windows_v1.0.0-stable/flutter/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreproperties = new Properties()
