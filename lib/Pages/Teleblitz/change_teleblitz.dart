@@ -4,6 +4,7 @@ import 'package:morea/services/crud.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/morealayout.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
@@ -37,6 +38,11 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   bool _noActivity = false;
   var aktteleblitz;
 
+  FocusNode datumFocus = FocusNode();
+  FocusNode antretenFocus = FocusNode();
+
+  Color datumColor = MoreaColors.violett;
+
   void initState() {
     super.initState();
     _stufe = widget.stufe;
@@ -59,7 +65,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
               return new Scaffold(
                 appBar: AppBar(
                   title: Text("Teleblitz ändern"),
-                  backgroundColor: Color(0xff7a62ff),
+                  backgroundColor: MoreaColors.violett,
                 ),
                 body: ListView(
                   children: [
@@ -89,21 +95,20 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                         ),
                                         trailing: Icon(Icons.date_range),
                                       ),
-                                      ListTile(
-                                        title: Switch(
-                                          value: _noActivity,
-                                          onChanged: (bool newValue) {
-                                            setState(() {
-                                              _noActivity = newValue;
-                                            });
-                                          },
-                                          activeColor: Color(0xff7a62ff),
-                                        ),
+                                      SwitchListTile(
+                                        title: Text('Off/On'),
+                                        value: _noActivity,
+                                        activeColor: MoreaColors.violett,
+                                        onChanged: (bool val) {
+                                          setState(() {
+                                            _noActivity = val;
+                                          });
+                                        },
                                       ),
                                     ],
                                   ),
                                 ),
-                                Container(
+                                /*Container(
                                   margin: EdgeInsets.only(bottom: 20),
                                   decoration: BoxDecoration(
                                     border: Border.all(
@@ -140,6 +145,20 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       ),
                                     ],
                                   ),
+                                ),*/
+                                TextFormField(
+                                  initialValue: datumController.text,
+                                  style: TextStyle(fontSize: 18),
+                                  textInputAction: TextInputAction.next,
+                                  focusNode: datumFocus,
+                                  onEditingComplete: () {
+                                    _changeFocus(
+                                        context, datumFocus, antretenFocus);
+                                  },
+                                  decoration: InputDecoration(
+                                      labelText: 'Datum',
+                                      labelStyle: TextStyle(color: datumColor),
+                                      prefixIcon: Icon(Icons.date_range),),
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(bottom: 20),
@@ -163,6 +182,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                         title: TextFormField(
                                           initialValue: antretenController.text,
                                           style: TextStyle(fontSize: 18),
+                                          focusNode: antretenFocus,
                                           decoration: InputDecoration(
                                               filled: true,
                                               fillColor: Color.fromRGBO(
@@ -362,7 +382,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                             style:
                                                 TextStyle(color: Colors.white),
                                           ),
-                                          color: Color(0xff7a62ff),
+                                          color: MoreaColors.violett,
                                           shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(5))),
@@ -385,7 +405,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                               style: TextStyle(
                                                   color: Colors.white),
                                             ),
-                                            color: Color(0xff7a62ff),
+                                            color: MoreaColors.violett,
                                             shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(5)))),
@@ -492,7 +512,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       "Teleblitz ändern",
                                       style: TextStyle(color: Colors.white),
                                     ),
-                                    color: Color(0xff7a62ff),
+                                    color: MoreaColors.violett,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(5))),
@@ -512,7 +532,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
               return Scaffold(
                   appBar: AppBar(
                     title: Text('Teleblitz ändern'),
-                    backgroundColor: Color(0xff7a62ff),
+                    backgroundColor: MoreaColors.violett,
                   ),
                   body: ListView(children: [
                     Column(children: <Widget>[
@@ -539,16 +559,15 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                         ),
                                         trailing: Icon(Icons.date_range),
                                       ),
-                                      ListTile(
-                                        title: Switch(
-                                          value: _noActivity,
-                                          onChanged: (bool newValue) {
-                                            setState(() {
-                                              _noActivity = newValue;
-                                            });
-                                          },
-                                          activeColor: Color(0xff7a62ff),
-                                        ),
+                                      SwitchListTile(
+                                        title: Text('Off/On'),
+                                        value: _noActivity,
+                                        activeColor: MoreaColors.violett,
+                                        onChanged: (bool val) {
+                                          setState(() {
+                                            _noActivity = val;
+                                          });
+                                        },
                                       ),
                                     ],
                                   ),
@@ -593,7 +612,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 ),
                                 ListTile(
                                   contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 25),
+                                      EdgeInsets.symmetric(horizontal: 25),
                                   title: RaisedButton.icon(
                                     onPressed: () {
                                       this.uploadTeleblitz(
@@ -609,7 +628,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       "Teleblitz ändern",
                                       style: TextStyle(color: Colors.white),
                                     ),
-                                    color: Color(0xff7a62ff),
+                                    color: MoreaColors.violett,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(5))),
@@ -622,13 +641,18 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                  title: Text("Loading"), backgroundColor: Color(0xff7a62ff)),
+                  title: Text("Loading"), backgroundColor: MoreaColors.violett),
               body: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
         });
+  }
+
+  _changeFocus(BuildContext context, FocusNode current, FocusNode next) {
+    current.unfocus();
+    FocusScope.of(context).requestFocus(next);
   }
 
   bool validateAndSave() {
@@ -732,16 +756,16 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     Map<String, dynamic> data;
     if (!(_noActivity)) {
       data = {
-            "abtreten": abtretenController.text,
-            "antreten": antretenController.text,
-            "bemerkung": bemerkungController.text,
-            "datum": datumController.text,
-            "keine-aktivitat": 'false',
-            "mitnehmen-test": _jsonMitnehmen,
-            "name-des-senders": senderController.text,
-            "google-map": mapAntretenController.text,
-            "map-abtreten": mapAbtretenController.text,
-          };
+        "abtreten": abtretenController.text,
+        "antreten": antretenController.text,
+        "bemerkung": bemerkungController.text,
+        "datum": datumController.text,
+        "keine-aktivitat": 'false',
+        "mitnehmen-test": _jsonMitnehmen,
+        "name-des-senders": senderController.text,
+        "google-map": mapAntretenController.text,
+        "map-abtreten": mapAbtretenController.text,
+      };
     } else {
       data = {
         'abtreten': '',
