@@ -12,6 +12,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Pages/Personenverzeichniss/parents.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/morealayout.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -187,7 +188,6 @@ class HomePageState extends State<HomePage> {
             child: Scaffold(
                 appBar: new AppBar(
                   title: new Text('Teleblitz'),
-                  backgroundColor: Color(0xff7a62ff),
                   bottom: TabBar(tabs: [
                     Tab(text: "Biber"),
                     Tab(
@@ -213,6 +213,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
+                                  key: ObjectKey(tlbz.anzeigen('Biber')),
                               children: <Widget>[
                                 tlbz.anzeigen('Biber'),
                               ],
@@ -230,6 +231,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
+                                  key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Wombat (Wölfe)'),
                               ],
@@ -247,6 +249,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
+                                  key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Nahani (Meitli)'),
                               ],
@@ -264,6 +267,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
+                                  key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Drason (Buebe)'),
                               ],
@@ -275,7 +279,7 @@ class HomePageState extends State<HomePage> {
                 floatingActionButton: new FloatingActionButton(
                     elevation: 1.0,
                     child: new Icon(Icons.edit),
-                    backgroundColor: Color(0xff7a62ff),
+                    backgroundColor: MoreaColors.violett,
                     onPressed: () => Navigator.of(context)
                             .push(new MaterialPageRoute(
                                 builder: (BuildContext context) =>
@@ -289,7 +293,7 @@ class HomePageState extends State<HomePage> {
         return Scaffold(
           appBar: new AppBar(
             title: new Text('Teleblitz'),
-            backgroundColor: Color(0xff7a62ff),
+            backgroundColor: MoreaColors.violett,
           ),
           drawer: new Drawer(
             child: new ListView(children: navigation()),

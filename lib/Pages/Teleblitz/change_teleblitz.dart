@@ -38,11 +38,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   bool _noActivity = false;
   var aktteleblitz;
 
-  FocusNode datumFocus = FocusNode();
-  FocusNode antretenFocus = FocusNode();
-
-  Color datumColor = MoreaColors.violett;
-
   void initState() {
     super.initState();
     _stufe = widget.stufe;
@@ -72,428 +67,311 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                     Column(
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.all(20),
                           child: Form(
                             key: _formKey,
                             child: Column(
                               children: <Widget>[
                                 Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
+                                  padding: EdgeInsets.only(
+                                      top: 30, left: 40, right: 10),
+                                  child: Row(
                                     children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Keine Aktivität",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.date_range),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.not_interested),
                                       ),
-                                      SwitchListTile(
-                                        title: Text('Off/On'),
-                                        value: _noActivity,
-                                        activeColor: MoreaColors.violett,
-                                        onChanged: (bool val) {
-                                          setState(() {
-                                            _noActivity = val;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                /*Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Datum",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.date_range),
-                                      ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue: datumController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              datumController.text = value,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),*/
-                                TextFormField(
-                                  initialValue: datumController.text,
-                                  style: TextStyle(fontSize: 18),
-                                  textInputAction: TextInputAction.next,
-                                  focusNode: datumFocus,
-                                  onEditingComplete: () {
-                                    _changeFocus(
-                                        context, datumFocus, antretenFocus);
-                                  },
-                                  decoration: InputDecoration(
-                                      labelText: 'Datum',
-                                      labelStyle: TextStyle(color: datumColor),
-                                      prefixIcon: Icon(Icons.date_range),),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Antreten",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.flag),
-                                      ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue: antretenController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          focusNode: antretenFocus,
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              antretenController.text = value,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Antreten Map",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.map),
-                                      ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue:
-                                              mapAntretenController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              mapAntretenController.text =
-                                                  value,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Abtreten",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.flag),
-                                      ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue: abtretenController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              abtretenController.text = value,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Abtreten Map",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.map),
-                                      ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue:
-                                              mapAbtretenController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              mapAbtretenController.text =
-                                                  value,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Mitnehmen",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.assignment),
-                                      ),
-                                      ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount:
-                                            this.mitnehmenControllerList.length,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return new ListTile(
-                                            title: TextFormField(
-                                              initialValue:
-                                                  mitnehmenControllerList[index]
-                                                      .text,
-                                              style: TextStyle(fontSize: 18),
-                                              decoration: InputDecoration(
-                                                  filled: true,
-                                                  fillColor: Color.fromRGBO(
-                                                      153, 255, 255, 0.3),
-                                                  border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10)))),
-                                              onSaved: (value) =>
-                                                  mitnehmenControllerList[index]
-                                                      .text = value,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      ListTile(
-                                        title: RaisedButton.icon(
-                                          onPressed: () {
-                                            this.setState(() {
-                                              mitnehmenControllerList
-                                                  .add(TextEditingController());
+                                      Expanded(
+                                        flex: 9,
+                                        child: SwitchListTile(
+                                          title: Text('Keine Aktivität'),
+                                          value: _noActivity,
+                                          activeColor: MoreaColors.violett,
+                                          onChanged: (bool val) {
+                                            setState(() {
+                                              _noActivity = val;
                                             });
                                           },
-                                          icon: Icon(
-                                            Icons.add,
-                                            color: Colors.white,
-                                          ),
-                                          label: Text(
-                                            "Element hinzufügen",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          color: MoreaColors.violett,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5))),
                                         ),
-                                      ),
-                                      ListTile(
-                                        title: RaisedButton.icon(
-                                            onPressed: () {
-                                              this.setState(() {
-                                                mitnehmenControllerList
-                                                    .removeLast();
-                                              });
-                                            },
-                                            icon: Icon(
-                                              Icons.clear,
-                                              color: Colors.white,
-                                            ),
-                                            label: Text(
-                                              "Element entfernen",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            color: MoreaColors.violett,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(5)))),
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
                                     children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Bemerkung",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.note),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.date_range),
                                       ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue:
-                                              bemerkungController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              bemerkungController.text = value,
+                                      Expanded(
+                                        flex: 9,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: TextFormField(
+                                            initialValue: datumController.text,
+                                            decoration: InputDecoration(
+                                              labelText: 'Datum',
+                                            ),
+                                            onSaved: (value) =>
+                                                datumController.text = value,
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
                                     children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Sender",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.contacts),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.map),
                                       ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue: senderController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              senderController.text = value,
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Column(
+                                            children: <Widget>[
+                                              TextFormField(
+                                                initialValue:
+                                                    antretenController.text,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Antreten',
+                                                ),
+                                                onSaved: (value) =>
+                                                    antretenController.text =
+                                                        value,
+                                              ),
+                                              TextFormField(
+                                                initialValue:
+                                                    mapAntretenController.text,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Antreten Map',
+                                                ),
+                                                onSaved: (value) =>
+                                                    mapAntretenController.text =
+                                                        value,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
-                                ListTile(
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 25),
-                                  title: RaisedButton.icon(
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.map),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Column(
+                                            children: <Widget>[
+                                              TextFormField(
+                                                initialValue:
+                                                    abtretenController.text,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Antreten',
+                                                ),
+                                                onSaved: (value) =>
+                                                    abtretenController.text =
+                                                        value,
+                                              ),
+                                              TextFormField(
+                                                initialValue:
+                                                    mapAbtretenController.text,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Antreten Map',
+                                                ),
+                                                onSaved: (value) =>
+                                                    mapAbtretenController.text =
+                                                        value,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.assignment),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Column(
+                                            children: <Widget>[
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: this
+                                                    .mitnehmenControllerList
+                                                    .length,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  return TextFormField(
+                                                    initialValue:
+                                                        mitnehmenControllerList[
+                                                                index]
+                                                            .text,
+                                                    decoration: InputDecoration(
+                                                        labelText: 'Mitnehmen'),
+                                                    onSaved: (value) =>
+                                                        mitnehmenControllerList[
+                                                                index]
+                                                            .text = value,
+                                                  );
+                                                },
+                                              ),
+                                              Container(
+                                                margin:
+                                                    EdgeInsets.only(top: 10),
+                                                child: FractionallySizedBox(
+                                                  widthFactor: 1,
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Expanded(
+                                                        flex: 4,
+                                                        child:
+                                                            RaisedButton.icon(
+                                                          onPressed: () {
+                                                            this.setState(() {
+                                                              mitnehmenControllerList
+                                                                  .add(
+                                                                      TextEditingController());
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.add,
+                                                            color: Colors.white,
+                                                          ),
+                                                          label: Text(
+                                                            "Element",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                          color: MoreaColors
+                                                              .violett,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          5))),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: Container(),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 4,
+                                                        child:
+                                                            RaisedButton.icon(
+                                                                onPressed: () {
+                                                                  this.setState(
+                                                                      () {
+                                                                    mitnehmenControllerList
+                                                                        .removeLast();
+                                                                  });
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons.remove,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                label: Text(
+                                                                  "Element",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                                color:
+                                                                    MoreaColors
+                                                                        .violett,
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.all(
+                                                                            Radius.circular(5)))),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.chat_bubble),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Column(
+                                            children: <Widget>[
+                                              TextFormField(
+                                                initialValue:
+                                                    bemerkungController.text,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Bemerkung',
+                                                ),
+                                                onSaved: (value) =>
+                                                    bemerkungController.text =
+                                                        value,
+                                              ),
+                                              TextFormField(
+                                                initialValue:
+                                                    senderController.text,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Sender',
+                                                ),
+                                                onSaved: (value) =>
+                                                    senderController.text =
+                                                        value,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 30),
+                                  child: RaisedButton.icon(
                                     onPressed: () {
                                       this.abtretenController.text = '';
                                       this.antretenController.text = '';
@@ -508,16 +386,21 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Icons.update,
                                       color: Colors.white,
                                     ),
-                                    label: Text(
-                                      "Teleblitz ändern",
-                                      style: TextStyle(color: Colors.white),
+                                    label: Container(
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Text(
+                                        "Teleblitz ändern",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
                                     ),
                                     color: MoreaColors.violett,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(5))),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -537,84 +420,68 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                   body: ListView(children: [
                     Column(children: <Widget>[
                       Container(
-                          margin: EdgeInsets.all(20),
                           child: Form(
                               key: _formKey,
                               child: Column(children: <Widget>[
                                 Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
+                                  padding: EdgeInsets.only(
+                                      top: 30, left: 40, right: 10),
+                                  child: Row(
                                     children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Keine Aktivität",
-                                          style: TextStyle(fontSize: 24),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.not_interested),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: SwitchListTile(
+                                          title: Text('Keine Aktivität'),
+                                          value: _noActivity,
+                                          activeColor: MoreaColors.violett,
+                                          onChanged: (bool val) {
+                                            setState(() {
+                                              _noActivity = val;
+                                            });
+                                          },
                                         ),
-                                        trailing: Icon(Icons.date_range),
-                                      ),
-                                      SwitchListTile(
-                                        title: Text('Off/On'),
-                                        value: _noActivity,
-                                        activeColor: MoreaColors.violett,
-                                        onChanged: (bool val) {
-                                          setState(() {
-                                            _noActivity = val;
-                                          });
-                                        },
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(bottom: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black26),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
                                     children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "Datum",
-                                          style: TextStyle(fontSize: 24),
-                                        ),
-                                        trailing: Icon(Icons.date_range),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.date_range),
                                       ),
-                                      ListTile(
-                                        title: TextFormField(
-                                          initialValue: datumController.text,
-                                          style: TextStyle(fontSize: 18),
-                                          decoration: InputDecoration(
-                                              filled: true,
-                                              fillColor: Color.fromRGBO(
-                                                  153, 255, 255, 0.3),
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10)))),
-                                          onSaved: (value) =>
-                                              datumController.text = value,
+                                      Expanded(
+                                        flex: 9,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: TextFormField(
+                                            initialValue: datumController.text,
+                                            decoration: InputDecoration(
+                                              labelText: 'Datum',
+                                            ),
+                                            onSaved: (value) =>
+                                                datumController.text = value,
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
-                                ListTile(
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 25),
-                                  title: RaisedButton.icon(
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 30),
+                                  child: RaisedButton.icon(
                                     onPressed: () {
+                                      this.abtretenController.text = '';
+                                      this.antretenController.text = '';
+                                      this.bemerkungController.text = '';
+                                      this.senderController.text = '';
                                       this.uploadTeleblitz(
                                           _stufe,
                                           snapshot.data.getID(),
@@ -624,9 +491,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Icons.update,
                                       color: Colors.white,
                                     ),
-                                    label: Text(
-                                      "Teleblitz ändern",
-                                      style: TextStyle(color: Colors.white),
+                                    label: Container(
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Text(
+                                        "Teleblitz ändern",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
                                     ),
                                     color: MoreaColors.violett,
                                     shape: RoundedRectangleBorder(
@@ -648,11 +520,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
             );
           }
         });
-  }
-
-  _changeFocus(BuildContext context, FocusNode current, FocusNode next) {
-    current.unfocus();
-    FocusScope.of(context).requestFocus(next);
   }
 
   bool validateAndSave() {

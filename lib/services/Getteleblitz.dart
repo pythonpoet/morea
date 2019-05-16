@@ -142,11 +142,11 @@ class Teleblitz implements BaseTeleblitz {
 }
 
 class Info {
-  static Info _instance;
-
-  factory Info() => _instance ??= new Info._();
-
-  Info._();
+//  static Info _instance;
+//
+//  factory Info() => _instance ??= new Info._();
+//
+//  Info._();
 
   Urllauncher urllauncher = new Urllauncher();
 

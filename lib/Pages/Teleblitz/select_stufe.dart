@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'change_teleblitz.dart';
+import 'package:morea/morealayout.dart';
 
 class SelectStufe extends StatelessWidget {
   SelectStufe();
@@ -9,7 +10,6 @@ class SelectStufe extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Stufe wählen"),
-        backgroundColor: Color(0xff7a62ff)
       ),
       body: Container(
         child: Container(
@@ -28,75 +28,76 @@ class SelectStufe extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                    color: MoreaColors.violett,
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: FlatButton(
                   child: Text(
                     "Biber",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   onPressed: () => Navigator.of(context).push(
                       new MaterialPageRoute(
                           builder: (BuildContext context) =>
-                          new ChangeTeleblitz(
-                            stufe: "Biber",
-                          ))),
+                              new ChangeTeleblitz(
+                                stufe: "Biber",
+                              ))),
                 ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                    color: MoreaColors.violett,
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: FlatButton(
                   child: Text(
                     "Wombat",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   onPressed: () => Navigator.of(context).push(
                       new MaterialPageRoute(
                           builder: (BuildContext context) =>
-                          new ChangeTeleblitz(
-                            stufe: "Wombat (Wölfe)",
-                          ))),
+                              new ChangeTeleblitz(
+                                stufe: "Wombat (Wölfe)",
+                              ))),
                 ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                    color: MoreaColors.violett,
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: FlatButton(
                   child: Text(
                     "Nahani",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   onPressed: () => Navigator.of(context).push(
                       new MaterialPageRoute(
                           builder: (BuildContext context) =>
-                          new ChangeTeleblitz(
-                            stufe: "Nahani (Meitli)",
-                          ))),
+                              new ChangeTeleblitz(
+                                stufe: "Nahani (Meitli)",
+                              ))),
                 ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                    color: MoreaColors.violett,
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: FlatButton(
                   child: Text(
                     "Drason",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
-                  onPressed: () => Navigator.of(context).push(
-                      new MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                          new ChangeTeleblitz(
-                            stufe: "Drason (Buebe)",
-                          ))).then((onValue){
-                            Navigator.pop(context);
-                          }),
+                  onPressed: () => Navigator.of(context)
+                          .push(new MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  new ChangeTeleblitz(
+                                    stufe: "Drason (Buebe)",
+                                  )))
+                          .then((onValue) {
+                        Navigator.pop(context);
+                      }),
                 ),
               ),
             ],
