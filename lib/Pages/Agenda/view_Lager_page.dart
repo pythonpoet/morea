@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 
@@ -45,303 +44,313 @@ class ViewLagerPageState extends StatelessWidget {
   }
   Widget viewLager(){
     return Container(
-          padding: EdgeInsets.all(15),
-          child: Column(
-            children: <Widget>[
-              Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          'Datum von:',
-                          style: TextStyle(fontSize: 20),
-                        ),
+      padding: EdgeInsets.all(15),
+      child: Column(
+        children: <Widget>[
+          Container(
+             alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
                       ),
-                      Expanded(
-                        child: Text(
-                          info['Datum'],
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      )
-                    ],
-                  )),
-              Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Row(
+                    ),
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: Column(
+                children: <Widget>[
+                  Row(
                     children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          'Datum bis:',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          info['Datum bis'],
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      )
-                    ],
-                  )),
+                      Container(
+                    child: Text(
+                      'Datum',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  )
+                    ],),
+                  
+                  Container(
+                    child: Row(
+                children: <Widget>[
+
+                  Expanded(
+                    
+                    child: Text(
+                     'vom: '+ info['Datum'],
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  Expanded(
+                    
+                    child: Text(
+                     'bis: '+ info['Datum bis'],
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  )
+                ],
+              )),
+              SizedBox(height: 5,),
               Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          'Lagerort:',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          info['Lagerort'],
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      )
-                    ],
-                  )),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Text(
+                     'Lagerort',
+                      style: TextStyle(fontSize: 20),
+                    )
+                    )
+                  ],
+                ),
+              ),
               Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Text(info['Lagerort'],style: TextStyle(fontSize: 15)),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              'Anfang:',
-                              style: TextStyle(fontSize: 20),
+                           Container(
+                            child: Text('Besammlung', style: TextStyle(fontSize: 20)),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 5),
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  child: Text('Zeit: '),
+                                ),
+                                Container(
+                                  child: Text(info['Anfangszeit']),)
+                              ],
                             ),
                           ),
+                          Container(
+                            padding: EdgeInsets.only(left: 5),
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  child: Text('Ort: '),
+                                ),
+                                Container(
+                                  child: Text(info['Anfangsort']),)
+                              ],
+                            ),
+                          ) 
                         ],
                       ),
-                      Row(
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Icon(Icons.brightness_1, size: 10),
+                          Container(
+                            child: Text('Schluss', style: TextStyle(fontSize: 20)),
                           ),
-                          Expanded(
-                            flex: 4,
-                            child:
-                                Text('Zeit:', style: TextStyle(fontSize: 20)),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              info['Anfangszeit'],
-                              style: TextStyle(fontSize: 20),
+                          Container(
+                            padding: EdgeInsets.only(left: 5),
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  child: Text('Zeit: '),
+                                ),
+                                Container(
+                                  child: Text(info['Schlusszeit']),)
+                              ],
                             ),
                           ),
-                         
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Icon(Icons.brightness_1, size: 10),
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child: Text('Ort:', style: TextStyle(fontSize: 20)),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              info['Anfangsort'],
-                              style: TextStyle(fontSize: 20),
+                          Container(
+                            padding: EdgeInsets.only(left: 5),
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  child: Text('Ort: '),
+                                ),
+                                Container(
+                                  child: Text(info['Schlussort']),)
+                              ],
                             ),
-                          )
-                        ],
-                      )
-                    ],
-                  )),
-              Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              'Schluss:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Icon(Icons.brightness_1, size: 10),
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child:
-                                Text('Zeit:', style: TextStyle(fontSize: 20)),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              info['Schlusszeit'],
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
+                          ) 
                           
                         ],
                       ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Icon(Icons.brightness_1, size: 10),
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child: Text('Ort:', style: TextStyle(fontSize: 20)),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              info['Schlusszeit'],
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  )),
-              Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  constraints: BoxConstraints(
-                    minHeight: 200,
-                    maxHeight: 400
+                    ),
+                  ],
+                ),
+              )
+
+                  
+
+                ],
+              ),
+            ),
+            ),
+          SizedBox(height: 15,),
+         Container(
+             alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+            child: Container(
+              padding: EdgeInsets.all(5),
+              
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Flexible(
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                      child: Text('Beschreibung', style: TextStyle(fontSize: 20)),
+                    ),
+                      ],
+                    )
                   ),
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          'Beschreibung:',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 13,
-                        child: SingleChildScrollView(
-                          child: Text(
-                          info['Beschreibung'],
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        )
+                  Flexible(
+                    child: Container(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(info['Beschreibung']),
                       )
-                    ],
-                  )),
-              Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 4,
-                        child: Text(
-                          'Mitnehmen:',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ]
-                      ),
-                      Container(
-                        height: 23 * info['Mitnehmen'].length.toDouble(),
-                        child: ListView.builder(
-                          itemCount: this.info['Mitnehmen'].length,
-                          itemBuilder: (context, int index) {
-                            return Container(
-                                child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                    flex: 1,
-                                    child: Icon(
-                                      Icons.brightness_1,
-                                      size: 10,
-                                    )),
-                                Expanded(
-                                  flex: 9,
-                                  child: Text(info['Mitnehmen'][index],
-                                      style: new TextStyle(
-                                        fontSize: 20,
-                                      )),
-                                ),
-                              ],
-                            ));
-                          },
-                        ),
-                      )
-                    ],
-                  )),
-              Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              'Kontakt:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Icon(Icons.brightness_1, size: 10),
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child:
-                                Text('Kontaktperson:', style: TextStyle(fontSize: 20)),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              info['Kontakt']['Pfadiname'],
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                         
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Icon(Icons.brightness_1, size: 10),
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child: Text('Ort:', style: TextStyle(fontSize: 20)),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: Text(
-                              info['Kontakt']['Email'],
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  )),
-            ],
+                  )
+                ],
+              ),
+            )
           ),
-        );
+          SizedBox(
+            height: 15,
+          ),
+          Container(
+             alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: Column(
+                children: <Widget>[
+                  Row(children: <Widget>[
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        'Mitnehmen:',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ]),
+                  Container(
+                    height: 18 * info['Mitnehmen'].length.toDouble(),
+                    child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: this.info['Mitnehmen'].length,
+                      itemBuilder: (context, int index) {
+                        return Container(
+                            child: Row(
+                          children: <Widget>[
+                            Expanded(
+                                flex: 1,
+                                child: Icon(
+                                  Icons.brightness_1,
+                                  size: 7,
+                                )),
+                            Expanded(
+                              flex: 9,
+                              child: Text(info['Mitnehmen'][index],
+                                  style: new TextStyle(
+                                    fontSize: 15,
+                                  )),
+                            ),
+                          ],
+                        ));
+                      },
+                    ),
+                  )
+                ],
+              ))),
+              SizedBox(height: 15,),
+              Container(
+             alignment: Alignment.center, //
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2),
+                      borderRadius: new BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
+                    ),
+                    child:
+          Container(
+              padding: EdgeInsets.all(5),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          'Kontakt:',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+        
+                      Expanded(
+                        child: Text('Kontaktperson: ',
+                            style: TextStyle(fontSize: 15)),
+                      ),
+                      Expanded(
+                        child: Text(
+                          info['Kontakt']['Pfadiname'],
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text('Email:', style: TextStyle(fontSize: 15)),
+                      ),
+                      Expanded(
+                        child: Text(
+                          info['Kontakt']['Email'],
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ))),
+        ],
+      ),
+    );
   }
 
   bool istLeiter(){

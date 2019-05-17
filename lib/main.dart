@@ -9,6 +9,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Grundbausteine/root_page.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/Pages/Teleblitz/home_page.dart';
+import 'morealayout.dart';
 
 
 
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Login',
       theme: new ThemeData(
-        primarySwatch: Colors.deepPurple
+        primarySwatch: MaterialColor(MoreaColors.violettInt, MoreaColors.violettMaterialColor),
       ),
       home: new RootPage(auth: new Auth()),
     );

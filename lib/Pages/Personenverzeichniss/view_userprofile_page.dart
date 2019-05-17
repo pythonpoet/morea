@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:morea/services/url_launcher.dart';
 import 'edit_userprofile_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+ 
 
 class ViewUserProfilePageState extends StatelessWidget {
   ViewUserProfilePageState({this.profile});
   var profile;
-
+  Urllauncher urllauncher = new Urllauncher();
+ 
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -156,11 +160,17 @@ class ViewUserProfilePageState extends StatelessWidget {
                         ),
                       )),
                       Expanded(
-                          child: Container(
+                          child: InkWell(
+                            child:  Container(
                               child: Text(
                         profile['Handynummer'],
-                        style: TextStyle(fontSize: 20),
-                      )))
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color.fromARGB(255, 0, 0, 255),
+                          decoration: TextDecoration.underline),
+                      )),
+                      onTap: () =>urllauncher.openPhone(profile['Handynummer']),
+                          ),)
                     ],
                   ),
                 ),
@@ -171,15 +181,21 @@ class ViewUserProfilePageState extends StatelessWidget {
                           child: Container(
                         child: Text(
                           'Email:',
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 20,
+                          ),
                         ),
                       )),
                       Expanded(
-                          child: Container(
+                          child: InkWell(
+                            child: Container(
                               child: Text(
                         profile['Email'],
-                        style: TextStyle(fontSize: 20),
-                      )))
+                        style: TextStyle(fontSize: 20,
+                        color: Color.fromARGB(255, 0, 0, 255),
+                          decoration: TextDecoration.underline),
+                      )),
+                      onTap: () => urllauncher.openMail(profile['Email']),
+                          ))
                     ],
                   ),
                 ),
@@ -265,4 +281,5 @@ class ViewUserProfilePageState extends StatelessWidget {
       ),
     );
   }
+  
 }
