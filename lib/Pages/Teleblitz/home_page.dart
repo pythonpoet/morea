@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
+import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
@@ -8,7 +10,6 @@ import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Pages/Personenverzeichniss/parents.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -132,7 +133,7 @@ class HomePageState extends State<HomePage> {
         print(e);
       }
       forminit();
-      getdevtoken();
+//      getdevtoken();
     });
   }
 
@@ -173,6 +174,17 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getuserinfo();
+//    firebaseMessaging.configure(
+//      onMessage: (Map<String, dynamic> message) {
+//
+//      },
+//      onResume: (Map<String, dynamic> message) {
+//
+//      },
+//      onLaunch: (Map<String, dynamic> message) {
+//
+//      }
+//    );
   }
 
   @override
@@ -451,6 +463,12 @@ class HomePageState extends State<HomePage> {
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                       new PersonenVerzeichnisState()))),
+          new ListTile(
+              title: new Text('Nachrichten'),
+              trailing: new Icon(Icons.message),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                  MessagesPage(userInfo: qsuserInfo.data)))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
