@@ -158,4 +158,13 @@ class MoreaFirebase extends BaseMoreaFirebase{
   Stream<QuerySnapshot> getMessages (userUID) {
     return crud0.streamCollection('/messages/$userUID/messages');
   }
+
+  Future<void> uploadMessage(userUID, message) async {
+    var messages = await crud0.getCollection('/messages/$userUID/messages');
+    var count = messages.documents.length;
+    count += 1;
+    print(count);
+    await crud0.setDataMessage('/messages/$userUID/messages', count.toString(), message);
+    return null;
+  }
 }

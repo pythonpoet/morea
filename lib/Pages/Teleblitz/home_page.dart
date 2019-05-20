@@ -174,17 +174,18 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getuserinfo();
-//    firebaseMessaging.configure(
-//      onMessage: (Map<String, dynamic> message) {
-//
-//      },
-//      onResume: (Map<String, dynamic> message) {
-//
-//      },
-//      onLaunch: (Map<String, dynamic> message) {
-//
-//      }
-//    );
+    firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        await moreafire.uploadMessage(await auth0.currentUser(), message['notification']);
+
+      },
+      onResume: (Map<String, dynamic> message) {
+
+      },
+      onLaunch: (Map<String, dynamic> message) {
+
+      }
+    );
   }
 
   @override

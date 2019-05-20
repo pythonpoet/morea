@@ -15,6 +15,8 @@ abstract class BaseCrudMethods{
   Future<void> setData(String path, String document, Map<dynamic,dynamic> data);
 
   Future deletedocument(String path, String document);
+
+  Future<void> setDataMessage(String path, String document, Map<String, dynamic> data);
 }
 class CrudMedthods implements BaseCrudMethods {
   DWIFormat dwiformat = new DWIFormat();
@@ -72,6 +74,13 @@ class CrudMedthods implements BaseCrudMethods {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
     await Firestore.instance.collection(path).document(document).delete().catchError((e){
+      print(e);
+    });
+  }
+  Future<void> setDataMessage(String path, String document, Map<String,dynamic> data) async {
+    document = dwiformat.simplestring(document);
+    path = dwiformat.pathstring(path);
+    await Firestore.instance.collection(path).document(document).setData(data).catchError((e){
       print(e);
     });
   }
