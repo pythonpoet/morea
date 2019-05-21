@@ -1,23 +1,47 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class SingleMessagePage extends StatelessWidget{
-  
-  SingleMessagePage({this.message});
-  
-  DocumentSnapshot message;
-  
+import '../../morealayout.dart';
+
+class SingleMessagePage extends StatelessWidget {
+  SingleMessagePage(message) {
+    final data = message.data;
+    title = data['title'];
+    body = data['body'];
+    sender = data['sender'];
+  }
+
+  String title, body, sender;
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.message.data['title']),
+        title: Text(title),
       ),
       body: Container(
-        padding: EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Text(this.message.data['body']),
+        padding: EdgeInsets.only(top: 20, bottom: 40, left: 40, right: 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text('Von: ' + sender, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: Colors.black87),),
+            Divider(),
+            Padding(padding: EdgeInsets.all(10),),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 32,
+                  color: MoreaColors.violett,
+                  fontWeight: FontWeight.bold),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Text(
+              body,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+            ),
+          ],
         ),
       ),
     );

@@ -7,6 +7,7 @@ import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/Pages/Teleblitz/notification_bell.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
@@ -175,17 +176,37 @@ class HomePageState extends State<HomePage> {
     super.initState();
     getuserinfo();
     firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        await moreafire.uploadMessage(await auth0.currentUser(), message['notification']);
-
-      },
-      onResume: (Map<String, dynamic> message) {
-
-      },
-      onLaunch: (Map<String, dynamic> message) {
-
-      }
-    );
+        onMessage: (Map<String, dynamic> message) async {
+      var notification = message['notification'];
+      var data = message['data'];
+      Map<String, dynamic> upload = {
+        'title': notification['title'].toString(),
+        'snippet': notification['body'].toString(),
+        'body': data['inhalt'].toString(),
+        'sender': data['sender'].toString(),
+        'read': false
+      };
+      await moreafire.uploadMessage(await auth0.currentUser(), upload);
+      print(message);
+    }, onResume: (Map<String, dynamic> message) async {
+      var notification = message['notification'];
+      Map<String, dynamic> upload = {
+        'title': notification['title'].toString(),
+        'snippet': notification['body'].toString(),
+        'body': notification['body'].toString(),
+        'read': false
+      };
+      await moreafire.uploadMessage(await auth0.currentUser(), upload);
+    }, onLaunch: (Map<String, dynamic> message) async {
+      var notification = message['notification'];
+      Map<String, dynamic> upload = {
+        'title': notification['title'].toString(),
+        'snippet': notification['body'].toString(),
+        'body': notification['body'].toString(),
+        'read': false
+      };
+      await moreafire.uploadMessage(await auth0.currentUser(), upload);
+    });
   }
 
   @override
@@ -211,6 +232,9 @@ class HomePageState extends State<HomePage> {
                     ),
                     Tab(text: 'Buebe')
                   ]),
+                  actions: <Widget>[
+                    NotificationBell()
+                  ],
                 ),
                 drawer: new Drawer(
                   child: new ListView(children: navigation()),
@@ -226,7 +250,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Biber')),
+                              key: ObjectKey(tlbz.anzeigen('Biber')),
                               children: <Widget>[
                                 tlbz.anzeigen('Biber'),
                               ],
@@ -244,7 +268,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
+                              key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Wombat (Wölfe)'),
                               ],
@@ -262,7 +286,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
+                              key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Nahani (Meitli)'),
                               ],
@@ -280,7 +304,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
+                              key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Drason (Buebe)'),
                               ],
@@ -469,7 +493,7 @@ class HomePageState extends State<HomePage> {
               trailing: new Icon(Icons.message),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                  MessagesPage(userInfo: qsuserInfo.data)))),
+                      MessagesPage(userInfo: qsuserInfo.data)))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

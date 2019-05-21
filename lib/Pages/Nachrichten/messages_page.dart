@@ -63,17 +63,46 @@ class _MessagesPageState extends State<MessagesPage> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var message = document;
-    return ListTile(
-      key: UniqueKey(),
-      title: Text(document['title']),
-      subtitle: Text(document['snippet']),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (BuildContext context) {
-            return SingleMessagePage(message: message);
-          }
-        )
-      ),
-    );
+    if (!(document['read'])) {
+      return ListTile(
+        key: UniqueKey(),
+        title: Text(document['sender'],
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(document['title'],
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        contentPadding: EdgeInsets.only(),
+        leading: CircleAvatar(
+          child: Text(document['sender'][0]),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios),
+        onTap: () async {
+          print(document.documentID);
+          firestore.setMessageRead(await auth0.currentUser(), document);
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return SingleMessagePage(message);
+          }));
+        },
+      );
+    } else {
+      return ListTile(
+        key: UniqueKey(),
+        title: Text(
+          document['sender'],
+        ),
+        subtitle: Text(
+          document['title'],
+        ),
+        contentPadding: EdgeInsets.only(),
+        leading: CircleAvatar(
+          child: Text(document['sender'][0]),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios),
+        onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (BuildContext context) {
+              return SingleMessagePage(message);
+            })),
+      );
+    }
   }
 }
