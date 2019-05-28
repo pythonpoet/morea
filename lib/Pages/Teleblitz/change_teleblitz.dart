@@ -107,11 +107,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       ),
                                       Expanded(
                                         flex: 9,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
+                                        child: Container(
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: TextFormField(
                                             initialValue: datumController.text,
                                             decoration: InputDecoration(
+                                              filled: true,
                                               labelText: 'Datum',
                                             ),
                                             onSaved: (value) =>
@@ -134,7 +142,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               TextFormField(
@@ -142,6 +157,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                     antretenController.text,
                                                 decoration: InputDecoration(
                                                   labelText: 'Antreten',
+                                                  filled: true,
                                                 ),
                                                 onSaved: (value) =>
                                                     antretenController.text =
@@ -152,6 +168,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                     mapAntretenController.text,
                                                 decoration: InputDecoration(
                                                   labelText: 'Antreten Map',
+                                                  filled: true,
                                                 ),
                                                 onSaved: (value) =>
                                                     mapAntretenController.text =
@@ -176,7 +193,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               TextFormField(
@@ -184,6 +208,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                     abtretenController.text,
                                                 decoration: InputDecoration(
                                                   labelText: 'Antreten',
+                                                  filled: true,
                                                 ),
                                                 onSaved: (value) =>
                                                     abtretenController.text =
@@ -193,6 +218,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                 initialValue:
                                                     mapAbtretenController.text,
                                                 decoration: InputDecoration(
+                                                  filled: true,
                                                   labelText: 'Antreten Map',
                                                 ),
                                                 onSaved: (value) =>
@@ -218,7 +244,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               ListView.builder(
@@ -237,6 +270,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                                 index]
                                                             .text,
                                                     decoration: InputDecoration(
+                                                        filled: true,
                                                         labelText: 'Mitnehmen'),
                                                     onSaved: (value) =>
                                                         mitnehmenControllerList[
@@ -247,13 +281,17 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                               ),
                                               Container(
                                                 margin:
-                                                    EdgeInsets.only(top: 10),
+                                                    EdgeInsets.only(top: 10, bottom: 10),
                                                 child: FractionallySizedBox(
                                                   widthFactor: 1,
                                                   child: Row(
                                                     children: <Widget>[
                                                       Expanded(
-                                                        flex: 4,
+                                                        flex: 1,
+                                                        child: Container(),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 7,
                                                         child:
                                                             RaisedButton.icon(
                                                           onPressed: () {
@@ -287,7 +325,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                         child: Container(),
                                                       ),
                                                       Expanded(
-                                                        flex: 4,
+                                                        flex: 7,
                                                         child:
                                                             RaisedButton.icon(
                                                                 onPressed: () {
@@ -315,7 +353,11 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                                     borderRadius:
                                                                         BorderRadius.all(
                                                                             Radius.circular(5)))),
-                                                      )
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: Container(),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -339,13 +381,21 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               TextFormField(
                                                 initialValue:
                                                     bemerkungController.text,
                                                 decoration: InputDecoration(
+                                                  filled: true,
                                                   labelText: 'Bemerkung',
                                                 ),
                                                 onSaved: (value) =>
@@ -356,6 +406,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                 initialValue:
                                                     senderController.text,
                                                 decoration: InputDecoration(
+                                                  filled: true,
                                                   labelText: 'Sender',
                                                 ),
                                                 onSaved: (value) =>
@@ -459,11 +510,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       ),
                                       Expanded(
                                         flex: 9,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
+                                        child: Container(
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: TextFormField(
                                             initialValue: datumController.text,
                                             decoration: InputDecoration(
+                                              filled: true,
                                               labelText: 'Datum',
                                             ),
                                             onSaved: (value) =>

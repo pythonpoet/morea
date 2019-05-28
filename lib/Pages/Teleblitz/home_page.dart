@@ -177,11 +177,10 @@ class HomePageState extends State<HomePage> {
     getuserinfo();
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
-      var notification = message['notification'];
       var data = message['data'];
       Map<String, dynamic> upload = {
-        'title': notification['title'].toString(),
-        'snippet': notification['body'].toString(),
+        'title': data['title'].toString(),
+        'snippet': data['snippet'].toString(),
         'body': data['inhalt'].toString(),
         'sender': data['sender'].toString(),
         'read': false
@@ -189,23 +188,27 @@ class HomePageState extends State<HomePage> {
       await moreafire.uploadMessage(await auth0.currentUser(), upload);
       print(message);
     }, onResume: (Map<String, dynamic> message) async {
-      var notification = message['notification'];
+      var data = message['data'];
       Map<String, dynamic> upload = {
-        'title': notification['title'].toString(),
-        'snippet': notification['body'].toString(),
-        'body': notification['body'].toString(),
+        'title': data['title'].toString(),
+        'snippet': data['snippet'].toString(),
+        'body': data['inhalt'].toString(),
+        'sender': data['sender'].toString(),
         'read': false
       };
       await moreafire.uploadMessage(await auth0.currentUser(), upload);
+      print(message);
     }, onLaunch: (Map<String, dynamic> message) async {
-      var notification = message['notification'];
+      var data = message['data'];
       Map<String, dynamic> upload = {
-        'title': notification['title'].toString(),
-        'snippet': notification['body'].toString(),
-        'body': notification['body'].toString(),
+        'title': data['title'].toString(),
+        'snippet': data['snippet'].toString(),
+        'body': data['inhalt'].toString(),
+        'sender': data['sender'].toString(),
         'read': false
       };
       await moreafire.uploadMessage(await auth0.currentUser(), upload);
+      print(message);
     });
   }
 
