@@ -27,7 +27,7 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => HomePageState();
 }
 
-enum FormType { leiter, teilnehmer, eltern }
+enum FormType { leiter, teilnehmer, eltern, loading }
 
 enum Anmeldung { angemolden, abgemolden, verchilt }
 
@@ -42,7 +42,7 @@ class HomePageState extends State<HomePage> {
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
-  FormType _formType = FormType.teilnehmer;
+  FormType _formType = FormType.loading;
   Anmeldung _anmeldung = Anmeldung.verchilt;
 
   String _pfadiname = 'Loading...',
@@ -219,6 +219,31 @@ class HomePageState extends State<HomePage> {
 
   Widget teleblitzwidget() {
     switch (_formType) {
+      case FormType.loading:
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Teleblitz'),
+          ),
+          drawer: Drawer(
+            child: ListView(
+              children: navigation(),
+            ),
+          ),
+          body: Container(
+            child: Center(
+                child: Container(
+              padding: EdgeInsets.all(120),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: new Text('Loading...'),
+                  ),
+                  Expanded(child: new CircularProgressIndicator())
+                ],
+              ),
+            )),
+          ),
+        );
       case FormType.leiter:
         return DefaultTabController(
             length: 4,
@@ -235,9 +260,7 @@ class HomePageState extends State<HomePage> {
                     ),
                     Tab(text: 'Buebe')
                   ]),
-                  actions: <Widget>[
-                    NotificationBell()
-                  ],
+                  actions: <Widget>[NotificationBell()],
                 ),
                 drawer: new Drawer(
                   child: new ListView(children: navigation()),
@@ -460,6 +483,12 @@ class HomePageState extends State<HomePage> {
 
   List<Widget> navigation() {
     switch (_formType) {
+      case FormType.loading:
+        return [
+          ListTile(
+            leading: Text('Loading...'),
+          )
+        ];
       case FormType.leiter:
         return [
           new UserAccountsDrawerHeader(

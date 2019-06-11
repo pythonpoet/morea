@@ -18,6 +18,7 @@ class _MessagesPageState extends State<MessagesPage> {
   MoreaFirebase firestore = MoreaFirebase();
   Auth auth0 = Auth();
   var messages;
+  var date;
 
   @override
   void initState() {
@@ -27,11 +28,14 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text('Nachrichten'),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        date = Timestamp.now();
+        print(date.toDate());
+      }),
       body: Container(
         padding: EdgeInsets.all(20),
         child: StreamBuilder(
