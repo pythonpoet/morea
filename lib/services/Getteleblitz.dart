@@ -16,7 +16,7 @@ class Teleblitz implements BaseTeleblitz {
   bool block = false;
 
   String _formatDate(String date) {
-    if (date != '') {
+    if (date != '' && date!=null) {
       String rawDate = date.split('T')[0];
       List<String> dates = rawDate.split('-');
       String formatedDate = dates[2] + '.' + dates[1] + '.' + dates[0];

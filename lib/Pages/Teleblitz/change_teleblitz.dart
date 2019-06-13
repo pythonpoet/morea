@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
+import 'package:intl/intl.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
@@ -36,6 +37,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   final mapAbtretenController = TextEditingController();
   final grundController = TextEditingController();
   final endeFerienController = TextEditingController();
+  String datumEndeFerien = 'Datum wählen';
   final formKey = new GlobalKey<FormState>();
   bool _noActivity = false;
   bool _ferien = false;
@@ -144,27 +146,43 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
+                                            alignment: Alignment.center, //
+                                            decoration: new BoxDecoration(
+                                              border: new Border.all(
+                                                  color: Colors.black,
+                                                  width: 2),
+                                              borderRadius:
+                                                  new BorderRadius.all(
+                                                Radius.circular(4.0),
+                                              ),
                                             ),
-                                          ),
-                                          child: TextFormField(
-                                            key: endeFerienKey,
-                                            initialValue:
-                                                endeFerienController.text,
-                                            decoration: InputDecoration(
-                                              filled: true,
-                                              labelText: 'Ende Ferien',
-                                            ),
-                                            onSaved: (value) =>
-                                                endeFerienController.text =
-                                                    value,
-                                          ),
-                                        ),
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(vertical: 10),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Text('Datum Ende Ferien:'),
+                                                  RaisedButton(
+                                                    onPressed: () {
+                                                      _selectDatumvon(context);
+                                                    },
+                                                    child: Text(
+                                                      datumEndeFerien,
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    color: MoreaColors.violett,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                  ),
+                                                ],
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                              ),
+                                            )),
                                       )
                                     ],
                                   ),
@@ -866,7 +884,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     mapAntretenController.text = teleblitz.getMapAntreten();
     mapAbtretenController.text = teleblitz.getMapAbtreten();
     grundController.text = teleblitz.getGrund();
-    endeFerienController.text = teleblitz.getEndeFerien();
 
     return teleblitz;
   }
@@ -898,7 +915,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
         mapAbtretenController.text,
         _noActivity,
         _ferien,
-        endeFerienController.text,
+        datumEndeFerien,
         grundController.text);
     var jsonMap = {"fields": newteleblitz.toJson()};
     String jsonStr = jsonEncode(jsonMap);
@@ -924,6 +941,11 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       _jsonMitnehmen = _jsonMitnehmen + "<li>" + u + "</li>";
     }
     _jsonMitnehmen = _jsonMitnehmen + '</ul>';
+
+    //Damit ende-ferien nie leer ist. Sonst enstehen bugs.
+    if (datumEndeFerien == 'Datum wählen') {
+      datumEndeFerien = '12-06-2018';
+    }
     Map<String, dynamic> data;
     data = {
       "abtreten": abtretenController.text,
@@ -936,11 +958,25 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       "google-map": mapAntretenController.text,
       "map-abtreten": mapAbtretenController.text,
       'ferien': _ferien.toString(),
-      'ende-ferien': endeFerienController.text,
+      'ende-ferien': datumEndeFerien,
       'grund': grundController.text,
     };
     moreafire.uploadteleblitz(_stufe, data);
     Navigator.pop(context);
+  }
+
+  Future<Null> _selectDatumvon(BuildContext context) async {
+    DateTime now = DateTime.now();
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: now.add(new Duration(days: 9999)),
+    );
+    if (picked != null)
+      setState(() {
+        datumEndeFerien = DateFormat('dd-MM-yyyy').format(picked);
+      });
   }
 }
 
@@ -997,10 +1033,10 @@ class TeleblitzInfo {
     _mapAntreten = mapAntreten;
     _mapAbtreten = mapAbtreten;
     _grund = grund;
-    if (endeFerien == '') {
-      _endeFerien = endeFerien;
+    if (endeFerien == 'Datum wählen') {
+      _endeFerien = '2019-06-12T00:00:00.000Z';
     } else {
-      var dates = endeFerien.split('.');
+      var dates = endeFerien.split('-');
       _endeFerien =
           dates[2] + '-' + dates[1] + '-' + dates[0] + 'T00:00:00.000Z';
     }
