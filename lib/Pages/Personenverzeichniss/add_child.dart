@@ -30,9 +30,11 @@ class _AddChildState extends State<AddChild> {
   Teleblitz tlbz = new Teleblitz();
   Info teleblitzinfo = new Info();
   MergeChildParent mergeChildParent = new MergeChildParent();
+  bool allowScanner = false;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    /*return Container(
       child: new Card(
         child: Container(
           child: Column(
@@ -46,6 +48,14 @@ class _AddChildState extends State<AddChild> {
           ),
         ),
       ),
-    );
+    );*/
+    print('jdhfkajls');
+    if (mergeChildParent.parentReaderror) {
+      setState(() {
+        print('jdhfkajls');
+      });
+    }
+    return mergeChildParent.parentScannsQrCode(
+        widget.profile['UID'], widget.profile['Vorname']);
   }
 }

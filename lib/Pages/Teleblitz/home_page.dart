@@ -51,6 +51,7 @@ class HomePageState extends State<HomePage> {
       _email = 'Loading...';
   DocumentSnapshot qsuserInfo;
   Map<String, String> anmeldeDaten;
+  bool chunnt = false;
 
   void submit({@required String anabmelden, String stufe}) {
     if (_formType != FormType.eltern) {
@@ -59,10 +60,12 @@ class HomePageState extends State<HomePage> {
       anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
       if (anabmelden == 'Chunt') {
         anmeldung = 'Du hast dich Angemolden';
+        chunnt = true;
       } else {
         anmeldung = 'Du hast dich Abgemolden';
+        chunnt = false;
       }
-      moreafire.uebunganmelden(_stufe, _userUID, anmeldeDaten);
+      moreafire.uebunganmelden(_stufe, _userUID, _pfadiname, chunnt);
       showDialog(
           context: context,
           child: new AlertDialog(
@@ -97,7 +100,7 @@ class HomePageState extends State<HomePage> {
                       } else {
                         anmeldung = 'Du hast dich Abgemolden';
                       }
-                      moreafire.uebunganmelden(stufe, uidkind, anmeldeDaten);
+                      //moreafire.uebunganmelden(stufe, uidkind, anmeldeDaten);
                       showDialog(
                           context: context,
                           child: new AlertDialog(
@@ -136,6 +139,7 @@ class HomePageState extends State<HomePage> {
       forminit();
       getdevtoken();
     });
+    //submit(anabmelden: "Chunt");
   }
 
   void _signedOut() async {
@@ -169,6 +173,10 @@ class HomePageState extends State<HomePage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  void check4anmeldung(){
+
   }
 
   @override
