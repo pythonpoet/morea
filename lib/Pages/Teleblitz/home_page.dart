@@ -134,7 +134,7 @@ class HomePageState extends State<HomePage> {
         print(e);
       }
       forminit();
-//      getdevtoken();
+      getdevtoken();
     });
   }
 
@@ -174,7 +174,6 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    getuserinfo();
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
       var data = message['data'];
@@ -210,6 +209,7 @@ class HomePageState extends State<HomePage> {
       await moreafire.uploadMessage(await auth0.currentUser(), upload);
       print(message);
     });
+    getuserinfo();
   }
 
   @override
