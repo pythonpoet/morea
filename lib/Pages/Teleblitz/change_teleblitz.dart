@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
+import 'package:intl/intl.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
@@ -34,9 +35,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   final senderController = TextEditingController();
   final mapAntretenController = TextEditingController();
   final mapAbtretenController = TextEditingController();
+  final grundController = TextEditingController();
+  final endeFerienController = TextEditingController();
+  String datumEndeFerien = 'Datum wählen';
   final formKey = new GlobalKey<FormState>();
   bool _noActivity = false;
+  bool _ferien = false;
   var aktteleblitz;
+  UniqueKey endeFerienKey = UniqueKey();
 
   void initState() {
     super.initState();
@@ -56,7 +62,163 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
         future: this.aktteleblitz,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (!(_noActivity)) {
+            if (_ferien) {
+              return Scaffold(
+                  appBar: AppBar(
+                    title: Text('Teleblitz ändern'),
+                    backgroundColor: MoreaColors.violett,
+                  ),
+                  body: ListView(children: [
+                    Column(children: <Widget>[
+                      Container(
+                          child: Form(
+                              key: _formKey,
+                              child: Column(children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      top: 30, left: 40, right: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.not_interested),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: SwitchListTile(
+                                          title: Text('Keine Aktivität'),
+                                          value: _noActivity,
+                                          activeColor: MoreaColors.violett,
+                                          onChanged: (bool val) {
+                                            setState(() {
+                                              if (val == true) {
+                                                _noActivity = val;
+                                                _ferien = !val;
+                                              } else {
+                                                _noActivity = val;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      top: 0, left: 40, right: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.not_interested),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: SwitchListTile(
+                                          title: Text('Ende Ferien'),
+                                          value: _ferien,
+                                          activeColor: MoreaColors.violett,
+                                          onChanged: (bool val) {
+                                            setState(() {
+                                              if (val == true) {
+                                                _noActivity = !val;
+                                                _ferien = val;
+                                              } else {
+                                                _ferien = val;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.date_range),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                            alignment: Alignment.center, //
+                                            decoration: new BoxDecoration(
+                                              border: new Border.all(
+                                                  color: Colors.black,
+                                                  width: 2),
+                                              borderRadius:
+                                                  new BorderRadius.all(
+                                                Radius.circular(4.0),
+                                              ),
+                                            ),
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(vertical: 10),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Text('Datum Ende Ferien:'),
+                                                  RaisedButton(
+                                                    onPressed: () {
+                                                      _selectDatumvon(context);
+                                                    },
+                                                    child: Text(
+                                                      datumEndeFerien,
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    color: MoreaColors.violett,
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                  ),
+                                                ],
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                              ),
+                                            )),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 30),
+                                  child: RaisedButton.icon(
+                                    onPressed: () {
+                                      this.uploadTeleblitz(
+                                          _stufe,
+                                          snapshot.data.getID(),
+                                          snapshot.data.getSlug());
+                                    },
+                                    icon: Icon(
+                                      Icons.update,
+                                      color: Colors.white,
+                                    ),
+                                    label: Container(
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Text(
+                                        "Teleblitz ändern",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                    ),
+                                    color: MoreaColors.violett,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                  ),
+                                )
+                              ])))
+                    ])
+                  ]));
+            } else if (!(_noActivity) && !(_ferien)) {
               return new Scaffold(
                 appBar: AppBar(
                   title: Text("Teleblitz ändern"),
@@ -88,7 +250,42 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                           activeColor: MoreaColors.violett,
                                           onChanged: (bool val) {
                                             setState(() {
-                                              _noActivity = val;
+                                              if (val == true) {
+                                                _noActivity = val;
+                                                _ferien = !val;
+                                              } else {
+                                                _noActivity = val;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      top: 0, left: 40, right: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.not_interested),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: SwitchListTile(
+                                          title: Text('Ende Ferien'),
+                                          value: _ferien,
+                                          activeColor: MoreaColors.violett,
+                                          onChanged: (bool val) {
+                                            setState(() {
+                                              if (val == true) {
+                                                _noActivity = !val;
+                                                _ferien = val;
+                                              } else {
+                                                _ferien = val;
+                                              }
                                             });
                                           },
                                         ),
@@ -107,11 +304,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       ),
                                       Expanded(
                                         flex: 9,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
+                                        child: Container(
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: TextFormField(
                                             initialValue: datumController.text,
                                             decoration: InputDecoration(
+                                              filled: true,
                                               labelText: 'Datum',
                                             ),
                                             onSaved: (value) =>
@@ -134,7 +339,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               TextFormField(
@@ -142,6 +354,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                     antretenController.text,
                                                 decoration: InputDecoration(
                                                   labelText: 'Antreten',
+                                                  filled: true,
                                                 ),
                                                 onSaved: (value) =>
                                                     antretenController.text =
@@ -152,6 +365,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                     mapAntretenController.text,
                                                 decoration: InputDecoration(
                                                   labelText: 'Antreten Map',
+                                                  filled: true,
                                                 ),
                                                 onSaved: (value) =>
                                                     mapAntretenController.text =
@@ -176,7 +390,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               TextFormField(
@@ -184,6 +405,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                     abtretenController.text,
                                                 decoration: InputDecoration(
                                                   labelText: 'Antreten',
+                                                  filled: true,
                                                 ),
                                                 onSaved: (value) =>
                                                     abtretenController.text =
@@ -193,6 +415,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                 initialValue:
                                                     mapAbtretenController.text,
                                                 decoration: InputDecoration(
+                                                  filled: true,
                                                   labelText: 'Antreten Map',
                                                 ),
                                                 onSaved: (value) =>
@@ -218,7 +441,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               ListView.builder(
@@ -237,6 +467,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                                 index]
                                                             .text,
                                                     decoration: InputDecoration(
+                                                        filled: true,
                                                         labelText: 'Mitnehmen'),
                                                     onSaved: (value) =>
                                                         mitnehmenControllerList[
@@ -246,14 +477,18 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                 },
                                               ),
                                               Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
+                                                margin: EdgeInsets.only(
+                                                    top: 10, bottom: 10),
                                                 child: FractionallySizedBox(
                                                   widthFactor: 1,
                                                   child: Row(
                                                     children: <Widget>[
                                                       Expanded(
-                                                        flex: 4,
+                                                        flex: 1,
+                                                        child: Container(),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 7,
                                                         child:
                                                             RaisedButton.icon(
                                                           onPressed: () {
@@ -287,7 +522,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                         child: Container(),
                                                       ),
                                                       Expanded(
-                                                        flex: 4,
+                                                        flex: 7,
                                                         child:
                                                             RaisedButton.icon(
                                                                 onPressed: () {
@@ -315,7 +550,11 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                                     borderRadius:
                                                                         BorderRadius.all(
                                                                             Radius.circular(5)))),
-                                                      )
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: Container(),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -339,13 +578,21 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       Expanded(
                                         flex: 9,
                                         child: Container(
-                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               TextFormField(
                                                 initialValue:
                                                     bemerkungController.text,
                                                 decoration: InputDecoration(
+                                                  filled: true,
                                                   labelText: 'Bemerkung',
                                                 ),
                                                 onSaved: (value) =>
@@ -356,6 +603,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                                 initialValue:
                                                     senderController.text,
                                                 decoration: InputDecoration(
+                                                  filled: true,
                                                   labelText: 'Sender',
                                                 ),
                                                 onSaved: (value) =>
@@ -373,10 +621,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   margin: EdgeInsets.symmetric(vertical: 30),
                                   child: RaisedButton.icon(
                                     onPressed: () {
-                                      this.abtretenController.text = '';
-                                      this.antretenController.text = '';
-                                      this.bemerkungController.text = '';
-                                      this.senderController.text = '';
                                       this.uploadTeleblitz(
                                           _stufe,
                                           snapshot.data.getID(),
@@ -440,7 +684,42 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                           activeColor: MoreaColors.violett,
                                           onChanged: (bool val) {
                                             setState(() {
-                                              _noActivity = val;
+                                              if (val == true) {
+                                                _noActivity = val;
+                                                _ferien = !val;
+                                              } else {
+                                                _noActivity = val;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      top: 0, left: 40, right: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.not_interested),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: SwitchListTile(
+                                          title: Text('Ende Ferien'),
+                                          value: _ferien,
+                                          activeColor: MoreaColors.violett,
+                                          onChanged: (bool val) {
+                                            setState(() {
+                                              if (val == true) {
+                                                _noActivity = !val;
+                                                _ferien = val;
+                                              } else {
+                                                _ferien = val;
+                                              }
                                             });
                                           },
                                         ),
@@ -459,11 +738,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                       ),
                                       Expanded(
                                         flex: 9,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
+                                        child: Container(
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
                                           child: TextFormField(
                                             initialValue: datumController.text,
                                             decoration: InputDecoration(
+                                              filled: true,
                                               labelText: 'Datum',
                                             ),
                                             onSaved: (value) =>
@@ -475,13 +762,43 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   ),
                                 ),
                                 Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 10),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.date_range),
+                                      ),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          alignment: Alignment.center, //
+                                          decoration: new BoxDecoration(
+                                            border: new Border.all(
+                                                color: Colors.black, width: 2),
+                                            borderRadius: new BorderRadius.all(
+                                              Radius.circular(4.0),
+                                            ),
+                                          ),
+                                          child: TextFormField(
+                                            initialValue: grundController.text,
+                                            decoration: InputDecoration(
+                                              filled: true,
+                                              labelText: 'Grund für Ausfall',
+                                            ),
+                                            onSaved: (value) =>
+                                                grundController.text = value,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
                                   margin: EdgeInsets.symmetric(vertical: 30),
                                   child: RaisedButton.icon(
                                     onPressed: () {
-                                      this.abtretenController.text = '';
-                                      this.antretenController.text = '';
-                                      this.bemerkungController.text = '';
-                                      this.senderController.text = '';
                                       this.uploadTeleblitz(
                                           _stufe,
                                           snapshot.data.getID(),
@@ -566,6 +883,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     senderController.text = teleblitz.getSender();
     mapAntretenController.text = teleblitz.getMapAntreten();
     mapAbtretenController.text = teleblitz.getMapAbtreten();
+    grundController.text = teleblitz.getGrund();
 
     return teleblitz;
   }
@@ -595,7 +913,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
         _slug,
         mapAntretenController.text,
         mapAbtretenController.text,
-        _noActivity);
+        _noActivity,
+        _ferien,
+        datumEndeFerien,
+        grundController.text);
     var jsonMap = {"fields": newteleblitz.toJson()};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
@@ -620,34 +941,42 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       _jsonMitnehmen = _jsonMitnehmen + "<li>" + u + "</li>";
     }
     _jsonMitnehmen = _jsonMitnehmen + '</ul>';
-    Map<String, dynamic> data;
-    if (!(_noActivity)) {
-      data = {
-        "abtreten": abtretenController.text,
-        "antreten": antretenController.text,
-        "bemerkung": bemerkungController.text,
-        "datum": datumController.text,
-        "keine-aktivitat": 'false',
-        "mitnehmen-test": _jsonMitnehmen,
-        "name-des-senders": senderController.text,
-        "google-map": mapAntretenController.text,
-        "map-abtreten": mapAbtretenController.text,
-      };
-    } else {
-      data = {
-        'abtreten': '',
-        'antreten': '',
-        'bemerkung': '',
-        'datum': datumController.text,
-        'keine-aktivitat': 'true',
-        'mitnehmen-test': '',
-        'name-des-senders': '',
-        "google-map": '',
-        "map-abtreten": '',
-      };
+
+    //Damit ende-ferien nie leer ist. Sonst enstehen bugs.
+    if (datumEndeFerien == 'Datum wählen') {
+      datumEndeFerien = '12-06-2018';
     }
+    Map<String, dynamic> data;
+    data = {
+      "abtreten": abtretenController.text,
+      "antreten": antretenController.text,
+      "bemerkung": bemerkungController.text,
+      "datum": datumController.text,
+      "keine-aktivitat": _noActivity.toString(),
+      "mitnehmen-test": _jsonMitnehmen,
+      "name-des-senders": senderController.text,
+      "google-map": mapAntretenController.text,
+      "map-abtreten": mapAbtretenController.text,
+      'ferien': _ferien.toString(),
+      'ende-ferien': datumEndeFerien,
+      'grund': grundController.text,
+    };
     moreafire.uploadteleblitz(_stufe, data);
     Navigator.pop(context);
+  }
+
+  Future<Null> _selectDatumvon(BuildContext context) async {
+    DateTime now = DateTime.now();
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: now.add(new Duration(days: 9999)),
+    );
+    if (picked != null)
+      setState(() {
+        datumEndeFerien = DateFormat('dd-MM-yyyy').format(picked);
+      });
   }
 }
 
@@ -665,8 +994,9 @@ class TeleblitzInfo {
       _slug,
       _jsonMitnehmen,
       _mapAntreten,
-      _mapAbtreten;
-  bool _noActivity;
+      _mapAbtreten,
+      _grund,
+      _endeFerien;
 
   List<String> _mitnehmen;
   bool _keineaktivitaet, _ferien;
@@ -685,7 +1015,10 @@ class TeleblitzInfo {
       String slug,
       String mapAntreten,
       String mapAbtreten,
-      bool noActivity) {
+      bool noActivity,
+      bool ferien,
+      String endeFerien,
+      String grund) {
     _titel = titel;
     _datum = datum;
     _antreten = antreten;
@@ -695,10 +1028,18 @@ class TeleblitzInfo {
     _id = id;
     _mitnehmen = mitnehmen;
     _keineaktivitaet = noActivity;
-    _ferien = false;
+    _ferien = ferien;
     _slug = slug;
     _mapAntreten = mapAntreten;
     _mapAbtreten = mapAbtreten;
+    _grund = grund;
+    if (endeFerien == 'Datum wählen') {
+      _endeFerien = '2019-06-12T00:00:00.000Z';
+    } else {
+      var dates = endeFerien.split('-');
+      _endeFerien =
+          dates[2] + '-' + dates[1] + '-' + dates[0] + 'T00:00:00.000Z';
+    }
     this.createJsonMitnehmen();
   }
 
@@ -715,7 +1056,8 @@ class TeleblitzInfo {
         _ferien = json['ferien'],
         _slug = json['slug'],
         _mapAntreten = json['google-map'],
-        _mapAbtreten = json['map-abtreten'] {
+        _mapAbtreten = json['map-abtreten'],
+        _grund = json['grund'] {
     this._mitnehmen = json["mitnehmen-test"]
         .replaceFirst("<ul>", "")
         .replaceFirst('<' + '/' + 'ul>', "")
@@ -725,6 +1067,20 @@ class TeleblitzInfo {
         .split(";");
     print(this._mitnehmen.toString());
     this._inhalt = Map.from(json);
+    this._endeFerien = _formatDate(json['ende-ferien']);
+    print(json);
+    print('Ferien: $_endeFerien');
+  }
+
+  String _formatDate(String date) {
+    if (date != '') {
+      String rawDate = date.split('T')[0];
+      List<String> dates = rawDate.split('-');
+      String formatedDate = dates[2] + '.' + dates[1] + '.' + dates[0];
+      return formatedDate;
+    } else {
+      return date;
+    }
   }
 
   Map<String, dynamic> toJson() => {
@@ -737,11 +1093,13 @@ class TeleblitzInfo {
         'name-des-senders': _sender,
         'keine-aktivitat': _keineaktivitaet,
         'ferien': _ferien,
+        'ende-ferien': _endeFerien,
         '_archived': false,
         '_draft': false,
         'slug': _slug,
         'google-map': _mapAntreten,
         'map-abtreten': _mapAbtreten,
+        'grund': _grund,
       };
 
   void createJsonMitnehmen() {
@@ -799,6 +1157,14 @@ class TeleblitzInfo {
 
   String getMapAbtreten() {
     return this._mapAbtreten;
+  }
+
+  String getGrund() {
+    return this._grund;
+  }
+
+  String getEndeFerien() {
+    return this._endeFerien;
   }
 
   void setDatum(String datum) {

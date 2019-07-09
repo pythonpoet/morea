@@ -1,14 +1,16 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
+import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/Pages/Teleblitz/notification_bell.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Pages/Personenverzeichniss/parents.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -25,7 +27,7 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => HomePageState();
 }
 
-enum FormType { leiter, teilnehmer, eltern }
+enum FormType { leiter, teilnehmer, eltern, loading }
 
 enum Anmeldung { angemolden, abgemolden, verchilt }
 
@@ -40,7 +42,7 @@ class HomePageState extends State<HomePage> {
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
-  FormType _formType = FormType.teilnehmer;
+  FormType _formType = FormType.loading;
   Anmeldung _anmeldung = Anmeldung.verchilt;
 
   String _pfadiname = 'Loading...',
@@ -132,7 +134,7 @@ class HomePageState extends State<HomePage> {
         print(e);
       }
       forminit();
-      getdevtoken();
+//      getdevtoken();
     });
   }
 
@@ -173,6 +175,41 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getuserinfo();
+    firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+      var data = message['data'];
+      Map<String, dynamic> upload = {
+        'title': data['title'].toString(),
+        'snippet': data['snippet'].toString(),
+        'body': data['inhalt'].toString(),
+        'sender': data['sender'].toString(),
+        'read': false
+      };
+      await moreafire.uploadMessage(await auth0.currentUser(), upload);
+      print(message);
+    }, onResume: (Map<String, dynamic> message) async {
+      var data = message['data'];
+      Map<String, dynamic> upload = {
+        'title': data['title'].toString(),
+        'snippet': data['snippet'].toString(),
+        'body': data['inhalt'].toString(),
+        'sender': data['sender'].toString(),
+        'read': false
+      };
+      await moreafire.uploadMessage(await auth0.currentUser(), upload);
+      print(message);
+    }, onLaunch: (Map<String, dynamic> message) async {
+      var data = message['data'];
+      Map<String, dynamic> upload = {
+        'title': data['title'].toString(),
+        'snippet': data['snippet'].toString(),
+        'body': data['inhalt'].toString(),
+        'sender': data['sender'].toString(),
+        'read': false
+      };
+      await moreafire.uploadMessage(await auth0.currentUser(), upload);
+      print(message);
+    });
   }
 
   @override
@@ -182,6 +219,31 @@ class HomePageState extends State<HomePage> {
 
   Widget teleblitzwidget() {
     switch (_formType) {
+      case FormType.loading:
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Teleblitz'),
+          ),
+          drawer: Drawer(
+            child: ListView(
+              children: navigation(),
+            ),
+          ),
+          body: Container(
+            child: Center(
+                child: Container(
+              padding: EdgeInsets.all(120),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: new Text('Loading...'),
+                  ),
+                  Expanded(child: new CircularProgressIndicator())
+                ],
+              ),
+            )),
+          ),
+        );
       case FormType.leiter:
         return DefaultTabController(
             length: 4,
@@ -198,6 +260,7 @@ class HomePageState extends State<HomePage> {
                     ),
                     Tab(text: 'Buebe')
                   ]),
+                  actions: <Widget>[NotificationBell()],
                 ),
                 drawer: new Drawer(
                   child: new ListView(children: navigation()),
@@ -213,7 +276,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Biber')),
+                              key: ObjectKey(tlbz.anzeigen('Biber')),
                               children: <Widget>[
                                 tlbz.anzeigen('Biber'),
                               ],
@@ -231,7 +294,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
+                              key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Wombat (Wölfe)'),
                               ],
@@ -249,7 +312,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
+                              key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Nahani (Meitli)'),
                               ],
@@ -267,7 +330,7 @@ class HomePageState extends State<HomePage> {
                             ),
                             child: SingleChildScrollView(
                                 child: Column(
-                                  key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
+                              key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
                               children: <Widget>[
                                 tlbz.anzeigen('Drason (Buebe)'),
                               ],
@@ -420,6 +483,12 @@ class HomePageState extends State<HomePage> {
 
   List<Widget> navigation() {
     switch (_formType) {
+      case FormType.loading:
+        return [
+          ListTile(
+            leading: Text('Loading...'),
+          )
+        ];
       case FormType.leiter:
         return [
           new UserAccountsDrawerHeader(
@@ -451,6 +520,12 @@ class HomePageState extends State<HomePage> {
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                       new PersonenVerzeichnisState()))),
+          new ListTile(
+              title: new Text('Nachrichten'),
+              trailing: new Icon(Icons.message),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      MessagesPage(userInfo: qsuserInfo.data)))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

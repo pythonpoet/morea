@@ -28,7 +28,7 @@ Future<void> main() async {
   await firestore.settings(timestampsInSnapshotsEnabled: true);
 
   runApp(MaterialApp(
-      title: 'Firestore Example', theme: ThemeData(fontFamily: 'Raleway'), home: MyApp(firestore: firestore)));
+      title: 'Firestore Example', debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'Raleway'), home: MyApp(firestore: firestore)),);
 }
 
 class MyApp extends StatelessWidget {
@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
 
     return new MaterialApp(
       title: 'Flutter Login',
+      debugShowCheckedModeBanner: false,
       theme: new ThemeData(
         primarySwatch: MaterialColor(MoreaColors.violettInt, MoreaColors.violettMaterialColor),
       ),

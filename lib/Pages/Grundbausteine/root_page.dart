@@ -25,7 +25,6 @@ class _RootPageState extends State<RootPage>{
   @override
 
   void initState() {
-    // TODO: implement initState
     super.initState();
     widget.auth.currentUser().then((userId){
       setState(() {

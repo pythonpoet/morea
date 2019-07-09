@@ -23,6 +23,8 @@ abstract class BaseMoreaFirebase{
   Future uploadtoAgenda(String stufe,String name, Map data);
 
   Future<void> uploaddevtocken(String stufe,String token, String userUID);
+  Stream<QuerySnapshot> getMessages(userUID);
+  Future<void> setMessageRead(String userUID, DocumentSnapshot messageID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase{
@@ -152,5 +154,22 @@ class MoreaFirebase extends BaseMoreaFirebase{
       'UID' : userUID
     };
     crud0.setData('Stufen/$stufe/Devices', token.toString(), tokendata);
+  }
+
+  Stream<QuerySnapshot> getMessages (userUID) {
+    return crud0.streamCollection('/messages/$userUID/messages');
+  }
+
+  Future<void> uploadMessage(userUID, Map data) async {
+    userUID = dwiformat.simplestring(userUID);
+    crud0.setDataMessage('messages/$userUID/messages', data);
+    return null;
+  }
+
+  Future<void> setMessageRead(String userUID, DocumentSnapshot document) {
+    userUID = dwiformat.simplestring(userUID);
+    Map<String, dynamic> updateData = {'read': true, 'body': document['body'], 'sender': document['sender'], 'snippet': document['snippet'], 'title': document['title']};
+    crud0.updateMessage('messages/$userUID/messages', document.documentID, updateData);
+    return null;
   }
 }

@@ -15,6 +15,17 @@ class Teleblitz implements BaseTeleblitz {
   MoreaFirebase moreafire = new MoreaFirebase();
   bool block = false;
 
+  String _formatDate(String date) {
+    if (date != '' && date!=null) {
+      String rawDate = date.split('T')[0];
+      List<String> dates = rawDate.split('-');
+      String formatedDate = dates[2] + '.' + dates[1] + '.' + dates[0];
+      return formatedDate;
+    } else {
+      return '';
+    }
+  }
+
   Future<Info> getInfos(String filter) async {
     var jsonData;
     var data;
@@ -32,25 +43,17 @@ class Teleblitz implements BaseTeleblitz {
           if (u["name"] == stufe) {
             info.setTitel(u["name"]);
             info.setDatum(u["datum"]);
-            if (u['keine-aktivitat'] == false) {
-              info.setAntreten(u["antreten"]);
-              info.setAntretenMaps(u['google-map']);
-              info.setAbtreten(u["abtreten"]);
-              info.setAbtretenMaps(u['map-abtreten']);
-              info.setBemerkung(u["bemerkung"]);
-              info.setSender(u["name-des-senders"]);
-              info.setMitnehmen(u['mitnehmen-test']);
-              info.setkeineAktivitat('false');
-            } else {
-              info.setkeineAktivitat('true');
-              info.setAntreten('');
-              info.setAbtreten('');
-              info.setAntretenMaps('');
-              info.setAbtretenMaps('');
-              info.setBemerkung('');
-              info.setSender('');
-              info.setMitnehmen('');
-            }
+            info.setAntreten(u["antreten"]);
+            info.setAntretenMaps(u['google-map']);
+            info.setAbtreten(u["abtreten"]);
+            info.setAbtretenMaps(u['map-abtreten']);
+            info.setBemerkung(u["bemerkung"]);
+            info.setSender(u["name-des-senders"]);
+            info.setMitnehmen(u['mitnehmen-test']);
+            info.setkeineAktivitat(u['keine-aktivitat'].toString());
+            info.setGrund(u['grund']);
+            info.setFerien(u['ferien'].toString());
+            info.setEndeFerien(_formatDate(u['ende-ferien']));
             telblitz = {
               'datum': info.datum,
               'keine-aktivitat': info.keineaktivitat,
@@ -60,7 +63,10 @@ class Teleblitz implements BaseTeleblitz {
               'map-abtreten': info.abtretenMap,
               'bemerkung': info.bemerkung,
               'name-des-senders': info.sender,
-              'mitnehmen-test': info.mitnehmen
+              'mitnehmen-test': info.mitnehmen,
+              'grund': info.grund,
+              'ferien': info.ferien,
+              'ende-ferien': info.endeferien,
             };
             moreafire.uploadteleblitz(stufe, telblitz);
           }
@@ -77,6 +83,9 @@ class Teleblitz implements BaseTeleblitz {
           info.setSender(result.data["name-des-senders"]);
           info.setMitnehmen(result.data['mitnehmen-test']);
           info.setkeineAktivitat(result.data['keine-aktivitat']);
+          info.setGrund(result.data['grund']);
+          info.setFerien(result.data['ferien']);
+          info.setEndeFerien(result.data['ende-ferien']);
         });
       }
       return info;
@@ -104,6 +113,45 @@ class Teleblitz implements BaseTeleblitz {
                 )),
               );
             } else {
+              if (snapshot.data.keineaktivitat == 'true') {
+                return Container(
+                  margin: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(15),
+                  child: Column(
+                    children: <Widget>[
+                      snapshot.data.getTitel(),
+                      snapshot.data.getKeineAktivitat(),
+                      snapshot.data.getDatum(),
+                      snapshot.data.getGrund()
+                    ],
+                  ),
+                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.16),
+                        offset: Offset(3, 3),
+                        blurRadius: 40)
+                  ]),
+                );
+              } else if (snapshot.data.ferien == 'true') {
+                return Container(
+                  margin: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(15),
+                  child: Column(
+                    children: <Widget>[
+                      snapshot.data.getTitel(),
+                      snapshot.data.getKeineAktivitat(),
+                      snapshot.data.getFerien(),
+                      snapshot.data.getEndeFerien(),
+                    ],
+                  ),
+                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.16),
+                        offset: Offset(3, 3),
+                        blurRadius: 40)
+                  ]),
+                );
+              }
               return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
@@ -160,6 +208,9 @@ class Info {
   String sender;
   String mitnehmen;
   String keineaktivitat;
+  String grund;
+  String ferien;
+  String endeferien;
   double _sizeleft = 110;
 
   void setTitel(String titel) {
@@ -202,6 +253,18 @@ class Info {
     this.keineaktivitat = aktv;
   }
 
+  void setGrund(String grund) {
+    this.grund = grund;
+  }
+
+  void setFerien(String ferien) {
+    this.ferien = ferien;
+  }
+
+  void setEndeFerien(String endeferien) {
+    this.endeferien = endeferien;
+  }
+
   Container getTitel() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
@@ -218,6 +281,24 @@ class Info {
                     blurRadius: 12),
               ])),
     );
+  }
+
+  Container getKeineAktivitat() {
+    return Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              child: Text(
+                'Keine Aktivität',
+                style: TextStyle(fontSize: 30),
+              ),
+            ),
+            Expanded(
+              child: SizedBox(),
+            )
+          ],
+        ));
   }
 
   Container getAntreten() {
@@ -252,22 +333,6 @@ class Info {
       ),
       padding: EdgeInsets.symmetric(horizontal: 20),*/
       );
-    } else {
-      return Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-          child: Row(
-            children: <Widget>[
-              SizedBox(
-                child: Text(
-                  'Keine Aktivität',
-                  style: TextStyle(fontSize: 30),
-                ),
-              ),
-              Expanded(
-                child: SizedBox(),
-              )
-            ],
-          ));
     }
   }
 
@@ -453,6 +518,96 @@ class Info {
             ],
           ));
     }
+  }
+
+  Container getGrund() {
+    return Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(bottom: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                      width: this._sizeleft,
+                      child: Text("Grund:", style: this._getStyleLeft())),
+                ],
+              ),
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                    child: Html(
+                  data: this.grund,
+                  defaultTextStyle: _getStyleRight(),
+                ))
+              ],
+            ),
+          ],
+        ));
+  }
+
+  Container getFerien() {
+    return Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(bottom: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                      width: this._sizeleft,
+                      child: Text("Grund:", style: this._getStyleLeft())),
+                ],
+              ),
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                    child: Text(
+                  "Die Aktivität fällt leider wegen der Schulferien aus.",
+                  style: this._getStyleRight(),
+                ))
+              ],
+            ),
+          ],
+        ));
+  }
+
+  Container getEndeFerien() {
+    return Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(bottom: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                      width: this._sizeleft,
+                      child: Text("Ende Ferien:", style: this._getStyleLeft())),
+                ],
+              ),
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                    child: Html(
+                  data: this.endeferien,
+                  defaultTextStyle: _getStyleRight(),
+                ))
+              ],
+            ),
+          ],
+        ));
   }
 
   TextStyle _getStyleLeft() {
