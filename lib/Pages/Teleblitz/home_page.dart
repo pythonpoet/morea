@@ -154,6 +154,9 @@ class HomePageState extends State<HomePage> {
   void forminit() {
     try {
       switch (qsuserInfo.data['Pos']) {
+        case 'Teilnehmer':
+          _formType = FormType.teilnehmer;
+          break;
         case 'Leiter':
           _formType = FormType.leiter;
           break;
