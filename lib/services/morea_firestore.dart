@@ -39,9 +39,9 @@ abstract class BaseMoreaFirebase {
 
   Future<void> uploaddevtocken(String stufe, String token, String userUID);
 
-  Stream<QuerySnapshot> getMessages(userUID);
+  Stream<QuerySnapshot> getMessages(String stufe);
 
-  Future<void> setMessageRead(String userUID, DocumentSnapshot messageID);
+  Future<void> setMessageRead(String userUID, String messageID, String stufe);
 
   String upLoadChildRequest(String childUID);
 }
@@ -54,7 +54,10 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> createUserInformation(Map userInfo) async {
     String userUID = await auth0.currentUser();
-    crud0.setData('user', userUID, userInfo);
+    String stufe = userInfo['Stufe'];
+    Map<String, dynamic> token =  {'devtoken': userInfo['devtoken'][0]};
+    await crud0.setData('user', userUID, userInfo);
+    await crud0.setData('Stufen/$stufe', userUID, token);
     return null;
   }
 
@@ -218,9 +221,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  Future<void> uploaddevtocken(String stufe, String token, String userUID) {
-    Map<String, String> tokendata = {'devtoken': token, 'UID': userUID};
-    crud0.setData('Stufen/$stufe/Devices', token, tokendata);
+  Future<void> uploaddevtocken(String stufe, String token, String userUID) async {
+    Map<String, dynamic> tokendata = {'devtoken': token};
+    await crud0.setData('Stufen/$stufe/Devices', userUID, tokendata);
     return null;
   }
 
@@ -235,27 +238,23 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return qrCodeString;
   }
 
-  Stream<QuerySnapshot> getMessages(userUID) {
-    return crud0.streamCollection('/messages/$userUID/messages');
+  Stream<QuerySnapshot> getMessages(String stufe) {
+    return crud0.streamCollection('/Stufen/$stufe/messages');
   }
 
-  Future<void> uploadMessage(userUID, Map data) async {
-    userUID = dwiformat.simplestring(userUID);
-    crud0.setDataMessage('messages/$userUID/messages', data);
+  Future<void> uploadMessage(stufe, Map data) async {
+    stufe = dwiformat.simplestring(stufe);
+    await crud0.setDataMessage('Stufen/$stufe/messages', data);
     return null;
   }
 
-  Future<void> setMessageRead(String userUID, DocumentSnapshot document) {
+  Future<void> setMessageRead(String userUID, String messageID, String stufe) async{
     userUID = dwiformat.simplestring(userUID);
-    Map<String, dynamic> updateData = {
-      'read': true,
-      'body': document['body'],
-      'sender': document['sender'],
-      'snippet': document['snippet'],
-      'title': document['title']
-    };
-    crud0.updateMessage(
-        'messages/$userUID/messages', document.documentID, updateData);
+    stufe = dwiformat.simplestring(stufe);
+    var oldMessage = await crud0.getMessage('/Stufen/$stufe/messages', messageID);
+    oldMessage.data['read'][userUID] = true;
+    await crud0.updateMessage(
+        'Stufen/$stufe/messages', messageID, oldMessage.data);
     return null;
   }
 }

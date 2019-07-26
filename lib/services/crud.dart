@@ -22,6 +22,8 @@ abstract class BaseCrudMethods {
 
   Future<void> setDataMessage(
       String path, Map<dynamic, dynamic> data);
+
+  Future<DocumentSnapshot> getMessage(String path, String document);
 }
 
 class CrudMedthods implements BaseCrudMethods {
@@ -116,5 +118,9 @@ class CrudMedthods implements BaseCrudMethods {
         .catchError((e) {
       print(e);
     });
+  }
+
+  Future<DocumentSnapshot> getMessage(String path, String document) async {
+    return await Firestore.instance.collection(path).document(document).get();
   }
 }

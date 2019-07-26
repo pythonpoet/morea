@@ -15,6 +15,7 @@ import 'package:morea/Pages/Personenverzeichniss/parents.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/Pages/Nachrichten/send_message.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -537,6 +538,12 @@ class HomePageState extends State<HomePage> {
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                       MessagesPage(userInfo: qsuserInfo.data)))),
+          ListTile(
+              title: new Text('Senden'),
+              trailing: new Icon(Icons.send),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      SendMessages()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

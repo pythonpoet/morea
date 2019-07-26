@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
             devtoken = [token];
             Map<String, List> devtokens = {'devtoken': devtoken};
             userInfo.data.addAll(devtokens);
-            auth0.createUserInformation(userInfo.data);
+            moreafire.createUserInformation(userInfo.data);
           });
         } else {
           firebaseMessaging.getToken().then((token) {
@@ -99,12 +99,12 @@ class _LoginPageState extends State<LoginPage> {
                   return;
                 }
               }
-              devtoken = new List.from(devtoken_old)..add(token);
+              devtoken = [token];
             }
 
             userInfo.data['devtoken'] = devtoken;
 
-            auth0.createUserInformation(userInfo.data);
+            moreafire.createUserInformation(userInfo.data);
           });
         }
       } catch (e) {
@@ -323,6 +323,7 @@ class _LoginPageState extends State<LoginPage> {
           'Kinder': <dynamic, dynamic> {},
           'Vorname': this._vorname,
           'Nachname': this._nachname,
+          'Stufe': 'Eltern',
           'Adresse': this._adresse,
           'PLZ': this._plz,
           'Ort': this._ort,

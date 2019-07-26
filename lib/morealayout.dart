@@ -19,8 +19,19 @@ class MoreaColors {
     900: Color.fromRGBO(122, 98, 255, 1),
   };
 }
-//
-//const Map<String, Color> MoreaColors = {
-//  'violett': Color(0xff7a62ff),
-//  'orange': Color(0xffff9262)
-//};
+
+class MainContainer extends StatelessWidget{
+
+  MainContainer(this.child);
+
+  Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: this.child
+    );
+  }
+
+}

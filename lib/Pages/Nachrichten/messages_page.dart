@@ -19,6 +19,8 @@ class _MessagesPageState extends State<MessagesPage> {
   Auth auth0 = Auth();
   var messages;
   var date;
+  var uid;
+  var stufe;
 
   @override
   void initState() {
@@ -42,10 +44,8 @@ class _MessagesPageState extends State<MessagesPage> {
             stream: this.messages,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                print(this.messages);
                 return Text('Loading...');
               } else {
-                print(snapshot.data);
                 return ListView.builder(
                     itemCount: snapshot.data.documents.length,
                     itemBuilder: (context, index) {
@@ -59,20 +59,22 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   _getMessages() async {
-    var uid = await auth0.currentUser();
+    this.uid = await auth0.currentUser();
+    var userInfo = await firestore.getUserInformation(uid);
+    this.stufe = await userInfo.data['Stufe'];
     setState(() {
-      this.messages = firestore.getMessages(uid);
+      this.messages = firestore.getMessages(this.stufe);
     });
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var message = document;
-    if (!(document['read'])) {
+    if (!(document['read'].containsKey(this.uid))) {
       return ListTile(
         key: UniqueKey(),
-        title: Text(document['sender'],
+        title: Text(document['title'],
             style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(document['title'],
+        subtitle: Text(document['sender'],
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         contentPadding: EdgeInsets.only(),
         leading: CircleAvatar(
@@ -80,8 +82,27 @@ class _MessagesPageState extends State<MessagesPage> {
         ),
         trailing: Icon(Icons.arrow_forward_ios),
         onTap: () async {
-          print(document.documentID);
-          firestore.setMessageRead(await auth0.currentUser(), document);
+          await firestore.setMessageRead(this.uid, document.documentID, this.stufe);
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return SingleMessagePage(message);
+          }));
+        },
+      );
+    } else if (!(document['read'][this.uid])) {
+      return ListTile(
+        key: UniqueKey(),
+        title: Text(document['title'],
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(document['sender'],
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        contentPadding: EdgeInsets.only(),
+        leading: CircleAvatar(
+          child: Text(document['sender'][0]),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios),
+        onTap: () async {
+          await firestore.setMessageRead(this.uid, document.documentID, this.stufe);
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (BuildContext context) {
             return SingleMessagePage(message);
@@ -92,20 +113,22 @@ class _MessagesPageState extends State<MessagesPage> {
       return ListTile(
         key: UniqueKey(),
         title: Text(
-          document['sender'],
+          document['title'],
         ),
         subtitle: Text(
-          document['title'],
+          document['sender'],
         ),
         contentPadding: EdgeInsets.only(),
         leading: CircleAvatar(
           child: Text(document['sender'][0]),
         ),
         trailing: Icon(Icons.arrow_forward_ios),
-        onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) {
-              return SingleMessagePage(message);
-            })),
+        onTap: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return SingleMessagePage(message);
+          }));
+        },
       );
     }
   }
