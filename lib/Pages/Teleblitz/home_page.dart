@@ -179,46 +179,17 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void check4anmeldung(){
-
-  }
+  void check4anmeldung() {}
 
   @override
   void initState() {
     super.initState();
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
-      var data = message['data'];
-      Map<String, dynamic> upload = {
-        'title': data['title'].toString(),
-        'snippet': data['snippet'].toString(),
-        'body': data['inhalt'].toString(),
-        'sender': data['sender'].toString(),
-        'read': false
-      };
-      await moreafire.uploadMessage(await auth0.currentUser(), upload);
       print(message);
     }, onResume: (Map<String, dynamic> message) async {
-      var data = message['data'];
-      Map<String, dynamic> upload = {
-        'title': data['title'].toString(),
-        'snippet': data['snippet'].toString(),
-        'body': data['inhalt'].toString(),
-        'sender': data['sender'].toString(),
-        'read': false
-      };
-      await moreafire.uploadMessage(await auth0.currentUser(), upload);
       print(message);
     }, onLaunch: (Map<String, dynamic> message) async {
-      var data = message['data'];
-      Map<String, dynamic> upload = {
-        'title': data['title'].toString(),
-        'snippet': data['snippet'].toString(),
-        'body': data['inhalt'].toString(),
-        'sender': data['sender'].toString(),
-        'read': false
-      };
-      await moreafire.uploadMessage(await auth0.currentUser(), upload);
       print(message);
     });
     getuserinfo();
@@ -542,8 +513,7 @@ class HomePageState extends State<HomePage> {
               title: new Text('Senden'),
               trailing: new Icon(Icons.send),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      SendMessages()))),
+                  builder: (BuildContext context) => SendMessages()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

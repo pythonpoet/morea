@@ -55,7 +55,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Future<void> createUserInformation(Map userInfo) async {
     String userUID = await auth0.currentUser();
     String stufe = userInfo['Stufe'];
-    Map<String, dynamic> token =  {'devtoken': userInfo['devtoken'][0]};
+    Map<String, dynamic> token = {'devtoken': userInfo['devtoken'][0]};
     await crud0.setData('user', userUID, userInfo);
     await crud0.setData('Stufen/$stufe', userUID, token);
     return null;
@@ -221,7 +221,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  Future<void> uploaddevtocken(String stufe, String token, String userUID) async {
+  Future<void> uploaddevtocken(
+      String stufe, String token, String userUID) async {
     Map<String, dynamic> tokendata = {'devtoken': token};
     await crud0.setData('Stufen/$stufe/Devices', userUID, tokendata);
     return null;
@@ -248,10 +249,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  Future<void> setMessageRead(String userUID, String messageID, String stufe) async{
+  Future<void> setMessageRead(
+      String userUID, String messageID, String stufe) async {
     userUID = dwiformat.simplestring(userUID);
     stufe = dwiformat.simplestring(stufe);
-    var oldMessage = await crud0.getMessage('/Stufen/$stufe/messages', messageID);
+    var oldMessage =
+        await crud0.getMessage('/Stufen/$stufe/messages', messageID);
     oldMessage.data['read'][userUID] = true;
     await crud0.updateMessage(
         'Stufen/$stufe/messages', messageID, oldMessage.data);
