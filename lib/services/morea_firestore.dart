@@ -37,7 +37,8 @@ abstract class BaseMoreaFirebase {
 
   Future uploadtoAgenda(String stufe, String name, Map data);
 
-  Future<void> uploaddevtocken(String stufe, String token, String userUID);
+  Future<void> uploaddevtocken(
+      var messagingGroups, String token, String userUID);
 
   Stream<QuerySnapshot> getMessages(String stufe);
 
@@ -54,19 +55,19 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> createUserInformation(Map userInfo) async {
     String userUID = await auth0.currentUser();
-    String stufe = userInfo['Stufe'];
-    Map<String, dynamic> token = {'devtoken': userInfo['devtoken'][0]};
     await crud0.setData('user', userUID, userInfo);
-    await crud0.setData('Stufen/$stufe', userUID, token);
     return null;
   }
 
   Future<void> updateUserInformation(
     String userUID,
     Map userInfo,
-  ) {
+  ) async {
     userUID = dwiformat.simplestring(userUID);
-    crud0.setData('user', userUID, userInfo);
+    var stufe = userInfo['Stufe'];
+    Map<String, dynamic> token = {'devtoken': userInfo['devtoken'][0]};
+    await crud0.setData('Stufen/$stufe', userUID, token);
+    await crud0.setData('user', userUID, userInfo);
     return null;
   }
 
@@ -222,9 +223,13 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uploaddevtocken(
-      String stufe, String token, String userUID) async {
+      var messagingGroups, String token, String userUID) async {
     Map<String, dynamic> tokendata = {'devtoken': token};
-    await crud0.setData('Stufen/$stufe/Devices', userUID, tokendata);
+    for (var u in messagingGroups.keys) {
+      if (messagingGroups[u]) {
+        await crud0.setData('Stufen/$u/Devices', userUID, tokendata);
+      }
+    }
     return null;
   }
 

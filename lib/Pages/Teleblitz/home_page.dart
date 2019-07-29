@@ -7,15 +7,12 @@ import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/Pages/Teleblitz/notification_bell.dart';
 import 'werchunt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
-import 'package:morea/Pages/Personenverzeichniss/parents.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
-import 'package:morea/Pages/Nachrichten/send_message.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
@@ -53,6 +50,7 @@ class HomePageState extends State<HomePage> {
   DocumentSnapshot qsuserInfo;
   Map<String, String> anmeldeDaten;
   bool chunnt = false;
+  var messagingGroups;
 
   void submit({@required String anabmelden, String stufe}) {
     if (_formType != FormType.eltern) {
@@ -119,7 +117,7 @@ class HomePageState extends State<HomePage> {
 
   void getdevtoken() async {
     var token = await firebaseMessaging.getToken();
-    moreafire.uploaddevtocken(_stufe, token, _userUID);
+    moreafire.uploaddevtocken(messagingGroups, token, _userUID);
   }
 
   void getuserinfo() async {
@@ -130,6 +128,7 @@ class HomePageState extends State<HomePage> {
       _pfadiname = qsuserInfo.data['Pfadinamen'];
       _stufe = qsuserInfo.data['Stufe'];
       _email = qsuserInfo.data['Email'];
+      messagingGroups = qsuserInfo.data['messagingGroups'];
       try {
         if (_pfadiname == '') {
           _pfadiname = qsuserInfo.data['Vorname'];
@@ -187,10 +186,45 @@ class HomePageState extends State<HomePage> {
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
       print(message);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Neue Nachricht'),
+            actions: <Widget>[
+              RaisedButton(
+                color: MoreaColors.violett,
+                onPressed: () {
+                  return Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) => MessagesPage()));
+                },
+                child: Text(
+                  'Ansehen',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              RaisedButton(
+                color: MoreaColors.violett,
+                child: Text(
+                  'Später',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
     }, onResume: (Map<String, dynamic> message) async {
       print(message);
+      Navigator.of(context).push(new MaterialPageRoute(
+          builder: (BuildContext context) => MessagesPage()));
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
+      Navigator.of(context).push(new MaterialPageRoute(
+          builder: (BuildContext context) => MessagesPage()));
     });
     getuserinfo();
   }
@@ -243,7 +277,6 @@ class HomePageState extends State<HomePage> {
                     ),
                     Tab(text: 'Buebe')
                   ]),
-                  actions: <Widget>[NotificationBell()],
                 ),
                 drawer: new Drawer(
                   child: new ListView(children: navigation()),
@@ -507,13 +540,7 @@ class HomePageState extends State<HomePage> {
               title: new Text('Nachrichten'),
               trailing: new Icon(Icons.message),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      MessagesPage(userInfo: qsuserInfo.data)))),
-          ListTile(
-              title: new Text('Senden'),
-              trailing: new Icon(Icons.send),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => SendMessages()))),
+                  builder: (BuildContext context) => MessagesPage()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -546,6 +573,11 @@ class HomePageState extends State<HomePage> {
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: qsuserInfo.data,
                       )))),
+          ListTile(
+              title: Text('Profil'),
+              trailing: Icon(Icons.message),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => MessagesPage()))),
           /*ListTile(
             title: Text('Eltern bestätigen'),
             trailing: Icon(Icons.pregnant_woman),
@@ -594,6 +626,11 @@ class HomePageState extends State<HomePage> {
                 builder: (BuildContext context) =>
                     AddChild(auth0, qsuserInfo.data))),
           ),
+          ListTile(
+              title: Text('Profil'),
+              trailing: Icon(Icons.message),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => MessagesPage()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

@@ -46,6 +46,26 @@ class _SendMessagesState extends State<SendMessages> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            if (_formKey.currentState.validate()) {
+              Map<String, dynamic> data = {
+                'body': inhaltController.text,
+                'read': Map<String, bool>(),
+                'sender': userInfo['Pfadinamen'],
+                'snippet': vorschauController.text,
+                'title': titleController.text
+              };
+              moreaFire.uploadMessage(dropdownValue, data);
+              print('Successful');
+              Navigator.of(context).pop();
+            }
+          });
+        },
+        child: Icon(Icons.send),
+        backgroundColor: MoreaColors.violett,
+      ),
       appBar: AppBar(
         title: Text('Nachricht Senden'),
       ),
@@ -113,7 +133,7 @@ class _SendMessagesState extends State<SendMessages> {
                       titleController.text = newValue;
                     });
                   },
-                  onEditingComplete: (){
+                  onEditingComplete: () {
                     FocusScope.of(context).requestFocus(vorschauFocus);
                   },
                   validator: (value) {
@@ -149,7 +169,7 @@ class _SendMessagesState extends State<SendMessages> {
                       vorschauController.text = newValue;
                     });
                   },
-                  onEditingComplete: (){
+                  onEditingComplete: () {
                     FocusScope.of(context).requestFocus(inhaltFocus);
                   },
                   validator: (value) {
@@ -192,27 +212,6 @@ class _SendMessagesState extends State<SendMessages> {
                     }
                   },
                 ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 20),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (_formKey.currentState.validate()) {
-                        Map<String, dynamic> data = {
-                          'body': inhaltController.text,
-                          'read': Map<String, bool>(),
-                          'sender': userInfo['Pfadinamen'],
-                          'snippet': vorschauController.text,
-                          'title': titleController.text
-                        };
-                        moreaFire.uploadMessage(dropdownValue, data);
-                        print('Successful');
-                      }
-                    });
-                  },
-                  child: Text('Senden'),
-                )
               ],
             ),
           )),

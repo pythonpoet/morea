@@ -6,7 +6,6 @@ import 'package:morea/services/dwi_format.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'datenschutz.dart';
 
-
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn});
 
@@ -67,6 +66,13 @@ class _LoginPageState extends State<LoginPage> {
   Color left = Colors.black;
   Color right = Colors.white;
 
+  //Für Eltern Stufenauswahl
+  bool biberCheckbox = false;
+  bool woelfeCheckbox = false;
+  bool meitliCheckbox = false;
+  bool buebeCheckbox = false;
+  bool pioCheckbox = false;
+
   bool validateAndSave() {
     final form = formKey.currentState;
     if (form.validate()) {
@@ -115,93 +121,107 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateAndSubmit() async {
     Platform.isAndroid;
-      
+
     if (validateAndSave()) {
       try {
         switch (_formType) {
           case FormType.login:
-              setState(() {
-              _load =true; 
-              });
+            setState(() {
+              _load = true;
+            });
             userId = await auth0.signInWithEmailAndPassword(_email, _password);
-              print('Sign in: ${userId}');
-              if(userId != null){
-                updatedevtoken();
-                setState(() {
-              _load = false; 
+            print('Sign in: ${userId}');
+            if (userId != null) {
+              updatedevtoken();
+              setState(() {
+                _load = false;
               });
               widget.onSignedIn();
-              }else{
-                setState(() {
-              _load = false; 
+            } else {
+              setState(() {
+                _load = false;
               });
-              }            
+            }
             break;
           case FormType.register:
-          if(_password.length >= 6){
-            if (_password == _passwordneu){
-            if (_selectedstufe != 'Stufe wählen') {
-              setState(() {
-           _load =true; 
-            });
-            await datenschutz.morea_datenschutzerklaerung(context);
-            if(datenschutz.akzeptiert){
-              userId = await auth0
-                        .createUserWithEmailAndPassword(_email, _password);
-              print('Registered user: ${userId}');
-              if (userId != null) {
-                moreafire.createUserInformation(await mapUserData());
-                widget.onSignedIn();
-            }
-             
-              }else{
-                setState(() {
-                  _load =false; 
-                });
-                return null;
+            if (_password.length >= 6) {
+              if (_password == _passwordneu) {
+                if (_selectedstufe != 'Stufe wählen') {
+                  setState(() {
+                    _load = true;
+                  });
+                  await datenschutz.morea_datenschutzerklaerung(context);
+                  if (datenschutz.akzeptiert) {
+                    userId = await auth0.createUserWithEmailAndPassword(
+                        _email, _password);
+                    print('Registered user: ${userId}');
+                    if (userId != null) {
+                      moreafire.createUserInformation(await mapUserData());
+                      widget.onSignedIn();
+                    }
+                  } else {
+                    setState(() {
+                      _load = false;
+                    });
+                    return null;
+                  }
+                } else {
+                  showDialog(
+                      context: context,
+                      child: new AlertDialog(
+                        title: new Text("Bitte eine Stufe wählen!"),
+                      ));
+                }
+              } else {
+                showDialog(
+                    context: context,
+                    child: new AlertDialog(
+                      title: new Text("Passwörter sind nicht identisch"),
+                    ));
               }
             } else {
               showDialog(
                   context: context,
                   child: new AlertDialog(
-                    title: new Text("Bitte eine Stufe wählen!"),
+                    title: new Text(
+                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
                   ));
             }
-          } else {
-            showDialog(
-                context: context,
-                child: new AlertDialog(
-                  title: new Text("Passwörter sind nicht identisch"),
-                ));
-          }
-          }else{
-            showDialog(
-                context: context,
-                child: new AlertDialog(
-                  title: new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
-                ));
-          }
-          
+
             break;
           case FormType.registereltern:
-          if (_password.length >= 6) {
+            if (_password.length >= 6) {
               if (_password == _passwordneu) {
                 if (_selectedverwandtschaft != "Verwandtschaftsgrad wählen") {
-                  setState(() {
-                    _load = true;
-                  });
-                  await datenschutz.morea_datenschutzerklaerung(context);
-                  if(datenschutz.akzeptiert){
-                  userId = await widget.auth
-                      .createUserWithEmailAndPassword(_email, _password);
-                  print('Registered user: ${userId}');
-                  if (userId != null) {
-                    moreafire.createUserInformation(await mapUserData());
+                  if (biberCheckbox ||
+                      woelfeCheckbox ||
+                      meitliCheckbox ||
+                      buebeCheckbox ||
+                      pioCheckbox) {
                     setState(() {
-                      _load = false;
+                      _load = true;
                     });
-                    widget.onSignedIn();
-                  }
+                    await datenschutz.morea_datenschutzerklaerung(context);
+                    if (datenschutz.akzeptiert) {
+                      userId = await widget.auth
+                          .createUserWithEmailAndPassword(_email, _password);
+                      print('Registered user: ${userId}');
+                      if (userId != null) {
+                        moreafire.createUserInformation(await mapUserData());
+                        setState(() {
+                          _load = false;
+                        });
+                        widget.onSignedIn();
+                      }
+                    }
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Stufe auswählen"),
+                          );
+                        });
                   }
                 } else {
                   showDialog(
@@ -228,15 +248,14 @@ class _LoginPageState extends State<LoginPage> {
                   ));
             }
             break;
-         
         }
       } catch (e) {
-        auth0.displayAuthError(auth0.checkForAuthErrors(context, e),context);
+        auth0.displayAuthError(auth0.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
-              _load = false; 
-              });
+      _load = false;
+    });
   }
 
   void moveToRegister() {
@@ -255,44 +274,44 @@ class _LoginPageState extends State<LoginPage> {
     await showDialog<String>(
       context: context,
       builder: (BuildContext context) => new AlertDialog(
-            contentPadding: const EdgeInsets.all(16.0),
-            content: new Row(
-              children: <Widget>[
-                new Expanded(
-                  child: new TextField(
-                    autofocus: true,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: new InputDecoration(
-                      labelText: 'Passwort zurücksetzen',
-                      hintText: 'z.B. maxi@stinkt.undso',
-                    ),
-                    onChanged: (String value) {
-                      this._email = value;
-                    },
-                  ),
-                )
-              ],
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  }),
-              new FlatButton(
-                  child: const Text('Zurücksetzen'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    showDialog(
-                        context: context,
-                        child: new AlertDialog(
-                          title: new Text(
-                              'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
-                        ));
-                    auth0.sendPasswordResetEmail(_email);
-                  })
-            ],
-          ),
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                autofocus: true,
+                keyboardType: TextInputType.emailAddress,
+                decoration: new InputDecoration(
+                  labelText: 'Passwort zurücksetzen',
+                  hintText: 'z.B. maxi@stinkt.undso',
+                ),
+                onChanged: (String value) {
+                  this._email = value;
+                },
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('Zurücksetzen'),
+              onPressed: () {
+                Navigator.pop(context);
+                showDialog(
+                    context: context,
+                    child: new AlertDialog(
+                      title: new Text(
+                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
+                    ));
+                auth0.sendPasswordResetEmail(_email);
+              })
+        ],
+      ),
     );
   }
 
@@ -301,11 +320,49 @@ class _LoginPageState extends State<LoginPage> {
     List devtoken = [token];
     switch (_formType) {
       case FormType.register:
+        if (_selectedstufe == 'Biber') {
+          biberCheckbox = true;
+          woelfeCheckbox = false;
+          meitliCheckbox = false;
+          buebeCheckbox = false;
+          pioCheckbox = false;
+        } else if (_selectedstufe == 'Wombat (Wölfe)') {
+          biberCheckbox = false;
+          woelfeCheckbox = true;
+          meitliCheckbox = false;
+          buebeCheckbox = false;
+          pioCheckbox = false;
+        } else if (_selectedstufe == 'Nahani (Meitli)') {
+          biberCheckbox = false;
+          woelfeCheckbox = false;
+          meitliCheckbox = true;
+          buebeCheckbox = false;
+          pioCheckbox = false;
+        } else if (_selectedstufe == 'Drason (Buebe)') {
+          biberCheckbox = false;
+          woelfeCheckbox = false;
+          meitliCheckbox = false;
+          buebeCheckbox = true;
+          pioCheckbox = false;
+        } else if (_selectedstufe == 'Pios') {
+          biberCheckbox = false;
+          woelfeCheckbox = false;
+          meitliCheckbox = false;
+          buebeCheckbox = false;
+          pioCheckbox = true;
+        }
         Map<String, dynamic> userInfo = {
           'Pfadinamen': this._pfadinamen,
           'Vorname': this._vorname,
           'Nachname': this._nachname,
           'Stufe': this._selectedstufe,
+          'messageGroups': {
+            'Biber': biberCheckbox,
+            'Wombat (Wölfe)': woelfeCheckbox,
+            'Nahani (Meitli)': meitliCheckbox,
+            'Drason (Buebe)': buebeCheckbox,
+            'Pios': pioCheckbox
+          },
           'Adresse': this._adresse,
           'PLZ': this._plz,
           'Ort': this._ort,
@@ -320,10 +377,17 @@ class _LoginPageState extends State<LoginPage> {
       case FormType.registereltern:
         Map<String, dynamic> userInfo = {
           'Pfadinamen': '',
-          'Kinder': <dynamic, dynamic> {},
+          'Kinder': <dynamic, dynamic>{},
           'Vorname': this._vorname,
           'Nachname': this._nachname,
           'Stufe': 'Eltern',
+          'messageGroups': {
+            'Biber': biberCheckbox,
+            'Wombat (Wölfe)': woelfeCheckbox,
+            'Nahani (Meitli)': meitliCheckbox,
+            'Drason (Buebe)': buebeCheckbox,
+            'Pios': pioCheckbox
+          },
           'Adresse': this._adresse,
           'PLZ': this._plz,
           'Ort': this._ort,
@@ -336,6 +400,7 @@ class _LoginPageState extends State<LoginPage> {
         return userInfo;
         break;
       case FormType.login:
+        return null;
         break;
     }
   }
@@ -372,9 +437,9 @@ class _LoginPageState extends State<LoginPage> {
                       key: formKey,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height >= 900.0
+                        height: MediaQuery.of(context).size.height >= 1100.0
                             ? MediaQuery.of(context).size.height
-                            : 900.0,
+                            : 1100.0,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buildInputs(),
@@ -584,7 +649,81 @@ class _LoginPageState extends State<LoginPage> {
                                 _selectedverwandtschaft = newVal;
                                 this.setState(() {});
                               }),
-                        )
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 60,
+                                    child: Text('Biberstufe'),
+                                  ),
+                                  Checkbox(
+                                      value: biberCheckbox,
+                                      onChanged: (bool change) => setState(() {
+                                            biberCheckbox = change;
+                                          })),
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 60,
+                                    child: Text('Wolfsstufe'),
+                                  ),
+                                  Checkbox(
+                                      value: woelfeCheckbox,
+                                      onChanged: (bool change) => setState(() {
+                                            woelfeCheckbox = change;
+                                          })),
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 60,
+                                    child: Text('Meitlipfadi'),
+                                  ),
+                                  Checkbox(
+                                      value: meitliCheckbox,
+                                      onChanged: (bool change) => setState(() {
+                                            meitliCheckbox = change;
+                                          })),
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 60,
+                                    child: Text('Buebepfadi'),
+                                  ),
+                                  Checkbox(
+                                      value: buebeCheckbox,
+                                      onChanged: (bool change) => setState(() {
+                                            buebeCheckbox = change;
+                                          })),
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 60,
+                                    child: Text('Piostufe'),
+                                  ),
+                                  Checkbox(
+                                      value: pioCheckbox,
+                                      onChanged: (bool change) => setState(() {
+                                            pioCheckbox = change;
+                                          })),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
