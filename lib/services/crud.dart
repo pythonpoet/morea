@@ -17,6 +17,9 @@ abstract class BaseCrudMethods {
 
   Future<void> setData(
       String path, String document, Map<dynamic, dynamic> data);
+      
+  Future<void> runTransaction(
+      String path, String document, Map<dynamic, dynamic> data);
 
   Future deletedocument(String path, String document);
 
@@ -28,6 +31,7 @@ abstract class BaseCrudMethods {
 
 class CrudMedthods implements BaseCrudMethods {
   DWIFormat dwiformat = new DWIFormat();
+  var db = Firestore.instance;
 
   Future<QuerySnapshot> getCollection(String path) async {
     path = dwiformat.pathstring(path);
@@ -70,10 +74,8 @@ class CrudMedthods implements BaseCrudMethods {
 
     return value.firstWhere((bool item) => item);
   }
-
   Future<void> setData(
       String path, String document, Map<dynamic, dynamic> data) async {
-    document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
     await Firestore.instance
         .collection(path)
@@ -84,6 +86,17 @@ class CrudMedthods implements BaseCrudMethods {
     });
   }
 
+
+  Future<void> runTransaction(
+      String path, String document, Map<dynamic, dynamic> data) async {
+        document = dwiformat.simplestring(document);
+        path = dwiformat.pathstring(path);
+    DocumentReference docRef = db.collection(path).document(document);
+    db.runTransaction((t) async {
+      t.update(docRef, data);
+      });
+    }
+    
   Future deletedocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
