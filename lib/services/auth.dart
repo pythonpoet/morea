@@ -3,8 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
-import 'package:morea/services/Getteleblitz.dart';
-import 'dwi_core.dart';
+import 'package:morea/services/Teleblitz/Getteleblitz.dart';
+import 'package:morea/services/utilities/dwi_core.dart';
+
 
 //enum PlatformType { isAndroid, isIOS }
 enum AuthProblems {

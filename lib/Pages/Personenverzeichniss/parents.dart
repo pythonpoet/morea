@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
-import 'package:morea/services/qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
-import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/services.dart';
+import 'package:morea/services/utilities/qr_code.dart';
 
 abstract class BaseMergeChildParent {
 
