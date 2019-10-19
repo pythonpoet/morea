@@ -20,7 +20,6 @@ class WerChunt extends StatefulWidget {
 }
 
 class _WerChuntState extends State<WerChunt> {
-  Auth auth0 = new Auth();
   final formKey = new GlobalKey<FormState>();
   Info teleblitzinfo = new Info();
   MoreaFirebase moreafire;

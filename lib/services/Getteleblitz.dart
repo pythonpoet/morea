@@ -225,7 +225,6 @@ class Teleblitz implements BaseTeleblitz {
       );
     }
   }
-
 }
 
 class Info {

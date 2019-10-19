@@ -10,7 +10,11 @@ description: Teleblitz app
 version: 2.0.1+4
 
 environment:
+<<<<<<< HEAD
     sdk: ">=2.2.0 <3.0.0"
+=======
+    sdk: ">=2.1.0 <3.0.0"
+>>>>>>> 6a34820223d576fd5e8878f82efab8970fc9b52b
 
 dependencies:
     flutter:
@@ -20,7 +24,11 @@ dependencies:
     flutter_html: any
     http: any
     intl: any
+<<<<<<< HEAD
     cloud_firestore: ^0.12.9+5
+=======
+    cloud_firestore: ^0.12.9+4
+>>>>>>> 6a34820223d576fd5e8878f82efab8970fc9b52b
     url_launcher: any
     share: any
     expandable: any

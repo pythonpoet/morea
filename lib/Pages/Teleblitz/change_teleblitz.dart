@@ -23,7 +23,7 @@ class ChangeTeleblitz extends StatefulWidget {
 }
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
-  Auth auth0 = Auth();
+  
   MoreaFirebase moreafire;
   String _stufe;
   final _formKey = GlobalKey<FormState>();

@@ -15,11 +15,10 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.onSigedOut, this.crud, this.firestore});
+  HomePage({this.auth, this.onSigedOut, this.firestore});
 
   final BaseAuth auth;
   final VoidCallback onSigedOut;
-  final BaseCrudMethods crud;
   final Firestore firestore;
 
   @override

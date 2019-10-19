@@ -8,9 +8,11 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  MessagesPage({this.userInfo, this.firestore});
+  MessagesPage({this.userInfo, this.firestore, this.auth});
   var userInfo;
   final Firestore firestore;
+  final Auth auth;
+
 
   @override
   State<StatefulWidget> createState() => _MessagesPageState();
@@ -18,7 +20,7 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage> {
   MoreaFirebase firestore;
-  Auth auth0 = Auth();
+ 
   var messages;
   var date;
   var uid;
@@ -64,7 +66,7 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   _getMessages() async {
-    this.uid = await auth0.currentUser();
+    this.uid = await widget.auth.currentUser();
     var userInfo = await firestore.getUserInformation(uid);
     this.stufe = await userInfo.data['Stufe'];
     setState(() {

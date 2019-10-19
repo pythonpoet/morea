@@ -24,7 +24,7 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
-  Auth auth0 = new Auth();
+  
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            userId = await auth0.signInWithEmailAndPassword(_email, _password);
+            userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
             print('Sign in: ${userId}');
             if (userId != null) {
               updatedevtoken();
@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                   });
                   await datenschutz.morea_datenschutzerklaerung(context);
                   if (datenschutz.akzeptiert) {
-                    userId = await auth0.createUserWithEmailAndPassword(
+                    userId = await widget.auth.createUserWithEmailAndPassword(
                         _email, _password);
                     print('Registered user: ${userId}');
                     if (userId != null) {
@@ -256,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
-        auth0.displayAuthError(auth0.checkForAuthErrors(context, e), context);
+        widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
@@ -314,7 +314,7 @@ class _LoginPageState extends State<LoginPage> {
                       title: new Text(
                           'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
                     ));
-                auth0.sendPasswordResetEmail(_email);
+                widget.auth.sendPasswordResetEmail(_email);
               })
         ],
       ),
@@ -357,7 +357,6 @@ class _LoginPageState extends State<LoginPage> {
           buebeCheckbox = false;
           pioCheckbox = true;
         }
-
         Map<String, dynamic> userInfo = {
           'Pfadinamen': this._pfadinamen,
           'Vorname': this._vorname,
