@@ -1,9 +1,8 @@
+import 'package:morea/services/Teleblitz/Getteleblitz.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
-
-import 'Getteleblitz.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'auth.dart';
 import 'crud.dart';
-import 'dwi_format.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:random_string/random_string.dart' as random;
 

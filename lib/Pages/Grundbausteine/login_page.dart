@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/services/auth.dart';
-import 'package:morea/services/bubble_indication_painter.dart';
-import 'package:morea/services/dwi_format.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
+import 'package:morea/services/utilities/bubble_indication_painter.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {

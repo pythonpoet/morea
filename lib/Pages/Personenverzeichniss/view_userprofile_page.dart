@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:morea/services/url_launcher.dart';
+import 'package:morea/services/utilities/url_launcher.dart';
 import 'edit_userprofile_page.dart';
-import 'package:url_launcher/url_launcher.dart';
  
 
 class ViewUserProfilePageState extends StatelessWidget {

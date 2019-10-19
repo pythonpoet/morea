@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/dwi_format.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'Agenda_Eventadd_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'view_Lager_page.dart';

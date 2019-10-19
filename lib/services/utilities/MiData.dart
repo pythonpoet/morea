@@ -1,4 +1,6 @@
-import 'package:morea/services/dwi_format.dart';
+
+
+import 'package:morea/services/utilities/dwi_format.dart';
 
 abstract class BaseMiData{
   String convWebflowtoMiData(String stufe);

@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:morea/services/download_teleblitz.dart' as prefix0;
-import 'package:morea/services/url_launcher.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'dart:convert';
-import 'auth.dart';
-import 'morea_firestore.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:morea/services/utilities/url_launcher.dart';
 
 abstract class BaseTeleblitz {
   Widget anzeigen(String _stufe);

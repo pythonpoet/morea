@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'dart:async';
-import 'dwi_format.dart';
+
 
 abstract class BaseCrudMethods {
   Future<QuerySnapshot> getCollection(String path);
