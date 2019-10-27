@@ -540,7 +540,7 @@ class HomePageState extends State<HomePage> {
               trailing: new Icon(Icons.event),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new AgendaState(
-                        userInfo: qsuserInfo.data,
+                        userInfo: qsuserInfo.data,firestore: widget.firestore,
                       )))),
           new ListTile(
               title: new Text('Personen'),

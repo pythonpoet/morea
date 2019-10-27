@@ -20,6 +20,12 @@ class MiData implements BaseMiData{
         return '3779';
       case 'DrasonBuebe':
         return '4013';
+      case 'Wombat (Wölfe)':
+        return '3776';
+      case 'Nahani (Meitli)':
+        return '3779';
+      case 'Drason (Buebe)':
+        return '4013';
     }
   }
    String convMiDatatoWebflow(String groupID){

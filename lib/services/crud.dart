@@ -97,8 +97,6 @@ class CrudMedthods implements BaseCrudMethods {
 
   Future<void> runTransaction(
       String path, String document, Map<String, dynamic> data) async {
-        document = dwiformat.simplestring(document);
-        path = dwiformat.pathstring(path);
       DocumentReference docRef = db.collection(path).document(document);
 
       try{

@@ -1,17 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/Widgets/info.dart';
+import 'package:morea/morea_strings.dart';
+import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 
 
 
 class EventAddPage extends StatefulWidget{
-  EventAddPage({this.eventinfo, this.agendaModus, this.firestore});
+  EventAddPage({this.eventinfo, this.agendaModus, this.firestore, this.agenda});
   var eventinfo;
   AgendaModus agendaModus;
   final Firestore firestore;
+  final Agenda agenda;
 
   @override
   State<StatefulWidget> createState() => EventAddPageState();
@@ -27,6 +32,8 @@ class EventAddPageState extends State<EventAddPage>{
   MoreaFirebase moreafire;
   DWIFormat dwiFormat= new DWIFormat();
   CrudMedthods crud0;
+  Agenda agenda;
+  MiData miData;
 
  int value = 2;
  List<String> mitnehemen= ['Pfadihämpt'];
@@ -38,12 +45,13 @@ class EventAddPageState extends State<EventAddPage>{
  String eventname = ' ', datum = 'Datum wählen', anfangzeit = 'Zeit wählen', anfangort = ' ', schlusszeit = 'Zeit wählen', schlussort = ' ', beschreibung = ' ', pfadiname = ' ', email = ' ';
  String lagername = ' ', datumvon = 'Datum wählen', datumbis = 'Datum wählen', lagerort = ' ';
  int order;
+ List<Map<dynamic, dynamic>> subgroups;
 
  
 
 
- Map<String, dynamic> Event;
- Map<String, dynamic> Lager;
+ Map<String, dynamic> event, lager;
+ Map<String, bool> goupCheckbox = new Map<String, bool> ();
 
   Map<String, bool> stufen ={
     'Biber' : false,
@@ -70,6 +78,11 @@ class EventAddPageState extends State<EventAddPage>{
      return false;
    }
  }
+ void groupCheckboxinit(List<Map> subgroups){
+   for(Map groupMap in subgroups){
+     this.goupCheckbox[groupMap[userMapgroupID]] = false;
+   }
+ }
  void eventHinzufuegen(_key){
    if(validateAndSave(_key)){
      Map<String, String> kontakt ={
@@ -77,8 +90,8 @@ class EventAddPageState extends State<EventAddPage>{
        'Email' : email
      };
 
-     
-     Event = {
+     this.goupCheckbox.removeWhere((k,v) => v == false);
+     event = {
        'Order': order,
        'Lager': false,
        'Event' : true,
@@ -88,26 +101,14 @@ class EventAddPageState extends State<EventAddPage>{
        'Anfangsort' : anfangort,
        'Schlusszeit' : schlusszeit,
        'Schlussort' : schlussort,
-       'Stufen' : stufen,
+       'groupIDs' : this.goupCheckbox.keys.toList(),
        'Beschreibung': beschreibung,
        'Kontakt' :kontakt,
        'Mitnehmen' : mitnehemen
      };
-     if(stufen['Biber']) {
-      moreafire.uploadtoAgenda('Biber', datum+eventname, Event);
-     }
-     if(stufen['Nahani (Meitli)']) {
-      moreafire.uploadtoAgenda('Nahani (Meitli)', datum+eventname, Event);
-     }
-     if(stufen['Nahani (Meitli)']) {
-      moreafire.uploadtoAgenda('Nahani (Meitli)', datum+eventname , Event);
-     }
-     if(stufen['Drason (Buebe)']) {
-      moreafire.uploadtoAgenda('Drason (Buebe)', datum+eventname, Event);
-     }
-     if(stufen['Pios']) {
-      moreafire.uploadtoAgenda('Pios', datum+eventname, Event);
-     }
+     
+     agenda.uploadtoAgenda(widget.eventinfo, event);
+     
      showDialog(context: context, 
      child: new AlertDialog(
        title: new Text("Event wurde hinzugefügt"),
@@ -123,8 +124,8 @@ class EventAddPageState extends State<EventAddPage>{
        'Email' : email
      };
 
-     
-     Lager = {
+     this.goupCheckbox.removeWhere((k,v) => v == false);
+     lager = {
        'Order': order,
        'Lager': true,
        'Event' : false,
@@ -136,26 +137,13 @@ class EventAddPageState extends State<EventAddPage>{
        'Anfangsort' : anfangort,
        'Schlusszeit' : schlusszeit,
        'Schlussort' : schlussort,
-       'Stufen' : stufen,
+       'groupIDs' : this.goupCheckbox.keys.toList(),
        'Beschreibung': beschreibung,
        'Kontakt' : kontakt,
        'Mitnehmen' : mitnehemen,
      };
-     if(stufen['Biber']) {
-      moreafire.uploadtoAgenda('Biber', datumvon+lagername, Lager);
-      }
-     if(stufen['Nahani (Meitli)']) {
-      moreafire.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
-     }
-     if(stufen['Nahani (Meitli)']) {
-      moreafire.uploadtoAgenda('Nahani (Meitli)', datumvon+lagername, Lager);
-     }
-     if(stufen['Drason (Buebe)']) {
-      moreafire.uploadtoAgenda('Drason (Buebe)', datumvon+lagername, Lager);
-     }
-     if(stufen['Pios']) {
-      moreafire.uploadtoAgenda('Pios', datumvon+lagername, Lager);
-     }
+     
+     agenda.uploadtoAgenda(widget.eventinfo, lager);
      Navigator.pop(context);
    }
  }
@@ -169,7 +157,7 @@ class EventAddPageState extends State<EventAddPage>{
 );
 if (picked != null && picked != datum)
    setState(() {
-    datum = DateFormat('dd-MM-yyyy').format(picked);
+    datum = DateFormat('yyyy-MM-dd').format(picked);
     order = int.parse(DateFormat('yyyyMMdd').format(picked));
    });
  }
@@ -183,7 +171,7 @@ if (picked != null && picked != datum)
 );
 if (picked != null && picked != datumvon)
    setState(() {
-    datumvon = DateFormat('dd-MM-yyyy').format(picked);
+    datumvon = DateFormat('yyyy-MM-dd').format(picked);
     order = int.parse(DateFormat('yyyyMMdd').format(picked));
    });
  }
@@ -197,7 +185,7 @@ if (picked != null && picked != datumvon)
   lastDate: now.add(new Duration(days: 9999)));
   if (picked2 != null && picked2 != datumbis)
    setState(() {
-    datumbis = DateFormat('dd-MM-yyyy').format(picked2);
+    datumbis = DateFormat('yyyy-MM-dd').format(picked2);
    });
  }
  Future<Null> _selectAnfangszeit(BuildContext context)async{
@@ -242,6 +230,7 @@ if (picked != null && picked != datumvon)
       
     );
     if(delete){
+      //TODO alternative
       String name = dwiFormat.simplestring(widget.eventinfo['Datum']+widget.eventinfo['Lagername']);
       crud0.deletedocument('Stufen/Biber/Agenda', name);
       crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
@@ -273,6 +262,7 @@ if (picked != null && picked != datumvon)
       
     );
     if(delete){
+      //agenda.deleteAgendaEvent(groupID, eventID)
       String name = dwiFormat.simplestring(widget.eventinfo['Datum']+widget.eventinfo['Eventname']);
       crud0.deletedocument('Stufen/Biber/Agenda', name);
       crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
@@ -282,6 +272,16 @@ if (picked != null && picked != datumvon)
       Navigator.pop(context);
     }
  }
+//TODO pass Abteilunggoup to this page
+initSubgoup()async{
+  Map<String,dynamic> data = (await crud0.getDocument(pathGroups, "1165")).data;
+  this.subgroups = new List<Map<dynamic, dynamic>>.from(data[groupMapSubgroup]);
+  this.groupCheckboxinit(this.subgroups);
+  setState(() {
+    
+  });
+
+}
   @override
   void initState() {
     datumvon    = widget.eventinfo['Datum'];
@@ -296,7 +296,9 @@ if (picked != null && picked != datumvon)
     order       = widget.eventinfo['Order'];
     moreafire = new MoreaFirebase(widget.firestore);
     crud0 = new CrudMedthods(widget.firestore);
-
+    agenda = new Agenda(widget.firestore);
+    initSubgoup();
+    
     super.initState();
   }
 
@@ -304,7 +306,8 @@ if (picked != null && picked != datumvon)
   Widget build(BuildContext context) {
     switch (widget.agendaModus) {
       case AgendaModus.beides:
-        return DefaultTabController(
+       return this.subgroups.isEmpty? moreaLoadingIndicator():
+         DefaultTabController(
       length: 2,
       child: new Scaffold(
         appBar: new AppBar(
@@ -323,15 +326,16 @@ if (picked != null && picked != datumvon)
         ),
         body: TabBarView(
           children: <Widget>[
-            event(),
-            lager()
+            eventWidget(),
+            lagerWidget()
           ],
         ),
       ),
     );
         break;
       case AgendaModus.event:
-        return Scaffold(
+       return this.subgroups.isEmpty? moreaLoadingIndicator():
+         Scaffold(
           appBar: new AppBar(
             title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
             backgroundColor: Color(0xff7a62ff),
@@ -347,7 +351,7 @@ if (picked != null && picked != datumvon)
                         child: SingleChildScrollView(
                           child: Column(
                             children: <Widget>[
-                              event()
+                              eventWidget()
                                
                             ],
                           )
@@ -360,12 +364,13 @@ if (picked != null && picked != datumvon)
         
           break;
       case AgendaModus.lager:
-       return Scaffold(
+       return this.subgroups.isEmpty? moreaLoadingIndicator():
+       Scaffold(
         appBar: new AppBar(
           title: new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
           backgroundColor: Color(0xff7a62ff),
         ),
-        body: lager()
+        body: lagerWidget()
         );
         break;
 
@@ -405,7 +410,7 @@ if (picked != null && picked != datumvon)
     );
   }
 
-  Widget lager(){
+  Widget lagerWidget(){
     return Container(
      child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
@@ -564,7 +569,7 @@ if (picked != null && picked != datumvon)
                       ),
                       Container(
                           padding: EdgeInsets.all(10),
-                          height: 300,
+                          height: (60 * goupCheckbox.length).toDouble(),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -575,17 +580,18 @@ if (picked != null && picked != datumvon)
                                   flex: 7,
                                   child: new ListView(
                                     physics: NeverScrollableScrollPhysics(),
-                                    children: stufen.keys.map((String key) {
+                                    children: subgroups.map((Map<dynamic,dynamic> group){
+                                      print("group: "+ group.toString());
                                       return new CheckboxListTile(
-                                        title: new Text(key),
-                                        value: stufen[key],
-                                          onChanged: (bool value) {
+                                        title: new Text(group[groupMapgroupNickName]),
+                                        value: goupCheckbox[group[userMapgroupID]],
+                                          onChanged: (bool value){
                                             setState(() {
-                                              stufen[key] = value;
+                                              goupCheckbox[group[userMapgroupID]] = value;
                                             });
-                                          }
+                                          },
                                       );
-                                    }).toList(),
+                                    }).toList()
                                   )
                               )
                             ],
@@ -737,7 +743,7 @@ if (picked != null && picked != datumvon)
       );
   }
 
-  Widget event(){
+  Widget eventWidget(){
     return new Container(
       height: 700,
      child: LayoutBuilder(
@@ -856,7 +862,7 @@ if (picked != null && picked != datumvon)
                       ),
                       Container(
                           padding: EdgeInsets.all(10),
-                          height: 300,
+                          height: (60 * goupCheckbox.length).toDouble(),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -867,17 +873,18 @@ if (picked != null && picked != datumvon)
                                   flex: 7,
                                   child: new ListView(
                                     physics: NeverScrollableScrollPhysics(),
-                                    children: stufen.keys.map((String key) {
+                                    children: subgroups.map((Map<dynamic,dynamic> group){
+                                      print("group: "+ group.toString());
                                       return new CheckboxListTile(
-                                        title: new Text(key),
-                                        value: stufen[key],
-                                          onChanged: (bool value) {
+                                        title: new Text(group[groupMapgroupNickName]),
+                                        value: goupCheckbox[group[userMapgroupID]],
+                                          onChanged: (bool value){
                                             setState(() {
-                                              stufen[key] = value;
+                                              goupCheckbox[group[userMapgroupID]] = value;
                                             });
-                                          }
+                                          },
                                       );
-                                    }).toList(),
+                                    }).toList()
                                   )
                               )
                             ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:morea/morea_strings.dart';
+import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'Agenda_Eventadd_page.dart';
@@ -19,9 +21,9 @@ class _AgendaStatePage extends State<AgendaState> {
   MoreaFirebase moreafire;
   DWIFormat dwiformat = new DWIFormat();
   CrudMedthods crud0;
-
+  prefix0.Agenda agenda;
   String pos = 'Teilnehmer';
-  Stream<QuerySnapshot> qsagenda;
+  Stream<List> sLagenda;
   Map stufen ={
     'Biber':false,
     'Pios':false,
@@ -52,18 +54,18 @@ class _AgendaStatePage extends State<AgendaState> {
  
     
 
- _getAgenda(stufe) async {
-   stufe=dwiformat.simplestring(stufe);
-   qsagenda = moreafire.getAgenda(stufe);
+ Stream<List> _getAgenda(groupID){
+   return agenda.getAgendaOverview(groupID);
  }
-
-  altevernichten(_agedatiteldatum,stufe){
-    stufe = dwiformat.simplestring(stufe);
-    String somdate = _agedatiteldatum.split('-')[2]+'-'+_agedatiteldatum.split('-')[1]+'-'+_agedatiteldatum.split('-')[0];
-    DateTime _agdatum = DateTime.parse(somdate+' 00:00:00.000');
+  //TODO alte vernichten ändern
+  altevernichten(_agedaTitledatum,groupID, eventID){
+    
+    DateTime _agdatum = DateTime.parse(_agedaTitledatum);
     DateTime now = DateTime.now();
+
+    print("diffrence: "+ _agdatum.difference(now).inDays.toString());
     if(_agdatum.difference(now).inDays< 0){
-      crud0.deletedocument('/Stufen/$stufe/Agenda', _agedatiteldatum);
+      agenda.deleteAgendaEvent(groupID, eventID);
     }
   }
   bool istLeiter(){
@@ -76,26 +78,28 @@ class _AgendaStatePage extends State<AgendaState> {
   routetoAddevent(){
     if(istLeiter()){
       Navigator.of(context).push(new MaterialPageRoute(
-              builder: (BuildContext context) => EventAddPage(eventinfo: quickfix,agendaModus: AgendaModus.beides,)));
+              builder: (BuildContext context) => EventAddPage(eventinfo: quickfix, agendaModus: AgendaModus.beides, firestore: widget.firestore,)));
     }
   }
   
 
   @override
   void initState() {
-    _getAgenda(widget.userInfo['Stufe']);
+    moreafire = new MoreaFirebase(widget.firestore);
+    crud0 = new CrudMedthods(widget.firestore);
+    agenda = new prefix0.Agenda(widget.firestore);
+
+    //_getAgenda("3776");
     quickfix['Stufen'] = stufen;
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen']= mitnehmen;
     pos=widget.userInfo['Pos'];
-    moreafire = new MoreaFirebase(widget.firestore);
-    crud0 = new CrudMedthods(widget.firestore);
 
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     if(istLeiter()){
       return new Container(
         child: new Scaffold(
@@ -103,7 +107,7 @@ class _AgendaStatePage extends State<AgendaState> {
         title: new Text('Agenda'),
         backgroundColor: Color(0xff7a62ff),
       ),
-      body: Agenda(widget.userInfo['Stufe']),
+      body: Agenda(widget.userInfo[userMapgroupID]),
       floatingActionButton: Opacity(
         opacity: istLeiter() ? 1.0 : 0.0 ,
         child: new FloatingActionButton(
@@ -120,23 +124,34 @@ class _AgendaStatePage extends State<AgendaState> {
         title: new Text('Agenda'),
         backgroundColor: Color(0xff7a62ff),
       ),
-      body: Agenda(widget.userInfo['Stufe']),
+      body: Agenda(widget.userInfo[userMapgroupID]),
     ));
     }
     
   }
+  viewLager(BuildContext context, Map<String,dynamic> agendaTitle)async{
+    Map<String, dynamic> info = (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+    Navigator.of(context).push(new MaterialPageRoute(
+                                  builder: (BuildContext context) => new ViewLagerPageState(info: info, pos: widget.userInfo['Pos'])));
+  }
+  viewEvent(BuildContext context, Map<String,dynamic> agendaTitle)async{
+    Map<String, dynamic> info = (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+    Navigator.of(context).push(new MaterialPageRoute(
+                                  builder: (BuildContext context) => new ViewEventPageState(info: info ,pos: widget.userInfo['Pos'], 
+                                  )));
+  }
 
-  Widget Agenda(stufe) {
+  Widget Agenda(String groupID) {
     return StreamBuilder(
-        stream: qsagenda,
-        builder: (context, AsyncSnapshot<QuerySnapshot> qsagenda) {
-          if (!qsagenda.hasData) return Center(child:Text('Laden... einen Moment bitte', style: TextStyle(fontSize: 20),));
-          if(qsagenda.data.documents.length==0)return Center(child:Text('Keine Events/Lager eingetragen', style: TextStyle(fontSize: 20),));
+        stream: _getAgenda(groupID).asBroadcastStream(),
+        builder: (context, AsyncSnapshot<List> slagenda) {
+          if (!slagenda.hasData) return Center(child:Text('Laden... einen Moment bitte', style: TextStyle(fontSize: 20),));
+          if(slagenda.data.length==0)return Center(child:Text('Keine Events/Lager eingetragen', style: TextStyle(fontSize: 20),));
           return ListView.builder(
-              itemCount: qsagenda.data.documents.length,
+              itemCount: slagenda.data.length,
               itemBuilder: (context, int index) {
-                final DocumentSnapshot _info = qsagenda.data.documents[index];
-                altevernichten(_info['Datum'],stufe);
+                final Map<String, dynamic> _info = Map<String, dynamic>.from(slagenda.data[index]);
+                altevernichten(_info['Datum'], groupID, _info[groupMapEventID]);
                 
                 if(_info['Event']){
                     return new ListTile(
@@ -162,7 +177,7 @@ class _AgendaStatePage extends State<AgendaState> {
                             Expanded(flex: 3, child: new Text(_info['Datum'].toString())),
                             Expanded(
                               flex: 5,
-                              child: new Text(_info.data['Eventname'].toString()),
+                              child: new Text(_info['Eventname'].toString()),
                             ),
                             Expanded(
                               flex: 2,
@@ -170,8 +185,7 @@ class _AgendaStatePage extends State<AgendaState> {
                             )
                           ],
                         )),
-                        onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (BuildContext context) => new ViewEventPageState(info: _info ,pos: widget.userInfo['Pos'],))),
+                        onTap: () => viewEvent(context, _info) 
                         );
                 }else if(_info['Lager']){
                    return new ListTile(
@@ -190,7 +204,7 @@ class _AgendaStatePage extends State<AgendaState> {
                             Expanded(flex: 3, child: new Text(_info['Datum'].toString())),
                             Expanded(
                               flex: 5,
-                              child: new Text(_info.data['Lagername'].toString()),
+                              child: new Text(_info['Lagername'].toString()),
                             ),
                             Expanded(
                               flex: 2,
@@ -209,9 +223,10 @@ class _AgendaStatePage extends State<AgendaState> {
                             )
                           ],
                         )),
-                        onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (BuildContext context) => new ViewLagerPageState(info: _info, pos: widget.userInfo['Pos']))),
+                        onTap: () => viewLager(context, _info)
                         );
+                }else{
+                  return SizedBox();
                 }
                
               });
