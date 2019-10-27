@@ -9,7 +9,7 @@ import 'dart:async';
 abstract class BaseAgenda{
   Stream<List<dynamic>> getAgendaOverview(String groupID);
   Future<DocumentSnapshot> getAgendaTitle(String eventID);
-  Future<void> deleteAgendaEvent(String groupID, eventID);
+  Future<void> deleteAgendaEvent(Map<String, dynamic> event);
   Future<void> deleteAgendaOverviewTitle(String groupID, String eventID);
   Future<void> uploadtoAgenda(Map<String, dynamic> dataold, Map<String, dynamic> data);
   Future<void> updateAgendaTitles(String groupID, Map<String, dynamic> agendaTitle);
@@ -39,8 +39,13 @@ class Agenda extends BaseAgenda{
    return await crud0.getDocument(pathEvents, eventID);
    
   }
-  Future<void> deleteAgendaEvent(String groupID, eventID)async{
+  Future<void> deleteAgendaEvent(Map<String, dynamic> event)async{
+    List<String> groupIDs = event["groupIDs"];
+    String eventID = event["eventID"];
+    for(String groupID in groupIDs){
     this.deleteAgendaOverviewTitle(groupID, eventID);
+    }
+    
     return await crud0.deletedocument(pathEvents, eventID);
   }
   Future<void> deleteAgendaOverviewTitle(String groupID, String eventID)async{

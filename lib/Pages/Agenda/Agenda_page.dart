@@ -57,15 +57,14 @@ class _AgendaStatePage extends State<AgendaState> {
  Stream<List> _getAgenda(groupID){
    return agenda.getAgendaOverview(groupID);
  }
-  //TODO alte vernichten ändern
-  altevernichten(_agedaTitledatum,groupID, eventID){
+
+  altevernichten(_agedaTitledatum,groupID, Map<String, dynamic> event){
     
     DateTime _agdatum = DateTime.parse(_agedaTitledatum);
     DateTime now = DateTime.now();
 
-    print("diffrence: "+ _agdatum.difference(now).inDays.toString());
     if(_agdatum.difference(now).inDays< 0){
-      agenda.deleteAgendaEvent(groupID, eventID);
+      agenda.deleteAgendaEvent(event);
     }
   }
   bool istLeiter(){
@@ -151,7 +150,7 @@ class _AgendaStatePage extends State<AgendaState> {
               itemCount: slagenda.data.length,
               itemBuilder: (context, int index) {
                 final Map<String, dynamic> _info = Map<String, dynamic>.from(slagenda.data[index]);
-                altevernichten(_info['Datum'], groupID, _info[groupMapEventID]);
+                altevernichten(_info['Datum'], groupID, _info);
                 
                 if(_info['Event']){
                     return new ListTile(
