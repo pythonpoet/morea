@@ -1,3 +1,4 @@
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/Getteleblitz.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
@@ -54,11 +55,17 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
+  Map<String,dynamic> userMap, groupMap;
   
 
   MoreaFirebase(Firestore firestore){
     crud0 = new CrudMedthods(firestore);
     tbz = new TeleblizFirestore(firestore);
+
+  }
+  Future<void> initFirestore(String userID)async{
+    userMap = (await crud0.getDocument(pathUser, userID)).data;
+    groupMap = (await crud0.getDocument(pathGroups, userMap[userMapgroupID])).data;
   }
 
   Future<void> createUserInformation(Map userInfo) async {

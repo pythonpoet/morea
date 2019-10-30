@@ -125,6 +125,7 @@ class HomePageState extends State<HomePage> {
 
   void getuserinfo() async {
     _userUID = await widget.auth.currentUser();
+    moreafire.initFirestore(_userUID);
     var results = await moreafire.getUserInformation(_userUID);
     setState(() {
       qsuserInfo = results;
@@ -191,6 +192,7 @@ class HomePageState extends State<HomePage> {
     super.initState();
     moreafire = new MoreaFirebase(widget.firestore);
     crud0 = new CrudMedthods(widget.firestore);
+    
     
 
     firebaseMessaging.configure(
@@ -528,12 +530,13 @@ class HomePageState extends State<HomePage> {
                     image: new NetworkImage(
                         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
           ),
+          //TODO eventID übertragen
           new ListTile(
               title: new Text('Wer chunt?'),
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new WerChunt(
-                        userInfo: qsuserInfo.data,
+                         firestore: widget.firestore,
                       )))),
           new ListTile(
               title: new Text('Agenda'),

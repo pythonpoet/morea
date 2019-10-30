@@ -17,6 +17,7 @@ final String pathGroups = "groups";
 final String pathMessages= "messages";
 final String pathUser = "user";
 final String pathConfig = "config";
+final String pathAnmeldungen="Anmeldungen";
 
 //Maps
 
@@ -29,3 +30,9 @@ final String userMapGroupEdditingAllow = "groupEdditingAllow";
 final String groupMapEventID = "eventID";
 final String groupMapgroupNickName = "groupNickName";
 final String groupMapSubgroup = "subgroups";
+final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
+
+//eventMap
+final String eventMapAnmeldeStatusNegativ = "Chunt nöd";
+final String eventMapAnmeldeStatusPositiv = "Chunt";
+final String eventMapAnmeldeUID = "AnmeldeUID";

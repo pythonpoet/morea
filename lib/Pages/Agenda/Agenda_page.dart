@@ -56,6 +56,7 @@ class _AgendaStatePage extends State<AgendaState> {
 
  Stream<List> _getAgenda(groupID){
    return agenda.getAgendaOverview(groupID);
+ 
  }
 
   altevernichten(_agedaTitledatum,groupID, Map<String, dynamic> event){

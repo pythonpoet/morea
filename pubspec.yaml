@@ -10,7 +10,7 @@ description: Teleblitz app
 version: 2.0.1+4
 
 environment:
-    sdk: ">=2.2.0 <3.0.0"
+    sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
     flutter:
@@ -28,6 +28,7 @@ dependencies:
     qrcode_reader: any
     random_string: any
     barcode_scan: ^1.0.0
+    rxdart: ^0.22.4
 
 
     shared_preferences: any
