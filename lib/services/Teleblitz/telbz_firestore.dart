@@ -17,15 +17,14 @@ abstract class BaseTeleblitzFirestore {
 class TeleblizFirestore implements BaseTeleblitzFirestore {
   CrudMedthods crud0;
 
-
   TeleblizFirestore(Firestore firestore) {
     crud0 = CrudMedthods(firestore);
   }
   
   Future<String> getTelbzAkt(String groupnr) async {
     try {
-      DocumentSnapshot akteleblitz = await crud0.getDocument('groups', groupnr);
-      return akteleblitz.data['AktuellerTeleblitz'];
+      DocumentSnapshot akteleblitz = await crud0.getDocument(pathGroups, groupnr);
+      return akteleblitz.data[groupMapAktuellerTeleblitz];
     } catch (e) {
       print(e.toString());
       return DateTime.parse('2019-03-07T13:30:16.388642').toString();
@@ -34,7 +33,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
 
   Future<Map> getTelbz(String eventID) async {
     try {
-      return (await crud0.getDocument('groups', eventID)).data;
+      return (await crud0.getDocument(pathGroups, eventID)).data;
     } catch (e) {
       print(e);
       return null;
@@ -42,16 +41,16 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   }
 
   Future<bool> eventIDExists(eventID) async {
-    DocumentSnapshot doc = await crud0.getDocument("events", eventID);
+    DocumentSnapshot doc = await crud0.getDocument(pathEvents, eventID);
     return doc.exists;
   }
 
   Future<void> uploadTelbzAkt(String groupnr, Map<String, dynamic> data) async {
-    return await crud0.runTransaction('groups', groupnr, data);
+    return await crud0.runTransaction(pathGroups, groupnr, data);
   }
 
   Future<void> uploadTelbz(String eventID, Map<String, dynamic> data) async {
     data['Timestamp'] = DateTime.now().toString();
-    return await crud0.runTransaction('events', eventID, data);
+    return await crud0.runTransaction(pathEvents, eventID, data);
   }
 }

@@ -8,44 +8,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:random_string/random_string.dart' as random;
 
 abstract class BaseMoreaFirebase {
+  String get getDisplayName;
+  String get getPfandiName;
+  String get getGroupID;
+  String get getVorName;
+  String get getNachName;
+  String get getPos;
+  String get getMessagingGroups;
+  String get getEventID;
+  List<String> get getSubscribedGroups;
+  Map<String,dynamic> get getGroupMap;
+  Map<String,dynamic> get getUserMap;
+
   Future<void> createUserInformation(Map userInfo);
-
   Future<void> updateUserInformation(String userUID, Map userInfo);
-
   Future<DocumentSnapshot> getUserInformation(String userUID);
-
   Stream<QuerySnapshot> getChildren();
-
   Future<void> pendParent(
       String child_UID, String parent_UID, String parent_name);
-
   Stream<DocumentSnapshot> streamPendingParents(String child_UID);
-
   Future<void> setChildToParent(
       String child_UID, String parent_UID, String child_name);
-
-  Future<void> uebunganmelden(
-      String eventID, String userUID, String anmeldeUID, String anmeldeStatus);
-
-  Future<QuerySnapshot> getTNs(String groupnr, String datum);
-
-  Future<Map> getteleblitz(String groupnr);
-
-  Future uploadteleblitz(String groupnr, Map data);
-
-  Future<bool> refreshteleblitz(String groupnr);
-
-  Stream<QuerySnapshot> getAgenda(String groupnr);
-
-  Future uploadtoAgenda(String groupnr, String name, Map data);
-
   Future<void> uploaddevtocken(
       var messagingGroups, String token, String userUID);
-
   Stream<QuerySnapshot> getMessages(String groupnr);
-
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
-
   String upLoadChildRequest(String childUID);
 }
 
@@ -55,22 +42,48 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
-  Map<String,dynamic> userMap, groupMap;
-  
+  Map<String,dynamic> _userMap, _groupMap;
+  String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID;
+  dynamic _messagingGroups;
+  List<String> _subscribedGroups;
 
   MoreaFirebase(Firestore firestore){
     crud0 = new CrudMedthods(firestore);
     tbz = new TeleblizFirestore(firestore);
-
+    getData(auth0.getUserID);
   }
-  Future<void> initFirestore(String userID)async{
-    userMap = (await crud0.getDocument(pathUser, userID)).data;
-    groupMap = (await crud0.getDocument(pathGroups, userMap[userMapgroupID])).data;
+  String get getDisplayName => _displayName;
+  String get getPfandiName => _pfadiName;
+  String get getGroupID => _groupID;
+  String get getVorName => _vorName;
+  String get getNachName => _nachName;
+  String get getPos => _pos;
+  String get getMessagingGroups => _messagingGroups;
+  String get getEventID => _eventID;
+  List<String> get getSubscribedGroups => _subscribedGroups;
+  Map<String,dynamic> get getGroupMap => _groupMap;
+  Map<String,dynamic> get getUserMap => _userMap;
+
+  Future<void> getData(String userID)async{
+    _userMap = (await crud0.getDocument(pathUser, userID)).data;
+    _groupMap = (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+    _pfadiName = _userMap[userMapPfadiName];
+    _groupID = _userMap[userMapgroupID];
+    _vorName = _userMap[userMapVorName];
+    _nachName = _userMap[userMapNachName];
+    _pos = _userMap[userMapPos];
+    _messagingGroups = List<String>.from(_userMap[userMapMessagingGroups]);
+    _eventID = _groupMap[groupMapEventID];
+    _subscribedGroups = _userMap[userMapSubscribedGroups];
+    if(_pfadiName == '')
+      _displayName = _vorName;
+    else
+      _displayName = _pfadiName;
   }
 
   Future<void> createUserInformation(Map userInfo) async {
     String userUID = await auth0.currentUser();
-    await crud0.setData('user', userUID, userInfo);
+    await crud0.setData(pathUser, userUID, userInfo);
     return null;
   }
 
@@ -79,19 +92,18 @@ class MoreaFirebase extends BaseMoreaFirebase {
     Map userInfo,
   ) async {
     userUID = dwiformat.simplestring(userUID);
-    await crud0.setData('user', userUID, userInfo);
+    await crud0.setData(pathUser, userUID, userInfo);
     return null;
   }
 
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
-    return await crud0.getDocument('user', userUID);
+    return await crud0.getDocument(pathUser, userUID);
   }
-  Future<DocumentSnapshot> getGroupInformation(String groupID)async{
-    return await crud0.getDocument("groups", groupID);
-  }
-
+  Future<Map<String,dynamic>> getGroupInformation(groupID)async =>
+     Map<String,dynamic>.from((await crud0.getDocument(pathGroups, groupID)).data);
+    
   Stream<QuerySnapshot> getChildren() {
-    return crud0.streamCollection('user');
+    return crud0.streamCollection(pathUser);
   }
 
   //Funktioniert das wück?
@@ -113,7 +125,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Stream<DocumentSnapshot> streamPendingParents(String childUID) {
-    return crud0.streamDocument('user', childUID);
+    return crud0.streamDocument(pathUser, childUID);
   }
 
   Future<void> setChildToParent(
@@ -134,7 +146,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> uebunganmelden(
       String eventID, String userUID, String anmeldeUID, String anmeldeStatus) async {
-        crud0.runTransaction("events/$eventID/Anmeldungen", anmeldeUID, Map<String, dynamic>.from({
+        crud0.runTransaction("$pathEvents/$eventID/Anmeldungen", anmeldeUID, Map<String, dynamic>.from({
       "AnmeldeStatus":  anmeldeStatus,
       "AnmedeUID":      anmeldeUID,
       "UID":            userUID,
@@ -147,8 +159,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
     String eventID =  groupID +  data['datum'].toString().replaceAll('Samstag, ', '');
     Map<String, String> akteleblitz = {
       'AktuellerTeleblitz': eventID
-    };
-       
+    };  
     await tbz.uploadTelbzAkt(groupID, akteleblitz);
     return await tbz.uploadTelbz(eventID, data);
   }
@@ -183,13 +194,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return false;
   }
 
-    //TODO Telebliz 
-  Future<QuerySnapshot> getTNs(String stufe, String datum) async {
-    /*
-    String uebungsdatum = teleblitzinfo.datum;
-    stufe = dwiformat.simplestring(stufe);
-    return await crud0.getCollection('uebung/$stufe/$datum');*/
-  }
 
   Stream<QuerySnapshot> getAgenda(String groupnr) {
     return crud0.streamOrderCollection('groups/$groupnr/Agenda', 'Order');

@@ -40,26 +40,22 @@ class HomePageState extends State<HomePage> {
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.loading;
-  Anmeldung _anmeldung = Anmeldung.verchilt;
+  
 
-  String _pfadiname = 'Loading...',
-      _userUID = ' ',
-      _groupID = '@',
-      _email = 'Loading...',
-      _eventID;
-  DocumentSnapshot qsuserInfo, groupInfo;
-  Map<String, dynamic> anmeldeDaten;
+  
+  
+  Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
   var messagingGroups;
 
   
 
   void submit({@required String anabmelden, String groupnr}) {
-    _eventID = tlbz.getEventID();
+    
     if (_formType != FormType.eltern) {
       String anmeldung;
-      print(qsuserInfo.data['Pfadinamen']);
-      anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
+
+      anmeldeDaten = {'Anmeldename': moreafire.getDisplayName, 'Anmeldung': anabmelden};
       if (anabmelden == 'Chunt') {
         anmeldung = 'Du hast dich Angemolden';
         chunnt = true;
@@ -67,7 +63,7 @@ class HomePageState extends State<HomePage> {
         anmeldung = 'Du hast dich Abgemolden';
         chunnt = false;
       }                       
-      moreafire.uebunganmelden(_eventID, _userUID, _userUID, anabmelden);
+      moreafire.uebunganmelden(moreafire.getEventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden);
       showDialog(
           context: context,
           child: new AlertDialog(
@@ -82,17 +78,17 @@ class HomePageState extends State<HomePage> {
               title: Text('Kind auswählen'),
               content: ListView.builder(
                 shrinkWrap: true,
-                itemCount: qsuserInfo.data['Kinder'].length,
+                itemCount: moreafire.getUserMap['Kinder'].length,
                 itemBuilder: (BuildContext context, int index) {
                   var namekind =
-                      List.from(qsuserInfo.data['Kinder'].keys)[index];
+                      List.from(moreafire.getUserMap['Kinder'].keys)[index];
                   var uidkind =
-                      List.from(qsuserInfo.data['Kinder'].values)[index];
+                      List.from(moreafire.getUserMap['Kinder'].values)[index];
                   return ListTile(
                     title: Text(namekind),
                     onTap: () {
                       String anmeldung;
-                      print(qsuserInfo.data['Pfadinamen']);
+                      print(moreafire.getUserMap['Pfadinamen']);
                       anmeldeDaten = {
                         'Anmeldename': namekind,
                         'Anmeldung': anabmelden
@@ -102,7 +98,7 @@ class HomePageState extends State<HomePage> {
                       } else {
                         anmeldung = 'Du hast dich Abgemolden';
                       }
-                      moreafire.uebunganmelden(_eventID ,_userUID , uidkind , anabmelden );
+                      moreafire.uebunganmelden(moreafire.getEventID , widget.auth.getUserID , uidkind , anabmelden );
                       showDialog(
                           context: context,
                           child: new AlertDialog(
@@ -120,33 +116,14 @@ class HomePageState extends State<HomePage> {
 
   void getdevtoken() async {
     var token = await firebaseMessaging.getToken();
-    moreafire.uploaddevtocken(messagingGroups, token, _userUID);
+    moreafire.uploaddevtocken(messagingGroups, token, widget.auth.getUserID);
   }
-
+  
   void getuserinfo() async {
-    _userUID = await widget.auth.currentUser();
-    moreafire.initFirestore(_userUID);
-    var results = await moreafire.getUserInformation(_userUID);
-    setState(() {
-      qsuserInfo = results;
-      _pfadiname = qsuserInfo.data['Pfadinamen'];
-      _groupID = qsuserInfo.data['groupID'];
-      _email = qsuserInfo.data['Email'];
-      messagingGroups = qsuserInfo.data['messagingGroups'];
-    
-      try {
-        if (_pfadiname == '') {
-          _pfadiname = qsuserInfo.data['Vorname'];
-        }
-      } catch (e) {
-        print(e);
-      }
       forminit();
       getdevtoken();
-    });
-    groupInfo = await moreafire.getGroupInformation(_groupID);
-    tlbz = new Teleblitz(widget.firestore, groupInfo.data);
-    //submit(anabmelden: "Chunt");
+
+    tlbz = new Teleblitz(widget.firestore, moreafire.getGroupMap);
   }
 
   void _signedOut() async {
@@ -160,7 +137,7 @@ class HomePageState extends State<HomePage> {
 
   void forminit() {
     try {
-      switch (qsuserInfo.data['Pos']) {
+      switch (moreafire.getPos) {
         case 'Teilnehmer':
           _formType = FormType.teilnehmer;
           break;
@@ -185,7 +162,6 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void check4anmeldung() {}
 
   @override
   void initState() {
@@ -401,7 +377,7 @@ class HomePageState extends State<HomePage> {
                     child: SingleChildScrollView(
                         child: Column(
                       children: <Widget>[
-                        tlbz.anzeigen(_groupID),
+                        tlbz.anzeigen(moreafire.getGroupID),
                         Text("Teleblitz"),
                         anmeldebutton()
                       ],
@@ -522,8 +498,8 @@ class HomePageState extends State<HomePage> {
       case FormType.leiter:
         return [
           new UserAccountsDrawerHeader(
-            accountName: new Text(_pfadiname),
-            accountEmail: new Text(_email),
+            accountName: new Text(moreafire.getDisplayName),
+            accountEmail: new Text(widget.auth.getUserEmail),
             decoration: new BoxDecoration(
                 image: new DecorationImage(
                     fit: BoxFit.fill,
@@ -543,7 +519,7 @@ class HomePageState extends State<HomePage> {
               trailing: new Icon(Icons.event),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new AgendaState(
-                        userInfo: qsuserInfo.data,firestore: widget.firestore,
+                        userInfo: moreafire.getUserMap,firestore: widget.firestore,
                       )))),
           new ListTile(
               title: new Text('Personen'),
@@ -567,8 +543,8 @@ class HomePageState extends State<HomePage> {
       case FormType.teilnehmer:
         return [
           new UserAccountsDrawerHeader(
-            accountName: new Text(_pfadiname),
-            accountEmail: new Text(_email),
+            accountName: new Text(moreafire.getDisplayName),
+            accountEmail: new Text(widget.auth.getUserEmail),
             decoration: new BoxDecoration(
                 image: new DecorationImage(
                     fit: BoxFit.fill,
@@ -580,13 +556,13 @@ class HomePageState extends State<HomePage> {
               trailing: new Icon(Icons.event),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      new AgendaState(userInfo: qsuserInfo.data)))),
+                      new AgendaState(userInfo: moreafire.getUserMap)))),
           new ListTile(
               title: new Text('Profil'),
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: qsuserInfo.data,
+                        profile: moreafire.getUserMap,
                       )))),
           ListTile(
               title: Text('Profil'),
@@ -609,12 +585,10 @@ class HomePageState extends State<HomePage> {
         ];
         break;
       case FormType.eltern:
-        print(this._pfadiname);
-        print(this._email);
         return [
           new UserAccountsDrawerHeader(
-            accountName: Text(this._pfadiname),
-            accountEmail: Text(this._email),
+            accountName: Text(moreafire.getDisplayName),
+            accountEmail: Text(widget.auth.getUserEmail),
             decoration: new BoxDecoration(
                 image: new DecorationImage(
                     fit: BoxFit.fill,
@@ -626,20 +600,20 @@ class HomePageState extends State<HomePage> {
               trailing: new Icon(Icons.event),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      new AgendaState(userInfo: qsuserInfo.data)))),
+                      new AgendaState(userInfo: moreafire.getUserMap)))),
           new ListTile(
               title: new Text('Profil'),
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: qsuserInfo.data,
+                        profile: moreafire.getUserMap,
                       )))),
           ListTile(
             title: Text('Kind hinzufügen'),
             trailing: Icon(Icons.person_add),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) =>
-                    AddChild(widget.auth, qsuserInfo.data, widget.firestore))),
+                    AddChild(widget.auth, moreafire.getUserMap, widget.firestore))),
           ),
           ListTile(
               title: Text('Profil'),
@@ -699,7 +673,7 @@ class HomePageState extends State<HomePage> {
                   child:
                       new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
                   onPressed: () =>
-                      submit(anabmelden: 'Chunt nöd', groupnr: _groupID),
+                      submit(anabmelden: 'Chunt nöd', groupnr: moreafire.getGroupID),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                 ),
@@ -709,7 +683,7 @@ class HomePageState extends State<HomePage> {
                   child: new RaisedButton(
                     child:
                         new Text('Chume', style: new TextStyle(fontSize: 20)),
-                    onPressed: () => submit(anabmelden: 'Chunt', groupnr: _groupID),
+                    onPressed: () => submit(anabmelden: 'Chunt', groupnr: moreafire.getGroupID),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Color(0xff7a62ff),

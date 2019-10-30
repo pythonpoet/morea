@@ -1,15 +1,14 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart';
 import 'package:morea/morea_strings.dart';
-import 'package:morea/services/Teleblitz/download_teleblitz.dart';
 import 'package:morea/services/crud.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class BaseTeleblitzAnmeldungen{
    Stream<List<String>> getTNAngemolden(String eventID);
    Stream<List<String>> getTNAbgemolden(String eventID);
+   Stream<List<String>> get getAnmeldungen;
+   Stream<List<String>> get getAbmeldungen;
 }
 class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen{
   StreamController<List<String>> _anmeldeController = new BehaviorSubject();

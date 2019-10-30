@@ -24,7 +24,12 @@ final String pathAnmeldungen="Anmeldungen";
 //userMap
 final String userMapgroupID = "groupID";
 final String userMapGroupEdditingAllow = "groupEdditingAllow";
-
+final String userMapPfadiName = "Pfadinamen";
+final String userMapNachName = "Nachname";
+final String userMapVorName = "Vorname";
+final String userMapPos = "Pos";
+final String userMapMessagingGroups ="messagingGroups";
+final String userMapSubscribedGroups = "subscribedGroups";
 
 //groupMap
 final String groupMapEventID = "eventID";
