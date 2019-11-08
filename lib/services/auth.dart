@@ -44,8 +44,8 @@ class Auth implements BaseAuth {
   DWICore dwiHardware = new DWICore();
   FirebaseUser _user;
 
-  String get getUserID => _user.uid;
-  String get getUserEmail => _user.email;
+  String get getUserID => _user != null? _user.uid: "not loaded";
+  String get getUserEmail => _user != null? _user.email: "nod loaded";
 
   Future<String> signInWithEmailAndPassword(String email, String password)async{
     this._user = (await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).catchError((onError){
@@ -76,18 +76,18 @@ class Auth implements BaseAuth {
   }
 
   Future<String> currentUser() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user != null ? user.uid : null;
+    this._user = await _firebaseAuth.currentUser();
+    return _user != null ? _user.uid : null;
   }
 
   Future<String> userEmail() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user != null ? user.email : null;
+    this._user = await _firebaseAuth.currentUser();
+    return _user != null ? _user.email : null;
   }
 
   Future<void> changePassword(String newPassword) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    user.updatePassword(newPassword);
+    this._user = await _firebaseAuth.currentUser();
+    _user.updatePassword(newPassword);
     return null;
   }
 

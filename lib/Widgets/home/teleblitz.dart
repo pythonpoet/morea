@@ -1,109 +1,56 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/morea_strings.dart';
-import 'dart:async';
+import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 
-abstract class BaseTeleblitz {
-  Widget anzeigen(String _stufe);
-  Future<Info> getInfos(String filter);
-  String _formatDate(String date); 
-}
 
-class Teleblitz implements BaseTeleblitz {
-  MoreaFirebase moreafire;
-  bool block = false;
-  Map groupData;
-  String eventID,groupID;
-
-
-  Teleblitz(Firestore firestore, Map<String,dynamic> groupData){
-    moreafire = new MoreaFirebase(firestore);
-    this.groupData = groupData;
-    groupID = groupData["groupID"];
-    if(groupData.containsKey("AktuellerTeleblitz")){
-      eventID = groupData["AktuellerTeleblitz"];
-    }
+class Teleblitz{
+  MoreaFirebase moreaFire;
+  Info info = new Info();
+  Teleblitz(MoreaFirebase moreaFire){
+    this.moreaFire = moreaFire;
   }
-  String getEventID(){
-    return this.eventID;
-  }
-
-    
   
-
-  String _formatDate(String date) {
-    if (date != '' && date!=null) {
-      String rawDate = date.split('T')[0];
-      List<String> dates = rawDate.split('-');
-      String formatedDate = dates[2] + '.' + dates[1] + '.' + dates[0];
-      return formatedDate;
-    } else {
-      return '';
-    }
+  void defineInfo(Map<String, dynamic> tlbz, groupID){
+    info.setTitel(convMiDatatoWebflow(groupID));
+    info.setDatum(tlbz["datum"]);
+    info.setAntreten(tlbz["antreten"]);
+    info.setAntretenMaps(tlbz["google-map"]);
+    info.setAbtreten(tlbz["abtreten"]);
+    info.setAbtretenMaps(tlbz["map-abtreten"]);
+    info.setBemerkung(tlbz["bemerkung"]);
+    info.setSender(tlbz["name-des-senders"]);
+    info.setMitnehmen(tlbz['mitnehmen-test']);
+    info.setkeineAktivitat(tlbz['keine-aktivitat']);
+    info.setGrund(tlbz['grund']);
+    info.setFerien(tlbz['ferien']);
+    info.setEndeFerien(tlbz['ende-ferien']);
   }
 
-  Future<Info> getInfos(String filter) async {
-    var jsonData;
-    var data;
-    var info = new Info();
-    String groupID = filter;
 
-    if (groupID != '@') {
-        await moreafire.getteleblitz(eventID).then((result) {
-          info.setTitel(convMiDatatoWebflow(groupID));
-          info.setDatum(result["datum"]);
-          info.setAntreten(result["antreten"]);
-          info.setAntretenMaps(result["google-map"]);
-          info.setAbtreten(result["abtreten"]);
-          info.setAbtretenMaps(result["map-abtreten"]);
-          info.setBemerkung(result["bemerkung"]);
-          info.setSender(result["name-des-senders"]);
-          info.setMitnehmen(result['mitnehmen-test']);
-          info.setkeineAktivitat(result['keine-aktivitat']);
-          info.setGrund(result['grund']);
-          info.setFerien(result['ferien']);
-          info.setEndeFerien(result['ende-ferien']);
-        });
-      }
-      return info;
-    }
-        
-
-  Widget anzeigen(String _stufe) {
-    try {
-      return new StreamBuilder(
-          stream: Firestore.instance.collection(pathEvents).document(_stufe).snapshots(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.data == null) {
-              return Container(
-                child: Center(
-                    child: Container(
-                  padding: EdgeInsets.all(120),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: new Text('Loading...'),
-                      ),
-                      Expanded(child: new CircularProgressIndicator())
-                    ],
-                  ),
-                )),
-              );
-            } else {
-              if (snapshot.data.keineaktivitat == 'true') {
-                return Container(
+  Widget loadingScreen(Function navigation){
+    return Scaffold(
+          appBar: AppBar(
+            title: Text('Teleblitz'),
+          ),
+          drawer: new Drawer(
+            child: new ListView(children: navigation()),
+          ),
+          body: moreaLoadingIndicator()
+        );
+  }
+  Widget keineAktivitat(){
+    return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
                   child: Column(
                     children: <Widget>[
-                      snapshot.data.getTitel(),
-                      snapshot.data.getKeineAktivitat(),
-                      snapshot.data.getDatum(),
-                      snapshot.data.getGrund()
+                      info.getTitel(),
+                      info.getKeineAktivitat(),
+                      info.getDatum(),
+                      info.getGrund()
                     ],
                   ),
                   decoration: BoxDecoration(color: Colors.white, boxShadow: [
@@ -113,16 +60,17 @@ class Teleblitz implements BaseTeleblitz {
                         blurRadius: 40)
                   ]),
                 );
-              } else if (snapshot.data.ferien == 'true') {
-                return Container(
+  }
+  Widget ferien(){
+    return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
                   child: Column(
                     children: <Widget>[
-                      snapshot.data.getTitel(),
-                      snapshot.data.getKeineAktivitat(),
-                      snapshot.data.getFerien(),
-                      snapshot.data.getEndeFerien(),
+                      info.getTitel(),
+                      info.getKeineAktivitat(),
+                      info.getFerien(),
+                      info.getEndeFerien(),
                     ],
                   ),
                   decoration: BoxDecoration(color: Colors.white, boxShadow: [
@@ -132,19 +80,20 @@ class Teleblitz implements BaseTeleblitz {
                         blurRadius: 40)
                   ]),
                 );
-              }
-              return Container(
+  }
+  Widget teleblitz (){
+    return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
                   child: Column(
                     children: <Widget>[
-                      snapshot.data.getTitel(),
-                      snapshot.data.getDatum(),
-                      snapshot.data.getAntreten(),
-                      snapshot.data.getAbtreten(),
-                      snapshot.data.getMitnehmen(),
-                      snapshot.data.getBemerkung(),
-                      snapshot.data.getSender(),
+                      info.getTitel(),
+                      info.getDatum(),
+                      info.getAntreten(),
+                      info.getAbtreten(),
+                      info.getMitnehmen(),
+                      info.getBemerkung(),
+                      info.getSender(),
                     ],
                   ),
                   decoration: BoxDecoration(
@@ -155,21 +104,38 @@ class Teleblitz implements BaseTeleblitz {
                           offset: Offset(3, 3),
                           blurRadius: 40)
                     ],
-                  ));
-            }
-          });
-    } catch (e) {
-      print(e);
-      return Center(
-        child: Text(
-          'Internet?',
-          style: TextStyle(fontSize: 20),
-        ),
-      );
-    }
+                  ));}
+  
+  Widget element(Map<String, dynamic> tlbz){
+    if (tlbz["keineaktivitat"] == 'true') {
+                return keineAktivitat();
+              } else if (tlbz["ferien"] == 'true') {
+                 return ferien();
+              }
+    return teleblitz();
   }
-}
 
+  List<Widget> anzeigen(String groupID, AsyncSnapshot snapshot) {
+    
+    List<Widget> returnTelebliz = new List<Widget>();
+    if(snapshot.data == null){
+       returnTelebliz.add(moreaLoadingIndicator());
+       return returnTelebliz;
+    }
+    
+    
+    
+    List<Map<String, dynamic>> listTeleblitz = snapshot.data;
+    for(Map<String, dynamic> tlbz in listTeleblitz){
+      this.defineInfo(tlbz, groupID);
+       returnTelebliz.add(element(tlbz));
+    }
+    return returnTelebliz;
+ }
+          
+     
+  
+}
 class Info {
 //  static Info _instance;
 //
@@ -283,7 +249,7 @@ class Info {
   }
 
   Container getAntreten() {
-    if ((keineaktivitat == 'false') || (this?.antreten?.isNotEmpty ?? false)) {
+    if (this?.antreten?.isNotEmpty ?? false) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -318,7 +284,7 @@ class Info {
   }
 
   Container getAbtreten() {
-    if ((keineaktivitat == false) || (this?.abtreten?.isNotEmpty ?? false)) {
+    if (this?.abtreten?.isNotEmpty ?? false) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -378,7 +344,7 @@ class Info {
   }
 
   Container getBemerkung() {
-    if ((keineaktivitat == false) || (this?.bemerkung?.isNotEmpty ?? false)) {
+    if (this?.bemerkung?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(
@@ -428,7 +394,7 @@ class Info {
   }
 
   Container getSender() {
-    if ((keineaktivitat == false) || (this?.sender?.isNotEmpty ?? false)) {
+    if (this?.sender?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
@@ -459,7 +425,7 @@ class Info {
   }
 
   Container getMitnehmen() {
-    if ((keineaktivitat == false) || (this?.antreten?.isNotEmpty ?? false)) {
+    if (this?.antreten?.isNotEmpty ?? false){
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(

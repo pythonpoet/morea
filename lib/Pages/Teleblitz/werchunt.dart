@@ -1,7 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Widgets/info.dart';
+import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/services/Teleblitz/teleblitzAnmeldungen.dart';
 
 class WerChunt extends StatefulWidget {

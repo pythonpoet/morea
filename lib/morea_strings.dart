@@ -28,7 +28,7 @@ final String userMapPfadiName = "Pfadinamen";
 final String userMapNachName = "Nachname";
 final String userMapVorName = "Vorname";
 final String userMapPos = "Pos";
-final String userMapMessagingGroups ="messagingGroups";
+final String userMapMessagingGroups ="messageGroups";
 final String userMapSubscribedGroups = "subscribedGroups";
 
 //groupMap
@@ -36,6 +36,7 @@ final String groupMapEventID = "eventID";
 final String groupMapgroupNickName = "groupNickName";
 final String groupMapSubgroup = "subgroups";
 final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
+final String groupMapHomeFeed = "homeFeed";
 
 //eventMap
 final String eventMapAnmeldeStatusNegativ = "Chunt nöd";

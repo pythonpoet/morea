@@ -14,11 +14,11 @@ abstract class BaseMoreaFirebase {
   String get getVorName;
   String get getNachName;
   String get getPos;
-  String get getMessagingGroups;
   String get getEventID;
   List<String> get getSubscribedGroups;
   Map<String,dynamic> get getGroupMap;
   Map<String,dynamic> get getUserMap;
+  Map<String,dynamic> get getMessagingGroups;
 
   Future<void> createUserInformation(Map userInfo);
   Future<void> updateUserInformation(String userUID, Map userInfo);
@@ -44,13 +44,15 @@ class MoreaFirebase extends BaseMoreaFirebase {
   TeleblizFirestore tbz;
   Map<String,dynamic> _userMap, _groupMap;
   String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID;
-  dynamic _messagingGroups;
-  List<String> _subscribedGroups;
+  Map<String,dynamic> _messagingGroups;
+  List<String> _subscribedGroups = new List<String>();
+  Firestore firestore;
 
-  MoreaFirebase(Firestore firestore){
+  MoreaFirebase(Firestore firestore, {List groupIDs}){
+    this.firestore = firestore;
     crud0 = new CrudMedthods(firestore);
-    tbz = new TeleblizFirestore(firestore);
-    getData(auth0.getUserID);
+    if(groupIDs != null)
+    tbz = new TeleblizFirestore(firestore , groupIDs);
   }
   String get getDisplayName => _displayName;
   String get getPfandiName => _pfadiName;
@@ -58,11 +60,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
   String get getVorName => _vorName;
   String get getNachName => _nachName;
   String get getPos => _pos;
-  String get getMessagingGroups => _messagingGroups;
+  
   String get getEventID => _eventID;
   List<String> get getSubscribedGroups => _subscribedGroups;
   Map<String,dynamic> get getGroupMap => _groupMap;
   Map<String,dynamic> get getUserMap => _userMap;
+  Map<String,dynamic> get getMessagingGroups => _messagingGroups;
 
   Future<void> getData(String userID)async{
     _userMap = (await crud0.getDocument(pathUser, userID)).data;
@@ -72,13 +75,21 @@ class MoreaFirebase extends BaseMoreaFirebase {
     _vorName = _userMap[userMapVorName];
     _nachName = _userMap[userMapNachName];
     _pos = _userMap[userMapPos];
-    _messagingGroups = List<String>.from(_userMap[userMapMessagingGroups]);
+    _messagingGroups = Map<String,dynamic>.from(_userMap[userMapMessagingGroups]);
     _eventID = _groupMap[groupMapEventID];
-    _subscribedGroups = _userMap[userMapSubscribedGroups];
+    _subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]);
     if(_pfadiName == '')
       _displayName = _vorName;
     else
       _displayName = _pfadiName;
+  }
+  Future<void> initTeleblitz(){
+    if(_groupID == null)
+    throw ("groupIDs shouldnt be null");
+    List<String> groupIDs = new List<String>();
+    groupIDs.add(_groupID);
+    groupIDs.addAll(_subscribedGroups);
+    tbz = new TeleblizFirestore(firestore ,groupIDs);
   }
 
   Future<void> createUserInformation(Map userInfo) async {

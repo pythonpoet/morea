@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:morea/Widgets/info.dart';
+import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -33,7 +33,6 @@ class EventAddPageState extends State<EventAddPage>{
   DWIFormat dwiFormat= new DWIFormat();
   CrudMedthods crud0;
   Agenda agenda;
-  MiData miData;
 
  int value = 2;
  List<String> mitnehemen= ['Pfadihämpt'];
@@ -155,7 +154,7 @@ class EventAddPageState extends State<EventAddPage>{
   firstDate: now,
   lastDate: now.add(new Duration(days: 9999)),
 );
-if (picked != null && picked != datum)
+if (picked != null && picked != DateTime.parse(datum))
    setState(() {
     datum = DateFormat('yyyy-MM-dd').format(picked);
     order = int.parse(DateFormat('yyyyMMdd').format(picked));
@@ -169,7 +168,7 @@ if (picked != null && picked != datum)
   firstDate: now,
   lastDate: now.add(new Duration(days: 9999)),
 );
-if (picked != null && picked != datumvon)
+if (picked != null && picked != DateTime.parse(datumvon))
    setState(() {
     datumvon = DateFormat('yyyy-MM-dd').format(picked);
     order = int.parse(DateFormat('yyyyMMdd').format(picked));

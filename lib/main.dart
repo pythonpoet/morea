@@ -1,15 +1,9 @@
-// Copyright 2017, the Chromium project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Grundbausteine/root_page.dart';
 import 'package:morea/services/auth.dart';
-import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'morealayout.dart';
 
 

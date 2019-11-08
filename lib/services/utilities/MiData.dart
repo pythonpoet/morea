@@ -1,15 +1,9 @@
 
 
-import 'package:morea/services/utilities/dwi_format.dart';
-
-abstract class BaseMiData{
-  String convWebflowtoMiData(String stufe);
-  String convMiDatatoWebflow(String groupnr);
-}
-class MiData implements BaseMiData{
-  DWIFormat dwiFormat = new DWIFormat();
+import 'package:morea/services/utilities/dwi_format.dart'; 
 
   String convWebflowtoMiData(String stufe){
+    DWIFormat dwiFormat = new DWIFormat();
     stufe = dwiFormat.simplestring(stufe);
     switch (stufe) {
       case 'Biber':
@@ -40,4 +34,3 @@ class MiData implements BaseMiData{
         return 'Drason (Buebe)';
      }     
    }
-}

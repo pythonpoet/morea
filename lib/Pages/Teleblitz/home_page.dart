@@ -4,7 +4,10 @@ import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
-import 'package:morea/services/Teleblitz/Getteleblitz.dart';
+import 'package:morea/Widgets/home/eltern.dart';
+import 'package:morea/Widgets/home/leiter.dart';
+import 'package:morea/Widgets/home/teilnehmer.dart';
+
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
@@ -13,6 +16,7 @@ import 'select_stufe.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/Widgets/home/teleblitz.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.firestore});
@@ -32,38 +36,37 @@ enum Anmeldung { angemolden, abgemolden, verchilt }
 class HomePageState extends State<HomePage> {
   CrudMedthods crud0;
   MoreaFirebase moreafire;
-  Teleblitz tlbz;
+  Teleblitz teleblitz;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
-  Info teleblitzinfo = new Info();
+
+
 
   final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.loading;
-  
 
-  
-  
   Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
   var messagingGroups;
 
-  
-
   void submit({@required String anabmelden, String groupnr}) {
-    
     if (_formType != FormType.eltern) {
       String anmeldung;
 
-      anmeldeDaten = {'Anmeldename': moreafire.getDisplayName, 'Anmeldung': anabmelden};
+      anmeldeDaten = {
+        'Anmeldename': moreafire.getDisplayName,
+        'Anmeldung': anabmelden
+      };
       if (anabmelden == 'Chunt') {
         anmeldung = 'Du hast dich Angemolden';
         chunnt = true;
       } else {
         anmeldung = 'Du hast dich Abgemolden';
         chunnt = false;
-      }                       
-      moreafire.uebunganmelden(moreafire.getEventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden);
+      }
+      moreafire.uebunganmelden(moreafire.getEventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden);
       showDialog(
           context: context,
           child: new AlertDialog(
@@ -98,7 +101,8 @@ class HomePageState extends State<HomePage> {
                       } else {
                         anmeldung = 'Du hast dich Abgemolden';
                       }
-                      moreafire.uebunganmelden(moreafire.getEventID , widget.auth.getUserID , uidkind , anabmelden );
+                      moreafire.uebunganmelden(moreafire.getEventID,
+                          widget.auth.getUserID, uidkind, anabmelden);
                       showDialog(
                           context: context,
                           child: new AlertDialog(
@@ -114,16 +118,18 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void getdevtoken() async {
+  Future<void> getdevtoken() async {
     var token = await firebaseMessaging.getToken();
     moreafire.uploaddevtocken(messagingGroups, token, widget.auth.getUserID);
   }
-  
-  void getuserinfo() async {
-      forminit();
-      getdevtoken();
 
-    tlbz = new Teleblitz(widget.firestore, moreafire.getGroupMap);
+  void getuserinfo() async {
+    await moreafire.getData(widget.auth.getUserID);
+    await moreafire.initTeleblitz();
+    forminit();
+    getdevtoken();
+    teleblitz = new Teleblitz(moreafire);
+    setState(() {});
   }
 
   void _signedOut() async {
@@ -162,14 +168,11 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
     moreafire = new MoreaFirebase(widget.firestore);
     crud0 = new CrudMedthods(widget.firestore);
-    
-    
 
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
@@ -215,7 +218,6 @@ class HomePageState extends State<HomePage> {
           builder: (BuildContext context) => MessagesPage()));
     });
     getuserinfo();
-    
   }
 
   @override
@@ -226,263 +228,32 @@ class HomePageState extends State<HomePage> {
   Widget teleblitzwidget() {
     switch (_formType) {
       case FormType.loading:
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Teleblitz'),
-          ),
-          drawer: Drawer(
-            child: ListView(
-              children: navigation(),
-            ),
-          ),
-          body: Container(
-            child: Center(
-                child: Container(
-              padding: EdgeInsets.all(120),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: new Text('Loading...'),
-                  ),
-                  Expanded(child: new CircularProgressIndicator())
-                ],
-              ),
-            )),
-          ),
-        );
+        return teleblitz.loadingScreen(navigation);
       case FormType.leiter:
-        return DefaultTabController(
-            length: 4,
-            child: Scaffold(
-                appBar: new AppBar(
-                  title: new Text('Teleblitz'),
-                  bottom: TabBar(tabs: [
-                    Tab(text: "Biber"),
-                    Tab(
-                      text: 'Wölfe',
-                    ),
-                    Tab(
-                      text: 'Meitli',
-                    ),
-                    Tab(text: 'Buebe')
-                  ]),
-                ),
-                drawer: new Drawer(
-                  child: new ListView(children: navigation()),
-                ),
-                body: TabBarView(children: [
-                  LayoutBuilder(
-                    builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Biber')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Biber'),
-                              ],
-                            ))),
-                      );
-                    },
-                  ),
-                  LayoutBuilder(
-                    builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Wombat (Wölfe)'),
-                              ],
-                            ))),
-                      );
-                    },
-                  ),
-                  LayoutBuilder(
-                    builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Nahani (Meitli)'),
-                              ],
-                            ))),
-                      );
-                    },
-                  ),
-                  LayoutBuilder(
-                    builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Drason (Buebe)'),
-                              ],
-                            ))),
-                      );
-                    },
-                  ),
-                ]),
-                floatingActionButton: new FloatingActionButton(
-                    elevation: 1.0,
-                    child: new Icon(Icons.edit),
-                    backgroundColor: MoreaColors.violett,
-                    onPressed: () => Navigator.of(context)
-                            .push(new MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    new SelectStufe()))
-                            .then((onValue) {
-                          setState(() {});
-                        }))));
+        return leiterView(
+            stream: moreafire.tbz.getMapofEvents,
+            groupID: moreafire.getGroupID,
+            subscribedGroups: moreafire.getSubscribedGroups,
+            navigation: navigation,
+            teleblitzAnzeigen: teleblitz.anzeigen,
+            route: routeEditTelebliz);
 
         break;
       case FormType.teilnehmer:
-        return Scaffold(
-          appBar: new AppBar(
-            title: new Text('Teleblitz'),
-            backgroundColor: MoreaColors.violett,
-          ),
-          drawer: new Drawer(
-            child: new ListView(children: navigation()),
-          ),
-          body: LayoutBuilder(
-            builder:
-                (BuildContext context, BoxConstraints viewportConstraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: viewportConstraints.maxHeight,
-                    ),
-                    child: SingleChildScrollView(
-                        child: Column(
-                      children: <Widget>[
-                        tlbz.anzeigen(moreafire.getGroupID),
-                        Text("Teleblitz"),
-                        anmeldebutton()
-                      ],
-                    ))),
-              );
-            },
-          ),
-        );
+        return teilnehmerView(
+            stream: moreafire.tbz.getMapofEvents,
+            groupID: moreafire.getGroupID,
+            navigation: navigation,
+            teleblitzAnzeigen: teleblitz.anzeigen,
+            anmeldebutton: anmeldebutton);
         break;
       case FormType.eltern:
-        return DefaultTabController(
-            length: 4,
-            child: Scaffold(
-              appBar: new AppBar(
-                title: new Text('Teleblitz'),
-                backgroundColor: Color(0xff7a62ff),
-                bottom: TabBar(tabs: [
-                  Tab(text: "Biber"),
-                  Tab(
-                    text: 'Wölfe',
-                  ),
-                  Tab(
-                    text: 'Meitli',
-                  ),
-                  Tab(text: 'Buebe')
-                ]),
-              ),
-              drawer: new Drawer(
-                child: new ListView(children: navigation()),
-              ),
-              body: TabBarView(children: [
-                LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: viewportConstraints.maxHeight,
-                          ),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: <Widget>[
-                              tlbz.anzeigen('Biber'),
-                              anmeldebutton(groupnr: 'Biber')
-                            ],
-                          ))),
-                    );
-                  },
-                ),
-                LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: viewportConstraints.maxHeight,
-                          ),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: <Widget>[
-                              tlbz.anzeigen('Wombat (Wölfe)'),
-                              anmeldebutton(groupnr: 'Wombat (Wölfe)')
-                            ],
-                          ))),
-                    );
-                  },
-                ),
-                LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: viewportConstraints.maxHeight,
-                          ),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: <Widget>[
-                              tlbz.anzeigen('Nahani (Meitli)'),
-                              anmeldebutton(groupnr: 'Nahani (Meitli)')
-                            ],
-                          ))),
-                    );
-                  },
-                ),
-                LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: viewportConstraints.maxHeight,
-                          ),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: <Widget>[
-                              tlbz.anzeigen('Drason (Buebe)'),
-                              anmeldebutton(groupnr: 'Drason (Buebe)')
-                            ],
-                          ))),
-                    );
-                  },
-                ),
-              ]),
-            ));
+        return elternView(
+            stream: moreafire.tbz.getMapofEvents,
+            subscribedGroups: moreafire.getSubscribedGroups,
+            navigation: navigation,
+            teleblitzAnzeigen: teleblitz.anzeigen,
+            anmeldebutton: anmeldebutton);
         break;
     }
   }
@@ -512,14 +283,15 @@ class HomePageState extends State<HomePage> {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new WerChunt(
-                         firestore: widget.firestore,
+                        firestore: widget.firestore,
                       )))),
           new ListTile(
               title: new Text('Agenda'),
               trailing: new Icon(Icons.event),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new AgendaState(
-                        userInfo: moreafire.getUserMap,firestore: widget.firestore,
+                        userInfo: moreafire.getUserMap,
+                        firestore: widget.firestore,
                       )))),
           new ListTile(
               title: new Text('Personen'),
@@ -612,8 +384,8 @@ class HomePageState extends State<HomePage> {
             title: Text('Kind hinzufügen'),
             trailing: Icon(Icons.person_add),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    AddChild(widget.auth, moreafire.getUserMap, widget.firestore))),
+                builder: (BuildContext context) => AddChild(
+                    widget.auth, moreafire.getUserMap, widget.firestore))),
           ),
           ListTile(
               title: Text('Profil'),
@@ -631,8 +403,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Widget anmeldebutton({String groupnr}) {
-    if (groupnr == null) {
+  Widget anmeldebutton(String groupnr) {
       return Container(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -642,7 +413,8 @@ class HomePageState extends State<HomePage> {
                 child: new RaisedButton(
                   child:
                       new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
-                  onPressed: () => submit(anabmelden: 'Chunt nöd'),
+                  onPressed: () => submit(
+                      anabmelden: 'Chunt nöd', groupnr: moreafire.getGroupID),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                 ),
@@ -652,7 +424,8 @@ class HomePageState extends State<HomePage> {
                   child: new RaisedButton(
                     child:
                         new Text('Chume', style: new TextStyle(fontSize: 20)),
-                    onPressed: () => submit(anabmelden: 'Chunt'),
+                    onPressed: () => submit(
+                        anabmelden: 'Chunt', groupnr: moreafire.getGroupID),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Color(0xff7a62ff),
@@ -662,37 +435,14 @@ class HomePageState extends State<HomePage> {
               )
             ],
           ));
-    } else {
-      return Container(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                  child: Container(
-                child: new RaisedButton(
-                  child:
-                      new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
-                  onPressed: () =>
-                      submit(anabmelden: 'Chunt nöd', groupnr: moreafire.getGroupID),
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                ),
-              )),
-              Expanded(
-                child: Container(
-                  child: new RaisedButton(
-                    child:
-                        new Text('Chume', style: new TextStyle(fontSize: 20)),
-                    onPressed: () => submit(anabmelden: 'Chunt', groupnr: moreafire.getGroupID),
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    color: Color(0xff7a62ff),
-                    textColor: Colors.white,
-                  ),
-                ),
-              )
-            ],
-          ));
-    }
+  }
+
+  void routeEditTelebliz() {
+    Navigator.of(context)
+        .push(new MaterialPageRoute(
+            builder: (BuildContext context) => new SelectStufe()))
+        .then((onValue) {
+      setState(() {});
+    });
   }
 }

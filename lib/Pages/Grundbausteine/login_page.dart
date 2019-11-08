@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
-  MiData miData = new MiData();
+ 
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -361,7 +361,7 @@ class _LoginPageState extends State<LoginPage> {
           'Pfadinamen': this._pfadinamen,
           'Vorname': this._vorname,
           'Nachname': this._nachname,
-          'groupID': miData.convWebflowtoMiData(_selectedstufe),
+          'groupID': convWebflowtoMiData(_selectedstufe),
           'message_groups': {
             'Biber': biberCheckbox,
             'Wombat (Wölfe)': woelfeCheckbox,
