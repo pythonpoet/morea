@@ -13,23 +13,38 @@ import 'select_stufe.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
+import 'dart:math' as math;
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.onSigedOut, this.crud});
+  HomePage({this.auth, this.onSigedOut, this.crud, this.userInfo});
 
   final BaseAuth auth;
   final VoidCallback onSigedOut;
   final BaseCrudMethods crud;
+  final Map<String, dynamic> userInfo;
 
   @override
-  State<StatefulWidget> createState() => HomePageState();
+  State<StatefulWidget> createState() => HomePageState(this.userInfo);
 }
 
 enum FormType { leiter, teilnehmer, eltern, loading }
 
 enum Anmeldung { angemolden, abgemolden, verchilt }
 
-class HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  HomePageState(this.userInfo);
+
+  AnimationController _loadingController;
+  Animation<int> loadingAnimation;
+  AnimationController _controller;
+  Animation curve;
+  Animation<double> animation;
+  List<String> loadingList = [
+    'Loading.',
+    'Loading..',
+    'Loading...',
+    'Loading...'
+  ];
   CrudMedthods crud0bj = new CrudMedthods();
   Auth auth0 = new Auth();
   MoreaFirebase moreafire = new MoreaFirebase();
@@ -47,7 +62,7 @@ class HomePageState extends State<HomePage> {
       _userUID = ' ',
       _stufe = '@',
       _email = 'Loading...';
-  DocumentSnapshot qsuserInfo;
+  Map<String, dynamic> userInfo;
   Map<String, String> anmeldeDaten;
   bool chunnt = false;
   var messagingGroups;
@@ -55,7 +70,6 @@ class HomePageState extends State<HomePage> {
   void submit({@required String anabmelden, String stufe}) {
     if (_formType != FormType.eltern) {
       String anmeldung;
-      print(qsuserInfo.data['Pfadinamen']);
       anmeldeDaten = {'Anmeldename': _pfadiname, 'Anmeldung': anabmelden};
       if (anabmelden == 'Chunt') {
         anmeldung = 'Du hast dich Angemolden';
@@ -79,17 +93,14 @@ class HomePageState extends State<HomePage> {
               title: Text('Kind auswählen'),
               content: ListView.builder(
                 shrinkWrap: true,
-                itemCount: qsuserInfo.data['Kinder'].length,
+                itemCount: userInfo['Kinder'].length,
                 itemBuilder: (BuildContext context, int index) {
-                  var namekind =
-                      List.from(qsuserInfo.data['Kinder'].keys)[index];
-                  var uidkind =
-                      List.from(qsuserInfo.data['Kinder'].values)[index];
+                  var namekind = List.from(userInfo['Kinder'].keys)[index];
+                  var uidkind = List.from(userInfo['Kinder'].values)[index];
                   return ListTile(
                     title: Text(namekind),
                     onTap: () {
                       String anmeldung;
-                      print(qsuserInfo.data['Pfadinamen']);
                       anmeldeDaten = {
                         'Anmeldename': namekind,
                         'Anmeldung': anabmelden
@@ -124,14 +135,14 @@ class HomePageState extends State<HomePage> {
     _userUID = await auth0.currentUser();
     var results = await moreafire.getUserInformation(_userUID);
     setState(() {
-      qsuserInfo = results;
-      _pfadiname = qsuserInfo.data['Pfadinamen'];
-      _stufe = qsuserInfo.data['Stufe'];
-      _email = qsuserInfo.data['Email'];
-      messagingGroups = qsuserInfo.data['messagingGroups'];
+      this.userInfo = results.data;
+      _pfadiname = userInfo['Pfadinamen'];
+      _stufe = userInfo['Stufe'];
+      _email = userInfo['Email'];
+      messagingGroups = userInfo['messagingGroups'];
       try {
         if (_pfadiname == '') {
-          _pfadiname = qsuserInfo.data['Vorname'];
+          _pfadiname = userInfo['Vorname'];
         }
       } catch (e) {
         print(e);
@@ -153,7 +164,7 @@ class HomePageState extends State<HomePage> {
 
   void forminit() {
     try {
-      switch (qsuserInfo.data['Pos']) {
+      switch (userInfo['Pos']) {
         case 'Teilnehmer':
           _formType = FormType.teilnehmer;
           break;
@@ -183,6 +194,25 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    curve = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    animation = Tween<double>(begin: -0.5, end: 18 * math.pi).animate(curve)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _controller.forward();
+        }
+      });
+    _controller.forward();
+    _loadingController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+    loadingAnimation = IntTween(begin: 0, end: 2).animate(_loadingController);
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
       print(message);
@@ -196,7 +226,8 @@ class HomePageState extends State<HomePage> {
                 color: MoreaColors.violett,
                 onPressed: () {
                   return Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => MessagesPage()));
+                      builder: (BuildContext context) => MessagesPage(
+                          widget.userInfo, widget.auth, widget.onSigedOut)));
                 },
                 child: Text(
                   'Ansehen',
@@ -220,13 +251,24 @@ class HomePageState extends State<HomePage> {
     }, onResume: (Map<String, dynamic> message) async {
       print(message);
       Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => MessagesPage()));
+          builder: (BuildContext context) =>
+              MessagesPage(widget.userInfo, widget.auth, widget.onSigedOut)));
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
-      Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => MessagesPage()));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => MessagesPage(
+                  widget.userInfo, widget.auth, widget.onSigedOut)));
     });
     getuserinfo();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _loadingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -237,29 +279,43 @@ class HomePageState extends State<HomePage> {
   Widget teleblitzwidget() {
     switch (_formType) {
       case FormType.loading:
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Teleblitz'),
-          ),
-          drawer: Drawer(
-            child: ListView(
-              children: navigation(),
-            ),
-          ),
-          body: Container(
-            child: Center(
-                child: Container(
-              padding: EdgeInsets.all(120),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: new Text('Loading...'),
-                  ),
-                  Expanded(child: new CircularProgressIndicator())
-                ],
+        return Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              AnimatedBuilder(
+                animation: _controller,
+                child: Image(image: AssetImage('assets/icon/logo_loading.png')),
+                builder: (BuildContext context, Widget child) {
+                  return Transform.rotate(
+                    angle: animation.value,
+                    child: child,
+                  );
+                },
               ),
-            )),
+              Padding(
+                padding: EdgeInsets.only(bottom: 15),
+              ),
+              AnimatedBuilder(
+                animation: _loadingController,
+                child: Text('Loading'),
+                builder: (BuildContext context, Widget child) {
+                  return Text(
+                    loadingList[loadingAnimation.value],
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Raleway',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.none,
+                    ),
+                    textAlign: TextAlign.left,
+                  );
+                },
+              )
+            ],
           ),
+          color: Colors.white,
         );
       case FormType.leiter:
         return DefaultTabController(
@@ -281,84 +337,274 @@ class HomePageState extends State<HomePage> {
                 drawer: new Drawer(
                   child: new ListView(children: navigation()),
                 ),
+                bottomNavigationBar: BottomAppBar(
+                  child: Container(
+                    color: Color.fromRGBO(43, 16, 42, 0.9),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: FlatButton(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            onPressed: (() {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) => MessagesPage(userInfo,
+                                      widget.auth, widget.onSigedOut)));
+                            }),
+                            child: Column(
+                              children: <Widget>[
+                                Icon(Icons.message, color: Colors.white),
+                                Text(
+                                  'Nachrichten',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      color: Colors.white),
+                                )
+                              ],
+                              mainAxisSize: MainAxisSize.min,
+                            ),
+                          ),
+                          flex: 1,
+                        ),
+                        Expanded(
+                          child: FlatButton(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            onPressed: (() {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      AgendaState(
+                                        userInfo,
+                                        widget.auth,
+                                        widget.onSigedOut
+                                      )));
+                            }),
+                            child: Column(
+                              children: <Widget>[
+                                Icon(Icons.event, color: Colors.white),
+                                Text(
+                                  'Agenda',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      color: Colors.white),
+                                )
+                              ],
+                              mainAxisSize: MainAxisSize.min,
+                            ),
+                          ),
+                          flex: 1,
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15.0),
+                            child: Text(
+                              'Teleblitz ändern',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          flex: 1,
+                        ),
+                        Expanded(
+                          child: FlatButton(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            onPressed: null,
+                            child: Column(
+                              children: <Widget>[
+                                Icon(Icons.flash_on, color: Colors.white),
+                                Text(
+                                  'Teleblitz',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      color: Colors.white),
+                                )
+                              ],
+                              mainAxisSize: MainAxisSize.min,
+                            ),
+                          ),
+                          flex: 1,
+                        ),
+                        Expanded(
+                          child: FlatButton(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            onPressed: null,
+                            child: Column(
+                              children: <Widget>[
+                                Icon(Icons.person, color: Colors.white),
+                                Text(
+                                  'Profil',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      color: Colors.white),
+                                )
+                              ],
+                              mainAxisSize: MainAxisSize.min,
+                            ),
+                          ),
+                          flex: 1,
+                        ),
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      textBaseline: TextBaseline.alphabetic,
+                    ),
+                  ),
+                  shape: CircularNotchedRectangle(),
+                ),
                 body: TabBarView(children: [
                   LayoutBuilder(
                     builder: (BuildContext context,
                         BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Biber')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Biber'),
-                              ],
-                            ))),
+                      return Container(
+                        padding: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: MoreaColors.orange,
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/background.png'),
+                              alignment: Alignment.bottomCenter),
+                        ),
+                        child: SingleChildScrollView(
+                          child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: viewportConstraints.maxHeight,
+                              ),
+                              child: Column(
+                                key: ObjectKey(tlbz.anzeigen(
+                                    'Biber',
+                                    _controller,
+                                    animation,
+                                    _loadingController,
+                                    loadingAnimation)),
+                                children: <Widget>[
+                                  tlbz.anzeigen('Biber', _controller, animation,
+                                      _loadingController, loadingAnimation),
+                                ],
+                              )),
+                        ),
                       );
                     },
                   ),
                   LayoutBuilder(
                     builder: (BuildContext context,
                         BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Wombat (Wölfe)')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Wombat (Wölfe)'),
-                              ],
-                            ))),
+                      return Container(
+                        padding: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: MoreaColors.orange,
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/background.png'),
+                              fit: BoxFit.cover),
+                        ),
+                        child: SingleChildScrollView(
+                          child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: viewportConstraints.maxHeight,
+                              ),
+                              child: Column(
+                                key: ObjectKey(tlbz.anzeigen(
+                                    'Wombat (Wölfe)',
+                                    _controller,
+                                    animation,
+                                    _loadingController,
+                                    loadingAnimation)),
+                                children: <Widget>[
+                                  tlbz.anzeigen(
+                                      'Wombat (Wölfe)',
+                                      _controller,
+                                      animation,
+                                      _loadingController,
+                                      loadingAnimation),
+                                ],
+                              )),
+                        ),
                       );
                     },
                   ),
                   LayoutBuilder(
                     builder: (BuildContext context,
                         BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Nahani (Meitli)')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Nahani (Meitli)'),
-                              ],
-                            ))),
+                      return Container(
+                        padding: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: MoreaColors.orange,
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/background.png'),
+                              fit: BoxFit.cover),
+                        ),
+                        child: SingleChildScrollView(
+                          child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: viewportConstraints.maxHeight,
+                              ),
+                              child: Column(
+                                key: ObjectKey(tlbz.anzeigen(
+                                    'Nahani (Meitli)',
+                                    _controller,
+                                    animation,
+                                    _loadingController,
+                                    loadingAnimation)),
+                                children: <Widget>[
+                                  tlbz.anzeigen(
+                                      'Nahani (Meitli)',
+                                      _controller,
+                                      animation,
+                                      _loadingController,
+                                      loadingAnimation),
+                                ],
+                              )),
+                        ),
                       );
                     },
                   ),
                   LayoutBuilder(
                     builder: (BuildContext context,
                         BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                              key: ObjectKey(tlbz.anzeigen('Drason (Buebe)')),
-                              children: <Widget>[
-                                tlbz.anzeigen('Drason (Buebe)'),
-                              ],
-                            ))),
+                      return Container(
+                        padding: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: MoreaColors.orange,
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/background.png'),
+                              fit: BoxFit.cover),
+                        ),
+                        child: SingleChildScrollView(
+                          child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: viewportConstraints.maxHeight,
+                              ),
+                              child: Column(
+                                key: ObjectKey(tlbz.anzeigen(
+                                    'Drason (Buebe)',
+                                    _controller,
+                                    animation,
+                                    _loadingController,
+                                    loadingAnimation)),
+                                children: <Widget>[
+                                  tlbz.anzeigen(
+                                      'Drason (Buebe)',
+                                      _controller,
+                                      animation,
+                                      _loadingController,
+                                      loadingAnimation),
+                                ],
+                              )),
+                        ),
                       );
                     },
                   ),
                 ]),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerDocked,
                 floatingActionButton: new FloatingActionButton(
                     elevation: 1.0,
                     child: new Icon(Icons.edit),
                     backgroundColor: MoreaColors.violett,
+                    shape: CircleBorder(side: BorderSide(color: Colors.white)),
                     onPressed: () => Navigator.of(context)
                             .push(new MaterialPageRoute(
                                 builder: (BuildContext context) =>
@@ -372,7 +618,6 @@ class HomePageState extends State<HomePage> {
         return Scaffold(
           appBar: new AppBar(
             title: new Text('Teleblitz'),
-            backgroundColor: MoreaColors.violett,
           ),
           drawer: new Drawer(
             child: new ListView(children: navigation()),
@@ -385,13 +630,13 @@ class HomePageState extends State<HomePage> {
                     constraints: BoxConstraints(
                       minHeight: viewportConstraints.maxHeight,
                     ),
-                    child: SingleChildScrollView(
-                        child: Column(
+                    child: Column(
                       children: <Widget>[
-                        tlbz.anzeigen(_stufe),
+                        tlbz.anzeigen(_stufe, _controller, animation,
+                            _loadingController, loadingAnimation),
                         anmeldebutton()
                       ],
-                    ))),
+                    )),
               );
             },
           ),
@@ -403,7 +648,6 @@ class HomePageState extends State<HomePage> {
             child: Scaffold(
               appBar: new AppBar(
                 title: new Text('Teleblitz'),
-                backgroundColor: Color(0xff7a62ff),
                 bottom: TabBar(tabs: [
                   Tab(text: "Biber"),
                   Tab(
@@ -427,13 +671,13 @@ class HomePageState extends State<HomePage> {
                           constraints: BoxConstraints(
                             minHeight: viewportConstraints.maxHeight,
                           ),
-                          child: SingleChildScrollView(
-                              child: Column(
+                          child: Column(
                             children: <Widget>[
-                              tlbz.anzeigen('Biber'),
+                              tlbz.anzeigen('Biber', _controller, animation,
+                                  _loadingController, loadingAnimation),
                               anmeldebutton(stufe: 'Biber')
                             ],
-                          ))),
+                          )),
                     );
                   },
                 ),
@@ -445,13 +689,17 @@ class HomePageState extends State<HomePage> {
                           constraints: BoxConstraints(
                             minHeight: viewportConstraints.maxHeight,
                           ),
-                          child: SingleChildScrollView(
-                              child: Column(
+                          child: Column(
                             children: <Widget>[
-                              tlbz.anzeigen('Wombat (Wölfe)'),
+                              tlbz.anzeigen(
+                                  'Wombat (Wölfe)',
+                                  _controller,
+                                  animation,
+                                  _loadingController,
+                                  loadingAnimation),
                               anmeldebutton(stufe: 'Wombat (Wölfe)')
                             ],
-                          ))),
+                          )),
                     );
                   },
                 ),
@@ -463,13 +711,17 @@ class HomePageState extends State<HomePage> {
                           constraints: BoxConstraints(
                             minHeight: viewportConstraints.maxHeight,
                           ),
-                          child: SingleChildScrollView(
-                              child: Column(
+                          child: Column(
                             children: <Widget>[
-                              tlbz.anzeigen('Nahani (Meitli)'),
+                              tlbz.anzeigen(
+                                  'Nahani (Meitli)',
+                                  _controller,
+                                  animation,
+                                  _loadingController,
+                                  loadingAnimation),
                               anmeldebutton(stufe: 'Nahani (Meitli)')
                             ],
-                          ))),
+                          )),
                     );
                   },
                 ),
@@ -481,13 +733,17 @@ class HomePageState extends State<HomePage> {
                           constraints: BoxConstraints(
                             minHeight: viewportConstraints.maxHeight,
                           ),
-                          child: SingleChildScrollView(
-                              child: Column(
+                          child: Column(
                             children: <Widget>[
-                              tlbz.anzeigen('Drason (Buebe)'),
+                              tlbz.anzeigen(
+                                  'Drason (Buebe)',
+                                  _controller,
+                                  animation,
+                                  _loadingController,
+                                  loadingAnimation),
                               anmeldebutton(stufe: 'Drason (Buebe)')
                             ],
-                          ))),
+                          )),
                     );
                   },
                 ),
@@ -511,24 +767,15 @@ class HomePageState extends State<HomePage> {
             accountName: new Text(_pfadiname),
             accountEmail: new Text(_email),
             decoration: new BoxDecoration(
-                image: new DecorationImage(
-                    fit: BoxFit.fill,
-                    image: new NetworkImage(
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+              color: MoreaColors.orange,
+            ),
           ),
           new ListTile(
               title: new Text('Wer chunt?'),
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new WerChunt(
-                        userInfo: qsuserInfo.data,
-                      )))),
-          new ListTile(
-              title: new Text('Agenda'),
-              trailing: new Icon(Icons.event),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new AgendaState(
-                        userInfo: qsuserInfo.data,
+                        userInfo: userInfo,
                       )))),
           new ListTile(
               title: new Text('Personen'),
@@ -536,11 +783,6 @@ class HomePageState extends State<HomePage> {
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
                       new PersonenVerzeichnisState()))),
-          new ListTile(
-              title: new Text('Nachrichten'),
-              trailing: new Icon(Icons.message),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => MessagesPage()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -561,29 +803,18 @@ class HomePageState extends State<HomePage> {
                         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
           ),
           new ListTile(
-              title: new Text('Agenda'),
-              trailing: new Icon(Icons.event),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new AgendaState(userInfo: qsuserInfo.data)))),
-          new ListTile(
               title: new Text('Profil'),
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: qsuserInfo.data,
+                        profile: userInfo,
                       )))),
-          ListTile(
-              title: Text('Profil'),
-              trailing: Icon(Icons.message),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => MessagesPage()))),
           /*ListTile(
             title: Text('Eltern bestätigen'),
             trailing: Icon(Icons.pregnant_woman),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) =>
-                    Parents(profile: qsuserInfo.data))),
+                    Parents(profile: userInfo))),
           ),*/
           new Divider(),
           new ListTile(
@@ -594,8 +825,6 @@ class HomePageState extends State<HomePage> {
         ];
         break;
       case FormType.eltern:
-        print(this._pfadiname);
-        print(this._email);
         return [
           new UserAccountsDrawerHeader(
             accountName: Text(this._pfadiname),
@@ -607,30 +836,18 @@ class HomePageState extends State<HomePage> {
                         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
           ),
           new ListTile(
-              title: new Text('Agenda'),
-              trailing: new Icon(Icons.event),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new AgendaState(userInfo: qsuserInfo.data)))),
-          new ListTile(
               title: new Text('Profil'),
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: qsuserInfo.data,
+                        profile: userInfo,
                       )))),
           ListTile(
             title: Text('Kind hinzufügen'),
             trailing: Icon(Icons.person_add),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    AddChild(auth0, qsuserInfo.data))),
+                builder: (BuildContext context) => AddChild(auth0, userInfo))),
           ),
-          ListTile(
-              title: Text('Profil'),
-              trailing: Icon(Icons.message),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => MessagesPage()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

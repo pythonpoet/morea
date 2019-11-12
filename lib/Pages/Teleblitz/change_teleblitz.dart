@@ -6,27 +6,41 @@ import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:intl/intl.dart';
+import 'dart:math' as math;
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
   final String stufe;
   final BaseAuth auth;
   final VoidCallback onSignedOut;
   final BaseCrudMethods crud;
+  final String formType;
 
-  ChangeTeleblitz({this.auth, this.crud, this.onSignedOut, this.stufe});
+  ChangeTeleblitz(
+      {this.auth,
+      this.crud,
+      this.onSignedOut,
+      this.stufe,
+      @required this.formType});
 
   @override
   State<StatefulWidget> createState() => _ChangeTeleblitzState();
 }
 
-class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
+enum FormType { keineAktivitaet, ferien, normal }
+
+class _ChangeTeleblitzState extends State<ChangeTeleblitz>
+    with SingleTickerProviderStateMixin {
   Auth auth0 = Auth();
   MoreaFirebase moreafire = MoreaFirebase();
   String _stufe;
   final _formKey = GlobalKey<FormState>();
   final datumController = TextEditingController();
-  final antretenController = TextEditingController();
-  final abtretenController = TextEditingController();
+  final ortAntretenController = TextEditingController();
+  final zeitAntretenController = MaskedTextController(mask: '00:00');
+  final ortAbtretenController = TextEditingController();
+  final zeitAbtretenController = MaskedTextController(mask: '00:00');
   Map<String, TextEditingController> mitnehmenControllerMap =
       Map<String, TextEditingController>();
   List<TextEditingController> mitnehmenControllerList =
@@ -38,805 +52,899 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   final grundController = TextEditingController();
   final endeFerienController = TextEditingController();
   String datumEndeFerien = 'Datum wählen';
-  final formKey = new GlobalKey<FormState>();
+  String datumAnzeige = 'Datum wählen';
+  String antreten;
+  String abtreten;
   bool _noActivity = false;
   bool _ferien = false;
   var aktteleblitz;
   UniqueKey endeFerienKey = UniqueKey();
+  AnimationController _controller;
+  Animation curve;
+  Animation<double> animation;
+  FormType formType;
+  int _index = 0;
+  int _maxIndex;
 
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    curve = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    animation = Tween<double>(begin: -0.5, end: 18 * math.pi).animate(curve)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _controller.forward();
+        }
+      });
+    _controller.forward();
     _stufe = widget.stufe;
     this.aktteleblitz = downloadInfo(_stufe);
+    if (widget.formType == 'keineAktivitaet') {
+      this.formType = FormType.keineAktivitaet;
+      this._maxIndex = 2;
+    } else if (widget.formType == 'ferien') {
+      this.formType = FormType.ferien;
+      this._maxIndex = 1;
+    } else {
+      this.formType = FormType.normal;
+      this._maxIndex = 5;
+    }
+    initializeDateFormatting("de_DE", null);
   }
 
   @override
   void dispose() {
     datumController.dispose();
+    ortAntretenController.dispose();
+    zeitAntretenController.dispose();
+    ortAbtretenController.dispose();
+    zeitAbtretenController.dispose();
+    for (TextEditingController u in mitnehmenControllerList) {
+      u.dispose();
+    }
+    bemerkungController.dispose();
+    senderController.dispose();
+    grundController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new FutureBuilder(
-        future: this.aktteleblitz,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (_ferien) {
-              return Scaffold(
-                  appBar: AppBar(
-                    title: Text('Teleblitz ändern'),
-                    backgroundColor: MoreaColors.violett,
-                  ),
-                  body: ListView(children: [
-                    Column(children: <Widget>[
-                      Container(
-                          child: Form(
-                              key: _formKey,
-                              child: Column(children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 30, left: 40, right: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.not_interested),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: SwitchListTile(
-                                          title: Text('Keine Aktivität'),
-                                          value: _noActivity,
-                                          activeColor: MoreaColors.violett,
-                                          onChanged: (bool val) {
-                                            setState(() {
-                                              if (val == true) {
-                                                _noActivity = val;
-                                                _ferien = !val;
-                                              } else {
-                                                _noActivity = val;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 0, left: 40, right: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.not_interested),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: SwitchListTile(
-                                          title: Text('Ende Ferien'),
-                                          value: _ferien,
-                                          activeColor: MoreaColors.violett,
-                                          onChanged: (bool val) {
-                                            setState(() {
-                                              if (val == true) {
-                                                _noActivity = !val;
-                                                _ferien = val;
-                                              } else {
-                                                _ferien = val;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.date_range),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                            alignment: Alignment.center, //
-                                            decoration: new BoxDecoration(
-                                              border: new Border.all(
-                                                  color: Colors.black,
-                                                  width: 2),
-                                              borderRadius:
-                                                  new BorderRadius.all(
-                                                Radius.circular(4.0),
-                                              ),
-                                            ),
-                                            child: Container(
-                                              margin: EdgeInsets.symmetric(vertical: 10),
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Text('Datum Ende Ferien:'),
-                                                  RaisedButton(
-                                                    onPressed: () {
-                                                      _selectDatumvon(context);
-                                                    },
-                                                    child: Text(
-                                                      datumEndeFerien,
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    color: MoreaColors.violett,
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    5))),
-                                                  ),
-                                                ],
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                              ),
-                                            )),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(vertical: 30),
-                                  child: RaisedButton.icon(
-                                    onPressed: () {
-                                      this.uploadTeleblitz(
-                                          _stufe,
-                                          snapshot.data.getID(),
-                                          snapshot.data.getSlug());
-                                    },
-                                    icon: Icon(
-                                      Icons.update,
-                                      color: Colors.white,
-                                    ),
-                                    label: Container(
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: Text(
-                                        "Teleblitz ändern",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
-                                      ),
-                                    ),
-                                    color: MoreaColors.violett,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                  ),
-                                )
-                              ])))
-                    ])
-                  ]));
-            } else if (!(_noActivity) && !(_ferien)) {
-              return new Scaffold(
-                appBar: AppBar(
-                  title: Text("Teleblitz ändern"),
-                  backgroundColor: MoreaColors.violett,
-                ),
-                body: ListView(
-                  children: [
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 30, left: 40, right: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.not_interested),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: SwitchListTile(
-                                          title: Text('Keine Aktivität'),
-                                          value: _noActivity,
-                                          activeColor: MoreaColors.violett,
-                                          onChanged: (bool val) {
-                                            setState(() {
-                                              if (val == true) {
-                                                _noActivity = val;
-                                                _ferien = !val;
-                                              } else {
-                                                _noActivity = val;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 0, left: 40, right: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.not_interested),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: SwitchListTile(
-                                          title: Text('Ende Ferien'),
-                                          value: _ferien,
-                                          activeColor: MoreaColors.violett,
-                                          onChanged: (bool val) {
-                                            setState(() {
-                                              if (val == true) {
-                                                _noActivity = !val;
-                                                _ferien = val;
-                                              } else {
-                                                _ferien = val;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.date_range),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: TextFormField(
-                                            initialValue: datumController.text,
-                                            decoration: InputDecoration(
-                                              filled: true,
-                                              labelText: 'Datum',
-                                            ),
-                                            onSaved: (value) =>
-                                                datumController.text = value,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.map),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: <Widget>[
-                                              TextFormField(
-                                                initialValue:
-                                                    antretenController.text,
-                                                decoration: InputDecoration(
-                                                  labelText: 'Antreten',
-                                                  filled: true,
-                                                ),
-                                                onSaved: (value) =>
-                                                    antretenController.text =
-                                                        value,
-                                              ),
-                                              TextFormField(
-                                                initialValue:
-                                                    mapAntretenController.text,
-                                                decoration: InputDecoration(
-                                                  labelText: 'Antreten Map',
-                                                  filled: true,
-                                                ),
-                                                onSaved: (value) =>
-                                                    mapAntretenController.text =
-                                                        value,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.map),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: <Widget>[
-                                              TextFormField(
-                                                initialValue:
-                                                    abtretenController.text,
-                                                decoration: InputDecoration(
-                                                  labelText: 'Antreten',
-                                                  filled: true,
-                                                ),
-                                                onSaved: (value) =>
-                                                    abtretenController.text =
-                                                        value,
-                                              ),
-                                              TextFormField(
-                                                initialValue:
-                                                    mapAbtretenController.text,
-                                                decoration: InputDecoration(
-                                                  filled: true,
-                                                  labelText: 'Antreten Map',
-                                                ),
-                                                onSaved: (value) =>
-                                                    mapAbtretenController.text =
-                                                        value,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.assignment),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: <Widget>[
-                                              ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: this
-                                                    .mitnehmenControllerList
-                                                    .length,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemBuilder:
-                                                    (BuildContext context,
-                                                        int index) {
-                                                  return TextFormField(
-                                                    initialValue:
-                                                        mitnehmenControllerList[
-                                                                index]
-                                                            .text,
-                                                    decoration: InputDecoration(
-                                                        filled: true,
-                                                        labelText: 'Mitnehmen'),
-                                                    onSaved: (value) =>
-                                                        mitnehmenControllerList[
-                                                                index]
-                                                            .text = value,
-                                                  );
-                                                },
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.only(
-                                                    top: 10, bottom: 10),
-                                                child: FractionallySizedBox(
-                                                  widthFactor: 1,
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Expanded(
-                                                        flex: 1,
-                                                        child: Container(),
-                                                      ),
-                                                      Expanded(
-                                                        flex: 7,
-                                                        child:
-                                                            RaisedButton.icon(
-                                                          onPressed: () {
-                                                            this.setState(() {
-                                                              mitnehmenControllerList
-                                                                  .add(
-                                                                      TextEditingController());
-                                                            });
-                                                          },
-                                                          icon: Icon(
-                                                            Icons.add,
-                                                            color: Colors.white,
-                                                          ),
-                                                          label: Text(
-                                                            "Element",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          ),
-                                                          color: MoreaColors
-                                                              .violett,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          5))),
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        flex: 1,
-                                                        child: Container(),
-                                                      ),
-                                                      Expanded(
-                                                        flex: 7,
-                                                        child:
-                                                            RaisedButton.icon(
-                                                                onPressed: () {
-                                                                  this.setState(
-                                                                      () {
-                                                                    mitnehmenControllerList
-                                                                        .removeLast();
-                                                                  });
-                                                                },
-                                                                icon: Icon(
-                                                                  Icons.remove,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                                label: Text(
-                                                                  "Element",
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white),
-                                                                ),
-                                                                color:
-                                                                    MoreaColors
-                                                                        .violett,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(5)))),
-                                                      ),
-                                                      Expanded(
-                                                        flex: 1,
-                                                        child: Container(),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.chat_bubble),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: <Widget>[
-                                              TextFormField(
-                                                initialValue:
-                                                    bemerkungController.text,
-                                                decoration: InputDecoration(
-                                                  filled: true,
-                                                  labelText: 'Bemerkung',
-                                                ),
-                                                onSaved: (value) =>
-                                                    bemerkungController.text =
-                                                        value,
-                                              ),
-                                              TextFormField(
-                                                initialValue:
-                                                    senderController.text,
-                                                decoration: InputDecoration(
-                                                  filled: true,
-                                                  labelText: 'Sender',
-                                                ),
-                                                onSaved: (value) =>
-                                                    senderController.text =
-                                                        value,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(vertical: 30),
-                                  child: RaisedButton.icon(
-                                    onPressed: () {
-                                      this.uploadTeleblitz(
-                                          _stufe,
-                                          snapshot.data.getID(),
-                                          snapshot.data.getSlug());
-                                    },
-                                    icon: Icon(
-                                      Icons.update,
-                                      color: Colors.white,
-                                    ),
-                                    label: Container(
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: Text(
-                                        "Teleblitz ändern",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
-                                      ),
-                                    ),
-                                    color: MoreaColors.violett,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(),
-                  ],
-                ),
-              );
-            } else {
-              return Scaffold(
-                  appBar: AppBar(
-                    title: Text('Teleblitz ändern'),
-                    backgroundColor: MoreaColors.violett,
-                  ),
-                  body: ListView(children: [
-                    Column(children: <Widget>[
-                      Container(
-                          child: Form(
-                              key: _formKey,
-                              child: Column(children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 30, left: 40, right: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.not_interested),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: SwitchListTile(
-                                          title: Text('Keine Aktivität'),
-                                          value: _noActivity,
-                                          activeColor: MoreaColors.violett,
-                                          onChanged: (bool val) {
-                                            setState(() {
-                                              if (val == true) {
-                                                _noActivity = val;
-                                                _ferien = !val;
-                                              } else {
-                                                _noActivity = val;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 0, left: 40, right: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.not_interested),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: SwitchListTile(
-                                          title: Text('Ende Ferien'),
-                                          value: _ferien,
-                                          activeColor: MoreaColors.violett,
-                                          onChanged: (bool val) {
-                                            setState(() {
-                                              if (val == true) {
-                                                _noActivity = !val;
-                                                _ferien = val;
-                                              } else {
-                                                _ferien = val;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.date_range),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: TextFormField(
-                                            initialValue: datumController.text,
-                                            decoration: InputDecoration(
-                                              filled: true,
-                                              labelText: 'Datum',
-                                            ),
-                                            onSaved: (value) =>
-                                                datumController.text = value,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 10),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.date_range),
-                                      ),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          alignment: Alignment.center, //
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                color: Colors.black, width: 2),
-                                            borderRadius: new BorderRadius.all(
-                                              Radius.circular(4.0),
-                                            ),
-                                          ),
-                                          child: TextFormField(
-                                            initialValue: grundController.text,
-                                            decoration: InputDecoration(
-                                              filled: true,
-                                              labelText: 'Grund für Ausfall',
-                                            ),
-                                            onSaved: (value) =>
-                                                grundController.text = value,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(vertical: 30),
-                                  child: RaisedButton.icon(
-                                    onPressed: () {
-                                      this.uploadTeleblitz(
-                                          _stufe,
-                                          snapshot.data.getID(),
-                                          snapshot.data.getSlug());
-                                    },
-                                    icon: Icon(
-                                      Icons.update,
-                                      color: Colors.white,
-                                    ),
-                                    label: Container(
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: Text(
-                                        "Teleblitz ändern",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
-                                      ),
-                                    ),
-                                    color: MoreaColors.violett,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                  ),
-                                )
-                              ])))
-                    ])
-                  ]));
-            }
-          } else {
+    return FutureBuilder(
+      future: this.aktteleblitz,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Loading...',
+                style: TextStyle(color: Colors.black),
+              ),
+              backgroundColor: MoreaColors.orange,
+            ),
+            body: Container(
+              decoration: BoxDecoration(color: Colors.white),
+              child:
+                  Center(child: moreaLoadingIndicator(_controller, animation)),
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.none) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Error',
+                style: TextStyle(color: Colors.black),
+              ),
+              backgroundColor: MoreaColors.orange,
+            ),
+            body: Container(
+              decoration: BoxDecoration(color: Colors.white),
+              child: Center(
+                child: Text('Keine gültige Verbindung. Internet überprüfen.'),
+              ),
+            ),
+          );
+        } else {
+          return LayoutBuilder(
+              builder: (context, BoxConstraints viewportConstraints) {
             return Scaffold(
               appBar: AppBar(
-                  title: Text("Loading"), backgroundColor: MoreaColors.violett),
-              body: Center(
-                child: CircularProgressIndicator(),
+                title: Text(
+                  'Teleblitz ändern',
+                  style: TextStyle(color: Colors.black),
+                ),
+                backgroundColor: MoreaColors.orange,
+              ),
+              body: Container(
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/images/background.png'),
+                        alignment: Alignment.bottomCenter),
+                    color: MoreaColors.orange),
+                constraints:
+                    BoxConstraints(minHeight: viewportConstraints.maxHeight),
+                child: Form(
+                  key: _formKey,
+                  child: Stepper(
+                    steps: buildSteps(snapshot),
+                    type: StepperType.vertical,
+                    currentStep: _index,
+                    onStepContinue: () {
+                      setState(() {
+                        if(_index == _maxIndex){
+                          switch (formType) {
+                            case FormType.ferien:
+                              this._ferien = true;
+                              this._noActivity = false;
+                              if (this.validateAndSave()) {
+                                this.uploadTeleblitz(_stufe, snapshot.data.getID(),
+                                    snapshot.data.getSlug());
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Ein Fehler ist aufgetreten!'),
+                                      content:
+                                      Text('Bitte überprüfe deine Eingaben.'),
+                                    );
+                                  },
+                                );
+                              }
+                              break;
+                            case FormType.keineAktivitaet:
+                              this._ferien = false;
+                              this._noActivity = true;
+                              if (this.validateAndSave()) {
+                                this.uploadTeleblitz(_stufe, snapshot.data.getID(),
+                                    snapshot.data.getSlug());
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Ein Fehler ist aufgetreten!'),
+                                      content:
+                                      Text('Bitte überprüfe deine Eingaben.'),
+                                    );
+                                  },
+                                );
+                              }
+                              break;
+                            case FormType.normal:
+                              this._ferien = false;
+                              this._noActivity = false;
+                              if (this.validateAndSave()) {
+                                this.uploadTeleblitz(_stufe, snapshot.data.getID(),
+                                    snapshot.data.getSlug());
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Ein Fehler ist aufgetreten!'),
+                                      content:
+                                      Text('Bitte überprüfe deine Eingaben.'),
+                                    );
+                                  },
+                                );
+                              }
+                          }
+                        } else {
+                          _index += 1;
+                        }
+                      });
+                    },
+                    onStepCancel: () {
+                      setState(() {
+                        if (_index == 0) {
+                          Navigator.of(context).pop();
+                        } else {
+                          _index -= 1;
+                        }
+                      });
+                    },
+                    onStepTapped: (index) {
+                      setState(() {
+                        _index = index;
+                      });
+                    },
+                    controlsBuilder: (BuildContext context,
+                        {VoidCallback onStepContinue,
+                        VoidCallback onStepCancel}) {
+                      return Container(
+                        margin: EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(50))),
+                                child: FlatButton(
+                                  child: Text(
+                                    'Zurück',
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.black),
+                                  ),
+                                  onPressed: () {
+                                    onStepCancel();
+                                  },
+                                )),
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: MoreaColors.violett,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(50))),
+                                child: FlatButton(
+                                  child: Text(
+                                    'Weiter',
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.white),
+                                  ),
+                                  onPressed: () {
+                                    onStepContinue();
+                                  },
+                                ))
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             );
-          }
-        });
+          });
+        }
+      },
+    );
+  }
+
+  List<Step> buildSteps(AsyncSnapshot snapshot) {
+    switch (formType) {
+      case FormType.ferien:
+        return [
+          Step(
+              title: Text('Ende Ferien', style: TextStyle(color: Colors.white),),
+              content: MoreaShadowContainer(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Datum Ende Ferien",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                          color: MoreaColors.violett,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: FlatButton(
+                        child: Text(
+                          datumEndeFerien,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          _selectDatumVon(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          Step(
+              title: Text('Abschliessen', style: TextStyle(color: Colors.white)),
+              content: MoreaShadowContainer(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Abschliessen",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                          color: MoreaColors.violett,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: FlatButton(
+                        child: Text(
+                          'Teleblitz ändern',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          this._ferien = true;
+                          this._noActivity = false;
+                          if (this.validateAndSave()) {
+                            this.uploadTeleblitz(_stufe, snapshot.data.getID(),
+                                snapshot.data.getSlug());
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Ein Fehler ist aufgetreten!'),
+                                  content:
+                                      Text('Bitte überprüfe deine Eingaben.'),
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ];
+        break;
+      case FormType.keineAktivitaet:
+        return [
+          Step(
+              title: Text('Datum', style: TextStyle(color: Colors.white)),
+              content: MoreaShadowContainer(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Datum auswählen",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                          color: MoreaColors.violett,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: FlatButton(
+                        child: Text(
+                          datumAnzeige,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          _selectDatum(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          Step(
+              title: Text('Grund', style: TextStyle(color: Colors.white)),
+              content: MoreaShadowContainer(
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Grund",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: grundController,
+                      maxLines: 10,
+                      minLines: 1,
+                      keyboardType: TextInputType.text,
+                      style: TextStyle(fontSize: 18),
+                      cursorColor: MoreaColors.violett,
+                      decoration: InputDecoration(
+                        labelText: 'Grund des Ausfalls',
+                        alignLabelWithHint: true,
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Bitte nicht leer lassen';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                    )
+                  ],
+                ),
+              )),
+          Step(
+              title: Text('Abschliessen', style: TextStyle(color: Colors.white)),
+              content: MoreaShadowContainer(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Abschliessen",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                          color: MoreaColors.violett,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: FlatButton(
+                        child: Text(
+                          'Teleblitz ändern',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          this._noActivity = true;
+                          this._ferien = false;
+                          if (this.validateAndSave()) {
+                            this.uploadTeleblitz(_stufe, snapshot.data.getID(),
+                                snapshot.data.getSlug());
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Ein Fehler ist aufgetreten!'),
+                                  content:
+                                      Text('Bitte überprüfe deine Eingaben.'),
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ];
+        break;
+      case FormType.normal:
+        return [
+          Step(
+              title: Text('Datum', style: TextStyle(color: Colors.white)),
+              content: MoreaShadowContainer(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Datum auswählen",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                          color: MoreaColors.violett,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: FlatButton(
+                        child: Text(
+                          datumAnzeige,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          _selectDatum(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          Step(
+            title: Text('Antreten', style: TextStyle(color: Colors.white)),
+            content: MoreaShadowContainer(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Antreten",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: ortAntretenController,
+                    maxLines: 2,
+                    minLines: 1,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Ort des Antretens',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  ),
+                  TextFormField(
+                    controller: zeitAntretenController,
+                    maxLines: 2,
+                    minLines: 1,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Zeit des Antretens',
+                      alignLabelWithHint: true,
+                      suffixText: 'Uhr',
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  ),
+                  TextFormField(
+                    controller: mapAntretenController,
+                    minLines: 1,
+                    maxLines: 5,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Google Maps Link',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Step(
+            title: Text('Abtreten', style: TextStyle(color: Colors.white)),
+            content: MoreaShadowContainer(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Abtreten",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: ortAbtretenController,
+                    maxLines: 2,
+                    minLines: 1,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Ort des Abtretens',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  ),
+                  TextFormField(
+                    controller: zeitAbtretenController,
+                    maxLines: 2,
+                    minLines: 1,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Zeit des Abtretens',
+                      alignLabelWithHint: true,
+                      suffixText: 'Uhr',
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  ),
+                  TextFormField(
+                    controller: mapAbtretenController,
+                    minLines: 1,
+                    maxLines: 5,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Google Maps Link',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Step(
+            title: Text('Mitnehmen', style: TextStyle(color: Colors.white)),
+            content: MoreaShadowContainer(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Mitnehmen",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: this.mitnehmenControllerList.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      return TextFormField(
+                        controller: mitnehmenControllerList[index],
+                        minLines: 1,
+                        maxLines: 2,
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(fontSize: 18),
+                        cursorColor: MoreaColors.violett,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Bitte nicht leer lassen';
+                          } else {
+                            return null;
+                          }
+                        },
+                      );
+                    },
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                    child: FractionallySizedBox(
+                      widthFactor: 1,
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 1,
+                            child: Container(),
+                          ),
+                          Expanded(
+                            flex: 7,
+                            child: RaisedButton.icon(
+                              onPressed: () {
+                                this.setState(() {
+                                  mitnehmenControllerList
+                                      .add(TextEditingController());
+                                });
+                              },
+                              icon: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 10,
+                              ),
+                              label: Text(
+                                "Element",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
+                              ),
+                              color: MoreaColors.violett,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5))),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(),
+                          ),
+                          Expanded(
+                            flex: 7,
+                            child: RaisedButton.icon(
+                                onPressed: () {
+                                  this.setState(() {
+                                    mitnehmenControllerList.removeLast();
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.remove,
+                                  color: Colors.white,
+                                  size: 10,
+                                ),
+                                label: Text(
+                                  "Element",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                ),
+                                color: MoreaColors.violett,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)))),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Step(
+            title: Text('Fussnote', style: TextStyle(color: Colors.white)),
+            content: MoreaShadowContainer(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      "Fussnote",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: bemerkungController,
+                    maxLines: 2,
+                    minLines: 1,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Bemerkung',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  ),
+                  TextFormField(
+                    controller: senderController,
+                    minLines: 1,
+                    maxLines: 10,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 18),
+                    cursorColor: MoreaColors.violett,
+                    decoration: InputDecoration(
+                      labelText: 'Sender',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Bitte nicht leer lassen';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Step(
+              title: Text('Abschliessen', style: TextStyle(color: Colors.white)),
+              content: MoreaShadowContainer(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        "Abschliessen",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                          color: MoreaColors.violett,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: FlatButton(
+                        child: Text(
+                          'Teleblitz ändern',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          this._noActivity = false;
+                          this._ferien = false;
+                          if (this.validateAndSave()) {
+                            this.uploadTeleblitz(_stufe, snapshot.data.getID(),
+                                snapshot.data.getSlug());
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Ein Fehler ist aufgetreten!'),
+                                  content:
+                                      Text('Bitte überprüfe deine Eingaben.'),
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ];
+        break;
+    }
   }
 
   bool validateAndSave() {
@@ -864,8 +972,15 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     }
     var teleblitz = TeleblitzInfo.fromJson(infos);
     datumController.text = teleblitz.getDatum();
-    antretenController.text = teleblitz.getAntreten();
-    abtretenController.text = teleblitz.getAbtreten();
+    this.antreten = teleblitz.getAntreten();
+    List splittedAntreten = antreten.split(',');
+    ortAntretenController.text = splittedAntreten[0];
+    zeitAntretenController.text = splittedAntreten[1].replaceAll(' ', '').replaceAll('Uhr', '');
+    this.abtreten = teleblitz.getAbtreten();
+    List splittedAbtreten = this.abtreten.split(',');
+    ortAbtretenController.text = splittedAbtreten[0];
+    zeitAbtretenController.text = splittedAbtreten[1].replaceAll(' ', '').replaceAll('Uhr', '');
+
     for (var u in teleblitz.getMitnehmen()) {
       print(u);
       if (!(this.mitnehmenControllerMap.containsKey(u))) {
@@ -895,17 +1010,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     String _jsonMitnehmen;
 
     List<String> _mitnehmen = List<String>();
-    validateAndSave();
 
     for (var u in mitnehmenControllerList) {
       _mitnehmen.add(u.text);
     }
 
+    this.antreten = ortAntretenController.text + ', ' + zeitAntretenController.text + ' Uhr';
+    this.abtreten = ortAbtretenController.text + ', ' + zeitAbtretenController.text + ' Uhr';
+
     TeleblitzInfo newteleblitz = TeleblitzInfo.fromString(
         _stufe,
         datumController.text,
-        antretenController.text,
-        abtretenController.text,
+        this.antreten,
+        this.abtreten,
         bemerkungController.text,
         senderController.text,
         _id,
@@ -948,16 +1065,16 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     }
     Map<String, dynamic> data;
     data = {
-      "abtreten": abtretenController.text,
-      "antreten": antretenController.text,
+      "abtreten": this.abtreten,
+      "antreten": this.antreten,
       "bemerkung": bemerkungController.text,
       "datum": datumController.text,
-      "keine-aktivitat": _noActivity.toString(),
+      "keine-aktivitat": _noActivity,
       "mitnehmen-test": _jsonMitnehmen,
       "name-des-senders": senderController.text,
       "google-map": mapAntretenController.text,
       "map-abtreten": mapAbtretenController.text,
-      'ferien': _ferien.toString(),
+      'ferien': _ferien,
       'ende-ferien': datumEndeFerien,
       'grund': grundController.text,
     };
@@ -965,7 +1082,23 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     Navigator.pop(context);
   }
 
-  Future<Null> _selectDatumvon(BuildContext context) async {
+  Future<Null> _selectDatum(BuildContext context) async {
+    DateTime now = DateTime.now();
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: now,
+        firstDate: now,
+        lastDate: now.add(Duration(days: 9999)));
+    if (picked != null) {
+      setState(() {
+        datumController.text =
+            DateFormat('EEEE, dd.MM.yyy', 'de_DE').format(picked);
+        datumAnzeige = DateFormat('dd.MM.yyy').format(picked);
+      });
+    }
+  }
+
+  Future<Null> _selectDatumVon(BuildContext context) async {
     DateTime now = DateTime.now();
     final DateTime picked = await showDatePicker(
       context: context,

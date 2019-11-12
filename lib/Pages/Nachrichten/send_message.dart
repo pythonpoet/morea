@@ -18,13 +18,19 @@ class _SendMessagesState extends State<SendMessages> {
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   UniqueKey dropdownKey = UniqueKey();
-  String dropdownValue;
+  List<String> receiver = <String>[];
   TextEditingController titleController = TextEditingController();
   FocusNode titleFocus = FocusNode();
   TextEditingController inhaltController = TextEditingController();
   FocusNode inhaltFocus = FocusNode();
   TextEditingController vorschauController = TextEditingController();
   FocusNode vorschauFocus = FocusNode();
+
+  bool biberCheckBox = false;
+  bool woelfeCheckBox = false;
+  bool meitliCheckBox = false;
+  bool buebeCheckBox = false;
+  bool pioCheckBox = false;
 
   @override
   void initState() {
@@ -43,25 +49,46 @@ class _SendMessagesState extends State<SendMessages> {
     vorschauFocus.dispose();
   }
 
+  _showDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Bitte Empfänger auswählen'),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            if (_formKey.currentState.validate()) {
-              Map<String, dynamic> data = {
-                'body': inhaltController.text,
-                'read': Map<String, bool>(),
-                'sender': userInfo['Pfadinamen'],
-                'snippet': vorschauController.text,
-                'title': titleController.text
-              };
-              moreaFire.uploadMessage(dropdownValue, data);
-              print('Successful');
-              Navigator.of(context).pop();
-            }
-          });
+          if (biberCheckBox ||
+              woelfeCheckBox ||
+              meitliCheckBox ||
+              buebeCheckBox ||
+              pioCheckBox) {
+            setState(() {
+              if (_formKey.currentState.validate()) {
+                Map<String, dynamic> data = {
+                  'body': inhaltController.text,
+                  'read': Map<String, bool>(),
+                  'sender': userInfo['Pfadinamen'],
+                  'snippet': vorschauController.text,
+                  'title': titleController.text
+                };
+                for(String i in receiver){
+                  moreaFire.uploadMessage(i, data);
+                }
+                print('Successful');
+                Navigator.of(context).pop();
+              }
+            });
+          } else {
+            print('error');
+            _showDialog(context);
+          }
         },
         child: Icon(Icons.send),
         backgroundColor: MoreaColors.violett,
@@ -83,50 +110,92 @@ class _SendMessagesState extends State<SendMessages> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 15),
                 ),
-                DropdownButtonFormField(
-                  value: dropdownValue,
-                  key: dropdownKey,
-                  items: [
-                    DropdownMenuItem(
-                        child: Text('Bitte Empfänger wählen'), value: null),
-                    DropdownMenuItem(child: Text('Biber'), value: 'Biber'),
-                    DropdownMenuItem(
-                        child: Text('Wombat'), value: 'Wombat (Wölfe)'),
-                    DropdownMenuItem(
-                        child: Text('Nahani'), value: 'NahaniMeitli'),
-                    DropdownMenuItem(
-                        child: Text('Drason'), value: 'DrasonBuebe'),
-                  ],
-                  onChanged: (newValue) {
-                    FocusScope.of(context).requestFocus(titleFocus);
+                CheckboxListTile(
+                  value: biberCheckBox,
+                  onChanged: (bool val) {
                     setState(() {
-                      dropdownValue = newValue;
+                      if(val) {
+                        receiver.add('Biber');
+                      } else {
+                        receiver.remove('Biber');
+                      }
+                      biberCheckBox = val;
                     });
                   },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Bitte Empfänger wählen';
-                    }
-                    return null;
+                  title: Text('Biber', style: TextStyle(fontSize: 20),),
+                  controlAffinity: ListTileControlAffinity.platform,
+                ),
+                CheckboxListTile(
+                  value: woelfeCheckBox,
+                  onChanged: (bool val) {
+                    setState(() {
+                      if(val) {
+                        receiver.add('WombatWlfe');
+                      } else {
+                        receiver.remove('WombatWlfe');
+                      }
+                      woelfeCheckBox = val;
+                    });
                   },
-                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  title: Text('Wölfe', style: TextStyle(fontSize: 20),),
+                  controlAffinity: ListTileControlAffinity.platform,
+                ),
+                CheckboxListTile(
+                  value: meitliCheckBox,
+                  onChanged: (bool val) {
+                    setState(() {
+                      if(val) {
+                        receiver.add('NahaniMeitli');
+                      } else {
+                        receiver.remove('NahaniMeitli');
+                      }
+                      meitliCheckBox = val;
+                    });
+                  },
+                  title: Text('Meitli', style: TextStyle(fontSize: 20),),
+                  controlAffinity: ListTileControlAffinity.platform,
+                ),
+                CheckboxListTile(
+                  value: buebeCheckBox,
+                  onChanged: (bool val) {
+                    setState(() {
+                      if(val) {
+                        receiver.add('DrasonBuebe');
+                      } else {
+                        receiver.remove('DrasonBuebe');
+                      }
+                      buebeCheckBox = val;
+                    });
+                  },
+                  title: Text('Buebe', style: TextStyle(fontSize: 20),),
+                  controlAffinity: ListTileControlAffinity.platform,
+                ),
+                CheckboxListTile(
+                  value: pioCheckBox,
+                  onChanged: (bool val) {
+                    setState(() {
+                      if(val) {
+                        receiver.add('Pios');
+                      } else {
+                        receiver.remove('Pios');
+                      }
+                      pioCheckBox = val;
+                    });
+                  },
+                  title: Text('Pios', style: TextStyle(fontSize: 20),),
+                  controlAffinity: ListTileControlAffinity.platform,
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 20),
                 ),
-                Text(
-                  'Betreff',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 15),
-                ),
                 TextFormField(
                   focusNode: titleFocus,
+                  style: TextStyle(fontSize: 16),
                   controller: titleController,
                   decoration: InputDecoration(
-                    hintText: 'Bspw: Fama',
+                    helperText: 'Bspw: Fama',
                     border: OutlineInputBorder(),
+                    labelText: 'Betreff',
                   ),
                   onSaved: (newValue) {
                     setState(() {
@@ -158,10 +227,11 @@ class _SendMessagesState extends State<SendMessages> {
                   keyboardType: TextInputType.text,
                   focusNode: vorschauFocus,
                   controller: vorschauController,
-                  minLines: 1,
-                  maxLines: 2,
+                  style: TextStyle(fontSize: 20),
+                  minLines: 2,
+                  maxLines: 4,
                   decoration: InputDecoration(
-                    labelText: 'Text',
+                    helperText: 'Dieser Text wird in der Benachrichtigung angezeigt.',
                     border: OutlineInputBorder(),
                   ),
                   onSaved: (newValue) {
@@ -193,10 +263,13 @@ class _SendMessagesState extends State<SendMessages> {
                 TextFormField(
                   focusNode: inhaltFocus,
                   controller: inhaltController,
-                  minLines: 3,
+                  style: TextStyle(fontSize: 20),
+                  minLines: 5,
                   maxLines: 1000,
                   decoration: InputDecoration(
-                    labelText: 'Text',
+                    labelText: 'Nachricht',
+                    alignLabelWithHint: true,
+                    helperText: 'Dieser Text wird in der App beim Öffnen der Nachricht angezeigt.',
                     border: OutlineInputBorder(),
                   ),
                   onSaved: (newValue) {

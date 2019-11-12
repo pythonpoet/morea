@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Grundbausteine/login_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
-
 import 'package:morea/services/auth.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 
 
@@ -26,6 +27,7 @@ class _RootPageState extends State<RootPage>{
 
   void initState() {
     super.initState();
+    initializeDateFormatting();
     widget.auth.currentUser().then((userId){
       setState(() {
         authStatus = userId == null ? AuthStatus.notSignedIn : AuthStatus.signedIn;
