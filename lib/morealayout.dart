@@ -98,4 +98,5 @@ class MoreaTextStyle {
             blurRadius: 6),
       ]);
   static TextStyle lable = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16);
+  static TextStyle normal = TextStyle(color: Colors.black, fontSize: 16);
 }

@@ -36,7 +36,7 @@ class _RootPageState extends State<RootPage>{
     
   }
 
-  void _signedIn(){
+  void signedIn(){
     setState(() {
       authStatus = AuthStatus.signedIn;
     });
@@ -52,7 +52,7 @@ class _RootPageState extends State<RootPage>{
       case AuthStatus.notSignedIn:
         return new LoginPage(
             auth: widget.auth,
-            onSignedIn: _signedIn,
+            onSignedIn: signedIn,
         );
 
       case AuthStatus.signedIn:

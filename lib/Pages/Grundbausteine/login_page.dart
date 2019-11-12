@@ -424,10 +424,7 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Pfadi Morea'),
-          backgroundColor: Color(0xff7a62ff),
-        ),
+      appBar: AppBar(),
         body: Stack(
           children: <Widget>[
             Container(

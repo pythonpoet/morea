@@ -4,6 +4,7 @@ import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/Pages/Profil/profil.dart';
 import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
@@ -431,7 +432,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         Expanded(
                           child: FlatButton(
                             padding: EdgeInsets.symmetric(vertical: 15),
-                            onPressed: null,
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    Profile(userInfo, widget.auth, widget.onSigedOut)
+                              )
+                            ),
                             child: Column(
                               children: <Widget>[
                                 Icon(Icons.person, color: Colors.white),
