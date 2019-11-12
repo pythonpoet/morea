@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Login',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
-        primarySwatch: MaterialColor(MoreaColors.violettInt, MoreaColors.violettMaterialColor),
+        primarySwatch: MaterialColor(MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
       ),
       home: new RootPage(auth: new Auth()),
     );

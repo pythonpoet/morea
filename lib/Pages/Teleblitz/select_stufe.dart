@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'change_teleblitz.dart';
 import 'package:morea/morealayout.dart';
+import 'select_teleblitz_type.dart';
 
 class SelectStufe extends StatelessWidget {
   SelectStufe();
@@ -11,106 +12,111 @@ class SelectStufe extends StatelessWidget {
       appBar: AppBar(
         title: Text("Stufe wählen"),
       ),
-      body: Container(
-        child: Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  "Stufe auswählen",
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                decoration: BoxDecoration(
-                    color: MoreaColors.violett,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: FlatButton(
-                  child: Text(
-                    "Biber",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) {
+          return Container(
+            decoration: BoxDecoration(
+              color: MoreaColors.orange,
+              image: DecorationImage(
+                  image: AssetImage('assets/images/background.png'),
+                  alignment: Alignment.bottomCenter),
+            ),
+            alignment: Alignment.topCenter,
+            child: Container(
+              decoration: MoreaShadow.teleblitz,
+              margin: EdgeInsets.all(20),
+              constraints:
+                  BoxConstraints(minWidth: viewportConstraints.maxWidth),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      "Stufe auswählen",
+                      style: MoreaTextStyle.title,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  onPressed: () => Navigator.of(context).push(
-                      new MaterialPageRoute(
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(thickness: 1, color: Colors.black26,)
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Biber",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    contentPadding: EdgeInsets.only(right: 15, left: 15,),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            SelectTeleblitzType('Biber')
+                      ));
+                    },
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(thickness: 1, color: Colors.black26,)
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Wombat",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    contentPadding: EdgeInsets.only(right: 15, left: 15,),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              new ChangeTeleblitz(
-                                stufe: "Biber",
-                              ))),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                decoration: BoxDecoration(
-                    color: MoreaColors.violett,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: FlatButton(
-                  child: Text(
-                    "Wombat",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                              SelectTeleblitzType('Wombat (Wölfe)')
+                      ));
+                    },
                   ),
-                  onPressed: () => Navigator.of(context).push(
-                      new MaterialPageRoute(
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(thickness: 1, color: Colors.black26,)
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Nahani",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    contentPadding: EdgeInsets.only(right: 15, left: 15,),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              new ChangeTeleblitz(
-                                stufe: "Wombat (Wölfe)",
-                              ))),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                decoration: BoxDecoration(
-                    color: MoreaColors.violett,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: FlatButton(
-                  child: Text(
-                    "Nahani",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                              SelectTeleblitzType('Nahani (Meitli)')
+                      ));
+                    },
                   ),
-                  onPressed: () => Navigator.of(context).push(
-                      new MaterialPageRoute(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(thickness: 1, color: Colors.black26,)
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Drason",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    contentPadding: EdgeInsets.only(right: 15, left: 15, bottom: 15),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              new ChangeTeleblitz(
-                                stufe: "Nahani (Meitli)",
-                              ))),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                decoration: BoxDecoration(
-                    color: MoreaColors.violett,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: FlatButton(
-                  child: Text(
-                    "Drason",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                              SelectTeleblitzType('Drason (Buebe)')
+                      ));
+                    },
                   ),
-                  onPressed: () => Navigator.of(context)
-                          .push(new MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  new ChangeTeleblitz(
-                                    stufe: "Drason (Buebe)",
-                                  )))
-                          .then((onValue) {
-                        Navigator.pop(context);
-                      }),
-                ),
+                ],
               ),
-            ],
-          ),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            border: Border.all(width: 1, color: Colors.black26),
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
-          margin: EdgeInsets.all(50),
-          constraints: BoxConstraints(maxWidth: 250, maxHeight: 350),
-        ),
-        alignment: Alignment.topCenter,
+            ),
+          );
+        },
       ),
     );
   }

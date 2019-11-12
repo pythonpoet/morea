@@ -6,17 +6,20 @@ import 'dart:convert';
 import 'auth.dart';
 import 'morea_firestore.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:morea/morealayout.dart';
 
 abstract class BaseTeleblitz {
-  Widget anzeigen(String _stufe);
+  Widget anzeigen(
+      String _stufe, AnimationController _controller, Animation _animation, AnimationController _loadingController, Animation _loadingAnimation);
 }
 
 class Teleblitz implements BaseTeleblitz {
   MoreaFirebase moreafire = new MoreaFirebase();
   bool block = false;
+  List<String> loadingList = ['Loading.', 'Loading..', 'Loading...'];
 
   String _formatDate(String date) {
-    if (date != '' && date!=null) {
+    if (date != '' && date != null) {
       String rawDate = date.split('T')[0];
       List<String> dates = rawDate.split('-');
       String formatedDate = dates[2] + '.' + dates[1] + '.' + dates[0];
@@ -50,9 +53,9 @@ class Teleblitz implements BaseTeleblitz {
             info.setBemerkung(u["bemerkung"]);
             info.setSender(u["name-des-senders"]);
             info.setMitnehmen(u['mitnehmen-test']);
-            info.setkeineAktivitat(u['keine-aktivitat'].toString());
+            info.setkeineAktivitat(u['keine-aktivitat']);
             info.setGrund(u['grund']);
-            info.setFerien(u['ferien'].toString());
+            info.setFerien(u['ferien']);
             info.setEndeFerien(_formatDate(u['ende-ferien']));
             telblitz = {
               'datum': info.datum,
@@ -92,28 +95,52 @@ class Teleblitz implements BaseTeleblitz {
     }
   }
 
-  Widget anzeigen(String _stufe) {
+  Widget anzeigen(
+      String _stufe, AnimationController _controller, Animation _animation, AnimationController _loadingController, Animation _loadingAnimation) {
     try {
       return new FutureBuilder(
           future: getInfos(_stufe),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.data == null) {
-              return Container(
-                child: Center(
-                    child: Container(
-                  padding: EdgeInsets.all(120),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: new Text('Loading...'),
-                      ),
-                      Expanded(child: new CircularProgressIndicator())
-                    ],
-                  ),
-                )),
+              return MoreaShadowContainer(
+                child: Column(
+                  children: <Widget>[
+                    AnimatedBuilder(
+                      animation: _controller,
+                      child: Image(
+                          image: AssetImage('assets/icon/logo_loading.png')),
+                      builder: (BuildContext context, Widget child) {
+                        return Transform.rotate(
+                          angle: _animation.value,
+                          child: child,
+                        );
+                      },
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20),
+                    ),
+                    AnimatedBuilder(
+                      animation: _loadingController,
+                      child: Text('Loading'),
+                      builder: (BuildContext context, Widget child) {
+                        return Text(
+                          loadingList[_loadingAnimation.value],
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Raleway',
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                          textAlign: TextAlign.left,
+                        );
+                      },
+                    )
+                  ],
+                ),
               );
             } else {
-              if (snapshot.data.keineaktivitat == 'true') {
+              if (snapshot.data.keineaktivitat) {
                 return Container(
                   margin: EdgeInsets.all(20),
                   padding: EdgeInsets.all(15),
@@ -125,17 +152,10 @@ class Teleblitz implements BaseTeleblitz {
                       snapshot.data.getGrund()
                     ],
                   ),
-                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                        offset: Offset(3, 3),
-                        blurRadius: 40)
-                  ]),
+                  decoration: MoreaShadow.teleblitz,
                 );
-              } else if (snapshot.data.ferien == 'true') {
-                return Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(15),
+              } else if (snapshot.data.ferien) {
+                return MoreaShadowContainer(
                   child: Column(
                     children: <Widget>[
                       snapshot.data.getTitel(),
@@ -144,12 +164,6 @@ class Teleblitz implements BaseTeleblitz {
                       snapshot.data.getEndeFerien(),
                     ],
                   ),
-                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                        offset: Offset(3, 3),
-                        blurRadius: 40)
-                  ]),
                 );
               }
               return Container(
@@ -166,15 +180,7 @@ class Teleblitz implements BaseTeleblitz {
                       snapshot.data.getSender(),
                     ],
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.16),
-                          offset: Offset(3, 3),
-                          blurRadius: 40)
-                    ],
-                  ));
+                  decoration: MoreaShadow.teleblitz);
             }
           });
     } catch (e) {
@@ -207,9 +213,9 @@ class Info {
   String bemerkung;
   String sender;
   String mitnehmen;
-  String keineaktivitat;
+  bool keineaktivitat;
   String grund;
-  String ferien;
+  bool ferien;
   String endeferien;
   double _sizeleft = 110;
 
@@ -249,7 +255,7 @@ class Info {
     this.mitnehmen = mitnehmen;
   }
 
-  void setkeineAktivitat(String aktv) {
+  void setkeineAktivitat(bool aktv) {
     this.keineaktivitat = aktv;
   }
 
@@ -257,7 +263,7 @@ class Info {
     this.grund = grund;
   }
 
-  void setFerien(String ferien) {
+  void setFerien(bool ferien) {
     this.ferien = ferien;
   }
 
@@ -267,18 +273,19 @@ class Info {
 
   Container getTitel() {
     return Container(
+      color: Color(0),
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
       alignment: Alignment.topLeft,
       child: Text(this.titel,
           style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+              fontSize: 34,
+              fontWeight: FontWeight.w700,
               color: Color(0xff7a62ff),
               shadows: <Shadow>[
                 Shadow(
                     color: Color.fromRGBO(0, 0, 0, 0.25),
-                    offset: Offset(0, 6),
-                    blurRadius: 12),
+                    offset: Offset(0, 3),
+                    blurRadius: 6),
               ])),
     );
   }
@@ -291,7 +298,7 @@ class Info {
             SizedBox(
               child: Text(
                 'Keine Aktivität',
-                style: TextStyle(fontSize: 30),
+                style: TextStyle(fontSize: 24),
               ),
             ),
             Expanded(
@@ -302,7 +309,7 @@ class Info {
   }
 
   Container getAntreten() {
-    if ((keineaktivitat == 'false') || (this?.antreten?.isNotEmpty ?? false)) {
+    if ((!(keineaktivitat)) || (this?.antreten?.isNotEmpty ?? false)) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -337,7 +344,7 @@ class Info {
   }
 
   Container getAbtreten() {
-    if ((keineaktivitat == false) || (this?.abtreten?.isNotEmpty ?? false)) {
+    if ((!(keineaktivitat)) || (this?.abtreten?.isNotEmpty ?? false)) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -397,7 +404,7 @@ class Info {
   }
 
   Container getBemerkung() {
-    if ((keineaktivitat == false) || (this?.bemerkung?.isNotEmpty ?? false)) {
+    if ((!(keineaktivitat)) || (this?.bemerkung?.isNotEmpty ?? false)) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(
@@ -447,7 +454,7 @@ class Info {
   }
 
   Container getSender() {
-    if ((keineaktivitat == false) || (this?.sender?.isNotEmpty ?? false)) {
+    if ((!(keineaktivitat)) || (this?.sender?.isNotEmpty ?? false)) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
@@ -478,7 +485,7 @@ class Info {
   }
 
   Container getMitnehmen() {
-    if ((keineaktivitat == false) || (this?.antreten?.isNotEmpty ?? false)) {
+    if ((!(keineaktivitat)) || (this?.antreten?.isNotEmpty ?? false)) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(
@@ -620,7 +627,7 @@ class Info {
   TextStyle _getStyleRight() {
     return TextStyle(
       fontSize: 20,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w400,
     );
   }
 }
