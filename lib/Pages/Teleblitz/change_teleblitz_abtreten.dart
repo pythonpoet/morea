@@ -109,6 +109,8 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                           child: Text('Uhrzeit', style: MoreaTextStyle.lable,),
                         ),
                         Container(
+                          constraints: BoxConstraints(minWidth: viewportConstraints.maxWidth),
+                          alignment: Alignment.centerLeft,
                           margin:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                           decoration: BoxDecoration(

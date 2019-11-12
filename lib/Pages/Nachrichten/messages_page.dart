@@ -178,12 +178,31 @@ class _MessagesPageState extends State<MessagesPage> {
               if (!snapshot.hasData) {
                 return Text('Loading...');
               } else {
-                return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (context, index) {
-                      var document = snapshot.data.documents[index];
-                      return _buildListItem(context, document);
-                    });
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text('Nachrichten', style: MoreaTextStyle.title,),
+                            ),
+                            ListView.builder(
+                                itemCount: snapshot.data.documents.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               }
             }),
       );
@@ -319,12 +338,25 @@ class _MessagesPageState extends State<MessagesPage> {
               if (!snapshot.hasData) {
                 return Text('Loading...');
               } else {
-                return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (context, index) {
-                      var document = snapshot.data.documents[index];
-                      return _buildListItem(context, document);
-                    });
+                return LayoutBuilder(
+                  builder: (context, viewportConstraints) {
+                    return MoreaBackgroundContainer(
+                      child: SingleChildScrollView(
+                        child: MoreaShadowContainer(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: ListView.builder(
+                                itemCount: snapshot.data.documents.length,
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
               }
             }),
       );

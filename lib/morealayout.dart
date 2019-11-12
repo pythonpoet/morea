@@ -97,5 +97,5 @@ class MoreaTextStyle {
             offset: Offset(0, 3),
             blurRadius: 6),
       ]);
-  static TextStyle lable = TextStyle(color: Colors.black54);
+  static TextStyle lable = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16);
 }
