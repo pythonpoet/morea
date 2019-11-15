@@ -1,64 +1,27 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/services/Getteleblitz.dart';
-import 'package:morea/services/auth.dart';
-import 'package:morea/services/crud.dart';
-import 'package:morea/services/morea_firestore.dart';
-import 'package:async/async.dart';
-import 'package:morea/services/dwi_format.dart';
+import 'package:morea/Widgets/standart/info.dart';
+import 'package:morea/services/Teleblitz/teleblitzAnmeldungen.dart';
 
 class WerChunt extends StatefulWidget {
-  WerChunt({this.auth, this.onSigedOut, this.crud, this.userInfo});
-  var userInfo;
-  final BaseAuth auth;
+  WerChunt({ this.onSigedOut, this.firestore, this.eventID});
+  final String eventID;
   final VoidCallback onSigedOut;
-  final BaseCrudMethods crud;
+  final Firestore firestore;
+
+
   @override
   State<StatefulWidget> createState() => _WerChuntState();
 }
 
 class _WerChuntState extends State<WerChunt> {
-  Auth auth0 = new Auth();
-  final formKey = new GlobalKey<FormState>();
-  Info teleblitzinfo = new Info();
-  MoreaFirebase moreafire = new MoreaFirebase();
-  DWIFormat dwiFormat = new DWIFormat();
-
-  DocumentSnapshot qsuserInfo, dsanmeldedat;
-  Map<String, String> anmeldeDaten;
-  List<String> lchunt=[' '], lchuntnoed=[' '];
-
-
- sortlist()async{
-    String stufe = dwiFormat.simplestring(widget.userInfo['Stufe']);
-    String datum = dwiFormat.simplestring(teleblitzinfo.datum);
-
-    QuerySnapshot qsdata = await moreafire.getTNs(stufe, datum);
-      
-      for(int i=0; i < qsdata.documents.length; i++){
-        if(qsdata.documents[i].data['Anmeldung']=='Chunt'){
-          if(lchunt[0]==' '){
-            lchunt[0]=qsdata.documents[i].data['Anmeldename'];
-          }else{
-            lchunt.add(qsdata.documents[i].data['Anmeldename']);
-          }  
-        }else if(qsdata.documents[i].data['Anmeldung']=='Chunt nöd'){
-          if(lchuntnoed[0]==' '){
-            lchuntnoed[0]= qsdata.documents[i].data['Anmeldename'];
-          }else{
-             lchuntnoed.add(qsdata.documents[i].data['Anmeldename']);
-          }           
-        }else{
-          print('Firesotre für uebung anmelden ist komisch');
-        }
-        setState(() {
-          
-        });
-      }
-}
+  TeleblitzAnmeldungen teleblitzAnmeldungen;
+  
+  
   @override
   void initState() {
-    sortlist();
+    teleblitzAnmeldungen = new TeleblitzAnmeldungen(widget.firestore, widget.eventID);
     super.initState();
   }
 
@@ -83,35 +46,53 @@ class _WerChuntState extends State<WerChunt> {
         ),
         body: TabBarView(
           children: <Widget>[
-            chunt(),
-            chuntnoed()
+            Container(
+              child: chunt(),
+              height: 50,
+            ),
+           
+            Container(
+              child: chuntnoed(),
+              height: 50,
+            ),
           ],
         ),
       ),
     );
   }
+   
   Widget chunt(){
-    return Container(
-              child: ListView.builder(
-                itemCount: lchunt.length,
-                itemBuilder: (context , int index){
-                  return new ListTile(
-                    title: new Text(lchunt[index]),
-                  );
-                }
-              ),
+    return StreamBuilder(
+      stream: teleblitzAnmeldungen.getAnmeldungen,
+      builder: (context,  AsyncSnapshot<dynamic> aSAngemolden){
+        if(!aSAngemolden.hasData) return moreaLoadingIndicator();
+        if(aSAngemolden.data.length==0) return  Center(child:Text('Niemand hat sich angemolden', style: TextStyle(fontSize: 20),));
+        return ListView.builder(
+          itemCount: aSAngemolden.data.length,
+          itemBuilder: (context, int index){
+            return ListTile(
+              title: new Text(aSAngemolden.data[index].toString()),
             );
+          }
+        );
+      }
+    );
   }
   Widget chuntnoed(){
-    return new Container(
-      child: ListView.builder(
-        itemCount: lchuntnoed.length,
-        itemBuilder: (context , int index){
-          return new ListTile(
-            title: new Text(lchuntnoed[index]),
-          );
-        }
-      ),
+    return StreamBuilder(
+      stream: teleblitzAnmeldungen.getAbmeldungen,
+      builder: (context, AsyncSnapshot<dynamic> asAbgemolden){
+        if(!asAbgemolden.hasData) return moreaLoadingIndicator();
+        if(asAbgemolden.data.length==0) return  Center(child:Text('Niemand hat sich abgemolden', style: TextStyle(fontSize: 20),));
+        return ListView.builder(
+          itemCount: asAbgemolden.data.length,
+          itemBuilder: (context, int index){
+            return ListTile(
+              title: new Text(asAbgemolden.data[index].toString()),
+            );
+          }
+        );
+      }
     );
   }
 

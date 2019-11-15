@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/crud.dart';
 import 'parents.dart';
@@ -6,10 +7,11 @@ import 'chilld_Qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
-  ProfilePageState({this.profile});
+  ProfilePageState({this.profile, this.firestore});
+  final Firestore firestore;
 
   var profile;
-  MergeChildParent mergeChildParent = new MergeChildParent();
+ // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
 
   @override
   State<StatefulWidget> createState() => ProfilePageStatePage();
@@ -22,15 +24,17 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   ProfilePageStatePage._();
 
-  //MergeChildParent mergeChildParent = new MergeChildParent();
-  MoreaFirebase moreaFire = MoreaFirebase();
-  CrudMedthods crud0 = new CrudMedthods();
+  MergeChildParent mergeChildParent;
+  MoreaFirebase moreaFire;
+  CrudMedthods crud0;
 
   bool hatEltern = false, hatKinder = false, display = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
   String qrCodeString;
   List elternMapList = ['Liam Bebecho'], kinderMapList = ['Walter'];
+  
+ 
 
   void reload() async {
     value = controller.stream;
@@ -84,7 +88,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   void parentaktuallisieren() {
     if (display) {
-      if (!widget.mergeChildParent.parentReaderror) {
+      if (!mergeChildParent.parentReaderror) {
         display = false;
       }
     } else {
@@ -121,6 +125,9 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   @override
   void initState() {
+    mergeChildParent = new MergeChildParent(widget.firestore);
+     moreaFire = MoreaFirebase(widget.firestore);
+     crud0 = new CrudMedthods(widget.firestore);
     if (widget.profile['Pos'] == 'Teilnehmer') {
       reload();
       erziungsberechtigte();
@@ -155,7 +162,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? widget.mergeChildParent
+                        ? mergeChildParent
                             .childShowQrCode(qrCodeString, context)
                         : Container(),
                   )
@@ -184,7 +191,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? widget.mergeChildParent.parentScannsQrCode(
+                        ? mergeChildParent.parentScannsQrCode(
                             widget.profile['UID'], widget.profile['Vorname'])
                         : Container(),
                   )

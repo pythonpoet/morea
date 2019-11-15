@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
@@ -11,18 +12,17 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
+  ChangeTeleblitz({this.auth, this.crud, this.onSignedOut, this.stufe, this.firestore, @required this.formType, this.moreaFire});
+
+  final Firestore firestore;
   final String stufe;
   final BaseAuth auth;
   final VoidCallback onSignedOut;
   final BaseCrudMethods crud;
   final String formType;
+  final MoreaFirebase moreaFire;
 
-  ChangeTeleblitz(
-      {this.auth,
-      this.crud,
-      this.onSignedOut,
-      this.stufe,
-      @required this.formType});
+ 
 
   @override
   State<StatefulWidget> createState() => _ChangeTeleblitzState();
@@ -33,7 +33,7 @@ enum FormType { keineAktivitaet, ferien, normal }
 class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     with SingleTickerProviderStateMixin {
   Auth auth0 = Auth();
-  MoreaFirebase moreafire = MoreaFirebase();
+  
   String _stufe;
   final _formKey = GlobalKey<FormState>();
   final datumController = TextEditingController();
@@ -65,6 +65,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
   FormType formType;
   int _index = 0;
   int _maxIndex;
+
+ 
 
   void initState() {
     super.initState();
@@ -1078,7 +1080,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       'ende-ferien': datumEndeFerien,
       'grund': grundController.text,
     };
-    moreafire.uploadteleblitz(_stufe, data);
+    widget.moreaFire.uploadteleblitz(_stufe, data);
     Navigator.pop(context);
   }
 

@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/services/qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/utilities/qr_code.dart';
 
 class ChildShowsQrCodeState extends StatefulWidget{
-  ChildShowsQrCodeState({this.childUID});
+  ChildShowsQrCodeState({this.childUID, this.firestore});
   String childUID;
+  final Firestore firestore;
   @override
   State<StatefulWidget> createState() => ChildShowsQrCodeStatePage();
 }
@@ -25,7 +26,7 @@ class ChildShowsQrCodeStatePage extends State<ChildShowsQrCodeState>{
   @override
   Widget build(BuildContext context) {
   QrCode qrCode = new QrCode();
-  MoreaFirebase moreafire = new MoreaFirebase();
+  MoreaFirebase moreafire = new MoreaFirebase(widget.firestore);
     return Container(
       padding: EdgeInsets.all(20),
       child: Card(

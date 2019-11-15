@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'change_teleblitz.dart';
 import 'package:morea/morealayout.dart';
 import 'select_teleblitz_type.dart';
 
 class SelectStufe extends StatelessWidget {
-  SelectStufe();
+  SelectStufe({MoreaFirebase moreaFire});
+  MoreaFirebase moreaFire;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,7 @@ class SelectStufe extends StatelessWidget {
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            SelectTeleblitzType('Biber')
+                            SelectTeleblitzType('Biber', moreaFire)
                       ));
                     },
                   ),
@@ -72,7 +74,7 @@ class SelectStufe extends StatelessWidget {
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              SelectTeleblitzType('Wombat (Wölfe)')
+                              SelectTeleblitzType('Wombat (Wölfe)', moreaFire), 
                       ));
                     },
                   ),
@@ -90,7 +92,7 @@ class SelectStufe extends StatelessWidget {
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              SelectTeleblitzType('Nahani (Meitli)')
+                              SelectTeleblitzType('Nahani (Meitli)', moreaFire)
                       ));
                     },
                   ),
@@ -108,7 +110,7 @@ class SelectStufe extends StatelessWidget {
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              SelectTeleblitzType('Drason (Buebe)')
+                              SelectTeleblitzType('Drason (Buebe)', moreaFire)
                       ));
                     },
                   ),

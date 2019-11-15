@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
-import 'package:morea/services/qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
-import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/services.dart';
+import 'package:morea/services/utilities/qr_code.dart';
 
 abstract class BaseMergeChildParent {
+
+  
   Widget childShowQrCode(String qrCodeString, BuildContext context);
 
   void parentReadsQrCode(String parentUID, String parentName);
@@ -20,14 +20,20 @@ class test {
 class MergeChildParent extends Object
     with test
     implements BaseMergeChildParent {
+
   QrCode qrCode = new QrCode();
-  MoreaFirebase moreafire = new MoreaFirebase();
-  CrudMedthods crud0 = new CrudMedthods();
+  MoreaFirebase moreafire;
+  CrudMedthods crud0;
   bool parentReaderror = false, allowScanner = true;
 
   //ProfilePageStatePage profilePageStatePage = new ProfilePageStatePage();
 
   BuildContext showDialogcontext;
+
+  MergeChildParent(Firestore firestore){
+    this.moreafire = new MoreaFirebase(firestore);
+    this.crud0 = new CrudMedthods(firestore);
+  }
 
   Widget childShowQrCode(String qrCodeString, BuildContext context) {
     return new Container(

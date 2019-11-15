@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'dart:async';
-import 'dwi_format.dart';
+
 
 abstract class BaseCrudMethods {
   Future<QuerySnapshot> getCollection(String path);
@@ -16,7 +17,10 @@ abstract class BaseCrudMethods {
   Future<bool> waitOnDocumentChanged(String path, String document);
 
   Future<void> setData(
-      String path, String document, Map<dynamic, dynamic> data);
+      String path, String document, Map<String, dynamic> data);
+      
+  Future<void> runTransaction(
+      String path, String document, Map<String, dynamic> data);
 
   Future deletedocument(String path, String document);
 
@@ -28,6 +32,13 @@ abstract class BaseCrudMethods {
 
 class CrudMedthods implements BaseCrudMethods {
   DWIFormat dwiformat = new DWIFormat();
+  Firestore db;
+
+  CrudMedthods(Firestore firestore){
+    this.db = firestore;
+    
+  }
+ 
 
   Future<QuerySnapshot> getCollection(String path) async {
     path = dwiformat.pathstring(path);
@@ -70,10 +81,8 @@ class CrudMedthods implements BaseCrudMethods {
 
     return value.firstWhere((bool item) => item);
   }
-
   Future<void> setData(
-      String path, String document, Map<dynamic, dynamic> data) async {
-    document = dwiformat.simplestring(document);
+      String path, String document, Map<String, dynamic> data) async {
     path = dwiformat.pathstring(path);
     await Firestore.instance
         .collection(path)
@@ -81,9 +90,34 @@ class CrudMedthods implements BaseCrudMethods {
         .setData(data)
         .catchError((e) {
       print(e);
+      print("tried to upload data: " + data.toString());
     });
   }
 
+
+  Future<void> runTransaction(
+      String path, String document, Map<String, dynamic> data) async {
+      DocumentReference docRef = db.collection(path).document(document);
+
+      try{
+          TransactionHandler transactionHandler =  (Transaction tran)async {
+          await tran.get(docRef).then((DocumentSnapshot snap)async {
+              if (snap.exists) {  
+                await tran.update(docRef, data);
+              }else{
+                await tran.set(docRef, data);
+              }
+            }).catchError((err)=>{
+              print(err)
+            });
+        };
+      return await db.runTransaction(transactionHandler);
+      }catch(e){
+        print(e);
+      }
+    
+    }
+    
   Future deletedocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
@@ -96,6 +130,7 @@ class CrudMedthods implements BaseCrudMethods {
     });
   }
 
+//TODO --> an Maxi, CrudMethods sind universelle Methoden. Kannst du diese in eine andere Klasse verschieben?
   Future<void> setDataMessage(
       String path, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
