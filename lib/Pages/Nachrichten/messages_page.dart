@@ -44,354 +44,344 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: this.getUserInfo(),
-      builder: (context, snapshot) {
-        if (!(snapshot.connectionState == ConnectionState.done)) {
-          return Container(
-            color: Colors.white,
-          );
-        } else {
-          if (this.userInfo['Pos'] == 'Leiter') {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Nachrichten'),
-              ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => SendMessages()));
-                },
-                child: Icon(Icons.edit),
-                backgroundColor: MoreaColors.violett,
-                shape: CircleBorder(side: BorderSide(color: Colors.white)),
-              ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerDocked,
-              bottomNavigationBar: BottomAppBar(
-                child: Container(
-                  color: Color.fromRGBO(43, 16, 42, 0.9),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: null,
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.message, color: Colors.white),
-                              Text(
-                                'Nachrichten',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: (() {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (BuildContext context) => AgendaState(
-                                    widget.auth, widget.onSignedOut)));
-                          }),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.event, color: Colors.white),
-                              Text(
-                                'Agenda',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15.0),
-                          child: Text(
-                            'Verfassen',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: (() {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) => HomePage(
-                                auth: widget.auth,
-                                onSigedOut: widget.onSignedOut,
-                              ),
-                            ));
-                          }),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.flash_on, color: Colors.white),
-                              Text(
-                                'Teleblitz',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: null,
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.person, color: Colors.white),
-                              Text(
-                                'Profil',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    textBaseline: TextBaseline.alphabetic,
+    if (widget.userInfo['Pos'] == 'Leiter') {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Nachrichten'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(new MaterialPageRoute(
+                builder: (BuildContext context) => SendMessages()));
+          },
+          child: Icon(Icons.edit),
+          backgroundColor: MoreaColors.violett,
+          shape: CircleBorder(side: BorderSide(color: Colors.white)),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BottomAppBar(
+          child: Container(
+            color: Color.fromRGBO(43, 16, 42, 0.9),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.message, color: Colors.white),
+                        Text(
+                          'Nachrichten',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
                   ),
+                  flex: 1,
                 ),
-                shape: CircularNotchedRectangle(),
-              ),
-              body: StreamBuilder(
-                  stream: this.messages,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.none ||
-                        snapshot.connectionState == ConnectionState.waiting) {
-                      return Text('Loading...');
-                    } else {
-                      return MoreaBackgroundContainer(
-                        child: SingleChildScrollView(
-                          child: MoreaShadowContainer(
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10.0),
-                                    child: Text(
-                                      'Nachrichten',
-                                      style: MoreaTextStyle.title,
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                      itemCount: snapshot.data.documents.length,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        var document =
-                                            snapshot.data.documents[index];
-                                        return _buildListItem(
-                                            context, document);
-                                      }),
-                                ],
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: (() {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) => AgendaState(
+                              widget.userInfo,
+                              widget.auth,
+                              widget.onSignedOut)));
+                    }),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.event, color: Colors.white),
+                        Text(
+                          'Agenda',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: Text(
+                      'Verfassen',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: (() {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => HomePage(
+                          userInfo: widget.userInfo,
+                          auth: widget.auth,
+                          onSigedOut: widget.onSignedOut,
+                        ),
+                      ));
+                    }),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.flash_on, color: Colors.white),
+                        Text(
+                          'Teleblitz',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.person, color: Colors.white),
+                        Text(
+                          'Profil',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              textBaseline: TextBaseline.alphabetic,
+            ),
+          ),
+          shape: CircularNotchedRectangle(),
+        ),
+        body: StreamBuilder(
+            stream: this.messages,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                        child:
+                            MoreaShadowContainer(child: Text('Loading...'))));
+              } else {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
                               ),
                             ),
-                          ),
+                            ListView.builder(
+                                itemCount: snapshot.data.documents.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ],
                         ),
-                      );
-                    }
-                  }),
-            );
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Nachrichten'),
-              ),
-              bottomNavigationBar: BottomAppBar(
-                child: Container(
-                  color: Color.fromRGBO(43, 16, 42, 0.9),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: null,
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.message, color: Colors.white),
-                              Text(
-                                'Nachrichten',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
                       ),
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: (() {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (BuildContext context) => AgendaState(
-                                    widget.auth, widget.onSignedOut)));
-                          }),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.event, color: Colors.white),
-                              Text(
-                                'Agenda',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15.0),
-                          child: Text(
-                            'Verfassen',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: (() {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) => HomePage(
-                                auth: widget.auth,
-                                onSigedOut: widget.onSignedOut,
-                              ),
-                            ));
-                          }),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.flash_on, color: Colors.white),
-                              Text(
-                                'Teleblitz',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          onPressed: null,
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.person, color: Colors.white),
-                              Text(
-                                'Profil',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              )
-                            ],
-                            mainAxisSize: MainAxisSize.min,
-                          ),
-                        ),
-                        flex: 1,
-                      ),
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    textBaseline: TextBaseline.alphabetic,
+                    ),
                   ),
+                );
+              }
+            }),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Nachrichten'),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Container(
+            color: Color.fromRGBO(43, 16, 42, 0.9),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.message, color: Colors.white),
+                        Text(
+                          'Nachrichten',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
                 ),
-                shape: CircularNotchedRectangle(),
-              ),
-              body: StreamBuilder(
-                  stream: this.messages,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Text('Loading...');
-                    } else {
-                      return LayoutBuilder(
-                        builder: (context, viewportConstraints) {
-                          return MoreaBackgroundContainer(
-                            child: SingleChildScrollView(
-                              child: MoreaShadowContainer(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: ListView.builder(
-                                      itemCount: snapshot.data.documents.length,
-                                      itemBuilder: (context, index) {
-                                        var document =
-                                            snapshot.data.documents[index];
-                                        return _buildListItem(
-                                            context, document);
-                                      }),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  }),
-            );
-          }
-          ;
-        }
-      },
-    );
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: (() {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) => AgendaState(
+                              widget.userInfo,
+                              widget.auth,
+                              widget.onSignedOut)));
+                    }),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.event, color: Colors.white),
+                        Text(
+                          'Agenda',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: Text(
+                      'Verfassen',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: (() {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => HomePage(
+                          userInfo: widget.userInfo,
+                          auth: widget.auth,
+                          onSigedOut: widget.onSignedOut,
+                        ),
+                      ));
+                    }),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.flash_on, color: Colors.white),
+                        Text(
+                          'Teleblitz',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.person, color: Colors.white),
+                        Text(
+                          'Profil',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                  ),
+                  flex: 1,
+                ),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              textBaseline: TextBaseline.alphabetic,
+            ),
+          ),
+          shape: CircularNotchedRectangle(),
+        ),
+        body: StreamBuilder(
+            stream: this.messages,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Text('Loading...');
+              } else {
+                return LayoutBuilder(
+                  builder: (context, viewportConstraints) {
+                    return MoreaBackgroundContainer(
+                      child: SingleChildScrollView(
+                        child: MoreaShadowContainer(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: ListView.builder(
+                                itemCount: snapshot.data.documents.length,
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+            }),
+      );
+    }
   }
 
   _getMessages(BuildContext context) async {
-    await this.getUserInfo();
-    this.stufe = this.userInfo['Stufe'];
+    this.uid = await auth0.currentUser();
+    this.stufe = widget.userInfo['Stufe'];
     setState(() {
       this.messages = firestore.getMessages(this.stufe);
-      print('setState');
     });
   }
 

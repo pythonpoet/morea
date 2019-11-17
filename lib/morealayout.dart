@@ -46,9 +46,10 @@ class MoreaShadowContainer extends Container {
 }
 
 class MoreaBackgroundContainer extends Container {
-  MoreaBackgroundContainer({this.child, Key key});
+  MoreaBackgroundContainer({this.child, Key key, this.constraints});
 
   @override
+  final BoxConstraints constraints;
   final Decoration decoration = BoxDecoration(
     color: MoreaColors.orange,
     image: DecorationImage(
