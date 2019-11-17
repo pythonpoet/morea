@@ -20,7 +20,7 @@ class HomePage extends StatefulWidget {
   HomePage({this.auth, this.onSigedOut, this.crud});
 
   final BaseAuth auth;
-  final VoidCallback onSigedOut;
+  final Function onSigedOut;
   final BaseCrudMethods crud;
 
   @override
@@ -154,6 +154,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _signedOut() async {
     try {
+      if(Navigator.of(context).canPop()){
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
       await widget.auth.signOut();
       widget.onSigedOut();
     } catch (e) {

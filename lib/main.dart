@@ -28,9 +28,12 @@ Future<void> main() async {
 
   runApp(
     MaterialApp(
-        title: 'Firestore Example',
+        title: 'Morea App',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(fontFamily: 'Raleway'),
+        theme: ThemeData(
+            fontFamily: 'Raleway',
+            primarySwatch: MaterialColor(
+                MoreaColors.appBarInt, MoreaColors.violettMaterialColor)),
         home: MyApp(firestore: firestore)),
   );
 }
@@ -49,7 +52,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: MaterialColor(
             MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
       ),
-      home: new RootPage(auth: new Auth()),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => RootPage(),
+      },
     );
   }
 }

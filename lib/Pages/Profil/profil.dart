@@ -34,197 +34,199 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.userInfo['Pfadinamen'] == null) {
+      widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+    }
     return Scaffold(
-      body: StreamBuilder(
-          stream: moreafire.streamUserInfomation(this.uid),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return LayoutBuilder(
-                builder:
-                    (BuildContext context, BoxConstraints viewportconstraints) {
-                  return MoreaBackgroundContainer(
-                    child: MoreaShadowContainer(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                            minWidth: viewportconstraints.maxWidth,
-                            minHeight: 300),
-                      ),
-                    ),
-                  );
-                },
-              );
-            } else {
-              return MoreaBackgroundContainer(
-                child: SingleChildScrollView(
-                  child: MoreaShadowContainer(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            'Profil ändern',
-                            style: MoreaTextStyle.title,
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black26,
-                            )),
-                        ListTile(
-                          title: Text(
-                            'Name',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          subtitle: Text(
-                            snapshot.data['Vorname'] +
-                                ' ' +
-                                snapshot.data['Nachname'] +
-                                ' v/o ' +
-                                snapshot.data['Pfadinamen'],
-                            style: MoreaTextStyle.normal,
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) => ChangeName(
-                                      snapshot.data['Vorname'],
-                                      snapshot.data['Nachname'],
-                                      snapshot.data['Pfadinamen']))),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black26,
-                            )),
-                        ListTile(
-                          title: Text(
-                            'E-Mail-Adresse',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          subtitle: Text(
-                            snapshot.data['Email'],
-                            style: MoreaTextStyle.normal,
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black26,
-                            )),
-                        ListTile(
-                          title: Text(
-                            'Passwort',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black26,
-                            )),
-                        ListTile(
-                          title: Text(
-                            'Handynummer',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          subtitle: Text(
-                            snapshot.data['Handynummer'],
-                            style: MoreaTextStyle.normal,
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black26,
-                            )),
-                        ListTile(
-                          title: Text(
-                            'Adresse',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          subtitle: Text(
-                            snapshot.data['Adresse'] +
-                                ', ' +
-                                snapshot.data['PLZ'] +
-                                ' ' +
-                                snapshot.data['Ort'],
-                            style: MoreaTextStyle.normal,
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black26,
-                            )),
-                        ListTile(
-                          title: Text(
-                            'Nachrichtengruppen',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          subtitle: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: snapshot.data['messagingGroups'].length,
-                            itemBuilder: (context, index) {
-                              List<String> results = [];
-                              for (var u
-                                  in snapshot.data['messagingGroups'].keys) {
-                                if (snapshot.data['messagingGroups'][u]) {
-                                  results.add(u);
-                                }
-                              }
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  results[index],
-                                  style: MoreaTextStyle.normal,
-                                ),
-                              );
-                            },
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                        )
-                      ],
-                    ),
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text(widget.userInfo['Pfadinamen']),
+              accountEmail: Text(widget.userInfo['Email']),
+              decoration: new BoxDecoration(
+                  image: new DecorationImage(
+                      fit: BoxFit.fill,
+                      image: new NetworkImage(
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+            ),
+            Divider(),
+            ListTile(
+              title: new Text('Logout'),
+              trailing: new Icon(Icons.cancel),
+              onTap: _signedOut,
+            )
+          ],
+        ),
+      ),
+      body: MoreaBackgroundContainer(
+        child: SingleChildScrollView(
+          child: MoreaShadowContainer(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    'Profil ändern',
+                    style: MoreaTextStyle.title,
                   ),
                 ),
-              );
-            }
-          }),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.black26,
+                    )),
+                ListTile(
+                  title: Text(
+                    'Name',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: Text(
+                    userInfo['Vorname'] +
+                        ' ' +
+                        userInfo['Nachname'] +
+                        ' v/o ' +
+                        userInfo['Pfadinamen'],
+                    style: MoreaTextStyle.normal,
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                  ),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => ChangeName(
+                          userInfo['Vorname'],
+                          userInfo['Nachname'],
+                          userInfo['Pfadinamen']))),
+                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.black26,
+                    )),
+                ListTile(
+                  title: Text(
+                    'E-Mail-Adresse',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: Text(
+                    userInfo['Email'],
+                    style: MoreaTextStyle.normal,
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.black26,
+                    )),
+                ListTile(
+                  title: Text(
+                    'Passwort',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.black26,
+                    )),
+                ListTile(
+                  title: Text(
+                    'Handynummer',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: Text(
+                    userInfo['Handynummer'],
+                    style: MoreaTextStyle.normal,
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.black26,
+                    )),
+                ListTile(
+                  title: Text(
+                    'Adresse',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: Text(
+                    userInfo['Adresse'] +
+                        ', ' +
+                        userInfo['PLZ'] +
+                        ' ' +
+                        userInfo['Ort'],
+                    style: MoreaTextStyle.normal,
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.black26,
+                    )),
+                ListTile(
+                  title: Text(
+                    'Nachrichtengruppen',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: userInfo['messagingGroups'].length,
+                    itemBuilder: (context, index) {
+                      List<String> results = [];
+                      for (var u in userInfo['messagingGroups'].keys) {
+                        if (userInfo['messagingGroups'][u]) {
+                          results.add(u);
+                        }
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          results[index],
+                          style: MoreaTextStyle.normal,
+                        ),
+                      );
+                    },
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
       appBar: AppBar(
         title: Text('Profil'),
+        automaticallyImplyLeading: false,
       ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
@@ -237,7 +239,7 @@ class _ProfileState extends State<Profile> {
                   onPressed: (() {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) => MessagesPage(
-                            widget.auth, widget.onSignedOut)));
+                            userInfo, widget.auth, widget.onSignedOut)));
                   }),
                   child: Column(
                     children: <Widget>[
@@ -261,7 +263,7 @@ class _ProfileState extends State<Profile> {
                   onPressed: (() {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) => AgendaState(
-                            widget.auth, widget.onSignedOut)));
+                            userInfo, widget.auth, widget.onSignedOut)));
                   }),
                   child: Column(
                     children: <Widget>[
@@ -291,6 +293,7 @@ class _ProfileState extends State<Profile> {
                   onPressed: (() {
                     Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) => HomePage(
+                        userInfo: userInfo,
                         auth: widget.auth,
                         onSigedOut: widget.onSignedOut,
                       ),
@@ -341,5 +344,17 @@ class _ProfileState extends State<Profile> {
         shape: CircularNotchedRectangle(),
       ),
     );
+  }
+
+  void _signedOut() async {
+    try {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
+      await widget.auth.signOut();
+      widget.onSignedOut();
+    } catch (e) {
+      print(e);
+    }
   }
 }

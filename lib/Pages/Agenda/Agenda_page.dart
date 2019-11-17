@@ -109,9 +109,34 @@ class _AgendaStatePage extends State<AgendaState> {
   @override
   Widget build(BuildContext context) {
     if (istLeiter()) {
+      if(widget.userInfo['Pfadinamen'] == null){
+        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+      }
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text('Agenda'),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.userInfo['Pfadinamen']),
+                accountEmail: Text(widget.userInfo['Email']),
+                decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                        fit: BoxFit.fill,
+                        image: new NetworkImage(
+                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+              ),
+              Divider(),
+              ListTile(
+                title: new Text('Logout'),
+                trailing: new Icon(Icons.cancel),
+                onTap: _signedOut,
+              )
+            ],
+          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         body: agenda(userInfo['Stufe']),
@@ -242,9 +267,34 @@ class _AgendaStatePage extends State<AgendaState> {
             onPressed: () => routetoAddevent()),
       );
     } else {
+      if(widget.userInfo['Pfadinamen'] == null){
+        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+      }
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text('Agenda'),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.userInfo['Pfadinamen']),
+                accountEmail: Text(widget.userInfo['Email']),
+                decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                        fit: BoxFit.fill,
+                        image: new NetworkImage(
+                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+              ),
+              Divider(),
+              ListTile(
+                title: new Text('Logout'),
+                trailing: new Icon(Icons.cancel),
+                onTap: _signedOut,
+              )
+            ],
+          ),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Container(
@@ -416,5 +466,17 @@ class _AgendaStatePage extends State<AgendaState> {
             );
           });
         });
+  }
+
+  void _signedOut() async {
+    try {
+      if(Navigator.of(context).canPop()){
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
+      await widget.auth.signOut();
+      widget.onSignedOut();
+    } catch (e) {
+      print(e);
+    }
   }
 }
