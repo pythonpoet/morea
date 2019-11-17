@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/dwi_format.dart';
 import 'Agenda_Eventadd_page.dart';
@@ -11,9 +12,7 @@ import 'view_Event_page.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class AgendaState extends StatefulWidget {
-  AgendaState(this.userInfo, this.auth, this.onSignedOut);
-
-  final userInfo;
+  AgendaState(this.auth, this.onSignedOut);
   final auth;
   final onSignedOut;
 
@@ -25,6 +24,8 @@ class _AgendaStatePage extends State<AgendaState> {
   MoreaFirebase moreafire = new MoreaFirebase();
   DWIFormat dwiformat = new DWIFormat();
   CrudMedthods crud0 = new CrudMedthods();
+  Auth auth0 = Auth();
+  Map userInfo;
 
   String pos = 'Teilnehmer';
   Stream<QuerySnapshot> qsagenda;
@@ -53,9 +54,10 @@ class _AgendaStatePage extends State<AgendaState> {
     'Lagername': ''
   };
 
-  _getAgenda(stufe) async {
-    stufe = dwiformat.simplestring(stufe);
-    qsagenda = moreafire.getAgenda(stufe);
+  _getAgenda() async {
+    await this.getUserInfo();
+    qsagenda = moreafire.getAgenda(this.userInfo['Stufe']);
+    this.pos = this.userInfo['Pos'];
   }
 
   altevernichten(_agedatiteldatum, stufe) {
@@ -92,12 +94,16 @@ class _AgendaStatePage extends State<AgendaState> {
 
   @override
   void initState() {
-    _getAgenda(widget.userInfo['Stufe']);
+    _getAgenda();
     quickfix['Stufen'] = stufen;
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
-    pos = widget.userInfo['Pos'];
     super.initState();
+  }
+
+  void getUserInfo() async {
+    var result = await moreafire.getUserInformation(await auth0.currentUser());
+    this.userInfo = result.data;
   }
 
   @override
@@ -108,7 +114,7 @@ class _AgendaStatePage extends State<AgendaState> {
           title: Text('Agenda'),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        body: agenda(widget.userInfo['Stufe']),
+        body: agenda(userInfo['Stufe']),
         bottomNavigationBar: BottomAppBar(
           child: Container(
             color: Color.fromRGBO(43, 16, 42, 0.9),
@@ -120,7 +126,6 @@ class _AgendaStatePage extends State<AgendaState> {
                     onPressed: (() {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) => MessagesPage(
-                              widget.userInfo,
                               widget.auth,
                               widget.onSignedOut)));
                     }),
@@ -180,7 +185,6 @@ class _AgendaStatePage extends State<AgendaState> {
                     onPressed: (() {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) =>HomePage(
-                          userInfo: widget.userInfo,
                           auth: widget.auth,
                           onSigedOut: widget.onSignedOut,
                         ),
@@ -252,7 +256,7 @@ class _AgendaStatePage extends State<AgendaState> {
                     padding: EdgeInsets.symmetric(vertical: 15),
                     onPressed: (() {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => MessagesPage(widget.userInfo,
+                          builder: (BuildContext context) => MessagesPage(
                               widget.auth, widget.onSignedOut)));
                     }),
                     child: Column(
@@ -339,7 +343,7 @@ class _AgendaStatePage extends State<AgendaState> {
           ),
           shape: CircularNotchedRectangle(),
         ),
-        body: agenda(widget.userInfo['Stufe']),
+        body: agenda(userInfo['Stufe']),
       );
     }
   }
@@ -388,7 +392,7 @@ class _AgendaStatePage extends State<AgendaState> {
                                     builder: (BuildContext context) =>
                                         new ViewEventPageState(
                                           info: _info,
-                                          pos: widget.userInfo['Pos'],
+                                          pos: userInfo['Pos'],
                                         ))),
                             trailing: Icon(Icons.arrow_forward_ios),
                             subtitle: Text('Event'),
@@ -401,7 +405,7 @@ class _AgendaStatePage extends State<AgendaState> {
                                     builder: (BuildContext context) =>
                                         new ViewLagerPageState(
                                             info: _info,
-                                            pos: widget.userInfo['Pos']))),
+                                            pos: userInfo['Pos']))),
                             trailing: Icon(Icons.arrow_forward_ios),
                             subtitle: Text('Lager'),
                           );

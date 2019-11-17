@@ -17,15 +17,14 @@ import 'package:morea/morealayout.dart';
 import 'dart:math' as math;
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.onSigedOut, this.crud, this.userInfo});
+  HomePage({this.auth, this.onSigedOut, this.crud});
 
   final BaseAuth auth;
   final VoidCallback onSigedOut;
   final BaseCrudMethods crud;
-  final Map<String, dynamic> userInfo;
 
   @override
-  State<StatefulWidget> createState() => HomePageState(this.userInfo);
+  State<StatefulWidget> createState() => HomePageState();
 }
 
 enum FormType { leiter, teilnehmer, eltern, loading }
@@ -33,7 +32,6 @@ enum FormType { leiter, teilnehmer, eltern, loading }
 enum Anmeldung { angemolden, abgemolden, verchilt }
 
 class HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  HomePageState(this.userInfo);
 
   AnimationController _loadingController;
   Animation<int> loadingAnimation;
@@ -228,7 +226,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onPressed: () {
                   return Navigator.of(context).push(new MaterialPageRoute(
                       builder: (BuildContext context) => MessagesPage(
-                          widget.userInfo, widget.auth, widget.onSigedOut)));
+                          widget.auth, widget.onSigedOut)));
                 },
                 child: Text(
                   'Ansehen',
@@ -253,14 +251,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       print(message);
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (BuildContext context) =>
-              MessagesPage(widget.userInfo, widget.auth, widget.onSigedOut)));
+              MessagesPage(widget.auth, widget.onSigedOut)));
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => MessagesPage(
-                  widget.userInfo, widget.auth, widget.onSigedOut)));
+                  widget.auth, widget.onSigedOut)));
     });
     getuserinfo();
   }
@@ -348,8 +346,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             padding: EdgeInsets.symmetric(vertical: 15),
                             onPressed: (() {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) => MessagesPage(userInfo,
-                                      widget.auth, widget.onSigedOut)));
+                                  builder: (BuildContext context) => MessagesPage(widget.auth, widget.onSigedOut)));
                             }),
                             child: Column(
                               children: <Widget>[
@@ -374,7 +371,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       AgendaState(
-                                        userInfo,
                                         widget.auth,
                                         widget.onSigedOut
                                       )));
@@ -435,7 +431,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             onPressed: () => Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (BuildContext context) =>
-                                    Profile(userInfo, widget.auth, widget.onSigedOut)
+                                    Profile(widget.auth, widget.onSigedOut, this._userUID)
                               )
                             ),
                             child: Column(

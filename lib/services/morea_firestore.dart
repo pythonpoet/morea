@@ -265,4 +265,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
         'Stufen/$stufe/messages', messageID, oldMessage.data);
     return null;
   }
+
+  Stream<DocumentSnapshot> streamUserInfomation(String userUID) {
+    userUID = dwiformat.simplestring(userUID);
+    return crud0.streamDocument('/user', userUID);
+  }
 }
