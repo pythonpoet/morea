@@ -3,8 +3,10 @@ import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 
+import 'change_email.dart';
 import 'change_name.dart';
 
 class Profile extends StatefulWidget {
@@ -21,6 +23,9 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   var userInfo;
   MoreaFirebase firestore = MoreaFirebase();
+  Auth auth0 = Auth();
+  TextEditingController password = TextEditingController();
+  final _passwordKey = GlobalKey<FormState>();
 
   _ProfileState();
 
@@ -28,6 +33,12 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     this.userInfo = widget.userInfo;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    password.dispose();
   }
 
   @override
@@ -114,6 +125,87 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
+                  onTap: () => showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text(
+                              'Achtung',
+                              style: MoreaTextStyle.title,
+                            ),
+                            content: Column(
+                              children: <Widget>[
+                                Text(
+                                    'Aus Sicherheitsgründen müssen sie ihr Passwort erneut eingeben, um ihre E-Mail-Adresse zu ändern.'),
+                                Form(
+                                  key: _passwordKey,
+                                  child: TextFormField(
+                                    controller: password,
+                                    maxLines: 1,
+                                    keyboardType: TextInputType.text,
+                                    style: TextStyle(fontSize: 18),
+                                    cursorColor: MoreaColors.violett,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    obscureText: true,
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return 'Bitte nicht leer lassen';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              RaisedButton.icon(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    "Abbrechen",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                  ),
+                                  color: MoreaColors.violett,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5)))),
+                              RaisedButton.icon(
+                                  onPressed: () async {
+                                    var result = await _validateAndSave();
+                                    if(result){
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => ChangeEmail(
+                                          userInfo['Email'],
+                                          this._changeEmail
+                                        )
+                                      ));
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.input,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    "Anmelden",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                  ),
+                                  color: MoreaColors.violett,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5)))),
+                            ],
+                          )),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -360,8 +452,33 @@ class _ProfileState extends State<Profile> {
       this.userInfo['Pfadinamen'] = pfadiname;
     }
     await firestore.createUserInformation(userInfo);
-    setState(() {
-      print('done');
-    });
+    setState(() {});
+  }
+
+  void _changeEmail(String email) async {
+    this.userInfo['Email'] = email;
+    await firestore.createUserInformation(userInfo);
+    await auth0.changeEmail(email);
+    await widget.auth.signOut();
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).popUntil(ModalRoute.withName('/'));
+    }
+    widget.onSignedOut();
+  }
+
+  Future<bool> _validateAndSave() async {
+    final form = _passwordKey.currentState;
+    if (form.validate()) {
+      var result = await auth0.reauthenticate(userInfo['Email'], password.text);
+      print(result);
+      if(result){
+        form.save();
+        return true;
+      } else{
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

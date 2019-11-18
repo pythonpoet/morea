@@ -32,7 +32,9 @@ abstract class BaseAuth {
 
   Future<void> changePassword(String newPassword);
 
-  Future<void> reauthenticate(String email, String password);
+  Future<bool> reauthenticate(String email, String password);
+
+  Future<void> changeEmail(String email);
 }
 
 class Auth implements BaseAuth {
@@ -40,17 +42,25 @@ class Auth implements BaseAuth {
   Info teleblitzinfo = new Info();
   DWICore dwiHardware = new DWICore();
 
-  Future<String> signInWithEmailAndPassword(String email, String password)async{
-    FirebaseUser user = (await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).catchError((onError){
+  Future<String> signInWithEmailAndPassword(
+      String email, String password) async {
+    FirebaseUser user = (await _firebaseAuth
+            .signInWithEmailAndPassword(email: email, password: password)
+            .catchError((onError) {
       print(onError);
-    })).user;
+    }))
+        .user;
     return user.uid;
   }
 
-  Future<String> createUserWithEmailAndPassword(String email, String password) async {
-    FirebaseUser user = (await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password).catchError((onError){
+  Future<String> createUserWithEmailAndPassword(
+      String email, String password) async {
+    FirebaseUser user = (await _firebaseAuth
+            .createUserWithEmailAndPassword(email: email, password: password)
+            .catchError((onError) {
       print(onError);
-    })).user;
+    }))
+        .user;
     return user.uid;
   }
 
@@ -85,16 +95,16 @@ class Auth implements BaseAuth {
     return null;
   }
 
-  Future<void> reauthenticate(String email, String password) async {
+  Future<bool> reauthenticate(String email, String password) async {
     AuthCredential credential =
         EmailAuthProvider.getCredential(email: email, password: password);
     FirebaseUser user = await _firebaseAuth.currentUser();
-    user.reauthenticateWithCredential(credential).then((onValue) {
-      return null;
-    }).catchError((e) {
-      print(e);
-      return null;
-    });
+    var check = await user.reauthenticateWithCredential(credential);
+    if (check.user == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   Future<void> signOut() async {
@@ -209,5 +219,11 @@ class Auth implements BaseAuth {
                 ),
               ),
             ));
+  }
+
+  Future<void> changeEmail(String email) async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    await user.updateEmail(email);
+    return null;
   }
 }
