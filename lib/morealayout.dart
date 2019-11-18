@@ -6,6 +6,7 @@ class MoreaColors {
   static int violettInt = 0xff7a62ff;
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;
+  static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 0.9);
 
   //306bac 3626A7
   static Map<int, Color> violettMaterialColor = {

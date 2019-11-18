@@ -44,13 +44,8 @@ class _ProfileState extends State<Profile> {
             UserAccountsDrawerHeader(
               accountName: Text(widget.userInfo['Pfadinamen']),
               accountEmail: Text(widget.userInfo['Email']),
-              decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                      fit: BoxFit.fill,
-                      image: new NetworkImage(
-                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+              decoration: new BoxDecoration(color: MoreaColors.orange),
             ),
-            Divider(),
             ListTile(
               title: new Text('Logout'),
               trailing: new Icon(Icons.cancel),
@@ -99,7 +94,8 @@ class _ProfileState extends State<Profile> {
                       builder: (BuildContext context) => ChangeName(
                           userInfo['Vorname'],
                           userInfo['Nachname'],
-                          userInfo['Pfadinamen']))),
+                          userInfo['Pfadinamen'],
+                          _changeName))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -226,7 +222,6 @@ class _ProfileState extends State<Profile> {
       ),
       appBar: AppBar(
         title: Text('Profil'),
-        automaticallyImplyLeading: false,
       ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
@@ -356,5 +351,19 @@ class _ProfileState extends State<Profile> {
     } catch (e) {
       print(e);
     }
+  }
+
+  void _changeName(String vorname, String nachname, String pfadiname) async {
+    this.userInfo['Vorname'] = vorname;
+    this.userInfo['Nachname'] = nachname;
+    if (pfadiname == null) {
+      this.userInfo['Pfadinamen'] = vorname;
+    } else {
+      this.userInfo['Pfadinamen'] = pfadiname;
+    }
+    await firestore.createUserInformation(userInfo);
+    setState(() {
+      print('done');
+    });
   }
 }
