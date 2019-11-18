@@ -12,8 +12,9 @@ import 'single_message_page.dart';
 class MessagesPage extends StatefulWidget {
   final auth;
   final onSignedOut;
+  final userInfo;
 
-  MessagesPage(this.auth, this.onSignedOut);
+  MessagesPage(this.userInfo, this.auth, this.onSignedOut);
 
   @override
   State<StatefulWidget> createState() => _MessagesPageState();
@@ -22,24 +23,15 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
   MoreaFirebase firestore = MoreaFirebase();
   Auth auth0 = Auth();
-  Stream<QuerySnapshot> messages;
+  var messages;
   var date;
   var uid;
   var stufe;
-  Map userInfo;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _getMessages(this.context);
-  }
-
-  Future<bool> getUserInfo() async {
-    var uid = await auth0.currentUser();
-    DocumentSnapshot results = await firestore.getUserInformation(uid);
-    this.userInfo = results.data;
-    this.uid = results.data['UID'];
-    return true;
   }
 
   @override

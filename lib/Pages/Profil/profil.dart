@@ -3,7 +3,6 @@ import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/morealayout.dart';
-import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 import 'change_name.dart';
@@ -11,25 +10,24 @@ import 'change_name.dart';
 class Profile extends StatefulWidget {
   final auth;
   final onSignedOut;
-  final uid;
+  final userInfo;
 
-  Profile(this.auth, this.onSignedOut, this.uid);
+  Profile(this.userInfo, this.auth, this.onSignedOut);
 
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  MoreaFirebase moreafire = MoreaFirebase();
-  Auth auth0 = Auth();
-  String uid;
+  var userInfo;
+  MoreaFirebase firestore = MoreaFirebase();
 
   _ProfileState();
 
   @override
   void initState() {
     super.initState();
-    this.uid = widget.uid;
+    this.userInfo = widget.userInfo;
   }
 
   @override
