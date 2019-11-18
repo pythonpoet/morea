@@ -9,7 +9,6 @@ import 'package:morea/services/Getteleblitz.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -82,7 +81,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       moreafire.uebunganmelden(_stufe, _userUID, _pfadiname, chunnt);
       showDialog(
           context: context,
-          child: new AlertDialog(
+          builder: (context) => new AlertDialog(
             title: new Text("Teleblitz"),
             content: new Text(anmeldung),
           ));
@@ -114,7 +113,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       //moreafire.uebunganmelden(stufe, uidkind, anmeldeDaten);
                       showDialog(
                           context: context,
-                          child: new AlertDialog(
+                          builder: (context) => AlertDialog(
                             title: new Text("Teleblitz"),
                             content: new Text(anmeldung),
                           ));
