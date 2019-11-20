@@ -13,8 +13,9 @@ import 'cange_teleblitz_sender.dart';
 class ChangeTeleblitzV2 extends StatefulWidget {
   final String stufe;
   final String formType;
+  final MoreaFirebase moreaFire;
 
-  ChangeTeleblitzV2(this.stufe, this.formType);
+  ChangeTeleblitzV2(this.stufe, this.formType, this.moreaFire);
 
   @override
   State<StatefulWidget> createState() => _ChangeTeleblitzV2State();
@@ -25,7 +26,7 @@ enum FormType { keineAktivitaet, ferien, normal }
 class _ChangeTeleblitzV2State extends State<ChangeTeleblitzV2> {
   String stufe;
   FormType formType;
-  MoreaFirebase moreaFire = MoreaFirebase();
+  
 
   //Variabeln vom Teleblitz
   String name,
@@ -314,7 +315,7 @@ class _ChangeTeleblitzV2State extends State<ChangeTeleblitzV2> {
       '_archived': false
     };
     await teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-    await moreaFire.uploadteleblitz(this.stufe, newTeleblitz);
+    await widget.moreaFire.uploadteleblitz(this.stufe, newTeleblitz);
     Navigator.of(context).pop();
   }
 

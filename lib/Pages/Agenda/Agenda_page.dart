@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Nachrichten/messages_page.dart';
-import 'package:morea/Pages/Teleblitz/home_page.dart';
-import 'package:morea/morealayout.dart';
+import 'package:morea/morea_strings.dart';
+import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/dwi_format.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'Agenda_Eventadd_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'view_Lager_page.dart';
@@ -11,29 +10,26 @@ import 'view_Event_page.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class AgendaState extends StatefulWidget {
-  AgendaState(this.userInfo, this.auth, this.onSignedOut);
-
-  final userInfo;
-  final auth;
-  final onSignedOut;
-
+  AgendaState({this.firestore, this.moreaFire});
+  final MoreaFirebase moreaFire;
+  final Firestore firestore;
   @override
   State<StatefulWidget> createState() => _AgendaStatePage();
 }
 
 class _AgendaStatePage extends State<AgendaState> {
-  MoreaFirebase moreafire = new MoreaFirebase();
+  MoreaFirebase moreafire;
   DWIFormat dwiformat = new DWIFormat();
-  CrudMedthods crud0 = new CrudMedthods();
-
+  CrudMedthods crud0;
+  prefix0.Agenda agenda;
   String pos = 'Teilnehmer';
-  Stream<QuerySnapshot> qsagenda;
-  Map stufen = {
-    'Biber': false,
-    'Pios': false,
-    'Nahani (Meitli)': false,
-    'Drason (Buebe)': false,
-    'Wombat (Wölfe)': false,
+  Stream<List> sLagenda;
+  Map stufen ={
+    'Biber':false,
+    'Pios':false,
+    'Nahani (Meitli)':false,
+    'Drason (Buebe)':false,
+    'Wombat (Wölfe)':false,
   };
   Map kontakt = {'Email': '', 'Pfadiname': ''};
   List mitnehmen = ['Pfadihämpt'];
@@ -52,23 +48,21 @@ class _AgendaStatePage extends State<AgendaState> {
     'Mitnehmen': '',
     'Lagername': ''
   };
+ 
+    
 
-  _getAgenda(stufe) async {
-    stufe = dwiformat.simplestring(stufe);
-    qsagenda = moreafire.getAgenda(stufe);
-  }
+ Stream<List> _getAgenda(groupID){
+   return agenda.getAgendaOverview(groupID);
+ 
+ }
 
-  altevernichten(_agedatiteldatum, stufe) {
-    stufe = dwiformat.simplestring(stufe);
-    String somdate = _agedatiteldatum.split('.')[2] +
-        '-' +
-        _agedatiteldatum.split('.')[1] +
-        '-' +
-        _agedatiteldatum.split('.')[0];
-    DateTime _agdatum = DateTime.parse(somdate + ' 00:00:00.000');
+  altevernichten(_agedaTitledatum,groupID, Map<String, dynamic> event){
+    
+    DateTime _agdatum = DateTime.parse(_agedaTitledatum);
     DateTime now = DateTime.now();
-    if (_agdatum.difference(now).inDays < 0) {
-      crud0.deletedocument('/Stufen/$stufe/Agenda', _agedatiteldatum);
+
+    if(_agdatum.difference(now).inDays< 0){
+      agenda.deleteAgendaEvent(event);
     }
   }
 
@@ -83,334 +77,156 @@ class _AgendaStatePage extends State<AgendaState> {
   routetoAddevent() {
     if (istLeiter()) {
       Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => EventAddPage(
-                eventinfo: quickfix,
-                agendaModus: AgendaModus.beides,
-              )));
+              builder: (BuildContext context) => EventAddPage(eventinfo: quickfix, agendaModus: AgendaModus.beides, firestore: widget.firestore,)));
     }
   }
 
   @override
   void initState() {
-    _getAgenda(widget.userInfo['Stufe']);
+    moreafire = widget.moreaFire;
+    
+    agenda = new prefix0.Agenda(widget.firestore);
+
+    //_getAgenda("3776");
     quickfix['Stufen'] = stufen;
     quickfix['Kontakt'] = kontakt;
-    quickfix['Mitnehmen'] = mitnehmen;
-    pos = widget.userInfo['Pos'];
+    quickfix['Mitnehmen']= mitnehmen;
+    pos= moreafire.getUserMap['Pos'];
+
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (istLeiter()) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Agenda'),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        body: agenda(widget.userInfo['Stufe']),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            color: Color.fromRGBO(43, 16, 42, 0.9),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => MessagesPage(
-                              widget.userInfo,
-                              widget.auth,
-                              widget.onSignedOut)));
-                    }),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.message, color: Colors.white),
-                        Text(
-                          'Nachrichten',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.event, color: Colors.white),
-                        Text(
-                          'Agenda',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Text(
-                      'Hinzufügen',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>HomePage(
-                          userInfo: widget.userInfo,
-                          auth: widget.auth,
-                          onSigedOut: widget.onSignedOut,
-                        ),
-                      ));
-                    }),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.flash_on, color: Colors.white),
-                        Text(
-                          'Teleblitz',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.person, color: Colors.white),
-                        Text(
-                          'Profil',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textBaseline: TextBaseline.alphabetic,
-            ),
-          ),
-          shape: CircularNotchedRectangle(),
-        ),
-        floatingActionButton: FloatingActionButton(
-            elevation: 0.0,
-            shape: CircleBorder(side: BorderSide(color: Colors.white)),
-            child: Icon(Icons.add),
-            backgroundColor: Color(0xff7a62ff),
-            onPressed: () => routetoAddevent()),
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Agenda'),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            color: Color.fromRGBO(43, 16, 42, 0.9),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => MessagesPage(widget.userInfo,
-                              widget.auth, widget.onSignedOut)));
-                    }),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.message, color: Colors.white),
-                        Text(
-                          'Nachrichten',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.event, color: Colors.white),
-                        Text(
-                          'Agenda',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.flash_on, color: Colors.white),
-                        Text(
-                          'Teleblitz',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.person, color: Colors.white),
-                        Text(
-                          'Profil',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textBaseline: TextBaseline.alphabetic,
-            ),
-          ),
-          shape: CircularNotchedRectangle(),
-        ),
-        body: agenda(widget.userInfo['Stufe']),
-      );
+  Widget build(BuildContext context){
+    if(istLeiter()){
+      return new Container(
+        child: new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Agenda'),
+        backgroundColor: Color(0xff7a62ff),
+      ),
+      body: Agenda(moreafire.getUserMap[userMapgroupID]),
+      floatingActionButton: Opacity(
+        opacity: istLeiter() ? 1.0 : 0.0 ,
+        child: new FloatingActionButton(
+          elevation: 0.0,
+          child: new Icon(Icons.add),
+          backgroundColor:  Color(0xff7a62ff),
+          onPressed: () => routetoAddevent()),
+      ),
+    ));
+    }else{
+      return new Container(
+        child: new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Agenda'),
+        backgroundColor: Color(0xff7a62ff),
+      ),
+      body: Agenda(moreafire.getUserMap[userMapgroupID]),
+    ));
     }
   }
+  viewLager(BuildContext context, Map<String,dynamic> agendaTitle)async{
+    Map<String, dynamic> info = (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+    Navigator.of(context).push(new MaterialPageRoute(
+                                  builder: (BuildContext context) => new ViewLagerPageState(info: info, pos:moreafire.getUserMap['Pos'])));
+  }
+  viewEvent(BuildContext context, Map<String,dynamic> agendaTitle)async{
+    Map<String, dynamic> info = (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+    Navigator.of(context).push(new MaterialPageRoute(
+                                  builder: (BuildContext context) => new ViewEventPageState(info: info ,pos: moreafire.getUserMap['Pos'], 
+                                  )));
+  }
 
-  Widget agenda(stufe) {
+  Widget Agenda(String groupID) {
     return StreamBuilder(
-        stream: qsagenda,
-        builder: (context, AsyncSnapshot<QuerySnapshot> qsagenda) {
-          if (!qsagenda.hasData)
-            return Center(
-                child: Text(
-              'Laden... einen Moment bitte',
-              style: TextStyle(fontSize: 20),
-            ));
-          if (qsagenda.data.documents.length == 0)
-            return MoreaBackgroundContainer(
-              child: Center(
-                  child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  'Keine Events/Lager eingetragen',
-                  style: TextStyle(fontSize: 20),
-                ),
-              )),
-            );
-          return LayoutBuilder(builder:
-              (BuildContext context, BoxConstraints viewportConstraints) {
-            return MoreaBackgroundContainer(
-              child: ConstrainedBox(
-                constraints:
-                    BoxConstraints(minHeight: (viewportConstraints.maxHeight)),
-                child: MoreaShadowContainer(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: qsagenda.data.documents.length,
-                      itemBuilder: (context, int index) {
-                        final DocumentSnapshot _info =
-                            qsagenda.data.documents[index];
-                        altevernichten(_info['Datum'], stufe);
-
-                        if (_info['Event']) {
-                          return ListTile(
-                            title: Text(_info['Datum'].toString() + ": " + _info.data['Eventname'].toString()),
-                            onTap: () => Navigator.of(context).push(
-                                new MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        new ViewEventPageState(
-                                          info: _info,
-                                          pos: widget.userInfo['Pos'],
-                                        ))),
-                            trailing: Icon(Icons.arrow_forward_ios),
-                            subtitle: Text('Event'),
-                          );
-                        } else {
-                          return ListTile(
-                            title: Text(_info['Datum'].toString() + ": " + _info.data['Lagername'].toString()),
-                            onTap: () => Navigator.of(context).push(
-                                new MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        new ViewLagerPageState(
-                                            info: _info,
-                                            pos: widget.userInfo['Pos']))),
-                            trailing: Icon(Icons.arrow_forward_ios),
-                            subtitle: Text('Lager'),
-                          );
-                        }
-                      }),
-                ),
-              ),
-            );
-          });
+        stream: _getAgenda(groupID).asBroadcastStream(),
+        builder: (context, AsyncSnapshot<List> slagenda) {
+          if (!slagenda.hasData) return Center(child:Text('Laden... einen Moment bitte', style: TextStyle(fontSize: 20),));
+          if(slagenda.data.length==0)return Center(child:Text('Keine Events/Lager eingetragen', style: TextStyle(fontSize: 20),));
+          return ListView.builder(
+              itemCount: slagenda.data.length,
+              itemBuilder: (context, int index) {
+                final Map<String, dynamic> _info = Map<String, dynamic>.from(slagenda.data[index]);
+                altevernichten(_info['Datum'], groupID, _info);
+                
+                if(_info['Event']){
+                    return new ListTile(
+                    title: Container(
+                        height: 50.0,
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        alignment: Alignment.center, //
+                        decoration: new BoxDecoration(
+                          border: new Border.all(color: Colors.black, width: 2),
+                          borderRadius: new BorderRadius.all(
+                            Radius.circular(4.0),
+                          ),
+                          boxShadow:  [
+                          BoxShadow(
+                
+                          color: Color.fromRGBO(0, 0, 0, 0.16),
+                          offset: Offset(3, 3),
+                          blurRadius: 40)
+                          ],
+                        ),
+                        child: new Row(
+                          children: <Widget>[
+                            Expanded(flex: 3, child: new Text(_info['Datum'].toString())),
+                            Expanded(
+                              flex: 5,
+                              child: new Text(_info['Eventname'].toString()),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: SizedBox()
+                            )
+                          ],
+                        )),
+                        onTap: () => viewEvent(context, _info) 
+                        );
+                }else if(_info['Lager']){
+                   return new ListTile(
+                    title: Container(
+                        height: 50.0,
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        alignment: Alignment.center, //
+                        decoration: new BoxDecoration(
+                          border: new Border.all(color: Colors.black, width: 2),
+                          borderRadius: new BorderRadius.all(
+                            Radius.circular(4.0),
+                          ),
+                        ),
+                        child: new Row(
+                          children: <Widget>[
+                            Expanded(flex: 3, child: new Text(_info['Datum'].toString())),
+                            Expanded(
+                              flex: 5,
+                              child: new Text(_info['Lagername'].toString()),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                height: 35,
+                                padding: EdgeInsets.all(10),
+                                alignment: Alignment.center, //
+                                decoration: new BoxDecoration(
+                                  color: Colors.orangeAccent,
+                                  borderRadius: new BorderRadius.all(
+                                    Radius.circular(4.0),
+                                  ),
+                                ),
+                                child: new Text('Lager'),
+                              ),
+                            )
+                          ],
+                        )),
+                        onTap: () => viewLager(context, _info)
+                        );
+                }else{
+                  return SizedBox();
+                }
+               
+              });
         });
   }
 }

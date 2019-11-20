@@ -1,4 +1,4 @@
-import 'package:morea/services/auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
@@ -11,8 +11,11 @@ class TeleblitzManager {
   bool archived = false;
   bool draft = false;
 
-  Auth auth = Auth();
-  MoreaFirebase moreafire = MoreaFirebase();
+  MoreaFirebase moreafire;
+
+  TeleblitzManager(Firestore firestore){
+    moreafire = new MoreaFirebase(firestore);
+  }
 
   Future<Teleblitz> downloadTeleblitz(String filter) async {
     var jsonDecode;

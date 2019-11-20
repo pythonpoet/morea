@@ -2,9 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:morea/morea_strings.dart';
 import 'dart:async';
-import 'package:morea/services/Getteleblitz.dart';
-import 'dwi_core.dart';
+import 'package:morea/services/utilities/dwi_core.dart';
+
 
 //enum PlatformType { isAndroid, isIOS }
 enum AuthProblems {
@@ -15,6 +16,8 @@ enum AuthProblems {
 }
 
 abstract class BaseAuth {
+  String get getUserID;
+  String get getUserEmail;
   Future<String> signInWithEmailAndPassword(String email, String password);
 
   Future<String> createUserWithEmailAndPassword(String email, String password);
@@ -37,21 +40,24 @@ abstract class BaseAuth {
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  Info teleblitzinfo = new Info();
   DWICore dwiHardware = new DWICore();
+  FirebaseUser _user;
+
+  String get getUserID => _user != null? _user.uid: "not loaded";
+  String get getUserEmail => _user != null? _user.email: "nod loaded";
 
   Future<String> signInWithEmailAndPassword(String email, String password)async{
-    FirebaseUser user = (await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).catchError((onError){
+    this._user = (await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).catchError((onError){
       print(onError);
     })).user;
-    return user.uid;
+    return _user.uid;
   }
 
   Future<String> createUserWithEmailAndPassword(String email, String password) async {
-    FirebaseUser user = (await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password).catchError((onError){
+    this._user = (await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password).catchError((onError){
       print(onError);
     })).user;
-    return user.uid;
+    return this._user.uid;
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
@@ -59,10 +65,9 @@ class Auth implements BaseAuth {
   }
 
   Future<void> createUserInformation(Map userInfo) async {
-    String userUID = await currentUser();
     await Firestore.instance
-        .collection('user')
-        .document(userUID)
+        .collection(pathUser)
+        .document(_user.uid)
         .setData(userInfo)
         .catchError((e) {
       print(e);
@@ -70,18 +75,18 @@ class Auth implements BaseAuth {
   }
 
   Future<String> currentUser() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user != null ? user.uid : null;
+    this._user = await _firebaseAuth.currentUser();
+    return _user != null ? _user.uid : null;
   }
 
   Future<String> userEmail() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user != null ? user.email : null;
+    this._user = await _firebaseAuth.currentUser();
+    return _user != null ? _user.email : null;
   }
 
   Future<void> changePassword(String newPassword) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    user.updatePassword(newPassword);
+    this._user = await _firebaseAuth.currentUser();
+    _user.updatePassword(newPassword);
     return null;
   }
 

@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/morealayout.dart';
 
 class SendMessages extends StatefulWidget {
+  SendMessages({this.firestore});
+  final Firestore firestore;
   @override
   State<StatefulWidget> createState() {
     return _SendMessagesState();
@@ -11,7 +14,7 @@ class SendMessages extends StatefulWidget {
 }
 
 class _SendMessagesState extends State<SendMessages> {
-  MoreaFirebase moreaFire = MoreaFirebase();
+  MoreaFirebase moreaFire;
   Auth auth = Auth();
   String uid;
   var userInfo;
@@ -36,6 +39,7 @@ class _SendMessagesState extends State<SendMessages> {
   void initState() {
     super.initState();
     _getUserInformation();
+    moreaFire = new MoreaFirebase(widget.firestore);
   }
 
   @override

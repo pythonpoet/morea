@@ -10,7 +10,7 @@ description: Teleblitz app
 version: 2.0.1+4
 
 environment:
-    sdk: ">=2.1.0 <3.0.0"
+    sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
     flutter:
@@ -20,7 +20,7 @@ dependencies:
     flutter_html: any
     http: any
     intl: any
-    cloud_firestore: ^0.12.9+4
+    cloud_firestore: ^0.12.9+5
     url_launcher: any
     share: any
     expandable: any
@@ -29,6 +29,7 @@ dependencies:
     random_string: any
     barcode_scan: ^1.0.0
     flutter_masked_text: ^0.8.0
+    rxdart: ^0.22.4
 
 
     shared_preferences: any
@@ -76,7 +77,7 @@ flutter:
     # To add assets to your application, add an assets section, like this:
     assets:
         - assets/images/Logo_gross_weiss.jpeg
-        - assets/images/Logo_gorss.jpeg
+        - assets/images/
         - assets/images/logo.jpeg
         - assets/images/background.png
         - assets/icon/logo_loading.png

@@ -1,61 +1,98 @@
-import 'Getteleblitz.dart';
+import 'package:morea/morea_strings.dart';
+import 'package:morea/services/Teleblitz/telbz_firestore.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'auth.dart';
 import 'crud.dart';
-import 'dwi_format.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:random_string/random_string.dart' as random;
 
 abstract class BaseMoreaFirebase {
+  String get getDisplayName;
+  String get getPfandiName;
+  String get getGroupID;
+  String get getVorName;
+  String get getNachName;
+  String get getPos;
+  String get getEventID;
+  List<String> get getSubscribedGroups;
+  Map<String,dynamic> get getGroupMap;
+  Map<String,dynamic> get getUserMap;
+  Map<String,dynamic> get getMessagingGroups;
+
   Future<void> createUserInformation(Map userInfo);
-
   Future<void> updateUserInformation(String userUID, Map userInfo);
-
   Future<DocumentSnapshot> getUserInformation(String userUID);
-
   Stream<QuerySnapshot> getChildren();
-
   Future<void> pendParent(
       String child_UID, String parent_UID, String parent_name);
-
   Stream<DocumentSnapshot> streamPendingParents(String child_UID);
-
   Future<void> setChildToParent(
       String child_UID, String parent_UID, String child_name);
-
-  Future uebunganmelden(
-      String stufe, String _userUID, String _userName, bool chunt);
-
-  Future<QuerySnapshot> getTNs(String stufe, String datum);
-
-  Future<DocumentSnapshot> getteleblitz(String stufe);
-
-  Future uploadteleblitz(String stufe, Map data);
-
-  Future<bool> refreshteleblitz(String stufe);
-
-  Stream<QuerySnapshot> getAgenda(String stufe);
-
-  Future uploadtoAgenda(String stufe, String name, Map data);
-
   Future<void> uploaddevtocken(
       var messagingGroups, String token, String userUID);
-
-  Stream<QuerySnapshot> getMessages(String stufe);
-
-  Future<void> setMessageRead(String userUID, String messageID, String stufe);
-
+  Stream<QuerySnapshot> getMessages(String groupnr);
+  Future<void> setMessageRead(String userUID, String messageID, String groupnr);
   String upLoadChildRequest(String childUID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
-  Info teleblitzinfo = new Info();
-  CrudMedthods crud0 = new CrudMedthods();
+  CrudMedthods crud0;
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
+  TeleblizFirestore tbz;
+  Map<String,dynamic> _userMap, _groupMap;
+  String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID;
+  Map<String,dynamic> _messagingGroups;
+  List<String> _subscribedGroups = new List<String>();
+  Firestore firestore;
+
+  MoreaFirebase(Firestore firestore, {List groupIDs}){
+    this.firestore = firestore;
+    crud0 = new CrudMedthods(firestore);
+    if(groupIDs != null)
+    tbz = new TeleblizFirestore(firestore , groupIDs);
+  }
+  String get getDisplayName => _displayName;
+  String get getPfandiName => _pfadiName;
+  String get getGroupID => _groupID;
+  String get getVorName => _vorName;
+  String get getNachName => _nachName;
+  String get getPos => _pos;
+  
+  String get getEventID => _eventID;
+  List<String> get getSubscribedGroups => _subscribedGroups;
+  Map<String,dynamic> get getGroupMap => _groupMap;
+  Map<String,dynamic> get getUserMap => _userMap;
+  Map<String,dynamic> get getMessagingGroups => _messagingGroups;
+
+  Future<void> getData(String userID)async{
+    _userMap = (await crud0.getDocument(pathUser, userID)).data;
+    _groupMap = (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+    _pfadiName = _userMap[userMapPfadiName];
+    _groupID = _userMap[userMapgroupID];
+    _vorName = _userMap[userMapVorName];
+    _nachName = _userMap[userMapNachName];
+    _pos = _userMap[userMapPos];
+    _messagingGroups = Map<String,dynamic>.from(_userMap[userMapMessagingGroups]??[]);
+    _eventID = _groupMap[groupMapEventID];
+    _subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]?? []);
+    if(_pfadiName == '')
+      _displayName = _vorName;
+    else
+      _displayName = _pfadiName;
+  }
+  Future<void> initTeleblitz(){
+    if(_groupID == null)
+    throw ("groupIDs shouldnt be null");
+    List<String> groupIDs = new List<String>();
+    groupIDs.add(_groupID);
+    groupIDs.addAll(_subscribedGroups);
+    tbz = new TeleblizFirestore(firestore ,groupIDs);
+  }
 
   Future<void> createUserInformation(Map userInfo) async {
     String userUID = await auth0.currentUser();
-    await crud0.setData('user', userUID, userInfo);
+    await crud0.setData(pathUser, userUID, userInfo);
     return null;
   }
 
@@ -64,19 +101,18 @@ class MoreaFirebase extends BaseMoreaFirebase {
     Map userInfo,
   ) async {
     userUID = dwiformat.simplestring(userUID);
-    var stufe = userInfo['Stufe'];
-    Map<String, dynamic> token = {'devtoken': userInfo['devtoken'][0]};
-    await crud0.setData('Stufen/$stufe', userUID, token);
-    await crud0.setData('user', userUID, userInfo);
+    await crud0.setData(pathUser, userUID, userInfo);
     return null;
   }
 
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
-    return await crud0.getDocument('user', userUID);
+    return await crud0.getDocument(pathUser, userUID);
   }
-
+  Future<Map<String,dynamic>> getGroupInformation(groupID)async =>
+     Map<String,dynamic>.from((await crud0.getDocument(pathGroups, groupID)).data);
+    
   Stream<QuerySnapshot> getChildren() {
-    return crud0.streamCollection('user');
+    return crud0.streamCollection(pathUser);
   }
 
   //Funktioniert das wück?
@@ -98,7 +134,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Stream<DocumentSnapshot> streamPendingParents(String childUID) {
-    return crud0.streamDocument('user', childUID);
+    return crud0.streamDocument(pathUser, childUID);
   }
 
   Future<void> setChildToParent(
@@ -118,116 +154,74 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uebunganmelden(
-      String stufe, String _userUID, String _userName, bool chunt) async {
-    /*Map<String,String> anmeldungen, abmeldungen;
-    String uebungsdatum = dwiformat.simplestring('0815');
-    stufe = dwiformat.simplestring(stufe);
-    try{
-      DocumentSnapshot dsanmeldungen = await crud0.getDocument('Teleblitz/info/'+ stufe + '/'+ 'Uebung/TNStatus', 'Anabmeldungen');
-      anmeldungen = dsanmeldungen.data;
-    }catch(e){
-      print(e);
-    }
-    try{
-      DocumentSnapshot dsabmeldungen = await crud0.getDocument('Teleblitz/info/'+ stufe + '/'+ 'Uebung/TNStatus', 'Anabmeldungen');
-      abmeldungen = dsabmeldungen.data;
-    }catch(e){
-      print(e);
-    }
-    if(chunt){
-      if(abmeldungen[_userName].isNotEmpty){
-        abmeldungen.remove(_userName);
-        crud0.setData('uebung/'+ stufe + '/'+ uebungsdatum,'chuntNoed', abmeldungen);
-      }
-      anmeldungen[_userName] = _userUID;
-      crud0.setData('uebung/'+ stufe + '/'+ uebungsdatum,'chunt', anmeldungen);
-    }else{
-      if(anmeldungen[_userName].isNotEmpty){
-        anmeldungen.remove(_userName);
-        crud0.setData('uebung/'+ stufe + '/'+ uebungsdatum,'chunt', anmeldungen);
-      }
-      abmeldungen[_userName] = _userUID;
-      crud0.setData('uebung/'+ stufe + '/'+ uebungsdatum, 'chuntNoed', abmeldungen);
-    }
-    */
+      String eventID, String userUID, String anmeldeUID, String anmeldeStatus) async {
+        crud0.runTransaction("$pathEvents/$eventID/Anmeldungen", anmeldeUID, Map<String, dynamic>.from({
+      "AnmeldeStatus":  anmeldeStatus,
+      "AnmedeUID":      anmeldeUID,
+      "UID":            userUID,
+      "Timestamp":      DateTime.now()
+    }));
     return null;
   }
 
-  Future<void> uploadteleblitz(String stufe, Map data) {
+  Future<void> uploadteleblitz(String groupID, Map data) async{
+    String eventID =  groupID +  data['datum'].toString().replaceAll('Samstag, ', '');
     Map<String, String> akteleblitz = {
-      'AktuellerTeleblitz':
-          data['datum'].toString().replaceAll('Samstag, ', ''),
-      'Stufe': stufe
-    };
-    stufe = dwiformat.simplestring(stufe);
-    crud0.setData(
-        'Teleblitz/overview/' + stufe, akteleblitz['AktuellerTeleblitz'], data);
-    crud0.setData('Teleblitz/info/' + stufe, 'AktuellerTeleblitz', akteleblitz);
-    return null;
+      'AktuellerTeleblitz': eventID
+    };  
+    await tbz.uploadTelbzAkt(groupID, akteleblitz);
+    return await tbz.uploadTelbz(eventID, data);
+  }
+  Future<String> createEventID()async{
+    String eventID;
+    do {
+      eventID = random.randomNumeric(9);
+    } while (await tbz.eventIDExists(eventID));
+    return eventID;
   }
 
-  Future<DocumentSnapshot> getteleblitz(String stufe) async {
-    if (stufe != null) {
-      stufe = dwiformat.simplestring(stufe);
-      DocumentSnapshot aktdat = await crud0.getDocument(
-          'Teleblitz/info/' + stufe, 'AktuellerTeleblitz');
-      return await crud0.getDocument(
-          'Teleblitz/overview/' + stufe, aktdat.data['AktuellerTeleblitz']);
+  Future<Map> getteleblitz(String eventID) async {
+    if (eventID != null) {
+      return await tbz.getTelbz(eventID);
     } else {
       return null;
     }
   }
 
-  Future<bool> refreshteleblitz(String stufe) async {
+  Future<bool> refreshteleblitz(String eventID) async {
     DateTime letztesaktdat;
-    var timenow = DateTime.now();
-    stufe = dwiformat.simplestring(stufe);
-    DocumentSnapshot aktdat = await crud0.getDocument(
-        'Teleblitz/info/' + stufe, 'Teleblitzaktualisiert');
+    Map telbz = await tbz.getTelbz(eventID);
 
-    if (aktdat.data != null) {
-      letztesaktdat =
-          DateTime.parse(aktdat.data['Letztesaktualisierungsdatum']);
-      //Aktuallisirungszeit festlegen
+    if (telbz != null) {
+      letztesaktdat = DateTime.parse(telbz['Timestamp']);
     } else {
       letztesaktdat = DateTime.parse('2019-03-07T13:30:16.388642');
     }
-
-    if (timenow.difference(letztesaktdat).inMinutes > 1) {
-      Map<String, String> uploadakdat = {
-        'Letztesaktualisierungsdatum': timenow.toIso8601String()
-      };
-      print('aktuelisiert');
-      crud0.setData(
-          'Teleblitz/info/' + stufe, 'Teleblitzaktualisiert', uploadakdat);
+    if ( DateTime.now().difference(letztesaktdat).inMinutes > 1) {
       return true;
     }
     return false;
   }
 
-  Future<QuerySnapshot> getTNs(String stufe, String datum) async {
-    String uebungsdatum = teleblitzinfo.datum;
-    stufe = dwiformat.simplestring(stufe);
-    return await crud0.getCollection('uebung/$stufe/$datum');
+
+  Stream<QuerySnapshot> getAgenda(String groupnr) {
+    return crud0.streamOrderCollection('groups/$groupnr/Agenda', 'Order');
   }
 
-  Stream<QuerySnapshot> getAgenda(String stufe) {
-    return crud0.streamOrderCollection('Stufen/$stufe/Agenda', 'Order');
-  }
-
-  Future<void> uploadtoAgenda(String stufe, String name, Map data) async {
-    stufe = dwiformat.simplestring(stufe);
+  Future<void> uploadtoAgenda(String groupnr, String name, Map data) async {
     name = dwiformat.simplestring(name);
-    crud0.setData('Stufen/$stufe/Agenda', name, data);
+    crud0.runTransaction('groups/$groupnr/Agenda', name, data);
     return null;
   }
 
+//TODO Macht immer son error
   Future<void> uploaddevtocken(
       var messagingGroups, String token, String userUID) async {
     Map<String, dynamic> tokendata = {'devtoken': token};
+    if(messagingGroups != null)
     for (var u in messagingGroups.keys) {
       if (messagingGroups[u]) {
-        await crud0.setData('Stufen/$u/Devices', userUID, tokendata);
+        await crud0.setData('groups/$u/Devices', userUID, tokendata);
       }
     }
     return null;
@@ -244,25 +238,23 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return qrCodeString;
   }
 
-  Stream<QuerySnapshot> getMessages(String stufe) {
-    return crud0.streamCollection('/Stufen/$stufe/messages');
+  Stream<QuerySnapshot> getMessages(String groupnr) {
+    return crud0.streamCollection('/groups/$groupnr/messages');
   }
 
-  Future<void> uploadMessage(stufe, Map data) async {
-    stufe = dwiformat.simplestring(stufe);
-    await crud0.setDataMessage('Stufen/$stufe/messages', data);
+  Future<void> uploadMessage(groupnr, Map data) async {
+    await crud0.setDataMessage('groups/$groupnr/messages', data);
     return null;
   }
 
   Future<void> setMessageRead(
-      String userUID, String messageID, String stufe) async {
+      String userUID, String messageID, String groupnr) async {
     userUID = dwiformat.simplestring(userUID);
-    stufe = dwiformat.simplestring(stufe);
     var oldMessage =
-        await crud0.getMessage('/Stufen/$stufe/messages', messageID);
+        await crud0.getMessage('/groups/$groupnr/messages', messageID);
     oldMessage.data['read'][userUID] = true;
     await crud0.updateMessage(
-        'Stufen/$stufe/messages', messageID, oldMessage.data);
+        'groups/$groupnr/messages', messageID, oldMessage.data);
     return null;
   }
 }

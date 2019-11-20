@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,28 +12,31 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  final auth;
-  final onSignedOut;
-  final userInfo;
+  MessagesPage({this.userInfo, this.firestore, this.auth, this.moreaFire});
+  var userInfo;
+  final Firestore firestore;
+  final Auth auth;
+  final MoreaFirebase moreaFire;
 
-  MessagesPage(this.userInfo, this.auth, this.onSignedOut);
 
   @override
   State<StatefulWidget> createState() => _MessagesPageState();
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  MoreaFirebase firestore = MoreaFirebase();
-  Auth auth0 = Auth();
+  MoreaFirebase firestore;
+ 
   var messages;
   var date;
   var uid;
   var stufe;
-
+  
+  
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     _getMessages(this.context);
+    firestore = new MoreaFirebase(widget.firestore);
   }
 
   @override
@@ -82,9 +87,9 @@ class _MessagesPageState extends State<MessagesPage> {
                     onPressed: (() {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) => AgendaState(
-                              widget.userInfo,
-                              widget.auth,
-                              widget.onSignedOut)));
+                             firestore: widget.firestore,
+                             moreaFire: widget.moreaFire,
+                              )));
                     }),
                     child: Column(
                       children: <Widget>[
@@ -119,15 +124,16 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
+                    //TODO Delete this if possible
+                    /*onPressed: (() {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) => HomePage(
-                          userInfo: widget.userInfo,
+                          firestore: widget.firestore,
                           auth: widget.auth,
-                          onSigedOut: widget.onSignedOut,
+                          onSigedOut:,
                         ),
                       ));
-                    }),
+                    }),*/
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.flash_on, color: Colors.white),
@@ -221,11 +227,11 @@ class _MessagesPageState extends State<MessagesPage> {
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
                     onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
+                      /*Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) => AgendaState(
                               widget.userInfo,
                               widget.auth,
-                              widget.onSignedOut)));
+                              widget.onSignedOut)));*/
                     }),
                     child: Column(
                       children: <Widget>[
@@ -260,7 +266,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
+                    /*onPressed: (() {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) => HomePage(
                           userInfo: widget.userInfo,
@@ -268,7 +274,7 @@ class _MessagesPageState extends State<MessagesPage> {
                           onSigedOut: widget.onSignedOut,
                         ),
                       ));
-                    }),
+                    }),*/
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.flash_on, color: Colors.white),
@@ -332,8 +338,8 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   _getMessages(BuildContext context) async {
-    this.uid = await auth0.currentUser();
-    this.stufe = widget.userInfo['Stufe'];
+    this.uid = widget.auth.getUserID;
+    this.stufe = widget.moreaFire.getGroupID;
     setState(() {
       this.messages = firestore.getMessages(this.stufe);
     });

@@ -367,4 +367,3 @@ class ViewLagerPageState extends StatelessWidget {
                     });
   }
 }
-

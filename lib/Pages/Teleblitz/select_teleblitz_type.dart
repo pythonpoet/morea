@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'change_teleblitz.dart';
 import 'change_teleblitz_v2.dart';
 
 class SelectTeleblitzType extends StatelessWidget{
 
-  SelectTeleblitzType(this.stufe);
+  SelectTeleblitzType(this.stufe, this.moreaFire);
 
   String stufe;
+  MoreaFirebase moreaFire;
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class SelectTeleblitzType extends StatelessWidget{
                     ),
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) => ChangeTeleblitzV2(
-                        this.stufe, 'normal',
+                        this.stufe, "normal", moreaFire
                       )
                     )),
                     trailing: Icon(Icons.arrow_forward_ios),

@@ -1,16 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/services/auth.dart';
-import 'package:morea/services/bubble_indication_painter.dart';
-import 'package:morea/services/dwi_format.dart';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/utilities/MiData.dart';
+import 'package:morea/services/utilities/bubble_indication_painter.dart';
+import 'package:morea/services/utilities/dwi_format.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({this.auth, this.onSignedIn});
+  LoginPage({this.auth, this.onSignedIn, this.firestore});
 
   final BaseAuth auth;
   final VoidCallback onSignedIn;
+  final Firestore firestore;
 
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
@@ -21,11 +24,12 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
-  Auth auth0 = new Auth();
-  MoreaFirebase moreafire = new MoreaFirebase();
+  
   DWIFormat dwiFormat = new DWIFormat();
+  MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
+ 
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -72,6 +76,8 @@ class _LoginPageState extends State<LoginPage> {
   bool meitliCheckbox = false;
   bool buebeCheckbox = false;
   bool pioCheckbox = false;
+
+
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -129,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            userId = await auth0.signInWithEmailAndPassword(_email, _password);
+            userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
             print('Sign in: ${userId}');
             if (userId != null) {
               updatedevtoken();
@@ -152,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                   });
                   await datenschutz.morea_datenschutzerklaerung(context);
                   if (datenschutz.akzeptiert) {
-                    userId = await auth0.createUserWithEmailAndPassword(
+                    userId = await widget.auth.createUserWithEmailAndPassword(
                         _email, _password);
                     print('Registered user: ${userId}');
                     if (userId != null) {
@@ -250,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
-        auth0.displayAuthError(auth0.checkForAuthErrors(context, e), context);
+        widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
@@ -308,7 +314,7 @@ class _LoginPageState extends State<LoginPage> {
                       title: new Text(
                           'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
                     ));
-                auth0.sendPasswordResetEmail(_email);
+                widget.auth.sendPasswordResetEmail(_email);
               })
         ],
       ),
@@ -355,8 +361,8 @@ class _LoginPageState extends State<LoginPage> {
           'Pfadinamen': this._pfadinamen,
           'Vorname': this._vorname,
           'Nachname': this._nachname,
-          'Stufe': this._selectedstufe,
-          'messageGroups': {
+          'groupID': convWebflowtoMiData(_selectedstufe),
+          'message_groups': {
             'Biber': biberCheckbox,
             'Wombat (Wölfe)': woelfeCheckbox,
             'Nahani (Meitli)': meitliCheckbox,
@@ -380,8 +386,9 @@ class _LoginPageState extends State<LoginPage> {
           'Kinder': <dynamic, dynamic>{},
           'Vorname': this._vorname,
           'Nachname': this._nachname,
-          'Stufe': 'Eltern',
-          'messageGroups': {
+          'Pos': 'Eltern',
+          //TODO convert _groupIDp to MiData format
+          'message_groups': {
             'Biber': biberCheckbox,
             'Wombat (Wölfe)': woelfeCheckbox,
             'Nahani (Meitli)': meitliCheckbox,
@@ -409,6 +416,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     pageController = PageController();
+    moreafire = new MoreaFirebase(widget.firestore);
   }
 
   @override

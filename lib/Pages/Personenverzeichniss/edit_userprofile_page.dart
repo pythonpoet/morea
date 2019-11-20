@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
@@ -5,9 +6,10 @@ import 'view_userprofile_page.dart';
 import 'package:flutter/material.dart';
 
 class EditUserProfilePage extends StatefulWidget {
-  EditUserProfilePage({this.profile, this.auth});
+  EditUserProfilePage({this.profile, this.auth, this.firestore});
 
   final BaseAuth auth;
+  final Firestore firestore;
   var profile;
 
   @override
@@ -16,8 +18,8 @@ class EditUserProfilePage extends StatefulWidget {
 
 class EditUserPoriflePageState extends State<EditUserProfilePage> {
   Auth auth0 = new Auth();
-  MoreaFirebase moreafire = MoreaFirebase();
-  CrudMedthods crud0 = CrudMedthods();
+  MoreaFirebase moreafire;
+  CrudMedthods crud0;
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -39,6 +41,12 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
   ];
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
   String error;
+
+  EditUserPoriflePageState(){
+    moreafire = new MoreaFirebase(widget.firestore);
+    crud0 = new CrudMedthods(widget.firestore);
+    auth0 = widget.auth;
+  }
 
   bool validateAndSave() {
     final form = formKey.currentState;

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Grundbausteine/login_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
@@ -8,8 +9,9 @@ import 'package:intl/date_symbol_data_local.dart';
 
 
 class RootPage extends StatefulWidget{
-  RootPage({this.auth});
+  RootPage({this.auth, this.firestore});
   final BaseAuth auth;
+  final Firestore firestore;
 
   @override
   State<StatefulWidget> createState() => _RootPageState();
@@ -47,7 +49,7 @@ class _RootPageState extends State<RootPage>{
     });
   }
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     switch (authStatus) {
       case AuthStatus.notSignedIn:
         return new LoginPage(
@@ -59,6 +61,7 @@ class _RootPageState extends State<RootPage>{
         return new HomePage(
             auth: widget.auth,
           onSigedOut: _signedOut,
+          firestore: widget.firestore,
         );
     }
   }
