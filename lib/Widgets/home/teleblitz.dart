@@ -125,11 +125,12 @@ class Teleblitz{
     
     
     
-    List<Map<String, dynamic>> listTeleblitz = snapshot.data;
-    for(Map<String, dynamic> tlbz in listTeleblitz){
-      this.defineInfo(tlbz, groupID);
-       returnTelebliz.add(element(tlbz));
-    }
+    Map<String, Map<String, dynamic>> mapTeleblitz = snapshot.data[groupID];
+    mapTeleblitz.forEach((eventID,tlbz){
+      defineInfo(tlbz, groupID);
+      returnTelebliz.add(element(tlbz));
+    });
+    
     return returnTelebliz;
  }
           

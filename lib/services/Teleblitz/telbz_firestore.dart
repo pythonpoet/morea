@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 
 abstract class BaseTeleblitzFirestore {
   Stream<Map<String, List<String>>> get getMapHomeFeed;
-  Stream<Map<String, Stream<Map<String, Map<String,dynamic>>>>> get getMapofEvents;
+  Stream<Map<String, Map<String, Map<String,dynamic>>>> get getMapofEvents;
 
   Future<String> getTelbzAkt(String groupnr);
   Future<Map> getTelbz(String eventID);
@@ -17,7 +15,7 @@ abstract class BaseTeleblitzFirestore {
   Stream<Map<String,dynamic>> steramTelebliz(eventID);
 
   Stream<Map<String, List<String>>> streamMapHomeFeed(List<String> groupIDs);
-  Stream<Map<String, Stream<Map<String, Map<String,dynamic>>>>> streamMapofGroupEvents();
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents();
   Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs);
   Future<bool> eventIDExists(String eventID);
 
@@ -30,10 +28,10 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Map<String, String> _aktTeleblitze = new Map<String,String>();
   Map<String, dynamic> _teleblitze = new Map<String,dynamic>();
   StreamController<Map<String, List<String>>> _mapHomeFeedController = new BehaviorSubject();
-  StreamController<Map<String, Stream<Map<String, Map<String,dynamic>>>>> _mapofEventsController = new BehaviorSubject();
+  StreamController<Map<String, Map<String, Map<String,dynamic>>>> _mapofEventsController = new BehaviorSubject();
   
   Stream<Map<String, List<String>>> get getMapHomeFeed => _mapHomeFeedController.stream;
-  Stream<Map<String, Stream<Map<String, Map<String,dynamic>>>>> get getMapofEvents => _mapofEventsController.stream;
+  Stream<Map<String, Map<String, Map<String,dynamic>>>> get getMapofEvents => _mapofEventsController.stream;
 
   TeleblizFirestore(Firestore firestore, List<String> groupIDs) {
     crud0 = CrudMedthods(firestore);
@@ -64,29 +62,25 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     });
   }
   Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{
-    Stream<Map<String, Map<String,dynamic>>> streamMapEvents;
-    Stream<Map<String, Map<String,dynamic>>> eventStream;
+    StreamController<Map<String, Map<String,dynamic>>> eventStream = new BehaviorSubject();
+    
     for (String eventID in eventIDs){
-      this.steramTelebliz(eventID).map((event){
-        eventStream = streamMapEvents.map((Map<String, Map<String,dynamic>> mapEvent){
-            return mapEvent[eventID] = event;
-        });
-      });
+     await for(Map<String, dynamic>event in this.steramTelebliz(eventID)){
+        yield Map<String, Map<String,dynamic>>.from({eventID:event});
+     }
     }
-    yield* eventStream;
+    
   }
-  Stream<Map<String, Stream<Map<String, Map<String,dynamic>>>>> streamMapofGroupEvents()async*{
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents()async*{
     Stream<Map<String, List<String>>> streamListHomeFeed = this.getMapHomeFeed;
-     Stream<Map<String, Stream<Map<String, Map<String,dynamic>>>>> str1= streamListHomeFeed.map((Map<String, List<String>> mapHomeFeed){
-        Map<String, Stream<Map<String, Map<String,dynamic>>>> mstream = new Map();
-         mapHomeFeed.map((k, v){
-           print(k);
-           print(v);
-           mstream[k] = steamMapofEvents(v).asBroadcastStream();
-         }); 
-         return mstream;
-  });
-    yield* str1;
+
+    await for(Map<String, List<String>>listHomeFeed in streamListHomeFeed){
+      for(var homeFeed in listHomeFeed.entries){
+        await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value)){
+          yield Map<String,Map<String, Map<String, dynamic>>>.from({homeFeed.key:mapofEvents});
+        }
+      }
+    }    
   }
   
   
