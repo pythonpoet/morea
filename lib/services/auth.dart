@@ -96,15 +96,28 @@ class Auth implements BaseAuth {
   }
 
   Future<bool> reauthenticate(String email, String password) async {
+    bool reAuthenticated;
     AuthCredential credential =
         EmailAuthProvider.getCredential(email: email, password: password);
+    print('got Credential');
+    print(email);
     FirebaseUser user = await _firebaseAuth.currentUser();
-    var check = await user.reauthenticateWithCredential(credential);
-    if (check.user == null) {
-      return false;
-    } else {
-      return true;
-    }
+    print('got current user');
+    user.reauthenticateWithCredential(credential).then(
+        (AuthResult result){
+          if(result.user == null){
+            print(false);
+            reAuthenticated = false;
+          } else {
+            print(true);
+            reAuthenticated = true;
+          }
+        }
+    ).catchError((error){
+      print(error);
+    });
+    print('reauthenticated');
+    return reAuthenticated;
   }
 
   Future<void> signOut() async {

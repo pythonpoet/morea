@@ -99,12 +99,14 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ChangeName(
-                          userInfo['Vorname'],
-                          userInfo['Nachname'],
-                          userInfo['Pfadinamen'],
-                          _changeName))),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChangeName(
+                                  userInfo['Vorname'],
+                                  userInfo['Nachname'],
+                                  userInfo['Pfadinamen'],
+                                  _changeName))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -113,99 +115,25 @@ class _ProfileState extends State<Profile> {
                       color: Colors.black26,
                     )),
                 ListTile(
-                  title: Text(
-                    'E-Mail-Adresse',
-                    style: MoreaTextStyle.lable,
-                  ),
-                  subtitle: Text(
-                    userInfo['Email'],
-                    style: MoreaTextStyle.normal,
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.black,
-                  ),
-                  onTap: () => showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            title: Text(
-                              'Achtung',
-                              style: MoreaTextStyle.title,
-                            ),
-                            content: Column(
-                              children: <Widget>[
-                                Text(
-                                    'Aus Sicherheitsgründen müssen sie ihr Passwort erneut eingeben, um ihre E-Mail-Adresse zu ändern.'),
-                                Form(
-                                  key: _passwordKey,
-                                  child: TextFormField(
-                                    controller: password,
-                                    maxLines: 1,
-                                    keyboardType: TextInputType.text,
-                                    style: TextStyle(fontSize: 18),
-                                    cursorColor: MoreaColors.violett,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    obscureText: true,
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return 'Bitte nicht leer lassen';
-                                      } else {
-                                        return null;
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            actions: <Widget>[
-                              RaisedButton.icon(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  icon: Icon(
-                                    Icons.cancel,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                  label: Text(
-                                    "Abbrechen",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 18),
-                                  ),
-                                  color: MoreaColors.violett,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5)))),
-                              RaisedButton.icon(
-                                  onPressed: () async {
-                                    var result = await _validateAndSave();
-                                    if(result){
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) => ChangeEmail(
-                                          userInfo['Email'],
-                                          this._changeEmail
-                                        )
-                                      ));
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.input,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                  label: Text(
-                                    "Anmelden",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 18),
-                                  ),
-                                  color: MoreaColors.violett,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5)))),
-                            ],
-                          )),
+                    title: Text(
+                      'E-Mail-Adresse',
+                      style: MoreaTextStyle.lable,
+                    ),
+                    subtitle: Text(
+                      userInfo['Email'],
+                      style: MoreaTextStyle.normal,
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.black,
+                    ),
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          ChangeEmail(
+                            userInfo['Email'],
+                            this._showReauthenticate
+                          )
+                    ))
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -323,8 +251,9 @@ class _ProfileState extends State<Profile> {
                   padding: EdgeInsets.symmetric(vertical: 15),
                   onPressed: (() {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => MessagesPage(
-                            userInfo, widget.auth, widget.onSignedOut)));
+                        builder: (BuildContext context) =>
+                            MessagesPage(
+                                userInfo, widget.auth, widget.onSignedOut)));
                   }),
                   child: Column(
                     children: <Widget>[
@@ -347,8 +276,9 @@ class _ProfileState extends State<Profile> {
                   padding: EdgeInsets.symmetric(vertical: 15),
                   onPressed: (() {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => AgendaState(
-                            userInfo, widget.auth, widget.onSignedOut)));
+                        builder: (BuildContext context) =>
+                            AgendaState(
+                                userInfo, widget.auth, widget.onSignedOut)));
                   }),
                   child: Column(
                     children: <Widget>[
@@ -377,11 +307,12 @@ class _ProfileState extends State<Profile> {
                   padding: EdgeInsets.symmetric(vertical: 15),
                   onPressed: (() {
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => HomePage(
-                        userInfo: userInfo,
-                        auth: widget.auth,
-                        onSigedOut: widget.onSignedOut,
-                      ),
+                      builder: (BuildContext context) =>
+                          HomePage(
+                            userInfo: userInfo,
+                            auth: widget.auth,
+                            onSigedOut: widget.onSignedOut,
+                          ),
                     ));
                   }),
                   child: Column(
@@ -471,14 +402,94 @@ class _ProfileState extends State<Profile> {
     if (form.validate()) {
       var result = await auth0.reauthenticate(userInfo['Email'], password.text);
       print(result);
-      if(result){
+      if (result) {
         form.save();
         return true;
-      } else{
+      } else {
         return false;
       }
     } else {
       return false;
     }
+  }
+
+  void _showReauthenticate(String email) {
+    showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: Text(
+                'Achtung',
+                style: MoreaTextStyle.title,
+              ),
+              content: Column(
+                children: <Widget>[
+                  Text(
+                      'Aus Sicherheitsgründen müssen sie ihr Passwort erneut eingeben, um ihre E-Mail-Adresse zu ändern.'),
+                  Form(
+                    key: _passwordKey,
+                    child: TextFormField(
+                      controller: password,
+                      maxLines: 1,
+                      keyboardType: TextInputType.text,
+                      style: TextStyle(fontSize: 18),
+                      cursorColor: MoreaColors.violett,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Bitte nicht leer lassen';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                RaisedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.cancel,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    label: Text(
+                      "Abbrechen",
+                      style: TextStyle(
+                          color: Colors.white, fontSize: 18),
+                    ),
+                    color: MoreaColors.violett,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5)))),
+                RaisedButton.icon(
+                    onPressed: () async {
+                      var result = await _validateAndSave();
+                      if (result) {
+                        this._changeEmail(email);
+                      }
+                    },
+                    icon: Icon(
+                      Icons.input,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    label: Text(
+                      "Anmelden",
+                      style: TextStyle(
+                          color: Colors.white, fontSize: 18),
+                    ),
+                    color: MoreaColors.violett,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5)))),
+              ],
+            ));
   }
 }
