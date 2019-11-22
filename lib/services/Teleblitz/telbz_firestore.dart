@@ -70,6 +70,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
       return dsEvent.data;
     });
   }
+<<<<<<< HEAD
   Stream<Map<String, Map<String,dynamic>>>steamMapofEventshelper(String eventID)async*{
     await for(Map<String, dynamic>event in this.steramTelebliz(eventID)){
        mapOfEvents[eventID] = event;
@@ -78,6 +79,9 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   }
   Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{
     List<Stream<Map<String, Map<String,dynamic>>>> listStream = new List();
+=======
+  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{  
+>>>>>>> dev
     for (String eventID in eventIDs){
       listStream.add(steamMapofEventshelper(eventID));
     }
