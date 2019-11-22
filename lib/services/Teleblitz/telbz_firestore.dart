@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
@@ -29,7 +30,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Map<String, dynamic> _teleblitze = new Map<String,dynamic>();
   Map<String,List<String>> mapHomeFeed = new Map<String,List<String>>();
   Map<String,Map<String, Map<String, dynamic>>> mapOfGroupEvent = new Map<String,Map<String, Map<String, dynamic>>>();
-  Map<String, Map<String,dynamic>> mapOfEvents = new Map<String, Map<String,dynamic>>();
+ 
   StreamController<Map<String, List<String>>> _mapHomeFeedController = new BehaviorSubject();
   StreamController<Map<String, Map<String, Map<String,dynamic>>>> _mapofEventsController = new BehaviorSubject();
   
@@ -70,25 +71,25 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
       return dsEvent.data;
     });
   }
-<<<<<<< HEAD
-  Stream<Map<String, Map<String,dynamic>>>steamMapofEventshelper(String eventID)async*{
+  Stream<Map<String, Map<String,dynamic>>>steamMapofEventshelper(String eventID,Map<String, Map<String,dynamic>> mapOfEvents)async*{
     await for(Map<String, dynamic>event in this.steramTelebliz(eventID)){
        mapOfEvents[eventID] = event;
        yield mapOfEvents;
      }
   }
-  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{
+  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs){
+    Map<String, Map<String,dynamic>> mapOfEvents = new Map();
     List<Stream<Map<String, Map<String,dynamic>>>> listStream = new List();
-=======
-  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{  
->>>>>>> dev
     for (String eventID in eventIDs){
-      listStream.add(steamMapofEventshelper(eventID));
+      listStream.add(steamMapofEventshelper(eventID, mapOfEvents));
     }
-    yield* StreamGroup.merge(listStream);
+    print(listStream);
+    return listStream[0];
   }
-  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEventsHelper(MapEntry<String, List<String>> homeFeed)async*{
+   Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEventsHelper(MapEntry<String, List<String>> homeFeed)async*{
+
     await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value)){
+          print(mapofEvents);
           mapOfGroupEvent[homeFeed.key] = mapofEvents;
           yield mapOfGroupEvent;
         }
@@ -96,19 +97,12 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs)async*{
     List<Stream<Map<String, Map<String, Map<String,dynamic>>>>> listStream = new List();
     Stream<Map<String, List<String>>> someStream = this.streamMapHomeFeed(groupIDs);
-    someStream.map((convert){
-      return convert;
-    });
     await for(Map<String, List<String>>listHomeFeed in someStream){
       for(MapEntry<String, List<String>> homeFeed in listHomeFeed.entries){
         if(homeFeed.value.isNotEmpty)
         listStream.add(streamMapofGroupEventsHelper(homeFeed));
-        
       }
-      yield* StreamGroup.merge(listStream).map((convert){
-        print(convert);
-        return convert;
-      });
+      yield* StreamGroup.merge(listStream);
     }    
   }
  

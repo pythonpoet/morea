@@ -22,9 +22,9 @@ class Teleblitz{
     info.setBemerkung(tlbz["bemerkung"]);
     info.setSender(tlbz["name-des-senders"]);
     info.setMitnehmen(tlbz['mitnehmen-test']);
-    info.setkeineAktivitat(tlbz['keine-aktivitat']);
+    info.setkeineAktivitat(tlbz['keine-aktivitat'].toString());
     info.setGrund(tlbz['grund']);
-    info.setFerien(tlbz['ferien']);
+    info.setFerien(tlbz['ferien'].toString());
     info.setEndeFerien(tlbz['ende-ferien']);
   }
 
