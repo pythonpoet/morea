@@ -61,9 +61,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
       return dsEvent.data;
     });
   }
-  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{
-    StreamController<Map<String, Map<String,dynamic>>> eventStream = new BehaviorSubject();
-    
+  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{  
     for (String eventID in eventIDs){
      await for(Map<String, dynamic>event in this.steramTelebliz(eventID)){
         yield Map<String, Map<String,dynamic>>.from({eventID:event});

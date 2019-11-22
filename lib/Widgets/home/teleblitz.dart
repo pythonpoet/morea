@@ -116,7 +116,6 @@ class Teleblitz{
   }
 
   List<Widget> anzeigen(String groupID, AsyncSnapshot snapshot, Widget moreaLoading){
-    
     List<Widget> returnTelebliz = new List<Widget>();
     if(snapshot.data == null){
        returnTelebliz.add(moreaLoading);
