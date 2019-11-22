@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:rxdart/rxdart.dart';
+import 'dart:async' show Stream;
+import 'package:async/async.dart' show StreamGroup;
 
 abstract class BaseTeleblitzFirestore {
   Stream<Map<String, List<String>>> get getMapHomeFeed;
@@ -15,7 +16,7 @@ abstract class BaseTeleblitzFirestore {
   Stream<Map<String,dynamic>> steramTelebliz(eventID);
 
   Stream<Map<String, List<String>>> streamMapHomeFeed(List<String> groupIDs);
-  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents();
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs);
   Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs);
   Future<bool> eventIDExists(String eventID);
 
@@ -25,8 +26,10 @@ abstract class BaseTeleblitzFirestore {
 
 class TeleblizFirestore implements BaseTeleblitzFirestore {
   CrudMedthods crud0;
-  Map<String, String> _aktTeleblitze = new Map<String,String>();
   Map<String, dynamic> _teleblitze = new Map<String,dynamic>();
+  Map<String,List<String>> mapHomeFeed = new Map<String,List<String>>();
+  Map<String,Map<String, Map<String, dynamic>>> mapOfGroupEvent = new Map<String,Map<String, Map<String, dynamic>>>();
+  Map<String, Map<String,dynamic>> mapOfEvents = new Map<String, Map<String,dynamic>>();
   StreamController<Map<String, List<String>>> _mapHomeFeedController = new BehaviorSubject();
   StreamController<Map<String, Map<String, Map<String,dynamic>>>> _mapofEventsController = new BehaviorSubject();
   
@@ -36,52 +39,75 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   TeleblizFirestore(Firestore firestore, List<String> groupIDs) {
     crud0 = CrudMedthods(firestore);
     _mapHomeFeedController.addStream(this.streamMapHomeFeed(groupIDs));
-    _mapofEventsController.addStream(this.streamMapofGroupEvents());
+    _mapofEventsController.addStream(this.streamMapofGroupEvents(groupIDs));
   }
 
 
   Stream<List<String>> streamHomeFeed(String groupID)async*{
     Stream<DocumentSnapshot> sDhomeFeed = crud0.streamDocument(pathGroups, groupID); 
     yield* sDhomeFeed.map((DocumentSnapshot dsHomeFeed){
-       return new List<String>.from(dsHomeFeed.data[groupMapHomeFeed]);
+       return new List<String>.from(dsHomeFeed.data[groupMapHomeFeed]?? new List());
     }); 
   }
+  Stream<Map<String,List<String>>> somestream(String groupID)async*{
+    await for(List<String>homeFeed in this.streamHomeFeed(groupID)){
+        mapHomeFeed[groupID]=homeFeed;
+        yield mapHomeFeed;
+      }
+  }
   Stream<Map<String, List<String>>> streamMapHomeFeed(List<String> groupIDs)async*{
-    Stream<Map<String, List<String>>> listHomeFeed;
-    for(String groupID in groupIDs){
-        Stream<List<String>>somestream = streamHomeFeed(groupID);
-        listHomeFeed = somestream.map((List<String> homeFeed){
-          return Map<String,List<String>>.from({groupID:homeFeed});
-         });
+    List<Stream<Map<String, List<String>>>> streamList = new List();
+    for(String groupID in groupIDs){   
+      streamList.add(somestream(groupID));
     }
-    yield* listHomeFeed;
+    yield* StreamGroup.merge(streamList).map((convert){
+      print(convert);
+      return convert;
+    });
   }
   Stream<Map<String,dynamic>> steramTelebliz(eventID)async*{
     yield* crud0.streamDocument(pathEvents, eventID).map((dsEvent){
       return dsEvent.data;
     });
   }
-  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{
-    StreamController<Map<String, Map<String,dynamic>>> eventStream = new BehaviorSubject();
-    
-    for (String eventID in eventIDs){
-     await for(Map<String, dynamic>event in this.steramTelebliz(eventID)){
-        yield Map<String, Map<String,dynamic>>.from({eventID:event});
+  Stream<Map<String, Map<String,dynamic>>>steamMapofEventshelper(String eventID)async*{
+    await for(Map<String, dynamic>event in this.steramTelebliz(eventID)){
+       mapOfEvents[eventID] = event;
+       yield mapOfEvents;
      }
-    }
-    
   }
-  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents()async*{
-    Stream<Map<String, List<String>>> streamListHomeFeed = this.getMapHomeFeed;
-
-    await for(Map<String, List<String>>listHomeFeed in streamListHomeFeed){
-      for(var homeFeed in listHomeFeed.entries){
-        await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value)){
-          yield Map<String,Map<String, Map<String, dynamic>>>.from({homeFeed.key:mapofEvents});
+  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs)async*{
+    List<Stream<Map<String, Map<String,dynamic>>>> listStream = new List();
+    for (String eventID in eventIDs){
+      listStream.add(steamMapofEventshelper(eventID));
+    }
+    yield* StreamGroup.merge(listStream);
+  }
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEventsHelper(MapEntry<String, List<String>> homeFeed)async*{
+    await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value)){
+          mapOfGroupEvent[homeFeed.key] = mapofEvents;
+          yield mapOfGroupEvent;
         }
+  }
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs)async*{
+    List<Stream<Map<String, Map<String, Map<String,dynamic>>>>> listStream = new List();
+    Stream<Map<String, List<String>>> someStream = this.streamMapHomeFeed(groupIDs);
+    someStream.map((convert){
+      return convert;
+    });
+    await for(Map<String, List<String>>listHomeFeed in someStream){
+      for(MapEntry<String, List<String>> homeFeed in listHomeFeed.entries){
+        if(homeFeed.value.isNotEmpty)
+        listStream.add(streamMapofGroupEventsHelper(homeFeed));
+        
       }
+      yield* StreamGroup.merge(listStream).map((convert){
+        print(convert);
+        return convert;
+      });
     }    
   }
+ 
   
   
   Future<String> getTelbzAkt(String groupID) async {

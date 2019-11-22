@@ -113,6 +113,25 @@ class Teleblitz{
               }
     return teleblitz();
   }
+  Widget noElement(){
+    return Container(
+      height: 400,
+      padding: EdgeInsets.all(15),
+      margin: EdgeInsets.all(20),
+      child: Center(
+        child: new Text("Es sind noch keine Aktivitäten eingetragen. Bitte kontaktiere deine Leiter", style: new TextStyle(fontSize: 25),),
+    ),
+     decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.16),
+                          offset: Offset(3, 3),
+                          blurRadius: 40)
+                    ],
+                  )
+    );
+  }
 
   List<Widget> anzeigen(String groupID, AsyncSnapshot snapshot, Widget moreaLoading){
     
@@ -125,11 +144,13 @@ class Teleblitz{
     
     
     Map<String, Map<String, dynamic>> mapTeleblitz = snapshot.data[groupID];
+    if(mapTeleblitz!= null)
     mapTeleblitz.forEach((eventID,tlbz){
       defineInfo(tlbz, groupID);
       returnTelebliz.add(element(tlbz));
     });
-    
+    else
+      returnTelebliz.add(noElement());
     return returnTelebliz;
  }
           

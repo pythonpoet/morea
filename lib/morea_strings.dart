@@ -28,7 +28,7 @@ final String userMapPfadiName = "Pfadinamen";
 final String userMapNachName = "Nachname";
 final String userMapVorName = "Vorname";
 final String userMapPos = "Pos";
-final String userMapMessagingGroups ="message_groups";
+final String userMapMessagingGroups ="messageGroups";
 final String userMapSubscribedGroups = "subscribedGroups";
 
 //groupMap
