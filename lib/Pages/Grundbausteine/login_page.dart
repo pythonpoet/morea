@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
@@ -358,17 +359,16 @@ class _LoginPageState extends State<LoginPage> {
           pioCheckbox = true;
         }
         Map<String, dynamic> userInfo = {
-          'Pfadinamen': this._pfadinamen,
-          'Vorname': this._vorname,
-          'Nachname': this._nachname,
-          'groupID': convWebflowtoMiData(_selectedstufe),
-          'message_groups': {
-            'Biber': biberCheckbox,
-            'Wombat (Wölfe)': woelfeCheckbox,
-            'Nahani (Meitli)': meitliCheckbox,
-            'Drason (Buebe)': buebeCheckbox,
-            'Pios': pioCheckbox
-          },
+          userMapPfadiName: this._pfadinamen,
+          userMapVorName: this._vorname,
+          userMapNachName: this._nachname,
+          userMapgroupID: convWebflowtoMiData(_selectedstufe),
+          userMapMessagingGroups: {
+            biberwebflowname: biberCheckbox,
+            woelfewebflowname: woelfeCheckbox,
+            meitliwebflowname: meitliCheckbox,
+            buebewebflowname: buebeCheckbox,
+            },
           'Adresse': this._adresse,
           'PLZ': this._plz,
           'Ort': this._ort,
@@ -382,19 +382,16 @@ class _LoginPageState extends State<LoginPage> {
         break;
       case FormType.registereltern:
         Map<String, dynamic> userInfo = {
-          'Pfadinamen': '',
-          'Kinder': <dynamic, dynamic>{},
-          'Vorname': this._vorname,
-          'Nachname': this._nachname,
-          'Pos': 'Eltern',
-          //TODO convert _groupIDp to MiData format
-          'message_groups': {
-            'Biber': biberCheckbox,
-            'Wombat (Wölfe)': woelfeCheckbox,
-            'Nahani (Meitli)': meitliCheckbox,
-            'Drason (Buebe)': buebeCheckbox,
-            'Pios': pioCheckbox
-          },
+          userMapPfadiName: " ",
+          userMapVorName: this._vorname,
+          userMapNachName: this._nachname,
+          userMapgroupID: convWebflowtoMiData(_selectedstufe),
+          userMapMessagingGroups: {
+            biberwebflowname: biberCheckbox,
+            woelfewebflowname: woelfeCheckbox,
+            meitliwebflowname: meitliCheckbox,
+            buebewebflowname: buebeCheckbox,
+            },
           'Adresse': this._adresse,
           'PLZ': this._plz,
           'Ort': this._ort,

@@ -18,10 +18,12 @@ final String pathMessages= "messages";
 final String pathUser = "user";
 final String pathConfig = "config";
 final String pathAnmeldungen="Anmeldungen";
+final String pathRequest = "request";
 
 //Maps
-
+final String mapTimestamp = "Timestamp";
 //userMap
+final String userMapUID = "UID";
 final String userMapgroupID = "groupID";
 final String userMapGroupEdditingAllow = "groupEdditingAllow";
 final String userMapPfadiName = "Pfadinamen";

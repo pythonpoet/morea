@@ -279,6 +279,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             moreaLoading: moreaLoading.loading());
         break;
       case FormType.eltern:
+        if(moreafire.getSubscribedGroups.length>0)
         return elternView(
             stream: moreafire.tbz.getMapofEvents,
             subscribedGroups: moreafire.getSubscribedGroups,
@@ -286,6 +287,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             teleblitzAnzeigen: teleblitz.anzeigen,
             anmeldebutton: anmeldebutton,
             moreaLoading: moreaLoading.loading());
+        else
+          return Scaffold(
+          appBar: AppBar(
+            title: Text('Teleblitz'),
+          ),
+          drawer: new Drawer(
+            child: new ListView(children: navigation()),
+          ),
+          body: moreaLoading.loading()
+        ); 
         break;
     }
   }
@@ -359,7 +370,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
+                        profile: moreafire.getUserMap, firestore: widget.firestore, crud0: crud0,
                       )))),
           /*ListTile(
             title: Text('Eltern bestätigen'),

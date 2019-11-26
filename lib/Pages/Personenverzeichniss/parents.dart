@@ -63,7 +63,11 @@ class MergeChildParent extends Object
               new RaisedButton(
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
-                onPressed: () => profilePageStatePage.childaktuallisieren(),
+                onPressed: () => {
+                  profilePageStatePage.childaktuallisieren(),
+                  profilePageStatePage.childParendPend.deleteRequest(qrCodeString)
+                  },
+
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
                 color: Color(0xff7a62ff),
@@ -77,6 +81,7 @@ class MergeChildParent extends Object
   }
 
   void parentReadsQrCode(String parentUID, String parentName) async {
+    
     await qrCode.german_scanQR();
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {

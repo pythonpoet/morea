@@ -2,13 +2,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'parents.dart';
 import 'chilld_Qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
-  ProfilePageState({this.profile, this.firestore});
+  ProfilePageState({this.profile, this.firestore, this.crud0});
   final Firestore firestore;
+  final CrudMedthods crud0;
 
   var profile;
  // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
@@ -27,7 +29,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   MergeChildParent mergeChildParent;
   MoreaFirebase moreaFire;
   CrudMedthods crud0;
-
+  ChildParendPend childParendPend;
   bool hatEltern = false, hatKinder = false, display = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
@@ -40,7 +42,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     value = controller.stream;
     controller.add(false);
     while (true) {
-      await crud0.waitOnDocumentChanged('user', 'document');
       var newData = await moreaFire.getUserInformation(widget.profile['UID']);
       if (newData.data != widget.profile) {
         childaktuallisieren();
@@ -72,15 +73,15 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
   }
 
-  void childaktuallisieren() {
+  void childaktuallisieren()async {
     if (display) {
       display = false;
       if (qrCodeString != null) {
-        crud0.deletedocument('user/requests/pend', qrCodeString);
+        childParendPend.deleteRequest(qrCodeString);
         qrCodeString = null;
       }
     } else {
-      qrCodeString = moreaFire.upLoadChildRequest(widget.profile['UID']);
+      qrCodeString = await childParendPend.childGenerateRequestString(Map<String,dynamic>.from(widget.profile));
       display = true;
     }
     setState(() {});
@@ -127,7 +128,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   void initState() {
     mergeChildParent = new MergeChildParent(widget.firestore);
      moreaFire = MoreaFirebase(widget.firestore);
-     crud0 = new CrudMedthods(widget.firestore);
+     crud0 = widget.crud0;
+     childParendPend = new ChildParendPend(crud0: widget.crud0);
     if (widget.profile['Pos'] == 'Teilnehmer') {
       reload();
       erziungsberechtigte();
@@ -191,13 +193,16 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? mergeChildParent.parentScannsQrCode(
-                            widget.profile['UID'], widget.profile['Vorname'])
+                        ? test()/*mergeChildParent.parentScannsQrCode(
+                            widget.profile['UID'], widget.profile['Vorname'])*/
                         : Container(),
                   )
                 ],
               )));
     }
+  }
+  test(){
+    childParendPend.parentSendsRequestString("Test", widget.profile);
   }
 
   Widget viewChildprofile(BuildContext context) {

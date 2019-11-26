@@ -67,7 +67,7 @@ class CrudMedthods implements BaseCrudMethods {
 
   Future<bool> waitOnDocumentChanged(String path, String document) async {
     Stream<bool> value;
-    var controller = new StreamController<bool>();
+    StreamController<bool> controller = new StreamController<bool>();
 
     value = controller.stream;
     controller.add(false);
@@ -78,7 +78,7 @@ class CrudMedthods implements BaseCrudMethods {
         }
       });
     });
-
+    controller.close();
     return value.firstWhere((bool item) => item);
   }
   Future<void> setData(
