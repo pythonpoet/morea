@@ -21,7 +21,7 @@ dependencies:
     flutter_html: any
     http: any
     intl: any
-    cloud_firestore: ^0.12.9+5
+    cloud_firestore: ^0.12.10+2
     url_launcher: any
     share: any
     expandable: any

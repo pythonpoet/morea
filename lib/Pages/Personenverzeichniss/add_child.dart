@@ -48,6 +48,6 @@ class _AddChildState extends State<AddChild> {
       });
     }
     return mergeChildParent.parentScannsQrCode(
-        widget.profile['UID'], widget.profile['Vorname']);
+        widget.profile);
   }
 }

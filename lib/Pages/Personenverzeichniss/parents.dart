@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
 
 abstract class BaseMergeChildParent {
@@ -10,7 +11,7 @@ abstract class BaseMergeChildParent {
   
   Widget childShowQrCode(String qrCodeString, BuildContext context);
 
-  void parentReadsQrCode(String parentUID, String parentName);
+  void parentReadsQrCode(Map<String,dynamic> userMap);
 }
 
 class test {
@@ -24,6 +25,7 @@ class MergeChildParent extends Object
   QrCode qrCode = new QrCode();
   MoreaFirebase moreafire;
   CrudMedthods crud0;
+  ChildParendPend childParendPend = new ChildParendPend();
   bool parentReaderror = false, allowScanner = true;
 
   //ProfilePageStatePage profilePageStatePage = new ProfilePageStatePage();
@@ -80,28 +82,23 @@ class MergeChildParent extends Object
     );
   }
 
-  void parentReadsQrCode(String parentUID, String parentName) async {
+  void parentReadsQrCode(Map<String,dynamic> userMap) async {
     
     await qrCode.german_scanQR();
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
-      DocumentSnapshot childQrCode =
-          await crud0.getDocument('user/requests/pend', qrCode.qrResult);
-      String childUID = childQrCode['child-UID'];
-      DocumentSnapshot childInfo = await moreafire.getUserInformation(childUID);
-      String childName = childInfo.data['Vorname'];
-      moreafire.pendParent(childUID, parentUID, parentName);
-      moreafire.setChildToParent(childUID, parentUID, childName);
+       childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
       allowScanner = false;
       parentReaderror = false;
       profilePageStatePage.parentaktuallisieren();
     } else {
+     
       parentReaderror = true;
       profilePageStatePage.parentaktuallisieren();
     }
   }
 
-  Widget parentScannsQrCode(String parentUID, String parentName) {
+  Widget parentScannsQrCode(Map<String, dynamic> userMap) {
     return new Container(
       color: Colors.black.withOpacity(0.7),
       padding: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 40),
@@ -132,7 +129,7 @@ class MergeChildParent extends Object
                     new Text('Scannen', style: new TextStyle(fontSize: 20))
                   ],
                 ),
-                onPressed: () => parentReadsQrCode(parentUID, parentName),
+                onPressed: () => parentReadsQrCode(userMap),
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
                 color: Color(0xff7a62ff),

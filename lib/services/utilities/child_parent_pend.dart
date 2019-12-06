@@ -13,12 +13,13 @@ class ChildParendPend extends BaseChildParendPend{
   ChildParendPend({this.crud0});
 
   Future<String> childGenerateRequestString(Map<String, dynamic> userMap) async {
-    return (await cloudFunctions.callFunction(
+    var someData = (await cloudFunctions.callFunction(
       cloudFunctions.getcallable("childPendRequest"), param: Map.from({
         userMapPos: userMap[userMapPos],
         userMapUID: userMap[userMapUID],
         mapTimestamp: DateTime.now().toIso8601String()
-    }))).toString();
+    }))).data;
+    return someData.toString();
   }
   Future<bool> waitOnUserDataChange(String userID)async{
     return await crud0.waitOnDocumentChanged(pathUser, userID);
@@ -26,7 +27,7 @@ class ChildParendPend extends BaseChildParendPend{
   Future<void> deleteRequest(String request)async{
    return await crud0.deletedocument(pathRequest, request);
   }
-  Future<void> parentSendsRequestString(String requestStr, userMap)async{
+  Future<void> parentSendsRequestString(String requestStr, Map<String,dynamic>userMap)async{
     return (await cloudFunctions.callFunction(
       cloudFunctions.getcallable("parendPendAccept"), param: Map.from({
         userMapPos: userMap[userMapPos],

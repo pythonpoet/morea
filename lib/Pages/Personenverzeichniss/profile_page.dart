@@ -44,7 +44,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     while (true) {
       var newData = await moreaFire.getUserInformation(widget.profile['UID']);
       if (newData.data != widget.profile) {
-        childaktuallisieren();
+        //childaktuallisieren();
         widget.profile = newData.data;
         erziungsberechtigte();
       }
@@ -74,6 +74,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   void childaktuallisieren()async {
+    await Future.delayed(Duration(seconds: 2));
     if (display) {
       display = false;
       if (qrCodeString != null) {
@@ -193,17 +194,15 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? test()/*mergeChildParent.parentScannsQrCode(
-                            widget.profile['UID'], widget.profile['Vorname'])*/
+                        ? mergeChildParent.parentScannsQrCode(
+                            widget.profile)
                         : Container(),
                   )
                 ],
               )));
     }
   }
-  test(){
-    childParendPend.parentSendsRequestString("Test", widget.profile);
-  }
+  
 
   Widget viewChildprofile(BuildContext context) {
     return Container(
@@ -424,7 +423,9 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 'Mit Eltern Koppeln',
                 style: TextStyle(fontSize: 20),
               ),
-              onPressed: () => childaktuallisieren(),
+              onPressed: () => {
+                print("executed throug button pressed"),
+                childaktuallisieren()},
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),
               color: Color(0xff7a62ff),

@@ -41,6 +41,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
   Map<String,dynamic> _userMap, _groupMap;
+  Map<String, Map<String,String>> _subscribedGroupsMap;
   String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID;
   Map<String,dynamic> _messagingGroups;
   List<String> _subscribedGroups = new List<String>();
@@ -67,24 +68,29 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> getData(String userID)async{
     _userMap = (await crud0.getDocument(pathUser, userID)).data;
-    _groupMap = (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+    //init userMap
     _pfadiName = _userMap[userMapPfadiName];
     _groupID = _userMap[userMapgroupID];
     _vorName = _userMap[userMapVorName];
     _nachName = _userMap[userMapNachName];
     _pos = _userMap[userMapPos];
     _messagingGroups = Map<String,dynamic>.from(_userMap[userMapMessagingGroups]??[]);
-    _eventID = _groupMap[groupMapEventID];
     _subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]?? []);
     if(_pfadiName == '')
       _displayName = _vorName;
     else
       _displayName = _pfadiName;
+    if((_pos == userMapLeiter)||(_pos == userMapTeilnehmer)){
+    //init groupMap
+    _groupMap = (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+    _eventID = _groupMap[groupMapEventID];
+    }
+    
+    
   }
   Future<void> initTeleblitz(){
-    if(_groupID == null)
-    throw ("groupIDs shouldnt be null");
     List<String> groupIDs = new List<String>();
+    if(_groupID == null)
     groupIDs.add(_groupID);
     groupIDs.addAll(_subscribedGroups);
     tbz = new TeleblizFirestore(firestore ,groupIDs);
