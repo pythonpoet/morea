@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'parents.dart';
@@ -33,7 +34,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   bool hatEltern = false, hatKinder = false, display = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
-  String qrCodeString;
+  Future<String> qrCodeString;
   List elternMapList = ['Liam Bebecho'], kinderMapList = ['Walter'];
   
  
@@ -41,13 +42,12 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   void reload() async {
     value = controller.stream;
     controller.add(false);
-    while (true) {
+    
       var newData = await moreaFire.getUserInformation(widget.profile['UID']);
       if (newData.data != widget.profile) {
-        //childaktuallisieren();
         widget.profile = newData.data;
         erziungsberechtigte();
-      }
+      
     }
   }
 
@@ -74,20 +74,26 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   void childaktuallisieren()async {
-    await Future.delayed(Duration(seconds: 2));
     if (display) {
       display = false;
       if (qrCodeString != null) {
-        childParendPend.deleteRequest(qrCodeString);
+        childParendPend.deleteRequest(await qrCodeString);
         qrCodeString = null;
       }
     } else {
-      qrCodeString = await childParendPend.childGenerateRequestString(Map<String,dynamic>.from(widget.profile));
       display = true;
+      documentChangeListender();
     }
     setState(() {});
   }
-
+  void documentChangeListender()async{
+    await Future.delayed(Duration(seconds: 2));
+    await childParendPend.waitOnUserDataChange(widget.profile[userMapUID]);
+    display = false;
+    setState(() {
+      
+    });
+  }
   void parentaktuallisieren() {
     if (display) {
       if (!mergeChildParent.parentReaderror) {
@@ -166,7 +172,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   new Align(
                     child: display
                         ? mergeChildParent
-                            .childShowQrCode(qrCodeString, context)
+                            .childShowQrCode(widget.profile, context)
                         : Container(),
                   )
                 ],
@@ -424,7 +430,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 style: TextStyle(fontSize: 20),
               ),
               onPressed: () => {
-                print("executed throug button pressed"),
                 childaktuallisieren()},
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),

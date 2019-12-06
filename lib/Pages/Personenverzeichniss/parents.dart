@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
@@ -9,7 +10,7 @@ import 'package:morea/services/utilities/qr_code.dart';
 abstract class BaseMergeChildParent {
 
   
-  Widget childShowQrCode(String qrCodeString, BuildContext context);
+  Widget childShowQrCode(Map userMap, BuildContext context);
 
   void parentReadsQrCode(Map<String,dynamic> userMap);
 }
@@ -37,7 +38,8 @@ class MergeChildParent extends Object
     this.crud0 = new CrudMedthods(firestore);
   }
 
-  Widget childShowQrCode(String qrCodeString, BuildContext context) {
+  Widget childShowQrCode(Map userMap, BuildContext context) {
+     Future<String> qrCodeString =childParendPend.childGenerateRequestString(Map<String,dynamic>.from(userMap));
     return new Container(
       color: Colors.black.withOpacity(0.7),
       padding: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 40),
@@ -58,16 +60,29 @@ class MergeChildParent extends Object
               SizedBox(
                 height: 30,
               ),
-              qrCode.generate(qrCodeString),
+              FutureBuilder(
+                future: qrCodeString,
+                builder: (BuildContext context, snap){
+                  if(snap.hasData)
+                    return qrCode.generate(snap.data);
+                  else
+                    return Container(
+                      child: moreaLoadingIndicator(),
+                      height: 100,
+                      width: 140,
+                      
+                    );
+                },
+              ),
               SizedBox(
                 height: 40,
               ),
               new RaisedButton(
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
-                onPressed: () => {
+                onPressed: () async => {
                   profilePageStatePage.childaktuallisieren(),
-                  profilePageStatePage.childParendPend.deleteRequest(qrCodeString)
+                  profilePageStatePage.childParendPend.deleteRequest(await qrCodeString)
                   },
 
                 shape: new RoundedRectangleBorder(

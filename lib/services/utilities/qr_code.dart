@@ -11,8 +11,6 @@ abstract class BaseQrCode{
 class QrCode implements BaseQrCode{
   String qrResult, germanError = 'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.';
   Widget generate(String str){
-    
-    print(str);
     return new QrImage(
       data: str,
       size: 200,
