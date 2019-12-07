@@ -34,6 +34,8 @@ final String userMapMessagingGroups ="messageGroups";
 final String userMapSubscribedGroups = "subscribedGroups";
 final String userMapLeiter="Leiter";
 final String userMapTeilnehmer="Teilnehmer";
+final String userMapKinder = "Kinder";
+final String userMapEltern= "Eltern";
 
 //groupMap
 final String groupMapEventID = "eventID";

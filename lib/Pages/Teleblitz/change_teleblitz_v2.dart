@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'cange_teleblitz_abtreten.dart';
 import 'cange_teleblitz_antreten.dart';
 import 'cange_teleblitz_bemerkung.dart';
@@ -315,7 +316,7 @@ class _ChangeTeleblitzV2State extends State<ChangeTeleblitzV2> {
       '_archived': false
     };
     await teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-    await widget.moreaFire.uploadteleblitz(this.stufe, newTeleblitz);
+     await widget.moreaFire.uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
     Navigator.of(context).pop();
   }
 

@@ -18,6 +18,7 @@ abstract class BaseMoreaFirebase {
   Map<String,dynamic> get getGroupMap;
   Map<String,dynamic> get getUserMap;
   Map<String,dynamic> get getMessagingGroups;
+  Map<String,Map<String,String>> get getChildMap;
 
   Future<void> createUserInformation(Map userInfo);
   Future<void> updateUserInformation(String userUID, Map userInfo);
@@ -41,7 +42,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
   Map<String,dynamic> _userMap, _groupMap;
-  Map<String, Map<String,String>> _subscribedGroupsMap;
+  Map<String, Map<String,String>> _subscribedGroupsMap, _childMap;
   String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID;
   Map<String,dynamic> _messagingGroups;
   List<String> _subscribedGroups = new List<String>();
@@ -65,6 +66,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String,dynamic> get getGroupMap => _groupMap;
   Map<String,dynamic> get getUserMap => _userMap;
   Map<String,dynamic> get getMessagingGroups => _messagingGroups;
+  Map<String,Map<String,String>> get getChildMap => _childMap;
 
   Future<void> getData(String userID)async{
     _userMap = (await crud0.getDocument(pathUser, userID)).data;
@@ -84,9 +86,19 @@ class MoreaFirebase extends BaseMoreaFirebase {
     //init groupMap
     _groupMap = (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
     _eventID = _groupMap[groupMapEventID];
+    }else{
+      if(_userMap.containsKey(userMapKinder)){
+        _childMap = await createChildMap(_userMap[userMapKinder]);
+      }
     }
-    
-    
+  }
+  Future<Map<String,Map<String,String>>> createChildMap(Map<String,String> childs)async{
+    Map childMap = new Map();
+    childs.forEach((vorname, childUID)async{
+      Map childUserDat = (await crud0.getDocument(pathUser, childUID)).data;
+      childMap[childUserDat[userMapgroupID]] = {vorname:childUID};
+    });
+    return childMap;
   }
   Future<void> initTeleblitz(){
     List<String> groupIDs = new List<String>();

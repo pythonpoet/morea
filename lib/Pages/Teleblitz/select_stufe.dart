@@ -5,7 +5,7 @@ import 'package:morea/morealayout.dart';
 import 'select_teleblitz_type.dart';
 
 class SelectStufe extends StatelessWidget {
-  SelectStufe({MoreaFirebase moreaFire});
+  SelectStufe(this.moreaFire);
   MoreaFirebase moreaFire;
 
   @override

@@ -51,7 +51,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
   bool chunnt = false;
   var messagingGroups;
 
-  void submit(String anabmelden, String groupnr, String eventID) {
+  void submit(String anabmelden, String groupnr, String eventID, String uid) {
     if (_formType != FormType.eltern) {
       String anmeldung;
 
@@ -66,7 +66,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
         anmeldung = 'Du hast dich Abgemolden';
         chunnt = false;
       }
-      crud0.waitOnDocumentChanged("$pathEvents/$eventID/Anmeldungen", widget.auth.getUserID).then((onValue){
+      crud0.waitOnDocumentChanged("$pathEvents/$eventID/Anmeldungen", uid).then((onValue){
         if(onValue)
         showDialog(
           context: context,
@@ -279,7 +279,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             groupID: moreafire.getGroupID,
             navigation: navigation,
             teleblitzAnzeigen: teleblitz.anzeigen,
-            anmeldebutton: anmeldebutton,
+            anmeldebutton: this.childAnmeldeButton,
             moreaLoading: moreaLoading.loading());
         break;
       case FormType.eltern:
@@ -289,7 +289,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             subscribedGroups: moreafire.getSubscribedGroups,
             navigation: navigation,
             teleblitzAnzeigen: teleblitz.anzeigen,
-            anmeldebutton: anmeldebutton,
+            anmeldebutton: parentAnmeldeButton,
             moreaLoading: moreaLoading.loading());
         else
           return Scaffold(
@@ -432,8 +432,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
         break;
     }
   }
-
-  Widget anmeldebutton(String groupID, String eventID) {
+  Widget parentAnmeldeButton(String groupID, String eventID){
+    List<Widget> anmeldebuttons = new List();
+    moreafire.getChildMap[groupID].forEach((String vorname, uid){
+      anmeldebuttons.add(anmeldebutton(groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden"));
+    });
+    return Column(
+      children: anmeldebuttons
+    );
+  }
+  Widget childAnmeldeButton(String groupID, String eventID){
+    return anmeldebutton( moreafire.getGroupID, eventID, widget.auth.getUserID, 'Chume','Chume nöd');
+  }
+  
+  Widget anmeldebutton(String groupID, String eventID, String uid, String anmelden, abmelden) {
       return Container(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -442,9 +454,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   child: Container(
                 child: new RaisedButton(
                   child:
-                      new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
+                      new Text(abmelden, style: new TextStyle(fontSize: 20)),
                   onPressed: () => submit(
-                      'Chunt nöd', moreafire.getGroupID, eventID),
+                      eventMapAnmeldeStatusNegativ,groupID , eventID, uid),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                 ),
@@ -453,7 +465,40 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                 child: Container(
                   child: new RaisedButton(
                     child:
-                        new Text('Chume', style: new TextStyle(fontSize: 20)),
+                        new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit(
+                        eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    color: Color(0xff7a62ff),
+                    textColor: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ));
+  }/*
+  Widget anmeldebutton(String groupID, String eventID, String uid) {
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                  child: Container(
+                child: new RaisedButton(
+                  child:
+                      new Text(, style: new TextStyle(fontSize: 20)),
+                  onPressed: () => submit(
+                      'Chunt nöd', moreafire.getGroupID, eventID, uid),
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                ),
+              )),
+              Expanded(
+                child: Container(
+                  child: new RaisedButton(
+                    child:
+                        new Text(, style: new TextStyle(fontSize: 20)),
                     onPressed: () => submit(
                         'Chunt nöd', moreafire.getGroupID, eventID),
                     shape: new RoundedRectangleBorder(
@@ -465,12 +510,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
               )
             ],
           ));
-  }
+  }*/
 
   void routeEditTelebliz() {
     Navigator.of(context)
         .push(new MaterialPageRoute(
-            builder: (BuildContext context) => new SelectStufe()))
+            builder: (BuildContext context) => new SelectStufe( moreafire,)))
         .then((onValue) {
       setState(() {});
     });
