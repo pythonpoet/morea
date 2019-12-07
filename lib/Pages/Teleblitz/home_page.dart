@@ -8,6 +8,7 @@ import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/home/eltern.dart';
 import 'package:morea/Widgets/home/leiter.dart';
 import 'package:morea/Widgets/home/teilnehmer.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
@@ -50,7 +51,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
   bool chunnt = false;
   var messagingGroups;
 
-  void submit({@required String anabmelden, String groupnr}) {
+  void submit(String anabmelden, String groupnr, String eventID) {
     if (_formType != FormType.eltern) {
       String anmeldung;
 
@@ -65,14 +66,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
         anmeldung = 'Du hast dich Abgemolden';
         chunnt = false;
       }
-      moreafire.uebunganmelden(moreafire.getEventID, widget.auth.getUserID,
-          widget.auth.getUserID, anabmelden);
-      showDialog(
+      crud0.waitOnDocumentChanged("$pathEvents/$eventID/Anmeldungen", widget.auth.getUserID).then((onValue){
+        if(onValue)
+        showDialog(
           context: context,
           child: new AlertDialog(
             title: new Text("Teleblitz"),
             content: new Text(anmeldung),
           ));
+      });
+      moreafire.uebunganmelden(eventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden);
     } else {
       showDialog(
           context: context,
@@ -429,7 +433,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
     }
   }
 
-  Widget anmeldebutton(String groupnr) {
+  Widget anmeldebutton(String groupID, String eventID) {
       return Container(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -440,7 +444,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   child:
                       new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
                   onPressed: () => submit(
-                      anabmelden: 'Chunt nöd', groupnr: moreafire.getGroupID),
+                      'Chunt nöd', moreafire.getGroupID, eventID),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                 ),
@@ -451,7 +455,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                     child:
                         new Text('Chume', style: new TextStyle(fontSize: 20)),
                     onPressed: () => submit(
-                        anabmelden: 'Chunt', groupnr: moreafire.getGroupID),
+                        'Chunt nöd', moreafire.getGroupID, eventID),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Color(0xff7a62ff),

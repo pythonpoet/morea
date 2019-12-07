@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -133,23 +134,21 @@ class Teleblitz{
     );
   }
 
-  List<Widget> anzeigen(String groupID, AsyncSnapshot snapshot, Widget moreaLoading){
-    List<Widget> returnTelebliz = new List<Widget>();
+  Map<String,Widget> anzeigen(String groupID, AsyncSnapshot snapshot, Widget moreaLoading){
+    Map<String,Widget> returnTelebliz = new Map();
     if(snapshot.data == null){
-       returnTelebliz.add(moreaLoading);
+      returnTelebliz[tlbzMapLoading]=moreaLoading;
        return returnTelebliz;
     }
-    
-    
     
     Map<String, Map<String, dynamic>> mapTeleblitz = snapshot.data[groupID];
     if(mapTeleblitz!= null)
     mapTeleblitz.forEach((eventID,tlbz){
       defineInfo(tlbz, groupID);
-      returnTelebliz.add(element(tlbz));
+      returnTelebliz[eventID]= element(tlbz);
     });
     else
-      returnTelebliz.add(noElement());
+      returnTelebliz[tlbzMapNoElement] = noElement();
     return returnTelebliz;
  }
           

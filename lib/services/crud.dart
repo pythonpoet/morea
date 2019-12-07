@@ -70,7 +70,6 @@ class CrudMedthods implements BaseCrudMethods {
   Future<bool> waitOnDocumentChanged(String path, String document) async {
     Stream<bool> value;
     StreamController<bool> controller = new BehaviorSubject();
-
     value = controller.stream;
     controller.add(false);
     Firestore.instance.collection(path).snapshots().listen((onData) {

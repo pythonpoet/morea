@@ -43,6 +43,10 @@ final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
 
 //eventMap
-final String eventMapAnmeldeStatusNegativ = "Chunt nöd";
+final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
 final String eventMapAnmeldeStatusPositiv = "Chunt";
 final String eventMapAnmeldeUID = "AnmeldeUID";
+
+//Teleblitz-local Map
+final String tlbzMapLoading = "Loading";
+final String tlbzMapNoElement= "noElement";

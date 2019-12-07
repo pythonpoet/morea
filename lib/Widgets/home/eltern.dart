@@ -7,7 +7,7 @@ Widget elternView(
     @required List<String> subscribedGroups,
     @required Function navigation,
     @required Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
-    @required Widget Function(String) anmeldebutton,
+    @required Widget Function(String, String) anmeldebutton,
     @required Widget moreaLoading}
 ){
   return DefaultTabController(
