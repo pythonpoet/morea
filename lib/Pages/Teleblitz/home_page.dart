@@ -52,13 +52,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
   var messagingGroups;
 
   void submit(String anabmelden, String groupnr, String eventID, String uid) {
-    if (_formType != FormType.eltern) {
       String anmeldung;
 
       anmeldeDaten = {
         'Anmeldename': moreafire.getDisplayName,
         'Anmeldung': anabmelden
       };
+      
       if (anabmelden == 'Chunt') {
         anmeldung = 'Du hast dich Angemolden';
         chunnt = true;
@@ -75,52 +75,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             content: new Text(anmeldung),
           ));
       });
-      moreafire.uebunganmelden(eventID, widget.auth.getUserID,
+      if (_formType != FormType.eltern) {
+      moreafire.childAnmelden(eventID, widget.auth.getUserID,
           widget.auth.getUserID, anabmelden);
-    } else {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Kind auswählen'),
-              content: ListView.builder(
-                shrinkWrap: true,
-                itemCount: moreafire.getUserMap['Kinder'].length,
-                itemBuilder: (BuildContext context, int index) {
-                  var namekind =
-                      List.from(moreafire.getUserMap['Kinder'].keys)[index];
-                  var uidkind =
-                      List.from(moreafire.getUserMap['Kinder'].values)[index];
-                  return ListTile(
-                    title: Text(namekind),
-                    onTap: () {
-                      String anmeldung;
-                      print(moreafire.getUserMap['Pfadinamen']);
-                      anmeldeDaten = {
-                        'Anmeldename': namekind,
-                        'Anmeldung': anabmelden
-                      };
-                      if (anabmelden == 'Chunt') {
-                        anmeldung = 'Du hast dich Angemolden';
-                      } else {
-                        anmeldung = 'Du hast dich Abgemolden';
-                      }
-                      moreafire.uebunganmelden(moreafire.getEventID,
-                          widget.auth.getUserID, uidkind, anabmelden);
-                      showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: new Text("Teleblitz"),
-                            content: new Text(anmeldung),
-                          ));
-                    },
-                  );
-                },
-              ),
-            );
-          });
+      }else{
+        moreafire.parentAnmeldet(eventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden);
+      }
     }
-  }
+
 
   Future<void> getdevtoken() async {
     var token = await firebaseMessaging.getToken();

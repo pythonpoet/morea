@@ -95,10 +95,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
   Future<Map<String,Map<String,String>>> createChildMap(Map<String,String> childs)async{
     Map<String,Map<String,String>> childMap = new Map();
-    childs.forEach((vorname, childUID)async{
-      Map<String,dynamic> childUserDat = (await crud0.getDocument(pathUser, childUID)).data;
-      childMap[childUserDat[userMapgroupID]] = {vorname:childUID};
-    });
+     for(String vorname in childs.keys){
+      Map<String,dynamic> childUserDat = (await crud0.getDocument(pathUser, childs[vorname])).data;
+      childMap[childUserDat[userMapgroupID]] = {vorname:childs[vorname]};
+      if(!_subscribedGroups.contains(childUserDat[userMapgroupID]))
+        _subscribedGroups.add(childUserDat[userMapgroupID]);
+    }
     return childMap;
   }
   Future<void> initTeleblitz(){
@@ -171,12 +173,22 @@ class MoreaFirebase extends BaseMoreaFirebase {
     }
   }
 
-  Future<void> uebunganmelden(
+  Future<void> childAnmelden(
       String eventID, String userUID, String anmeldeUID, String anmeldeStatus) async {
         crud0.runTransaction("$pathEvents/$eventID/Anmeldungen", anmeldeUID, Map<String, dynamic>.from({
       "AnmeldeStatus":  anmeldeStatus,
       "AnmedeUID":      anmeldeUID,
       "UID":            userUID,
+      "Timestamp":      DateTime.now()
+    }));
+    return null;
+  }
+  Future<void> parentAnmeldet(String eventID, String childUID, String anmeldeUID, String anmeldeStatus) async{
+    crud0.runTransaction("$pathEvents/$eventID/Anmeldungen", anmeldeUID, Map<String, dynamic>.from({
+      "AnmeldeStatus":  anmeldeStatus,
+      "AnmedeUID":      anmeldeUID,
+      "UID":            childUID,
+      "ParentUID":      getUserMap[userMapUID],
       "Timestamp":      DateTime.now()
     }));
     return null;
