@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
+import 'package:morea/morealayout.dart';
 
 
 class ViewEventPageState extends StatelessWidget {
@@ -13,19 +14,17 @@ class ViewEventPageState extends StatelessWidget {
       return Container(
         child: Scaffold(
             appBar: AppBar(
-              backgroundColor: Color(0xff7a62ff),
               title: Text(info['Eventname'].toString()),
             ),
             body: LayoutBuilder(
               builder:
                   (BuildContext context, BoxConstraints viewportConstraints) {
-                return SingleChildScrollView(
-                    child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: viewportConstraints.maxHeight,
-                  ),
-                  child: viewEvent(),
-                ));
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                      child: MoreaShadowContainer(
+                        child: viewEvent(),
+                      )),
+                );
               },
             ),floatingActionButton: Opacity(
               opacity: istLeiter() ? 1.0 : 0.0 ,
@@ -63,7 +62,12 @@ class ViewEventPageState extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: Text(info['Eventname'], style: MoreaTextStyle.title,),
+          ),
           Container(
              alignment: Alignment.center, //
                     decoration: new BoxDecoration(
@@ -96,11 +100,11 @@ class ViewEventPageState extends StatelessWidget {
               Container(
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -130,13 +134,13 @@ class ViewEventPageState extends StatelessWidget {
                                   child: Text(info['Anfangsort']),)
                               ],
                             ),
-                          ) 
+                          )
                         ],
                       ),
                     ),
                     Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -166,8 +170,8 @@ class ViewEventPageState extends StatelessWidget {
                                   child: Text(info['Schlussort']),)
                               ],
                             ),
-                          ) 
-                          
+                          )
+
                         ],
                       ),
                     ),

@@ -25,12 +25,12 @@ abstract class BaseMoreaFirebase {
   Future<DocumentSnapshot> getUserInformation(String userUID);
   Stream<QuerySnapshot> getChildren();
   Future<void> pendParent(
-      String child_UID, String parent_UID, String parent_name);
-  Stream<DocumentSnapshot> streamPendingParents(String child_UID);
+  String childUID, String parentUID, String parentName);
+  Stream<DocumentSnapshot> streamPendingParents(String childUID);
   Future<void> setChildToParent(
-      String child_UID, String parent_UID, String child_name);
+  String childUID, String parentUID, String childName);
   Future<void> uploaddevtocken(
-      var messagingGroups, String token, String userUID);
+  var messagingGroups, String token, String userUID);
   Stream<QuerySnapshot> getMessages(String groupnr);
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
   String upLoadChildRequest(String childUID);
@@ -69,7 +69,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String,Map<String,String>> get getChildMap => _childMap;
 
   Future<void> getData(String userID)async{
-    _userMap = (await crud0.getDocument(pathUser, userID)).data;
+    _userMap = Map<String,dynamic>.from((await crud0.getDocument(pathUser, userID)).data);
     //init userMap
     _pfadiName = _userMap[userMapPfadiName];
     _groupID = _userMap[userMapgroupID];
@@ -88,23 +88,23 @@ class MoreaFirebase extends BaseMoreaFirebase {
     _eventID = _groupMap[groupMapEventID];
     }else{
       if(_userMap.containsKey(userMapKinder)){
-        _childMap = await createChildMap(_userMap[userMapKinder]);
+        Map<String,String> kinderMap =  Map<String,String>.from( _userMap[userMapKinder]);
+        _childMap = await createChildMap(kinderMap);
       }
     }
   }
   Future<Map<String,Map<String,String>>> createChildMap(Map<String,String> childs)async{
-    Map childMap = new Map();
+    Map<String,Map<String,String>> childMap = new Map();
     childs.forEach((vorname, childUID)async{
-      Map childUserDat = (await crud0.getDocument(pathUser, childUID)).data;
+      Map<String,dynamic> childUserDat = (await crud0.getDocument(pathUser, childUID)).data;
       childMap[childUserDat[userMapgroupID]] = {vorname:childUID};
     });
     return childMap;
   }
   Future<void> initTeleblitz(){
     List<String> groupIDs = new List<String>();
-    if(_groupID == null)
-    groupIDs.add(_groupID);
     groupIDs.addAll(_subscribedGroups);
+    groupIDs.add(_groupID);
     tbz = new TeleblizFirestore(firestore ,groupIDs);
   }
 
@@ -184,8 +184,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> uploadteleblitz(String groupID, Map data) async{
     String eventID =  groupID +  data['datum'].toString().replaceAll('Samstag, ', '');
-    Map<String, String> akteleblitz = {
-      'AktuellerTeleblitz': eventID
+    Map<String, List> akteleblitz = {
+      groupMapHomeFeed: [eventID]
     };  
     await tbz.uploadTelbzAkt(groupID, akteleblitz);
     return await tbz.uploadTelbz(eventID, data);

@@ -39,7 +39,6 @@ class _LoginPageState extends State<LoginPage> {
       _pfadinamen = ' ',
       _vorname,
       _nachname,
-      _stufe,
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
   String _password,
@@ -51,7 +50,6 @@ class _LoginPageState extends State<LoginPage> {
       userId,
       error;
   FormType _formType = FormType.login;
-  Platform _platform = Platform.isAndroid;
   List<String> _stufenselect = [
     'Biber',
     'Wombat (Wölfe)',
@@ -94,8 +92,8 @@ class _LoginPageState extends State<LoginPage> {
     List devtoken;
     await moreafire.getUserInformation(userId).then((userInfo) {
       try {
-        List devtoken_old = userInfo.data['devtoken'];
-        if (devtoken_old == null) {
+        List devTokenOld = userInfo.data['devtoken'];
+        if (devTokenOld == null) {
           firebaseMessaging.getToken().then((token) {
             devtoken = [token];
             Map<String, List> devtokens = {'devtoken': devtoken};
@@ -104,11 +102,11 @@ class _LoginPageState extends State<LoginPage> {
           });
         } else {
           firebaseMessaging.getToken().then((token) {
-            if (devtoken_old[0] == 'leer') {
+            if (devTokenOld[0] == 'leer') {
               devtoken = [token];
             } else {
-              for (int i = 0; i < devtoken_old.length; i++) {
-                if (devtoken_old[i] == token) {
+              for (int i = 0; i < devTokenOld.length; i++) {
+                if (devTokenOld[i] == token) {
                   return;
                 }
               }
@@ -127,7 +125,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void validateAndSubmit() async {
-    Platform.isAndroid;
 
     if (validateAndSave()) {
       try {
@@ -137,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
               _load = true;
             });
             userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
-            print('Sign in: ${userId}');
+            print('Sign in: $userId');
             if (userId != null) {
               updatedevtoken();
               setState(() {
@@ -161,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                   if (datenschutz.akzeptiert) {
                     userId = await widget.auth.createUserWithEmailAndPassword(
                         _email, _password);
-                    print('Registered user: ${userId}');
+                    print('Registered user: $userId');
                     if (userId != null) {
                       moreafire.createUserInformation(await mapUserData());
                       widget.onSignedIn();
@@ -212,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (datenschutz.akzeptiert) {
                       userId = await widget.auth
                           .createUserWithEmailAndPassword(_email, _password);
-                      print('Registered user: ${userId}');
+                      print('Registered user: $userId');
                       if (userId != null) {
                         moreafire.createUserInformation(await mapUserData());
                         setState(() {
@@ -406,6 +403,8 @@ class _LoginPageState extends State<LoginPage> {
       case FormType.login:
         return null;
         break;
+      default:
+        return null;
     }
   }
 
@@ -429,10 +428,7 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Pfadi Morea'),
-          backgroundColor: Color(0xff7a62ff),
-        ),
+      appBar: AppBar(),
         body: Stack(
           children: <Widget>[
             Container(

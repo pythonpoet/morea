@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
@@ -12,7 +13,6 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -70,7 +70,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
         if(onValue)
         showDialog(
           context: context,
-          child: new AlertDialog(
+          builder: (context) => new AlertDialog(
             title: new Text("Teleblitz"),
             content: new Text(anmeldung),
           ));
@@ -109,7 +109,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                           widget.auth.getUserID, uidkind, anabmelden);
                       showDialog(
                           context: context,
-                          child: new AlertDialog(
+                          builder: (context) => AlertDialog(
                             title: new Text("Teleblitz"),
                             content: new Text(anmeldung),
                           ));
@@ -138,6 +138,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
   void _signedOut() async {
     try {
+      if(Navigator.of(context).canPop()){
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
       await widget.auth.signOut();
       widget.onSigedOut();
     } catch (e) {

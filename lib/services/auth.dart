@@ -35,7 +35,9 @@ abstract class BaseAuth {
 
   Future<void> changePassword(String newPassword);
 
-  Future<void> reauthenticate(String email, String password);
+  Future<bool> reauthenticate(String email, String password);
+
+  Future<void> changeEmail(String email);
 }
 
 class Auth implements BaseAuth {
@@ -90,16 +92,29 @@ class Auth implements BaseAuth {
     return null;
   }
 
-  Future<void> reauthenticate(String email, String password) async {
+  Future<bool> reauthenticate(String email, String password) async {
+    bool reAuthenticated;
     AuthCredential credential =
         EmailAuthProvider.getCredential(email: email, password: password);
+    print('got Credential');
+    print(email);
     FirebaseUser user = await _firebaseAuth.currentUser();
-    user.reauthenticateWithCredential(credential).then((onValue) {
-      return null;
-    }).catchError((e) {
-      print(e);
-      return null;
+    print('got current user');
+    user.reauthenticateWithCredential(credential).then(
+        (AuthResult result){
+          if(result.user == null){
+            print(false);
+            reAuthenticated = false;
+          } else {
+            print(true);
+            reAuthenticated = true;
+          }
+        }
+    ).catchError((error){
+      print(error);
     });
+    print('reauthenticated');
+    return reAuthenticated;
   }
 
   Future<void> signOut() async {
@@ -214,5 +229,11 @@ class Auth implements BaseAuth {
                 ),
               ),
             ));
+  }
+
+  Future<void> changeEmail(String email) async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    await user.updateEmail(email);
+    return null;
   }
 }

@@ -1,57 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:morea/morealayout.dart';
 
-class ChangeAntreten extends StatefulWidget {
+class ChangeAbtreten extends StatefulWidget {
   final String antreten, mapAntreten;
 
   final Function speichern;
 
-  ChangeAntreten(this.antreten, this.mapAntreten, this.speichern);
+  ChangeAbtreten(this.antreten, this.mapAntreten, this.speichern);
 
   @override
   State<StatefulWidget> createState() {
-    return _ChangeAntretenState();
+    return _ChangeAbtretenState();
   }
 }
 
-class _ChangeAntretenState extends State<ChangeAntreten> {
-  String ortAntreten;
-  String zeitAntreten;
-  String mapAntreten;
+class _ChangeAbtretenState extends State<ChangeAbtreten> {
+  String ortAbtreten;
+  String zeitAbtreten;
+  String mapAbtreten;
   final _formKey = GlobalKey<FormState>();
-  TextEditingController ortAntretenController = TextEditingController();
-  TextEditingController mapAntretenController = TextEditingController();
+  TextEditingController ortAbtretenController = TextEditingController();
+  TextEditingController mapAbtretenController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     var splitAntreten = widget.antreten.split(',');
-    this.ortAntreten = splitAntreten[0];
-    this.zeitAntreten = splitAntreten[1].split(' ')[1];
-    this.mapAntreten = widget.mapAntreten;
-    ortAntretenController.text = ortAntreten;
-    mapAntretenController.text = mapAntreten;
+    this.ortAbtreten = splitAntreten[0];
+    this.zeitAbtreten = splitAntreten[1].split(' ')[1];
+    this.mapAbtreten = widget.mapAntreten;
+    ortAbtretenController.text = ortAbtreten;
+    mapAbtretenController.text = mapAbtreten;
   }
 
   @override
   void dispose() {
     super.dispose();
-    ortAntretenController.dispose();
-    mapAntretenController.dispose();
+    ortAbtretenController.dispose();
+    mapAbtretenController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Beginn ändern'),
+        title: Text('Ende ändern'),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: MoreaColors.violett,
         child: Icon(Icons.check),
         onPressed: (){
           if (saveAndSubmit()) {
-            widget.speichern(this.ortAntretenController.text, this.zeitAntreten, this.mapAntretenController.text);
+            widget.speichern(this.ortAbtretenController.text, this.zeitAbtreten, this.mapAbtretenController.text);
             Navigator.of(context).pop();
           }
         },
@@ -73,7 +73,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
                           child: Text(
-                            'Beginn',
+                            'Ende',
                             style: MoreaTextStyle.title,
                           ),
                         ),
@@ -87,7 +87,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
                           child: TextFormField(
-                            controller: ortAntretenController,
+                            controller: ortAbtretenController,
                             maxLines: 1,
                             keyboardType: TextInputType.text,
                             style: TextStyle(fontSize: 18),
@@ -109,6 +109,8 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                           child: Text('Uhrzeit', style: MoreaTextStyle.lable,),
                         ),
                         Container(
+                          constraints: BoxConstraints(minWidth: viewportConstraints.maxWidth),
+                          alignment: Alignment.centerLeft,
                           margin:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                           decoration: BoxDecoration(
@@ -117,7 +119,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                           border: Border.all(color: Colors.black45)),
                           child: FlatButton(
                             child: Text(
-                              zeitAntreten + ' Uhr',
+                              zeitAbtreten + ' Uhr',
                               style:
                                   TextStyle(fontSize: 18, color: Colors.black87),
                             ),
@@ -133,7 +135,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
                           child: TextFormField(
-                            controller: mapAntretenController,
+                            controller: mapAbtretenController,
                             maxLines: 10,
                             minLines: 1,
                             keyboardType: TextInputType.text,
@@ -164,8 +166,8 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
   }
 
   Future<Null> _selectTime(BuildContext context) async {
-    String hour = zeitAntreten.split(':')[0];
-    String minute = zeitAntreten.split(':')[1];
+    String hour = zeitAbtreten.split(':')[0];
+    String minute = zeitAbtreten.split(':')[1];
     final TimeOfDay picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: int.parse(hour), minute: int.parse(minute)),
@@ -174,21 +176,21 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
       setState(() {
         if (picked.minute.toString().length < 2 &&
             picked.hour.toString().length >= 2) {
-          this.zeitAntreten =
+          this.zeitAbtreten =
               picked.hour.toString() + ":" + picked.minute.toString() + "0";
         } else if (picked.hour.toString().length < 2 &&
             picked.minute.toString().length >= 2) {
-          this.zeitAntreten =
+          this.zeitAbtreten =
               "0" + picked.hour.toString() + ":" + picked.minute.toString();
         } else if (picked.hour.toString().length < 2 &&
             picked.minute.toString().length < 2) {
-          this.zeitAntreten = "0" +
+          this.zeitAbtreten = "0" +
               picked.hour.toString() +
               ":" +
               "0" +
               picked.minute.toString();
         } else {
-          this.zeitAntreten =
+          this.zeitAbtreten =
               picked.hour.toString() + ":" + picked.minute.toString();
         }
       });

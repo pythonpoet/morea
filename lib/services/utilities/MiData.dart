@@ -20,6 +20,8 @@ import 'package:morea/services/utilities/dwi_format.dart';
         return '3779';
       case 'Drason (Buebe)':
         return '4013';
+      default:
+        throw "convWebflowtoMiData Error";
     }
   }
    String convMiDatatoWebflow(String groupID){
@@ -32,5 +34,7 @@ import 'package:morea/services/utilities/dwi_format.dart';
         return 'Nahani (Meitli)';
       case '4013':
         return 'Drason (Buebe)';
+      default:
+        throw "convMiDatatoWebflow Error";
      }     
    }

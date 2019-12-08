@@ -10,9 +10,10 @@ import 'view_Event_page.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class AgendaState extends StatefulWidget {
-  AgendaState({this.firestore, this.moreaFire});
+  AgendaState({this.firestore, this.moreaFire, this.onSignedOut});
   final MoreaFirebase moreaFire;
   final Firestore firestore;
+  final VoidCallback onSignedOut;
   @override
   State<StatefulWidget> createState() => _AgendaStatePage();
 }
@@ -228,5 +229,16 @@ class _AgendaStatePage extends State<AgendaState> {
                
               });
         });
+  }
+
+  void _signedOut() async {
+    try {
+      if(Navigator.of(context).canPop()){
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
+      widget.onSignedOut();
+    } catch (e) {
+      print(e);
+    }
   }
 }

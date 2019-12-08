@@ -6,6 +6,7 @@ class MoreaColors {
   static int violettInt = 0xff7a62ff;
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;
+  static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 0.9);
 
   //306bac 3626A7
   static Map<int, Color> violettMaterialColor = {
@@ -35,7 +36,7 @@ class MoreaShadow {
 }
 
 class MoreaShadowContainer extends Container {
-  MoreaShadowContainer({this.child, Key key, this.constraints});
+  MoreaShadowContainer({this.child, this.constraints});
 
   @override
   final Decoration decoration = MoreaShadow.teleblitz;
@@ -46,9 +47,10 @@ class MoreaShadowContainer extends Container {
 }
 
 class MoreaBackgroundContainer extends Container {
-  MoreaBackgroundContainer({this.child, Key key});
+  MoreaBackgroundContainer({this.child, this.constraints});
 
   @override
+  final BoxConstraints constraints;
   final Decoration decoration = BoxDecoration(
     color: MoreaColors.orange,
     image: DecorationImage(
@@ -97,5 +99,6 @@ class MoreaTextStyle {
             offset: Offset(0, 3),
             blurRadius: 6),
       ]);
-  static TextStyle lable = TextStyle(color: Colors.black54);
+  static TextStyle lable = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16);
+  static TextStyle normal = TextStyle(color: Colors.black, fontSize: 16);
 }
