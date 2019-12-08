@@ -36,6 +36,10 @@ final String userMapLeiter="Leiter";
 final String userMapTeilnehmer="Teilnehmer";
 final String userMapKinder = "Kinder";
 final String userMapEltern= "Eltern";
+final String userMapAdresse = "Adresse";
+final String userMapPLZ = "PLZ";
+final String userMapOrt = "Ort";
+final String userMapHandynummer ="Handynummer";
 
 //groupMap
 final String groupMapEventID = "eventID";

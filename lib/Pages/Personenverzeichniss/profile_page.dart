@@ -31,7 +31,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   MoreaFirebase moreaFire;
   CrudMedthods crud0;
   ChildParendPend childParendPend;
-  bool hatEltern = false, hatKinder = false, display = false;
+  bool hatEltern = false, hatKinder = false, display = false, newKidDisplay = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
   Future<String> qrCodeString;
@@ -104,6 +104,16 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
     setState(() {});
   }
+  void newKidakt(){
+    if(newKidDisplay){
+      newKidDisplay = false;
+    }else{
+      newKidDisplay = true;
+    }
+    setState(() {
+      
+    });
+  }
 
   Future<void> getElternMap() async {
     List elternUID = List.from(widget.profile['Eltern-pending'].values);
@@ -129,6 +139,10 @@ class ProfilePageStatePage extends State<ProfilePageState> {
       }
     }
     return null;
+  }
+  void setProfileState(){
+    setState(() {
+    });
   }
 
   @override
@@ -203,6 +217,10 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                         ? mergeChildParent.parentScannsQrCode(
                             widget.profile)
                         : Container(),
+                  ),
+                  new Align(
+                    child: newKidDisplay?
+                    mergeChildParent.registernewChild(widget.profile ,context): Container()
                   )
                 ],
               )));
@@ -667,7 +685,9 @@ class ProfilePageStatePage extends State<ProfilePageState> {
             height: 10,
           ),
           Container(
-            child: RaisedButton(
+            child: Column(
+              children: <Widget>[
+                RaisedButton(
               child: Text(
                 'Mit Kind Koppeln',
                 style: TextStyle(fontSize: 20),
@@ -678,6 +698,20 @@ class ProfilePageStatePage extends State<ProfilePageState> {
               color: Color(0xff7a62ff),
               textColor: Colors.white,
             ),
+            RaisedButton(
+              child: Text(
+                'Neues Kind registrieren',
+                style: TextStyle(fontSize: 20),
+              ),
+              onPressed: () => this.newKidakt(),
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+              color: Color(0xff7a62ff),
+              textColor: Colors.white,
+            ),
+              ],
+            )
+            
           ),
           SizedBox(
             height: 24,

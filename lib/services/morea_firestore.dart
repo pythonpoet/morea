@@ -17,23 +17,16 @@ abstract class BaseMoreaFirebase {
   List<String> get getSubscribedGroups;
   Map<String,dynamic> get getGroupMap;
   Map<String,dynamic> get getUserMap;
-  Map<String,dynamic> get getMessagingGroups;
   Map<String,Map<String,String>> get getChildMap;
 
   Future<void> createUserInformation(Map userInfo);
   Future<void> updateUserInformation(String userUID, Map userInfo);
   Future<DocumentSnapshot> getUserInformation(String userUID);
   Stream<QuerySnapshot> getChildren();
-  Future<void> pendParent(
-  String childUID, String parentUID, String parentName);
-  Stream<DocumentSnapshot> streamPendingParents(String childUID);
-  Future<void> setChildToParent(
-  String childUID, String parentUID, String childName);
   Future<void> uploaddevtocken(
   var messagingGroups, String token, String userUID);
   Stream<QuerySnapshot> getMessages(String groupnr);
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
-  String upLoadChildRequest(String childUID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -65,7 +58,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
   List<String> get getSubscribedGroups => _subscribedGroups;
   Map<String,dynamic> get getGroupMap => _groupMap;
   Map<String,dynamic> get getUserMap => _userMap;
-  Map<String,dynamic> get getMessagingGroups => _messagingGroups;
   Map<String,Map<String,String>> get getChildMap => _childMap;
 
   Future<void> getData(String userID)async{
@@ -76,7 +68,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
     _vorName = _userMap[userMapVorName];
     _nachName = _userMap[userMapNachName];
     _pos = _userMap[userMapPos];
-    _messagingGroups = Map<String,dynamic>.from(_userMap[userMapMessagingGroups]??[]);
     _subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]?? []);
     if(_pfadiName == '')
       _displayName = _vorName;
@@ -134,45 +125,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Stream<QuerySnapshot> getChildren() {
     return crud0.streamCollection(pathUser);
   }
-
-  //Funktioniert das wück?
-  Future<void> pendParent(
-      String childUID, String parentUID, String parentName) async {
-    Map<String, dynamic> parentMap = {};
-    var old = await getUserInformation(childUID);
-
-    if ((old.data['Eltern-pending'] != null) &&
-        (old.data['Eltern-pending'].length != 0)) {
-      parentMap = Map<String, dynamic>.from(old.data['Eltern-pending']);
-    }
-    if (parentMap[parentName] == null) {
-      parentMap[parentName] = parentUID;
-      Map newUserData = old.data;
-      newUserData['Eltern-pending'] = parentMap;
-      updateUserInformation(childUID, newUserData);
-    }
-  }
-
-  Stream<DocumentSnapshot> streamPendingParents(String childUID) {
-    return crud0.streamDocument(pathUser, childUID);
-  }
-
-  Future<void> setChildToParent(
-      String childUID, String parentUID, String childName) async {
-    Map<String, dynamic> childMap = {};
-    var old = await getUserInformation(parentUID);
-
-    if ((old.data['Kinder'] != null) && (old.data['Kinder'].length != 0)) {
-      childMap = Map<String, dynamic>.from(old.data['Kinder']);
-    }
-    if (childMap[childName] == null) {
-      childMap[childName] = childUID;
-      Map newUserData = old.data;
-      newUserData['Kinder'] = childMap;
-      updateUserInformation(parentUID, newUserData);
-    }
-  }
-
   Future<void> childAnmelden(
       String eventID, String userUID, String anmeldeUID, String anmeldeStatus) async {
         crud0.runTransaction("$pathEvents/$eventID/Anmeldungen", anmeldeUID, Map<String, dynamic>.from({
@@ -257,16 +209,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  String upLoadChildRequest(String childUID) {
-    Map<String, String> data = {
-      'purpose': 'child-pend-request',
-      'child-UID': childUID,
-      'timestamp': DateTime.now().toIso8601String()
-    };
-    String qrCodeString = random.randomAlphaNumeric(78);
-    crud0.setData('user/requests/pend', qrCodeString, data);
-    return qrCodeString;
-  }
 
   Stream<QuerySnapshot> getMessages(String groupnr) {
     return crud0.streamCollection('/groups/$groupnr/messages');
