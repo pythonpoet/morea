@@ -319,8 +319,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.event),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new AgendaState(
+                        auth: widget.auth,
                         moreaFire: moreafire,
                         firestore: widget.firestore,
+                        navigationMap: widget.navigationMap,
                       )))),
           new ListTile(
               title: new Text('Profil'),
@@ -357,6 +359,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   builder: (BuildContext context) => new AgendaState(
                         moreaFire: moreafire,
                         firestore: widget.firestore,
+                        auth: widget.auth,
+                        navigationMap: widget.navigationMap,
                       )))),
           new ListTile(
               title: new Text('Profil'),
