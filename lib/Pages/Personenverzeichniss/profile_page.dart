@@ -21,11 +21,11 @@ class ProfilePageState extends StatefulWidget {
 }
 
 class ProfilePageStatePage extends State<ProfilePageState> {
-  static ProfilePageStatePage _instance;
+  /*static ProfilePageStatePage _instance;
 
   factory ProfilePageStatePage() => _instance ??= new ProfilePageStatePage._();
 
-  ProfilePageStatePage._();
+  ProfilePageStatePage._();*/
 
   MergeChildParent mergeChildParent;
   MoreaFirebase moreaFire;
@@ -144,6 +144,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     setState(() {
     });
   }
+  @override
+  void dispose() {
+    //_instance.dispose();
+     
+  controller.close();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -186,7 +193,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   new Align(
                     child: display
                         ? mergeChildParent
-                            .childShowQrCode(widget.profile, context)
+                            .childShowQrCode(widget.profile, context, this.childaktuallisieren, childParendPend.deleteRequest)
                         : Container(),
                   )
                 ],
@@ -215,12 +222,12 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   new Align(
                     child: display
                         ? mergeChildParent.parentScannsQrCode(
-                            widget.profile)
+                            widget.profile, this.parentaktuallisieren)
                         : Container(),
                   ),
                   new Align(
                     child: newKidDisplay?
-                    mergeChildParent.registernewChild(widget.profile ,context): Container()
+                    mergeChildParent.registernewChild(widget.profile ,context, this.setProfileState, this.newKidakt): Container()
                   )
                 ],
               )));

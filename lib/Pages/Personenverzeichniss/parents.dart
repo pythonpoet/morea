@@ -13,18 +13,13 @@ import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
 
 abstract class BaseMergeChildParent {
-  Widget childShowQrCode(Map userMap, BuildContext context);
-
-  void parentReadsQrCode(Map<String, dynamic> userMap);
+  Widget childShowQrCode(Map userMap, BuildContext context, Function childaktuallisieren, Function(String) deleteRequest);
+  void parentReadsQrCode(Map<String, dynamic> userMap, Function parentaktuallisieren);
 }
 
-class test {
-  ProfilePageStatePage profilePageStatePage = new ProfilePageStatePage();
-}
 
-class MergeChildParent extends Object
-    with test
-    implements BaseMergeChildParent {
+
+class MergeChildParent extends BaseMergeChildParent {
   QrCode qrCode = new QrCode();
   MoreaFirebase moreafire;
   CrudMedthods crud0;
@@ -55,7 +50,7 @@ class MergeChildParent extends Object
     'Pios'
   ];
 
-  //ProfilePageStatePage profilePageStatePage = new ProfilePageStatePage();
+
 
   BuildContext showDialogcontext;
 
@@ -66,7 +61,7 @@ class MergeChildParent extends Object
     this.crud0 = new CrudMedthods(firestore);
   }
   Widget registernewChild(
-      Map<String, dynamic> parentData, BuildContext context) {
+      Map<String, dynamic> parentData, BuildContext context, Function setProfileState, Function newKidakt) {
     return new Container(
         color: Colors.black.withOpacity(0.7),
         padding: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 40),
@@ -95,7 +90,7 @@ class MergeChildParent extends Object
                                 minHeight: viewportConstraints.maxHeight,
                               ),
                               child:
-                                  buildRegisterTeilnehmer(context, parentData)),
+                                  buildRegisterTeilnehmer(context, parentData, setProfileState, newKidakt)),
                         );
                       },
                     ),
@@ -107,7 +102,7 @@ class MergeChildParent extends Object
                     child: new Text('Abbrechen',
                         style: new TextStyle(fontSize: 20)),
                     onPressed: () async => {
-                      profilePageStatePage.newKidakt(),
+                      newKidakt(),
                     },
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
@@ -121,7 +116,7 @@ class MergeChildParent extends Object
         ));
   }
 
-  Widget childShowQrCode(Map userMap, BuildContext context) {
+  Widget childShowQrCode(Map userMap, BuildContext context, Function childaktuallisieren, Function(String) deleteRequest) {
     Future<String> qrCodeString = childParendPend
         .childGenerateRequestString(Map<String, dynamic>.from(userMap));
     return new Container(
@@ -164,9 +159,9 @@ class MergeChildParent extends Object
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () async => {
-                  profilePageStatePage.childaktuallisieren(),
-                  profilePageStatePage.childParendPend
-                      .deleteRequest(await qrCodeString)
+                  childaktuallisieren(),
+                  
+                      deleteRequest(await qrCodeString)
                 },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
@@ -180,21 +175,21 @@ class MergeChildParent extends Object
     );
   }
 
-  void parentReadsQrCode(Map<String, dynamic> userMap) async {
+  void parentReadsQrCode(Map<String, dynamic> userMap, Function parentaktuallisieren) async {
     await qrCode.german_scanQR();
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
       childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
       allowScanner = false;
       parentReaderror = false;
-      profilePageStatePage.parentaktuallisieren();
+      parentaktuallisieren();
     } else {
       parentReaderror = true;
-      profilePageStatePage.parentaktuallisieren();
+      parentaktuallisieren();
     }
   }
 
-  Widget parentScannsQrCode(Map<String, dynamic> userMap) {
+  Widget parentScannsQrCode(Map<String, dynamic> userMap,Function parentaktuallisieren) {
     return new Container(
       color: Colors.black.withOpacity(0.7),
       padding: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 40),
@@ -225,7 +220,7 @@ class MergeChildParent extends Object
                     new Text('Scannen', style: new TextStyle(fontSize: 20))
                   ],
                 ),
-                onPressed: () => parentReadsQrCode(userMap),
+                onPressed: () => parentReadsQrCode(userMap, parentaktuallisieren),
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
                 color: Color(0xff7a62ff),
@@ -239,7 +234,7 @@ class MergeChildParent extends Object
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () => {
                   parentReaderror = false,
-                  profilePageStatePage.parentaktuallisieren()
+                  parentaktuallisieren()
                 },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
@@ -254,7 +249,7 @@ class MergeChildParent extends Object
   }
 
   Widget buildRegisterTeilnehmer(
-      BuildContext context, Map<String, dynamic> parentData) {
+      BuildContext context, Map<String, dynamic> parentData, Function setProfileState, Function newKidakt) {
     return Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -344,7 +339,7 @@ class MergeChildParent extends Object
                                   },
                                       currentTime: DateTime.now(),
                                       locale: LocaleType.de);
-                                  profilePageStatePage.setProfileState();
+                                  setProfileState();
                                 },
                               )
                             ],
@@ -369,7 +364,7 @@ class MergeChildParent extends Object
                               hint: Text(_selectedstufe),
                               onChanged: (newVal) {
                                 _selectedstufe = newVal;
-                                profilePageStatePage.setProfileState();
+                                setProfileState();
                               }),
                         )
                       ],
@@ -465,7 +460,7 @@ class MergeChildParent extends Object
           new RaisedButton(
             child: new Text('$_vorname Registrieren',
                 style: new TextStyle(fontSize: 20)),
-            onPressed: () => {registerChild(parentData, context)},
+            onPressed: () => {registerChild(parentData, context, newKidakt)},
             shape: new RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(30.0)),
             color: Color(0xff7a62ff),
@@ -503,7 +498,7 @@ class MergeChildParent extends Object
   }
 
   Future<void> registerChild(
-      Map<String, dynamic> parentData, BuildContext context) async {
+      Map<String, dynamic> parentData, BuildContext context, Function newKidakt) async {
     if (validateAndSave()) {
       _adresse = parentData[userMapAdresse];
       _plz = parentData[userMapPLZ];
@@ -511,7 +506,7 @@ class MergeChildParent extends Object
       Map<String, dynamic> childData = await this.mapUserData();
       await childParendPend.createChildAndPendIt(
           this._email, this._password, childData, parentData, context);
-      return profilePageStatePage.newKidakt();
+      return newKidakt();
     }
     return null;
   }

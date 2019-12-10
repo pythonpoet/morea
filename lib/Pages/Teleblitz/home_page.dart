@@ -15,7 +15,6 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
 import 'select_stufe.dart';
-import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
