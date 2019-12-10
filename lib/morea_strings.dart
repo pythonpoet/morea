@@ -1,4 +1,6 @@
 //Config
+import 'package:flutter/cupertino.dart';
+
 final String appVersion = "1";
 final String configMapMinAppVerson = "minAppVersion";
 final String configMapBlockedDevToken= "blockedDevTokens";
@@ -48,6 +50,7 @@ final String userMapAdresse = "Adresse";
 final String userMapPLZ = "PLZ";
 final String userMapOrt = "Ort";
 final String userMapHandynummer ="Handynummer";
+final String userMapEmail = "Email";
 
 //groupMap
 final String groupMapEventID = "eventID";
@@ -64,3 +67,11 @@ final String eventMapAnmeldeUID = "AnmeldeUID";
 //Teleblitz-local Map
 final String tlbzMapLoading = "Loading";
 final String tlbzMapNoElement= "noElement";
+
+//Keys der Map der Navigation
+final String signedOut = 'signedOut';
+final String signedIn = 'signedIn';
+final String toHomePage = 'homePage';
+final String toMessagePage = 'messagePage';
+final String toAgendaPage = 'agendaPage';
+final String toProfilePage = 'profilePage';
