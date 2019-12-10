@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 import 'edit_userprofile_page.dart';
  
 
 class ViewUserProfilePageState extends StatelessWidget {
-  ViewUserProfilePageState({this.profile});
-  var profile;
-  Urllauncher urllauncher = new Urllauncher();
+  ViewUserProfilePageState(this.allUsers, this.profile);
+  final Map<String,dynamic> profile;
+  final QuerySnapshot allUsers;
+  final Urllauncher urllauncher = new Urllauncher();
  
   @override
   Widget build(BuildContext context) {
@@ -162,13 +165,13 @@ class ViewUserProfilePageState extends StatelessWidget {
                           child: InkWell(
                             child:  Container(
                               child: Text(
-                        profile['Handynummer'],
+                        profile['Handynummer']?? "",
                         style: TextStyle(
                           fontSize: 20,
                           color: Color.fromARGB(255, 0, 0, 255),
                           decoration: TextDecoration.underline),
                       )),
-                      onTap: () =>urllauncher.openPhone(profile['Handynummer']),
+                      onTap: () =>urllauncher.openPhone(profile['Handynummer']?? "007"),
                           ),)
                     ],
                   ),
@@ -275,10 +278,162 @@ class ViewUserProfilePageState extends StatelessWidget {
               ],
             ),
             )
-          )
+          ),
+           SizedBox(height: 15,),
+          profile.containsKey(userMapEltern)? Column(children: parentWidget())  :  Container(),
         ],
       ),
+      
     );
+  }
+  List<Widget> parentWidget(){
+    List<Widget> elternWidget = new List();
+    for(Map<String,dynamic> eltern in getParentMap()){
+      elternWidget.add(
+        Column(
+          children: <Widget>[
+            Container(
+                 alignment: Alignment.center, //
+                        decoration: new BoxDecoration(
+                          border: new Border.all(color: Colors.black, width: 2),
+                          borderRadius: new BorderRadius.all(
+                            Radius.circular(4.0),
+                          ),
+                        ),
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Container(
+                            child: Text(
+                              'Rolle:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          )),
+                          Expanded(
+                              child: Container(
+                                  child: Text(
+                            eltern[userMapPos],
+                            style: TextStyle(fontSize: 20),
+                          )))
+                        ],
+                      ),
+                    ),
+                     Container(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Container(
+                            child: Text(
+                              'Vorname:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          )),
+                          Expanded(
+                              child: Container(
+                                  child: Text(
+                            eltern['Vorname'],
+                            style: TextStyle(fontSize: 20),
+                          )))
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Container(
+                            child: Text(
+                              'Nachname:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          )),
+                          Expanded(
+                              child: Container(
+                                  child: Text(
+                            eltern['Nachname'],
+                            style: TextStyle(fontSize: 20),
+                          ))),
+                          
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Container(
+                            child: Text(
+                              'Telefon:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          )),
+                          Expanded(
+                              child: InkWell(
+                                child:  Container(
+                                  child: Text(
+                            eltern['Handynummer'],
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 0, 0, 255),
+                              decoration: TextDecoration.underline),
+                          )),
+                          onTap: () =>urllauncher.openPhone(eltern['Handynummer']),
+                              ),)
+                        ],
+                      ),
+                    ),
+                     Container(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Container(
+                            child: Text(
+                              'Email:',
+                              style: TextStyle(fontSize: 20,
+                              ),
+                            ),
+                          )),
+                          Expanded(
+                              child: InkWell(
+                                child: Container(
+                                  child: Text(
+                            eltern['Email'],
+                            style: TextStyle(fontSize: 20,
+                            color: Color.fromARGB(255, 0, 0, 255),
+                              decoration: TextDecoration.underline),
+                          )),
+                          onTap: () => urllauncher.openMail(eltern['Email']),
+                              ))
+                        ],
+                      ),
+                    ),
+                    ],
+                  ))),
+                  SizedBox(height: 15,)
+          ],
+        )
+              );
+    }
+    return elternWidget;
+  }
+  getParentMap(){
+    List<Map> elternMap = new List();
+    if(profile.containsKey(userMapEltern)){
+      Map<String,String> elt = Map<String,String>.from(profile[userMapEltern]);
+      List<String> elternUID = new List();
+      elternUID.addAll(elt.values);
+      allUsers.documents.forEach((test){
+        if(elternUID.contains(test.documentID)){
+          elternMap.add(Map<String,dynamic>.from(test.data));
+        }
+      });
+    }
+    return elternMap;
   }
   
 }
