@@ -9,3 +9,15 @@ Widget moreaEditActionbutton(Function route){
                     onPressed: () => route()
                             );
 }
+Widget moreaButton(String text, Function action)
+/// The default Morea violet button
+{
+  return new RaisedButton(
+                color: MoreaColors.violett,
+                onPressed: action,
+                child: Text(
+                 text,
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+}

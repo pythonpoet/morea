@@ -9,7 +9,7 @@ import 'morealayout.dart';
 
 
 Future<void> main() async {
-  final FirebaseApp app = await FirebaseApp.configure(
+  /*final FirebaseApp app = await FirebaseApp.configure(
     name: 'Pfadi Morea',
     options: const FirebaseOptions(
       googleAppID: '1:20884476221:android:da0ee1d9ef987290793554',
@@ -21,7 +21,8 @@ Future<void> main() async {
   final Firestore firestore = Firestore(app: app);
   await firestore.settings(timestampsInSnapshotsEnabled: true);
 
-  
+  */
+  Firestore firestore = new Firestore();
 
   runApp(MaterialApp(
       title: 'Firestore Example', debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'Raleway'), home: MyApp(firestore: firestore)),);

@@ -26,7 +26,7 @@ Widget teilnehmerView(
               return SingleChildScrollView(
                         child: Column(
                       children: <Widget>[
-                        teleblitzAnzeigen(groupID, snapshot, moreaLoading),
+                        ...teleblitzAnzeigen(groupID, snapshot, moreaLoading),
                         anmeldebutton(groupID)
                       ],
                     ),

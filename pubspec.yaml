@@ -15,7 +15,7 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    firebase_auth: any
+    firebase_auth: 0.15.0+1
     firebase_messaging: any
     cloud_functions: ^0.4.1+4
     flutter_html: any
@@ -31,6 +31,7 @@ dependencies:
     barcode_scan: ^1.0.0
     flutter_masked_text: ^0.8.0
     rxdart: ^0.22.4
+    flutter_datetime_picker: ^1.2.8
 
 
     shared_preferences: any

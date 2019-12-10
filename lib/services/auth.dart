@@ -12,7 +12,9 @@ enum AuthProblems {
   userNotFound,
   passwordNotValid,
   networkError,
-  undefinedError
+  undefinedError,
+  emailNotValid,
+  emalAlreadyinUse
 }
 
 abstract class BaseAuth {
@@ -28,7 +30,7 @@ abstract class BaseAuth {
 
   Future<void> signOut();
 
-  AuthProblems checkForAuthErrors(
+   AuthProblems checkForAuthErrors(
       BuildContext context, PlatformException error);
 
   Future<void> displayAuthError(AuthProblems errorType, BuildContext context);
@@ -48,15 +50,13 @@ class Auth implements BaseAuth {
 
   Future<String> signInWithEmailAndPassword(String email, String password)async{
     this._user = (await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).catchError((onError){
-      print(onError);
+     throw onError;
     })).user;
     return _user.uid;
   }
 
   Future<String> createUserWithEmailAndPassword(String email, String password) async {
-    this._user = (await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password).catchError((onError){
-      print(onError);
-    })).user;
+    this._user = (await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password)).user;
     return this._user.uid;
   }
 
@@ -107,7 +107,7 @@ class Auth implements BaseAuth {
   }
 
   AuthProblems checkForAuthErrors(
-      BuildContext context, PlatformException error) {
+      BuildContext context, PlatformException error)  {
     PlatformType platform = dwiHardware.getDevicePlatform();
     AuthProblems errorType;
     if (platform == PlatformType.isAndroid) {
@@ -121,10 +121,17 @@ class Auth implements BaseAuth {
         case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
           errorType = AuthProblems.networkError;
           break;
+        case "The email address is badly formatted.":
+          errorType = AuthProblems.emailNotValid;
+          break;
+        case "The email address is already in use by another account.":
+          errorType = AuthProblems.emalAlreadyinUse;
+          break;
 
         default:
           errorType = AuthProblems.undefinedError;
           print('Case ${error.message} is not jet implemented');
+          break;
       }
     } else if (platform == PlatformType.isIOS) {
       switch (error.code) {
@@ -159,8 +166,13 @@ class Auth implements BaseAuth {
         errorMessage = 'Du brauchst Internet um fortzufahren';
         break;
       case AuthProblems.undefinedError:
-        errorMessage = 'Etwas ist schief gelaufen';
+        errorMessage = 'Etwas ist hat nicht funktioniert, bitte kontaktiere ein Leiter';
         break;
+      case AuthProblems.emailNotValid:
+        errorMessage = "Die eingegebene Email Adresse ist nicht korrekt";
+        break;
+      case AuthProblems.emalAlreadyinUse:
+        errorMessage = "Die eingegebene Email wird bereits verwendet";
     }
 
     showDialog(

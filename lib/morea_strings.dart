@@ -32,6 +32,7 @@ final String userMapVorName = "Vorname";
 final String userMapPos = "Pos";
 final String userMapMessagingGroups ="messageGroups";
 final String userMapSubscribedGroups = "subscribedGroups";
+final String userMapAlter = "Geburtstag";
 
 //groupMap
 final String groupMapEventID = "eventID";
