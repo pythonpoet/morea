@@ -136,8 +136,9 @@ class Teleblitz{
 
   Map<String,Widget> anzeigen(String groupID, AsyncSnapshot snapshot, Widget moreaLoading){
     Map<String,Widget> returnTelebliz = new Map();
-    if(snapshot.data == null){
+    if(snapshot.connectionState == ConnectionState.waiting){
       returnTelebliz[tlbzMapLoading]=moreaLoading;
+      print("Loading Teleblitz");
        return returnTelebliz;
     }
     
@@ -147,8 +148,10 @@ class Teleblitz{
       defineInfo(tlbz, groupID);
       returnTelebliz[eventID]= element(tlbz);
     });
-    else
+    else {
       returnTelebliz[tlbzMapNoElement] = noElement();
+      print("No Teleblitz");
+    }
     return returnTelebliz;
  }
           

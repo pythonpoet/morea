@@ -48,16 +48,17 @@ List<Widget> getTeleblizWidgetList(String groupID, Stream stream,
    for (String groupID in subscribedGroups) {
      listTeleblitzWidget.add(getLayoutBuilderWidget(groupID, stream, teleblitzAnzeigen, moreaLoading));
    }
+   print(listTeleblitzWidget.length);
   return listTeleblitzWidget;
 }
 
 Widget getLayoutBuilderWidget(
     String groupID, Stream stream, Map<String, Widget> Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen, Widget moreaLoading) {
-      List<Widget> anzeige = new List();
       
   return StreamBuilder(
     stream:  stream,
     builder: (BuildContext context, AsyncSnapshot snapshot) {
+      List<Widget> anzeige = new List();
       teleblitzAnzeigen(groupID, snapshot, moreaLoading).forEach((String eventID, tlbz){
         anzeige.add(tlbz);
       });
