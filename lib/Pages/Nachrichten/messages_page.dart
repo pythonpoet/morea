@@ -11,11 +11,9 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  MessagesPage({this.userInfo, this.firestore, this.auth, this.moreaFire, this.onSignedOut});
-  final Map userInfo;
+  MessagesPage({this.firestore, this.auth, this.onSignedOut});
   final Firestore firestore;
   final Auth auth;
-  final MoreaFirebase moreaFire;
   final VoidCallback onSignedOut;
 
 
@@ -30,28 +28,33 @@ class _MessagesPageState extends State<MessagesPage> {
   var date;
   var uid;
   var stufe;
+  String anzeigename;
+  MoreaFirebase moreaFire;
   
   
   @override
   void initState() {
     super.initState();
+    this.moreaFire = MoreaFirebase(widget.firestore);
     _getMessages(this.context);
     firestore = new MoreaFirebase(widget.firestore);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.userInfo['Pos'] == 'Leiter') {
-      if(widget.userInfo['Pfadinamen'] == null){
-        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+    if (moreaFire.getPos == 'Leiter') {
+      if(moreaFire.getPfandiName == null){
+        this.anzeigename = moreaFire.getVorName;
+      } else {
+        this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
         drawer: Drawer(
           child: ListView(
             children: <Widget>[
               UserAccountsDrawerHeader(
-                accountName: Text(widget.userInfo['Pfadinamen']),
-                accountEmail: Text(widget.userInfo['Email']),
+                accountName: Text(anzeigename),
+                accountEmail: Text(moreaFire.get),
                 decoration: new BoxDecoration(
                     image: new DecorationImage(
                         fit: BoxFit.fill,
