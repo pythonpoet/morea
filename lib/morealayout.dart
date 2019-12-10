@@ -40,7 +40,8 @@ class MoreaShadowContainer extends Container {
 
   @override
   final Decoration decoration = MoreaShadow.teleblitz;
-  final EdgeInsetsGeometry margin = EdgeInsets.all(20);
+  final EdgeInsetsGeometry margin =
+      EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 40);
   final Widget child;
   final Color color = Color.fromRGBO(255, 255, 255, 0.8);
   final BoxConstraints constraints;
@@ -99,6 +100,12 @@ class MoreaTextStyle {
             offset: Offset(0, 3),
             blurRadius: 6),
       ]);
-  static TextStyle lable = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16);
+  static TextStyle lable =
+      TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16);
   static TextStyle normal = TextStyle(color: Colors.black, fontSize: 16);
+}
+
+class MoreaDivider extends Divider{
+  final double thickness = 1;
+  final Color color = Colors.black26;
 }

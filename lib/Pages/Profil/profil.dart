@@ -13,13 +13,11 @@ import 'change_name.dart';
 
 class Profile extends StatefulWidget {
   final auth;
-  final onSignedOut;
   final MoreaFirebase moreaFire;
   final Map<String, Function> navigationMap;
 
   Profile(
       {@required this.auth,
-      @required this.onSignedOut,
       @required this.moreaFire,
       @required this.navigationMap});
 
@@ -209,6 +207,7 @@ class _ProfileState extends State<Profile> {
                   ),
                   subtitle: ListView.builder(
                     shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                     itemCount: nachrichtenGruppen.length,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -340,11 +339,8 @@ class _ProfileState extends State<Profile> {
 
   void _signedOut() async {
     try {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/'));
-      }
       await widget.auth.signOut();
-      widget.onSignedOut();
+      widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
@@ -370,7 +366,7 @@ class _ProfileState extends State<Profile> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).popUntil(ModalRoute.withName('/'));
     }
-    widget.onSignedOut();
+    this._signedOut();
   }
 
   Future<bool> _validateAndSave() async {

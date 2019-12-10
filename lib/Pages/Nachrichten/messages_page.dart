@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -12,15 +13,12 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  MessagesPage(
-      {@required this.auth,
-      @required this.onSignedOut,
-      @required this.moreaFire,
-      @required this.navigationMap});
+  MessagesPage({@required this.auth,
+    @required this.moreaFire,
+    @required this.navigationMap});
 
   final MoreaFirebase moreaFire;
   final Auth auth;
-  final VoidCallback onSignedOut;
   final Map navigationMap;
 
   @override
@@ -57,11 +55,7 @@ class _MessagesPageState extends State<MessagesPage> {
               UserAccountsDrawerHeader(
                 accountName: Text(anzeigename),
                 accountEmail: Text(moreaFire.getEmail),
-                decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                        fit: BoxFit.fill,
-                        image: new NetworkImage(
-                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+                decoration: BoxDecoration(color: MoreaColors.orange),
               ),
               Divider(),
               ListTile(
@@ -75,15 +69,7 @@ class _MessagesPageState extends State<MessagesPage> {
         appBar: AppBar(
           title: Text('Nachrichten'),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => SendMessages(moreaFire: moreaFire,)));
-          },
-          child: Icon(Icons.edit),
-          backgroundColor: MoreaColors.violett,
-          shape: CircleBorder(side: BorderSide(color: Colors.white)),
-        ),
+        floatingActionButton: moreaEditActionbutton(this.routeToSendMessage),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           child: Container(
@@ -199,7 +185,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                         child:
-                            MoreaShadowContainer(child: Text('Loading...'))));
+                        MoreaShadowContainer(child: Text('Loading...'))));
               } else if (snapshot.data.documents.length == 0) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -253,11 +239,11 @@ class _MessagesPageState extends State<MessagesPage> {
                                   if (snapshot.data.documents.length == 0) {
                                     return ListTile(
                                       title:
-                                          Text('Keine Nachrichten vorhanden'),
+                                      Text('Keine Nachrichten vorhanden'),
                                     );
                                   } else {
                                     var document =
-                                        snapshot.data.documents[index];
+                                    snapshot.data.documents[index];
                                     return _buildListItem(context, document);
                                   }
                                 }),
@@ -425,11 +411,11 @@ class _MessagesPageState extends State<MessagesPage> {
                                   if (snapshot.data.documents.length == 0) {
                                     return ListTile(
                                       title:
-                                          Text('Keine Nachrichten vorhanden'),
+                                      Text('Keine Nachrichten vorhanden'),
                                     );
                                   } else {
                                     var document =
-                                        snapshot.data.documents[index];
+                                    snapshot.data.documents[index];
                                     return _buildListItem(context, document);
                                   }
                                 }),
@@ -448,7 +434,7 @@ class _MessagesPageState extends State<MessagesPage> {
   void _signedOut() async {
     try {
       await widget.auth.signOut();
-      widget.onSignedOut();
+      widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
@@ -460,6 +446,14 @@ class _MessagesPageState extends State<MessagesPage> {
     setState(() {
       this.messages = moreaFire.getMessages(this.stufe);
     });
+  }
+
+  routeToSendMessage() {
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (BuildContext context) =>
+            SendMessages(
+              moreaFire: moreaFire,
+            )));
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {

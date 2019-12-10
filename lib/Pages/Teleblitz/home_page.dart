@@ -20,10 +20,9 @@ import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.onSigedOut, this.firestore, this.navigationMap});
+  HomePage({this.auth, this.firestore, this.navigationMap});
 
   final BaseAuth auth;
-  final VoidCallback onSigedOut;
   final Firestore firestore;
   final Map<String, Function> navigationMap;
 
@@ -92,7 +91,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void getuserinfo() async {
-    await moreafire.getData(await widget.auth.getUserID);
+    await moreafire.getData(widget.auth.getUserID);
     await moreafire.initTeleblitz();
     forminit();
     getdevtoken();
@@ -102,11 +101,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _signedOut() async {
     try {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/'));
-      }
       await widget.auth.signOut();
-      widget.onSigedOut();
+      widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
@@ -162,7 +158,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             moreaFire: moreafire,
                             auth: widget.auth,
                             navigationMap: widget.navigationMap,
-                            onSignedOut: widget.onSigedOut,
                           )));
                 },
                 child: Text(
@@ -191,7 +186,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 moreaFire: moreafire,
                 auth: widget.auth,
                 navigationMap: widget.navigationMap,
-                onSignedOut: widget.onSigedOut,
               )));
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
@@ -200,7 +194,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 moreaFire: moreafire,
                 auth: widget.auth,
                 navigationMap: widget.navigationMap,
-                onSignedOut: widget.onSigedOut,
               )));
     });
     getuserinfo();
@@ -294,14 +287,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new WerChunt(
-                        firestore: widget.firestore,
-                      )))),
-          new ListTile(
-              title: new Text('Agenda'),
-              trailing: new Icon(Icons.event),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new AgendaState(
-                        moreaFire: moreafire,
                         firestore: widget.firestore,
                       )))),
           new ListTile(

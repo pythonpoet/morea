@@ -433,7 +433,9 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
         body: Stack(
           children: <Widget>[
             Container(

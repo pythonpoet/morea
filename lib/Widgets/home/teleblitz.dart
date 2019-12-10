@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -42,69 +43,64 @@ class Teleblitz{
         );
   }
   Widget keineAktivitat(){
-    return Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    children: <Widget>[
-                      info.getTitel(),
-                      info.getKeineAktivitat(),
-                      info.getDatum(),
-                      info.getGrund()
-                    ],
-                  ),
-                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                        offset: Offset(3, 3),
-                        blurRadius: 40)
-                  ]),
-                );
+    return MoreaBackgroundContainer(
+      child: SingleChildScrollView(
+        child: MoreaShadowContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: <Widget>[
+                info.getTitel(),
+                info.getKeineAktivitat(),
+                info.getDatum(),
+                info.getGrund()
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
   Widget ferien(){
-    return Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    children: <Widget>[
-                      info.getTitel(),
-                      info.getKeineAktivitat(),
-                      info.getFerien(),
-                      info.getEndeFerien(),
-                    ],
-                  ),
-                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                    BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                        offset: Offset(3, 3),
-                        blurRadius: 40)
-                  ]),
-                );
+    return MoreaBackgroundContainer(
+      child: SingleChildScrollView(
+        child: MoreaShadowContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: <Widget>[
+                info.getTitel(),
+                info.getKeineAktivitat(),
+                info.getFerien(),
+                info.getEndeFerien(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
   Widget teleblitz (){
-    return Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    children: <Widget>[
-                      info.getTitel(),
-                      info.getDatum(),
-                      info.getAntreten(),
-                      info.getAbtreten(),
-                      info.getMitnehmen(),
-                      info.getBemerkung(),
-                      info.getSender(),
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.16),
-                          offset: Offset(3, 3),
-                          blurRadius: 40)
-                    ],
-                  ));}
+    return MoreaBackgroundContainer(
+      child: SingleChildScrollView(
+        child: MoreaShadowContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: <Widget>[
+                info.getTitel(),
+                info.getDatum(),
+                info.getAntreten(),
+                info.getAbtreten(),
+                info.getMitnehmen(),
+                info.getBemerkung(),
+                info.getSender(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );}
   
   Widget element(Map<String, dynamic> tlbz){
     if (tlbz["keineaktivitat"] == 'true') {
@@ -239,16 +235,7 @@ class Info {
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
       alignment: Alignment.topLeft,
       child: Text(this.titel,
-          style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Color(0xff7a62ff),
-              shadows: <Shadow>[
-                Shadow(
-                    color: Color.fromRGBO(0, 0, 0, 0.25),
-                    offset: Offset(0, 6),
-                    blurRadius: 12),
-              ])),
+          style: MoreaTextStyle.title),
     );
   }
 

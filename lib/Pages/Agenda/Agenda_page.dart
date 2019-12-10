@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/agenda.dart' as prefix0;
+import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import '../../morealayout.dart';
 import 'Agenda_Eventadd_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'view_Lager_page.dart';
@@ -14,12 +16,12 @@ class AgendaState extends StatefulWidget {
   AgendaState(
       {@required this.firestore,
       @required this.moreaFire,
-      @required this.onSignedOut,
+      @required this.auth,
       @required this.navigationMap});
 
   final MoreaFirebase moreaFire;
   final Firestore firestore;
-  final VoidCallback onSignedOut;
+  final Auth auth;
   final Map<String, Function> navigationMap;
 
   @override
@@ -123,13 +125,30 @@ class _AgendaStatePage extends State<AgendaState>
           title: new Text('Agenda'),
         ),
         body: Agenda(moreafire.getUserMap[userMapgroupID]),
-        floatingActionButton: Opacity(
-          opacity: istLeiter() ? 1.0 : 0.0,
-          child: new FloatingActionButton(
-              elevation: 0.0,
-              child: new Icon(Icons.add),
-              backgroundColor: Color(0xff7a62ff),
-              onPressed: () => routetoAddevent()),
+        floatingActionButton: new FloatingActionButton(
+          child: Icon(Icons.add),
+          backgroundColor: Color(0xff7a62ff),
+          onPressed: () => routetoAddevent(),
+          shape: CircleBorder(side: BorderSide(color: Colors.white)),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: new Text(moreafire.getDisplayName),
+                accountEmail: new Text(moreafire.getEmail),
+                decoration: new BoxDecoration(
+                  color: MoreaColors.orange,
+                ),
+              ),
+              ListTile(
+                title: Text('Logout'),
+                trailing: Icon(Icons.cancel),
+                onTap: _signedOut,
+              )
+            ],
+          ),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Container(
@@ -139,7 +158,7 @@ class _AgendaStatePage extends State<AgendaState>
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
+                    onPressed: widget.navigationMap[toMessagePage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.message, color: Colors.white),
@@ -159,7 +178,7 @@ class _AgendaStatePage extends State<AgendaState>
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toAgendaPage],
+                    onPressed: null,
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.event, color: Colors.white),
@@ -180,7 +199,7 @@ class _AgendaStatePage extends State<AgendaState>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 15.0),
                     child: Text(
-                      'Verfassen',
+                      'Hinzufügen',
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
@@ -244,7 +263,6 @@ class _AgendaStatePage extends State<AgendaState>
           child: new Scaffold(
         appBar: new AppBar(
           title: new Text('Agenda'),
-          backgroundColor: Color(0xff7a62ff),
         ),
         body: Agenda(moreafire.getUserMap[userMapgroupID]),
       ));
@@ -273,112 +291,112 @@ class _AgendaStatePage extends State<AgendaState>
     return StreamBuilder(
         stream: _getAgenda(groupID).asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
-          if (!(slagenda.hasData)) {
+          if (slagenda.connectionState == ConnectionState.waiting) {
             return moreaLoading.loading();
-          }
-          if (slagenda.data.length == 0)
-            return Center(
-                child: Text(
-              'Keine Events/Lager eingetragen',
-              style: TextStyle(fontSize: 20),
-            ));
-          return ListView.builder(
-              itemCount: slagenda.data.length,
-              itemBuilder: (context, int index) {
-                final Map<String, dynamic> _info =
-                    Map<String, dynamic>.from(slagenda.data[index]);
-                altevernichten(_info['Datum'], groupID, _info);
+          } else if (!slagenda.hasData)
+            return MoreaBackgroundContainer(
+              child: MoreaShadowContainer(
+                child: Center(
+                    child: Text(
+                  'Keine Events/Lager eingetragen',
+                  style: TextStyle(fontSize: 20),
+                )),
+              ),
+            );
+          else if (slagenda.data.length == 0) {
+            return MoreaBackgroundContainer(
+              child: MoreaShadowContainer(
+                child: Center(
+                    child: Text(
+                  'Keine Events/Lager eingetragen',
+                  style: TextStyle(fontSize: 20),
+                )),
+              ),
+            );
+          } else {
+            return MoreaBackgroundContainer(
+              child: SingleChildScrollView(
+                child: MoreaShadowContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'Agenda',
+                          style: MoreaTextStyle.title,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                        child: MoreaDivider(),
+                      ),
+                      ListView.separated(
+                          itemCount: slagenda.data.length,
+                          shrinkWrap: true,
+                          separatorBuilder: (context, int index){
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: MoreaDivider(),
+                            );
+                          },
+                          itemBuilder: (context, int index) {
+                            final Map<String, dynamic> _info =
+                                Map<String, dynamic>.from(slagenda.data[index]);
+                            altevernichten(_info['Datum'], groupID, _info);
 
-                if (_info['Event']) {
-                  return new ListTile(
-                      title: Container(
-                          height: 50.0,
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          alignment: Alignment.center,
-                          //
-                          decoration: new BoxDecoration(
-                            border:
-                                new Border.all(color: Colors.black, width: 2),
-                            borderRadius: new BorderRadius.all(
-                              Radius.circular(4.0),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Color.fromRGBO(0, 0, 0, 0.16),
-                                  offset: Offset(3, 3),
-                                  blurRadius: 40)
-                            ],
-                          ),
-                          child: new Row(
-                            children: <Widget>[
-                              Expanded(
-                                  flex: 3,
-                                  child: new Text(_info['Datum'].toString())),
-                              Expanded(
-                                flex: 5,
-                                child: new Text(_info['Eventname'].toString()),
-                              ),
-                              Expanded(flex: 2, child: SizedBox())
-                            ],
-                          )),
-                      onTap: () => viewEvent(context, _info));
-                } else if (_info['Lager']) {
-                  return new ListTile(
-                      title: Container(
-                          height: 50.0,
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          alignment: Alignment.center,
-                          //
-                          decoration: new BoxDecoration(
-                            border:
-                                new Border.all(color: Colors.black, width: 2),
-                            borderRadius: new BorderRadius.all(
-                              Radius.circular(4.0),
-                            ),
-                          ),
-                          child: new Row(
-                            children: <Widget>[
-                              Expanded(
-                                  flex: 3,
-                                  child: new Text(_info['Datum'].toString())),
-                              Expanded(
-                                flex: 5,
-                                child: new Text(_info['Lagername'].toString()),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Container(
-                                  height: 35,
-                                  padding: EdgeInsets.all(10),
-                                  alignment: Alignment.center,
-                                  //
-                                  decoration: new BoxDecoration(
-                                    color: Colors.orangeAccent,
-                                    borderRadius: new BorderRadius.all(
-                                      Radius.circular(4.0),
+                            if (_info['Event']) {
+                              return ListTile(
+                                subtitle: ListView(
+                                  shrinkWrap: true,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Text(_info['Datum'].toString(), style: MoreaTextStyle.normal,),
                                     ),
-                                  ),
-                                  child: new Text('Lager'),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Text('Event', style: MoreaTextStyle.normal,),
+                                    )
+                                  ],
                                 ),
-                              )
-                            ],
-                          )),
-                      onTap: () => viewLager(context, _info));
-                } else {
-                  return SizedBox();
-                }
-              });
+                                  title: Text(_info['Eventname'].toString(), style: MoreaTextStyle.lable,),
+                                  onTap: () => viewEvent(context, _info));
+                            } else if (_info['Lager']) {
+                              return ListTile(
+                                  title: Text(_info['Lagername'], style: MoreaTextStyle.lable,),
+                                  subtitle: ListView(
+                                    shrinkWrap: true,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(_info['Lagername'], style: MoreaTextStyle.normal,),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text('Lager', style: MoreaTextStyle.normal,),
+                                      )
+                                    ],
+                                  ),
+                                  onTap: () => viewLager(context, _info));
+                            } else {
+                              return SizedBox();
+                            }
+                          }),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 20),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
         });
   }
 
   void _signedOut() async {
-    try {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/'));
-      }
-      widget.onSignedOut();
-    } catch (e) {
-      print(e);
-    }
+    await widget.auth.signOut();
+    widget.navigationMap[signedOut]();
   }
 }

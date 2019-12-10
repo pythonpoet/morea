@@ -7,6 +7,7 @@ import 'package:morea/Pages/Grundbausteine/login_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Profil/profil.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -24,6 +25,7 @@ class RootPage extends StatefulWidget {
 }
 
 enum AuthStatus {
+  loading,
   notSignedIn,
   blockedByAppVersion,
   blockedByDevToken,
@@ -33,15 +35,17 @@ enum AuthStatus {
   profilePage
 }
 
-class _RootPageState extends State<RootPage> {
+class _RootPageState extends State<RootPage> with TickerProviderStateMixin{
   Auth auth = Auth();
-  AuthStatus authStatus = AuthStatus.notSignedIn;
+  AuthStatus authStatus = AuthStatus.loading;
   MoreaFirebase moreaFire;
   Map<String, Function> navigationMap;
+  MoreaLoading moreaLoading;
 
   @override
   void initState() {
     super.initState();
+    moreaLoading = MoreaLoading(this);
     initializeDateFormatting();
     authStatusInit();
 
@@ -122,7 +126,6 @@ class _RootPageState extends State<RootPage> {
       case AuthStatus.homePage:
         return new HomePage(
           auth: auth,
-          onSigedOut: this.signedOut,
           firestore: widget.firestore,
           navigationMap: navigationMap,
         );
@@ -138,7 +141,6 @@ class _RootPageState extends State<RootPage> {
       case AuthStatus.messagePage:
         return MessagesPage(
           auth: auth,
-          onSignedOut: this.signedOut,
           moreaFire: moreaFire,
           navigationMap: this.navigationMap,
         );
@@ -146,7 +148,7 @@ class _RootPageState extends State<RootPage> {
 
       case AuthStatus.agendaPage:
         return AgendaState(
-          onSignedOut: signedOut,
+          auth: auth,
           navigationMap: navigationMap,
           moreaFire: moreaFire,
           firestore: widget.firestore,
@@ -156,10 +158,12 @@ class _RootPageState extends State<RootPage> {
       case AuthStatus.profilePage:
         return Profile(
           auth: auth,
-          onSignedOut: this.signedOut,
           moreaFire: moreaFire,
           navigationMap: navigationMap,
         );
+        break;
+      case AuthStatus.loading:
+        return Container(child: moreaLoading.loading(), color: Colors.white,);
         break;
     }
   }
