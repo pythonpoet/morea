@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
+
 
 abstract class BaseCrudMethods {
   Future<QuerySnapshot> getCollection(String path);
@@ -69,19 +71,19 @@ class CrudMedthods implements BaseCrudMethods {
 
   Future<bool> waitOnDocumentChanged(String path, String document) async {
     Stream<bool> value;
-    StreamController<bool> controller = new StreamController<bool>();
-
+    StreamController<bool> controller = new BehaviorSubject();
     value = controller.stream;
     controller.add(false);
     Firestore.instance.collection(path).snapshots().listen((onData) {
       onData.documentChanges.forEach((change) async {
-        if (change.oldIndex == change.newIndex) {
+        if ((change.oldIndex == change.newIndex)&&(change.document.documentID == document)) {
           controller.add(true);
         }
       });
     });
+    await value.firstWhere((bool item) => item);
     controller.close();
-    return value.firstWhere((bool item) => item);
+    return true;
   }
   Future<void> setData(
       String path, String document, Map<String, dynamic> data) async {
@@ -111,7 +113,7 @@ class CrudMedthods implements BaseCrudMethods {
                 await tran.set(docRef, data);
               }
             }).catchError((err)=>{
-              print(err)
+             throw err
             });
         };
       return await db.runTransaction(transactionHandler);

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:morea/services/morea_firestore.dart';
-import 'change_teleblitz.dart';
 import 'package:morea/morealayout.dart';
 import 'select_teleblitz_type.dart';
 
 class SelectStufe extends StatelessWidget {
-  SelectStufe({MoreaFirebase moreaFire});
-  MoreaFirebase moreaFire;
+  SelectStufe(this.moreaFire);
+  final MoreaFirebase moreaFire;
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,6 @@
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
@@ -12,11 +11,12 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  MessagesPage({this.userInfo, this.firestore, this.auth, this.moreaFire});
-  var userInfo;
+  MessagesPage({this.userInfo, this.firestore, this.auth, this.moreaFire, this.onSignedOut});
+  final Map userInfo;
   final Firestore firestore;
   final Auth auth;
   final MoreaFirebase moreaFire;
+  final VoidCallback onSignedOut;
 
 
   @override
@@ -42,7 +42,31 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   Widget build(BuildContext context) {
     if (widget.userInfo['Pos'] == 'Leiter') {
+      if(widget.userInfo['Pfadinamen'] == null){
+        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+      }
       return Scaffold(
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.userInfo['Pfadinamen']),
+                accountEmail: Text(widget.userInfo['Email']),
+                decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                        fit: BoxFit.fill,
+                        image: new NetworkImage(
+                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+              ),
+              Divider(),
+              ListTile(
+                title: new Text('Logout'),
+                trailing: new Icon(Icons.cancel),
+                onTap: _signedOut,
+              )
+            ],
+          ),
+        ),
         appBar: AppBar(
           title: Text('Nachrichten'),
         ),
@@ -182,21 +206,70 @@ class _MessagesPageState extends State<MessagesPage> {
             stream: this.messages,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Text('Loading...');
+                return MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                        child:
+                            MoreaShadowContainer(child: Text('Loading...'))));
               } else {
-                return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (context, index) {
-                      var document = snapshot.data.documents[index];
-                      return _buildListItem(context, document);
-                    });
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView.builder(
+                                itemCount: snapshot.data.documents.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               }
             }),
       );
     } else {
+      if(widget.userInfo['Pfadinamen'] == null){
+        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+      }
       return Scaffold(
         appBar: AppBar(
           title: Text('Nachrichten'),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.userInfo['Pfadinamen']),
+                accountEmail: Text(widget.userInfo['Email']),
+                decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                        fit: BoxFit.fill,
+                        image: new NetworkImage(
+                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+              ),
+              Divider(),
+              ListTile(
+                title: new Text('Logout'),
+                trailing: new Icon(Icons.cancel),
+                onTap: _signedOut,
+              )
+            ],
+          ),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Container(
@@ -325,15 +398,40 @@ class _MessagesPageState extends State<MessagesPage> {
               if (!snapshot.hasData) {
                 return Text('Loading...');
               } else {
-                return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (context, index) {
-                      var document = snapshot.data.documents[index];
-                      return _buildListItem(context, document);
-                    });
+                return LayoutBuilder(
+                  builder: (context, viewportConstraints) {
+                    return MoreaBackgroundContainer(
+                      child: SingleChildScrollView(
+                        child: MoreaShadowContainer(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: ListView.builder(
+                                itemCount: snapshot.data.documents.length,
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
               }
             }),
       );
+    }
+  }
+
+  void _signedOut() async {
+    try {
+      if(Navigator.of(context).canPop()){
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
+      await widget.auth.signOut();
+      widget.onSignedOut();
+    } catch (e) {
+      print(e);
     }
   }
 

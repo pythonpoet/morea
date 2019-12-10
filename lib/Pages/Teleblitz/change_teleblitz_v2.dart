@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:morea/Pages/Teleblitz/change_teleblitz_abtreten.dart';
+import 'package:morea/Pages/Teleblitz/change_teleblitz_antreten.dart';
+import 'package:morea/Pages/Teleblitz/change_teleblitz_bemerkung.dart';
+import 'package:morea/Pages/Teleblitz/change_teleblitz_mitnehmen.dart';
+import 'package:morea/Pages/Teleblitz/change_teleblitz_sender.dart';
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:intl/intl.dart';
-import 'cange_teleblitz_abtreten.dart';
-import 'cange_teleblitz_antreten.dart';
-import 'cange_teleblitz_bemerkung.dart';
-import 'cange_teleblitz_mitnehmen.dart';
-import 'cange_teleblitz_sender.dart';
+import 'package:morea/services/utilities/MiData.dart';
 
 class ChangeTeleblitzV2 extends StatefulWidget {
   final String stufe;
@@ -314,8 +315,8 @@ class _ChangeTeleblitzV2State extends State<ChangeTeleblitzV2> {
       '_draft': false,
       '_archived': false
     };
-    await teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-    await widget.moreaFire.uploadteleblitz(this.stufe, newTeleblitz);
+     teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
+     await widget.moreaFire.uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
     Navigator.of(context).pop();
   }
 

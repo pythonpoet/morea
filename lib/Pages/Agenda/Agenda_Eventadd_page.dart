@@ -6,15 +6,14 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 
 
 
 class EventAddPage extends StatefulWidget{
   EventAddPage({this.eventinfo, this.agendaModus, this.firestore, this.agenda});
-  var eventinfo;
-  AgendaModus agendaModus;
+  final Map eventinfo;
+  final AgendaModus agendaModus;
   final Firestore firestore;
   final Agenda agenda;
 
@@ -182,7 +181,7 @@ if (picked != null && picked != DateTime.parse(datumvon))
   initialDate: now,
   firstDate: now,
   lastDate: now.add(new Duration(days: 9999)));
-  if (picked2 != null && picked2 != datumbis)
+  if (picked2 != null && picked2 != DateTime.parse(datumbis))
    setState(() {
     datumbis = DateFormat('yyyy-MM-dd').format(picked2);
    });
@@ -192,7 +191,7 @@ if (picked != null && picked != DateTime.parse(datumvon))
      initialTime: TimeOfDay.now(),
      context: context
    );
-   if (picked != null && picked != anfangzeit)
+   if (picked != null && picked != DateTime.parse(anfangzeit))
    setState(() {
      anfangzeit = picked.hour.toString() + ':' + picked.minute.toString();
    });

@@ -15,19 +15,19 @@ class ChangeMitnehmen extends StatefulWidget {
 }
 
 class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
-  List <String> mitnehmen;
-  List <TextEditingController> mitnehmenController = List<TextEditingController>();
+  List<String> mitnehmen;
+  List<TextEditingController> mitnehmenController =
+      List<TextEditingController>();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     this.mitnehmen = widget.mitnehmen;
-    for(String u in this.mitnehmen){
+    for (String u in this.mitnehmen) {
       mitnehmenController.add(TextEditingController(text: u));
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
         onPressed: () {
           if (saveAndSubmit()) {
             List<String> neuMitnehmen = List<String>();
-            for(TextEditingController u in mitnehmenController){
+            for (TextEditingController u in mitnehmenController) {
               neuMitnehmen.add(u.text);
             }
             widget.speichern(neuMitnehmen);
@@ -52,6 +52,8 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
       body: LayoutBuilder(
         builder: (context, viewportConstraints) {
           return MoreaBackgroundContainer(
+            constraints:
+                BoxConstraints(maxHeight: viewportConstraints.maxHeight),
             child: SingleChildScrollView(
               child: MoreaShadowContainer(
                 child: Padding(
@@ -72,31 +74,8 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
                         ),
                         Padding(
                           padding: EdgeInsets.only(top: 10),
-                          child: ListView.builder(
-                            itemCount: mitnehmenController.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index){
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: TextFormField(
-                                  controller: mitnehmenController[index],
-                                  maxLines: 1,
-                                  keyboardType: TextInputType.text,
-                                  style: TextStyle(fontSize: 18),
-                                  cursorColor: MoreaColors.violett,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return 'Bitte nicht leer lassen';
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                ),
-                              );
-                            },
+                          child: Column(
+                            children: buildMitnehmen(),
                           ),
                         ),
                         Container(
@@ -126,8 +105,8 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
                                     ),
                                     color: MoreaColors.violett,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(5))),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
                                   ),
                                 ),
                                 Expanded(
@@ -154,8 +133,8 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
                                       ),
                                       color: MoreaColors.violett,
                                       shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(5)))),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5)))),
                                 ),
                               ],
                             ),
@@ -171,6 +150,33 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
         },
       ),
     );
+  }
+
+  List<Widget> buildMitnehmen() {
+    List<Widget> mitnehmenList = [];
+    for (var u in mitnehmenController) {
+      mitnehmenList.add(Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: TextFormField(
+          controller: u,
+          maxLines: 1,
+          keyboardType: TextInputType.text,
+          style: TextStyle(fontSize: 18),
+          cursorColor: MoreaColors.violett,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Bitte nicht leer lassen';
+            } else {
+              return null;
+            }
+          },
+        ),
+      ));
+    }
+    return mitnehmenList;
   }
 
   bool saveAndSubmit() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 Widget elternView(
@@ -7,7 +8,7 @@ Widget elternView(
     @required List<String> subscribedGroups,
     @required Function navigation,
     @required Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
-    @required Widget Function(String) anmeldebutton,
+    @required Widget Function(String, String) anmeldebutton,
     @required Widget moreaLoading}
 ){
   return DefaultTabController(
@@ -34,17 +35,28 @@ List<Widget> getTeleblizWidgetList(
 }
 
 Widget getLayoutBuilderWidget(
-    String groupID, Stream stream, Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen, Function(String) anmeldebutton, Widget moreaLoading) {
+    String groupID, Stream stream, Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen, Function(String, String) anmeldebutton, Widget moreaLoading) {
   return StreamBuilder(
     stream: stream,
     builder: (BuildContext context, AsyncSnapshot snapshot) {
+       List<Widget> anzeige = new List();
+                  teleblitzAnzeigen(groupID, snapshot, moreaLoading).forEach((String eventID, tlbz){
+                    if((eventID != tlbzMapNoElement)&&(eventID != tlbzMapLoading))
+                    anzeige.add(
+                      new Column(
+                        children: <Widget>[
+                          tlbz,
+                          anmeldebutton(groupID, eventID)
+                        ],
+                      )
+                    );
+                    else
+                    anzeige.add(tlbz);
+                  });
       return SingleChildScrollView(
                 child: Column(
               key: ObjectKey(teleblitzAnzeigen(groupID, snapshot, moreaLoading)),
-              children: <Widget>[
-                teleblitzAnzeigen(groupID, snapshot, moreaLoading),
-                anmeldebutton(groupID)
-              ],
+              children: anzeige
             ),
       );
     },

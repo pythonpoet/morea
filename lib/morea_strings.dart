@@ -33,6 +33,14 @@ final String userMapPos = "Pos";
 final String userMapMessagingGroups ="messageGroups";
 final String userMapSubscribedGroups = "subscribedGroups";
 final String userMapAlter = "Geburtstag";
+final String userMapLeiter="Leiter";
+final String userMapTeilnehmer="Teilnehmer";
+final String userMapKinder = "Kinder";
+final String userMapEltern= "Eltern";
+final String userMapAdresse = "Adresse";
+final String userMapPLZ = "PLZ";
+final String userMapOrt = "Ort";
+final String userMapHandynummer ="Handynummer";
 
 //groupMap
 final String groupMapEventID = "eventID";
@@ -42,6 +50,10 @@ final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
 
 //eventMap
-final String eventMapAnmeldeStatusNegativ = "Chunt nöd";
+final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
 final String eventMapAnmeldeStatusPositiv = "Chunt";
 final String eventMapAnmeldeUID = "AnmeldeUID";
+
+//Teleblitz-local Map
+final String tlbzMapLoading = "Loading";
+final String tlbzMapNoElement= "noElement";

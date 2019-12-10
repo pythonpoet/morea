@@ -8,7 +8,7 @@ Widget leiterView(
     @required String groupID,
     @required List<String> subscribedGroups,
     @required Function navigation,
-    @required List<Widget> Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
+    @required Map<String, Widget> Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
     @required Function route,
     @required Widget moreaLoading
     }
@@ -52,14 +52,19 @@ List<Widget> getTeleblizWidgetList(String groupID, Stream stream,
 }
 
 Widget getLayoutBuilderWidget(
-    String groupID, Stream stream, Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen, Widget moreaLoading) {
+    String groupID, Stream stream, Map<String, Widget> Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen, Widget moreaLoading) {
+      List<Widget> anzeige = new List();
+      
   return StreamBuilder(
     stream:  stream,
     builder: (BuildContext context, AsyncSnapshot snapshot) {
+      teleblitzAnzeigen(groupID, snapshot, moreaLoading).forEach((String eventID, tlbz){
+        anzeige.add(tlbz);
+      });
       return SingleChildScrollView(
                 child: Column(
-              key: ObjectKey(teleblitzAnzeigen(groupID, snapshot, moreaLoading)),
-              children: teleblitzAnzeigen(groupID, snapshot,moreaLoading),
+              key: ObjectKey(anzeige),
+              children: anzeige,
             )
       );
     },

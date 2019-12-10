@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
@@ -8,10 +9,10 @@ import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/home/eltern.dart';
 import 'package:morea/Widgets/home/leiter.dart';
 import 'package:morea/Widgets/home/teilnehmer.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'select_stufe.dart';
 import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -50,14 +51,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
   bool chunnt = false;
   var messagingGroups;
 
-  void submit({@required String anabmelden, String groupnr}) {
-    if (_formType != FormType.eltern) {
+  void submit(String anabmelden, String groupnr, String eventID, String uid) {
       String anmeldung;
 
       anmeldeDaten = {
         'Anmeldename': moreafire.getDisplayName,
         'Anmeldung': anabmelden
       };
+      
       if (anabmelden == 'Chunt') {
         anmeldung = 'Du hast dich Angemolden';
         chunnt = true;
@@ -65,58 +66,24 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
         anmeldung = 'Du hast dich Abgemolden';
         chunnt = false;
       }
-      moreafire.uebunganmelden(moreafire.getEventID, widget.auth.getUserID,
-          widget.auth.getUserID, anabmelden);
-      showDialog(
+      crud0.waitOnDocumentChanged("$pathEvents/$eventID/Anmeldungen", uid).then((onValue){
+        if(onValue)
+        showDialog(
           context: context,
-          child: new AlertDialog(
+          builder: (context) => new AlertDialog(
             title: new Text("Teleblitz"),
             content: new Text(anmeldung),
           ));
-    } else {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Kind auswählen'),
-              content: ListView.builder(
-                shrinkWrap: true,
-                itemCount: moreafire.getUserMap['Kinder'].length,
-                itemBuilder: (BuildContext context, int index) {
-                  var namekind =
-                      List.from(moreafire.getUserMap['Kinder'].keys)[index];
-                  var uidkind =
-                      List.from(moreafire.getUserMap['Kinder'].values)[index];
-                  return ListTile(
-                    title: Text(namekind),
-                    onTap: () {
-                      String anmeldung;
-                      print(moreafire.getUserMap['Pfadinamen']);
-                      anmeldeDaten = {
-                        'Anmeldename': namekind,
-                        'Anmeldung': anabmelden
-                      };
-                      if (anabmelden == 'Chunt') {
-                        anmeldung = 'Du hast dich Angemolden';
-                      } else {
-                        anmeldung = 'Du hast dich Abgemolden';
-                      }
-                      moreafire.uebunganmelden(moreafire.getEventID,
-                          widget.auth.getUserID, uidkind, anabmelden);
-                      showDialog(
-                          context: context,
-                          child: new AlertDialog(
-                            title: new Text("Teleblitz"),
-                            content: new Text(anmeldung),
-                          ));
-                    },
-                  );
-                },
-              ),
-            );
-          });
+      });
+      if (_formType != FormType.eltern) {
+      moreafire.childAnmelden(eventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden);
+      }else{
+        moreafire.parentAnmeldet(eventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden);
+      }
     }
-  }
+
 
   Future<void> getdevtoken() async {
     var token = await firebaseMessaging.getToken();
@@ -134,6 +101,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
 
   void _signedOut() async {
     try {
+      if(Navigator.of(context).canPop()){
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      }
       await widget.auth.signOut();
       widget.onSigedOut();
     } catch (e) {
@@ -275,7 +245,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             groupID: moreafire.getGroupID,
             navigation: navigation,
             teleblitzAnzeigen: teleblitz.anzeigen,
-            anmeldebutton: anmeldebutton,
+            anmeldebutton: this.childAnmeldeButton,
             moreaLoading: moreaLoading.loading());
         break;
       case FormType.eltern:
@@ -285,7 +255,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
             subscribedGroups: moreafire.getSubscribedGroups,
             navigation: navigation,
             teleblitzAnzeigen: teleblitz.anzeigen,
-            anmeldebutton: anmeldebutton,
+            anmeldebutton: parentAnmeldeButton,
             moreaLoading: moreaLoading.loading());
         else
           return Scaffold(
@@ -428,8 +398,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
         break;
     }
   }
-
-  Widget anmeldebutton(String groupnr) {
+  Widget parentAnmeldeButton(String groupID, String eventID){
+    List<Widget> anmeldebuttons = new List();
+    moreafire.getChildMap[groupID].forEach((String vorname, uid){
+      anmeldebuttons.add(anmeldebutton(groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden"));
+    });
+    return Column(
+      children: anmeldebuttons
+    );
+  }
+  Widget childAnmeldeButton(String groupID, String eventID){
+    return anmeldebutton( moreafire.getGroupID, eventID, widget.auth.getUserID, 'Chume','Chume nöd');
+  }
+  
+  Widget anmeldebutton(String groupID, String eventID, String uid, String anmelden, abmelden) {
       return Container(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -438,9 +420,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   child: Container(
                 child: new RaisedButton(
                   child:
-                      new Text('Chume nöd', style: new TextStyle(fontSize: 20)),
+                      new Text(abmelden, style: new TextStyle(fontSize: 20)),
                   onPressed: () => submit(
-                      anabmelden: 'Chunt nöd', groupnr: moreafire.getGroupID),
+                      eventMapAnmeldeStatusNegativ,groupID , eventID, uid),
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                 ),
@@ -449,9 +431,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                 child: Container(
                   child: new RaisedButton(
                     child:
-                        new Text('Chume', style: new TextStyle(fontSize: 20)),
+                        new Text(abmelden, style: new TextStyle(fontSize: 20)),
                     onPressed: () => submit(
-                        anabmelden: 'Chunt', groupnr: moreafire.getGroupID),
+                        eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Color(0xff7a62ff),
@@ -461,12 +443,45 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
               )
             ],
           ));
-  }
+  }/*
+  Widget anmeldebutton(String groupID, String eventID, String uid) {
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                  child: Container(
+                child: new RaisedButton(
+                  child:
+                      new Text(, style: new TextStyle(fontSize: 20)),
+                  onPressed: () => submit(
+                      'Chunt nöd', moreafire.getGroupID, eventID, uid),
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                ),
+              )),
+              Expanded(
+                child: Container(
+                  child: new RaisedButton(
+                    child:
+                        new Text(, style: new TextStyle(fontSize: 20)),
+                    onPressed: () => submit(
+                        'Chunt nöd', moreafire.getGroupID, eventID),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    color: Color(0xff7a62ff),
+                    textColor: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ));
+  }*/
 
   void routeEditTelebliz() {
     Navigator.of(context)
         .push(new MaterialPageRoute(
-            builder: (BuildContext context) => new SelectStufe()))
+            builder: (BuildContext context) => new SelectStufe(moreafire)))
         .then((onValue) {
       setState(() {});
     });
