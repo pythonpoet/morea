@@ -304,7 +304,7 @@ initSubgoup()async{
   Widget build(BuildContext context) {
     switch (widget.agendaModus) {
       case AgendaModus.beides:
-       return this.subgroups.isEmpty? moreaLoadingIndicator():
+       return this.subgroups.isEmpty? simpleMoreaLoadingIndicator():
          DefaultTabController(
       length: 2,
       child: new Scaffold(
@@ -332,7 +332,7 @@ initSubgoup()async{
     );
         break;
       case AgendaModus.event:
-       return this.subgroups.isEmpty? moreaLoadingIndicator():
+       return this.subgroups.isEmpty? simpleMoreaLoadingIndicator():
          Scaffold(
           appBar: new AppBar(
             title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
@@ -362,7 +362,7 @@ initSubgoup()async{
         
           break;
       case AgendaModus.lager:
-       return this.subgroups.isEmpty? moreaLoadingIndicator():
+       return this.subgroups.isEmpty? simpleMoreaLoadingIndicator():
        Scaffold(
         appBar: new AppBar(
           title: new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),

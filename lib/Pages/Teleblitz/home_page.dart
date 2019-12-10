@@ -342,13 +342,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap, firestore: widget.firestore, crud0: crud0,
                       )))),
-          /*ListTile(
-            title: Text('Eltern bestätigen'),
-            trailing: Icon(Icons.pregnant_woman),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    Parents(profile: userInfo))),
-          ),*/
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -381,13 +374,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
                       )))),
-          ListTile(
-            title: Text('Kind hinzufügen'),
-            trailing: Icon(Icons.person_add),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => AddChild(
-                    widget.auth, moreafire.getUserMap, widget.firestore))),
-          ),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -443,40 +429,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
               )
             ],
           ));
-  }/*
-  Widget anmeldebutton(String groupID, String eventID, String uid) {
-      return Container(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                  child: Container(
-                child: new RaisedButton(
-                  child:
-                      new Text(, style: new TextStyle(fontSize: 20)),
-                  onPressed: () => submit(
-                      'Chunt nöd', moreafire.getGroupID, eventID, uid),
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                ),
-              )),
-              Expanded(
-                child: Container(
-                  child: new RaisedButton(
-                    child:
-                        new Text(, style: new TextStyle(fontSize: 20)),
-                    onPressed: () => submit(
-                        'Chunt nöd', moreafire.getGroupID, eventID),
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    color: Color(0xff7a62ff),
-                    textColor: Colors.white,
-                  ),
-                ),
-              )
-            ],
-          ));
-  }*/
+  }
 
   void routeEditTelebliz() {
     Navigator.of(context)
