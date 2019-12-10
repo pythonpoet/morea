@@ -1,25 +1,24 @@
 /* 
   The elten-pend widget requests the User when he is a parent and he has no childs pend to him
 */
-
 import 'package:flutter/cupertino.dart';
-import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:flutter/material.dart';
 
-Widget requestPrompttoParent(Function createAccount, Function pendAccount){
+
+Widget requestPrompttoParent(){
   return new Column(
-    mainAxisAlignment: MainAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.center,
     mainAxisSize: MainAxisSize.max,
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      Text(message),
-      Row(
-        children: <Widget>[
-          moreaButton("Ein Account erstellen", createAccount),
-          moreaButton("Mit einem Account verbinden", pendAccount)
-        ],
-      )
+      
+      Center(child:Container(
+        padding: EdgeInsets.all(15),
+         child: Text(message, style: new TextStyle(fontSize: 20),)
+      )),
+      
     ],
   );
 }
 
-final String message = "Wir können dir noch keine Inhalte anzeigen, da dein Account noch nicht mit deinem Kind verbunden ist.";
+final String message = "Wir können dir noch keine Inhalte anzeigen, da dein Account noch nicht mit deinem Kind verbunden ist. In deinem Profil kannst du deine Kinder verwalten.";

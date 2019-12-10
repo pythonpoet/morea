@@ -7,6 +7,7 @@ import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/home/eltern.dart';
+import 'package:morea/Widgets/home/elternpend.dart';
 import 'package:morea/Widgets/home/leiter.dart';
 import 'package:morea/Widgets/home/teilnehmer.dart';
 import 'package:morea/morea_strings.dart';
@@ -265,7 +266,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
           drawer: new Drawer(
             child: new ListView(children: navigation()),
           ),
-          body: moreaLoading.loading()
+          body:requestPrompttoParent()
         ); 
         break;
     }
@@ -372,7 +373,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
+                        profile: moreafire.getUserMap,firestore: widget.firestore, crud0: crud0,
                       )))),
           new Divider(),
           new ListTile(
