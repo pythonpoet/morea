@@ -14,7 +14,6 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'werchunt.dart';
 import 'select_stufe.dart';
-import 'package:morea/Pages/Personenverzeichniss/add_child.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
@@ -340,7 +339,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
               trailing: new Icon(Icons.person),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap, firestore: widget.firestore, crud0: crud0,
+                        profile: moreafire.getUserMap, moreaFire: moreafire, crud0: crud0,
                       )))),
           /*ListTile(
             title: Text('Eltern bestätigen'),
@@ -381,13 +380,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
                       )))),
-          ListTile(
-            title: Text('Kind hinzufügen'),
-            trailing: Icon(Icons.person_add),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => AddChild(
-                    widget.auth, moreafire.getUserMap, widget.firestore))),
-          ),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

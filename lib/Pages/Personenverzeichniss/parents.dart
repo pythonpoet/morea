@@ -28,7 +28,7 @@ class MergeChildParent extends Object
   QrCode qrCode = new QrCode();
   MoreaFirebase moreafire;
   CrudMedthods crud0;
-  ChildParendPend childParendPend = new ChildParendPend();
+  ChildParendPend childParendPend;
   bool parentReaderror = false, allowScanner = true;
   final formKey = new GlobalKey<FormState>();
 
@@ -59,9 +59,10 @@ class MergeChildParent extends Object
 
   BuildContext showDialogcontext;
 
-  MergeChildParent(Firestore firestore, ){
-    this.moreafire = new MoreaFirebase(firestore);
-    this.crud0 = new CrudMedthods(firestore);
+  MergeChildParent(MoreaFirebase moreafire,CrudMedthods crud0){
+    this.moreafire = moreafire;
+    this.crud0 = crud0;
+    this.childParendPend = new ChildParendPend(crud0: crud0);
   }
   Widget registernewChild(Map<String,dynamic> parentData, BuildContext context){
     return new Container(

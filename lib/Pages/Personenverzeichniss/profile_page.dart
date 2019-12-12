@@ -9,8 +9,8 @@ import 'chilld_Qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
-  ProfilePageState({this.profile, this.firestore, this.crud0});
-  final Firestore firestore;
+  ProfilePageState({this.profile, this.moreaFire, this.crud0});
+  final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
 
   var profile;
@@ -147,8 +147,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   @override
   void initState() {
-    mergeChildParent = new MergeChildParent(widget.firestore);
-     moreaFire = MoreaFirebase(widget.firestore);
+    mergeChildParent = new MergeChildParent(widget.moreaFire, widget.crud0);
+     moreaFire = widget.moreaFire;
      crud0 = widget.crud0;
      childParendPend = new ChildParendPend(crud0: widget.crud0);
     if (widget.profile['Pos'] == 'Teilnehmer') {
