@@ -6,15 +6,15 @@ import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 
-
-class Teleblitz{
+class Teleblitz {
   MoreaFirebase moreaFire;
   Info info = new Info();
-  Teleblitz(MoreaFirebase moreaFire){
+
+  Teleblitz(MoreaFirebase moreaFire) {
     this.moreaFire = moreaFire;
   }
-  
-  void defineInfo(Map<String, dynamic> tlbz, groupID){
+
+  void defineInfo(Map<String, dynamic> tlbz, groupID) {
     info.setTitel(convMiDatatoWebflow(groupID));
     info.setDatum(tlbz["datum"]);
     info.setAntreten(tlbz["antreten"]);
@@ -30,19 +30,18 @@ class Teleblitz{
     info.setEndeFerien(tlbz['ende-ferien']);
   }
 
-
-  Widget loadingScreen(Function navigation, Widget moreaLoading){
+  Widget loadingScreen(Function navigation, Widget moreaLoading) {
     return Scaffold(
-          appBar: AppBar(
-            title: Text('Teleblitz'),
-          ),
-          drawer: new Drawer(
-            child: new ListView(children: navigation()),
-          ),
-          body: moreaLoading
-        );
+        appBar: AppBar(
+          title: Text('Teleblitz'),
+        ),
+        drawer: new Drawer(
+          child: new ListView(children: navigation()),
+        ),
+        body: moreaLoading);
   }
-  Widget keineAktivitat(){
+
+  Widget keineAktivitat() {
     return MoreaBackgroundContainer(
       child: SingleChildScrollView(
         child: MoreaShadowContainer(
@@ -61,7 +60,8 @@ class Teleblitz{
       ),
     );
   }
-  Widget ferien(){
+
+  Widget ferien() {
     return MoreaBackgroundContainer(
       child: SingleChildScrollView(
         child: MoreaShadowContainer(
@@ -80,80 +80,81 @@ class Teleblitz{
       ),
     );
   }
-  Widget teleblitz (){
-    return MoreaBackgroundContainer(
-      child: SingleChildScrollView(
-        child: MoreaShadowContainer(
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: <Widget>[
-                info.getTitel(),
-                info.getDatum(),
-                info.getAntreten(),
-                info.getAbtreten(),
-                info.getMitnehmen(),
-                info.getBemerkung(),
-                info.getSender(),
-              ],
-            ),
-          ),
+
+  Widget teleblitz() {
+    return MoreaShadowContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: <Widget>[
+            info.getTitel(),
+            info.getDatum(),
+            info.getAntreten(),
+            info.getAbtreten(),
+            info.getMitnehmen(),
+            info.getBemerkung(),
+            info.getSender(),
+          ],
         ),
       ),
-    );}
-  
-  Widget element(Map<String, dynamic> tlbz){
-    if (tlbz["keineaktivitat"] == 'true') {
-                return keineAktivitat();
-              } else if (tlbz["ferien"] == 'true') {
-                 return ferien();
-              }
-    return teleblitz();
-  }
-  Widget noElement(){
-    return Container(
-      height: 400,
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(20),
-      child: Center(
-        child: new Text("Es sind noch keine Aktivitäten eingetragen. Bitte kontaktiere deine Leiter", style: new TextStyle(fontSize: 25),),
-    ),
-     decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.16),
-                          offset: Offset(3, 3),
-                          blurRadius: 40)
-                    ],
-                  )
     );
   }
 
-  Map<String,Widget> anzeigen(String groupID, AsyncSnapshot snapshot, Widget moreaLoading){
-    Map<String,Widget> returnTelebliz = new Map();
-    if(snapshot.connectionState == ConnectionState.waiting){
-      returnTelebliz[tlbzMapLoading]=moreaLoading;
-      print("Loading Teleblitz");
-       return returnTelebliz;
+  Widget element(Map<String, dynamic> tlbz) {
+    if (tlbz["keine-aktivitat"]) {
+      return keineAktivitat();
+    } else if (tlbz["ferien"]) {
+      return ferien();
+    } else{
+      return teleblitz();
     }
-    
+  }
+
+  Widget noElement() {
+    return Container(
+        height: 400,
+        padding: EdgeInsets.all(15),
+        margin: EdgeInsets.all(20),
+        child: Center(
+          child: new Text(
+            "Es sind noch keine Aktivitäten eingetragen. Bitte kontaktiere deine Leiter",
+            style: new TextStyle(fontSize: 25),
+          ),
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.16),
+                offset: Offset(3, 3),
+                blurRadius: 40)
+          ],
+        ));
+  }
+
+  Map<String, Widget> anzeigen(
+      String groupID, AsyncSnapshot snapshot, Widget moreaLoading) {
+    Map<String, Widget> returnTelebliz = new Map();
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      returnTelebliz[tlbzMapLoading] = moreaLoading;
+      print("Loading Teleblitz");
+      return returnTelebliz;
+    }
+
     Map<String, Map<String, dynamic>> mapTeleblitz = snapshot.data[groupID];
-    if(mapTeleblitz!= null)
-    mapTeleblitz.forEach((eventID,tlbz){
-      defineInfo(tlbz, groupID);
-      returnTelebliz[eventID]= element(tlbz);
-    });
+    if (mapTeleblitz != null)
+      mapTeleblitz.forEach((eventID, tlbz) {
+        defineInfo(tlbz, groupID);
+        returnTelebliz[eventID] = element(tlbz);
+      });
     else {
       returnTelebliz[tlbzMapNoElement] = noElement();
       print("No Teleblitz");
     }
     return returnTelebliz;
- }
-          
-     
-  
+  }
 }
+
 class Info {
 //  static Info _instance;
 //
@@ -234,8 +235,7 @@ class Info {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
       alignment: Alignment.topLeft,
-      child: Text(this.titel,
-          style: MoreaTextStyle.title),
+      child: Text(this.titel, style: MoreaTextStyle.title),
     );
   }
 
@@ -244,11 +244,9 @@ class Info {
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
           children: <Widget>[
-            SizedBox(
-              child: Text(
-                'Keine Aktivität',
-                style: TextStyle(fontSize: 30),
-              ),
+            Text(
+              'Keine Aktivität',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
             ),
             Expanded(
               child: SizedBox(),
@@ -266,7 +264,7 @@ class Info {
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Antreten", style: this._getStyleLeft())),
+                child: Text("Beginn", style: this._getStyleLeft())),
             Expanded(
               child: InkWell(
                 child: Text(
@@ -301,7 +299,7 @@ class Info {
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Abtreten", style: this._getStyleLeft())),
+                child: Text("Schluss", style: this._getStyleLeft())),
             Expanded(
                 child: InkWell(
               child: Text(
@@ -434,7 +432,7 @@ class Info {
   }
 
   Container getMitnehmen() {
-    if (this?.antreten?.isNotEmpty ?? false){
+    if (this?.antreten?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(
@@ -456,7 +454,8 @@ class Info {
                   Expanded(
                       child: Html(
                     data: this.mitnehmen,
-                    defaultTextStyle: _getStyleRight(),
+                    defaultTextStyle:
+                        TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                   ))
                 ],
               ),
@@ -496,9 +495,9 @@ class Info {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(
-                    child: Html(
-                  data: this.grund,
-                  defaultTextStyle: _getStyleRight(),
+                    child: Text(
+                  this.grund,
+                  style: _getStyleRight(),
                 ))
               ],
             ),

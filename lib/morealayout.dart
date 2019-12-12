@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'morea_strings.dart';
+
 class MoreaColors {
   static Color violett = Color(0xff7a62ff);
   static Color orange = Color(0xffff9262);
@@ -108,4 +110,100 @@ class MoreaTextStyle {
 class MoreaDivider extends Divider{
   final double thickness = 1;
   final Color color = Colors.black26;
+}
+
+BottomAppBar moreaChildBottomAppBar(Map navigationMap){
+  return BottomAppBar(
+    child: Container(
+      color: Color.fromRGBO(43, 16, 42, 0.9),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: FlatButton(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              onPressed: navigationMap[toMessagePage],
+              child: Column(
+                children: <Widget>[
+                  Icon(Icons.message, color: Colors.white),
+                  Text(
+                    'Nachrichten',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.white),
+                  )
+                ],
+                mainAxisSize: MainAxisSize.min,
+              ),
+            ),
+            flex: 1,
+          ),
+          Expanded(
+            child: FlatButton(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              onPressed: navigationMap[toAgendaPage],
+              child: Column(
+                children: <Widget>[
+                  Icon(Icons.event, color: Colors.white),
+                  Text(
+                    'Agenda',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.white),
+                  )
+                ],
+                mainAxisSize: MainAxisSize.min,
+              ),
+            ),
+            flex: 1,
+          ),
+          Expanded(
+            child: FlatButton(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              onPressed: navigationMap[toHomePage],
+              child: Column(
+                children: <Widget>[
+                  Icon(Icons.flash_on, color: Colors.white),
+                  Text(
+                    'Teleblitz',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.white),
+                  )
+                ],
+                mainAxisSize: MainAxisSize.min,
+              ),
+            ),
+            flex: 1,
+          ),
+          Expanded(
+            child: FlatButton(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              onPressed: navigationMap[toProfilePage],
+              child: Column(
+                children: <Widget>[
+                  Icon(Icons.person, color: Colors.white),
+                  Text(
+                    'Profil',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.white),
+                  )
+                ],
+                mainAxisSize: MainAxisSize.min,
+              ),
+            ),
+            flex: 1,
+          ),
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        textBaseline: TextBaseline.alphabetic,
+      ),
+    ),
+    shape: CircularNotchedRectangle(),
+  );
 }

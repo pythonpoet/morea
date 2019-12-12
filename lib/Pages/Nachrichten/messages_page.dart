@@ -1,9 +1,5 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Agenda/Agenda_page.dart';
-import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
@@ -13,9 +9,10 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  MessagesPage({@required this.auth,
-    @required this.moreaFire,
-    @required this.navigationMap});
+  MessagesPage(
+      {@required this.auth,
+      @required this.moreaFire,
+      @required this.navigationMap});
 
   final MoreaFirebase moreaFire;
   final Auth auth;
@@ -57,7 +54,6 @@ class _MessagesPageState extends State<MessagesPage> {
                 accountEmail: Text(moreaFire.getEmail),
                 decoration: BoxDecoration(color: MoreaColors.orange),
               ),
-              Divider(),
               ListTile(
                 title: new Text('Logout'),
                 trailing: new Icon(Icons.cancel),
@@ -185,7 +181,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                         child:
-                        MoreaShadowContainer(child: Text('Loading...'))));
+                            MoreaShadowContainer(child: Text('Loading...'))));
               } else if (snapshot.data.documents.length == 0) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -239,11 +235,11 @@ class _MessagesPageState extends State<MessagesPage> {
                                   if (snapshot.data.documents.length == 0) {
                                     return ListTile(
                                       title:
-                                      Text('Keine Nachrichten vorhanden'),
+                                          Text('Keine Nachrichten vorhanden'),
                                     );
                                   } else {
                                     var document =
-                                    snapshot.data.documents[index];
+                                        snapshot.data.documents[index];
                                     return _buildListItem(context, document);
                                   }
                                 }),
@@ -259,6 +255,8 @@ class _MessagesPageState extends State<MessagesPage> {
     } else {
       if (moreaFire.getPfandiName == null) {
         this.anzeigename = moreaFire.getVorName;
+      } else {
+        this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
         appBar: AppBar(
@@ -271,12 +269,8 @@ class _MessagesPageState extends State<MessagesPage> {
                 accountName: Text(this.anzeigename),
                 accountEmail: Text(moreaFire.getEmail),
                 decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                        fit: BoxFit.fill,
-                        image: new NetworkImage(
-                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+                    color: MoreaColors.orange),
               ),
-              Divider(),
               ListTile(
                 title: new Text('Logout'),
                 trailing: new Icon(Icons.cancel),
@@ -326,20 +320,6 @@ class _MessagesPageState extends State<MessagesPage> {
                         )
                       ],
                       mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Text(
-                      'Verfassen',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                   flex: 1,
@@ -406,16 +386,17 @@ class _MessagesPageState extends State<MessagesPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: ListView.builder(
+                                shrinkWrap: true,
                                 itemCount: snapshot.data.documents.length,
                                 itemBuilder: (context, index) {
                                   if (snapshot.data.documents.length == 0) {
                                     return ListTile(
                                       title:
-                                      Text('Keine Nachrichten vorhanden'),
+                                          Text('Keine Nachrichten vorhanden'),
                                     );
                                   } else {
                                     var document =
-                                    snapshot.data.documents[index];
+                                        snapshot.data.documents[index];
                                     return _buildListItem(context, document);
                                   }
                                 }),
@@ -450,8 +431,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   routeToSendMessage() {
     Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) =>
-            SendMessages(
+        builder: (BuildContext context) => SendMessages(
               moreaFire: moreaFire,
             )));
   }

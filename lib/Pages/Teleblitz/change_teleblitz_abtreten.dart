@@ -49,9 +49,10 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: MoreaColors.violett,
         child: Icon(Icons.check),
-        onPressed: (){
+        onPressed: () {
           if (saveAndSubmit()) {
-            widget.speichern(this.ortAbtretenController.text, this.zeitAbtreten, this.mapAbtretenController.text);
+            widget.speichern(this.ortAbtretenController.text, this.zeitAbtreten,
+                this.mapAbtretenController.text);
             Navigator.of(context).pop();
           }
         },
@@ -73,8 +74,36 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
                           child: Text(
-                            'Ende',
+                            'Schluss',
                             style: MoreaTextStyle.title,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Text(
+                            'Uhrzeit',
+                            style: MoreaTextStyle.lable,
+                          ),
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                              minWidth: viewportConstraints.maxWidth),
+                          alignment: Alignment.centerLeft,
+                          margin:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                              border: Border.all(color: Colors.black45)),
+                          child: FlatButton(
+                            child: Text(
+                              zeitAbtreten + ' Uhr',
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.black87),
+                            ),
+                            onPressed: () {
+                              _selectTime(context);
+                            },
                           ),
                         ),
                         Padding(
@@ -105,32 +134,11 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Text('Uhrzeit', style: MoreaTextStyle.lable,),
-                        ),
-                        Container(
-                          constraints: BoxConstraints(minWidth: viewportConstraints.maxWidth),
-                          alignment: Alignment.centerLeft,
-                          margin:
-                              EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                          border: Border.all(color: Colors.black45)),
-                          child: FlatButton(
-                            child: Text(
-                              zeitAbtreten + ' Uhr',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black87),
-                            ),
-                            onPressed: () {
-                              _selectTime(context);
-                            },
-                          ),
-                        ),
-                        Padding(
                           padding: const EdgeInsets.only(top: 20.0),
-                          child: Text('Google Maps', style: MoreaTextStyle.lable,),
+                          child: Text(
+                            'Google Maps',
+                            style: MoreaTextStyle.lable,
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
@@ -240,6 +239,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             navigation: navigation,
             teleblitzAnzeigen: teleblitz.anzeigen,
             anmeldebutton: this.childAnmeldeButton,
+            navigationMap: widget.navigationMap,
             moreaLoading: moreaLoading.loading());
         break;
       case FormType.eltern:
@@ -250,6 +250,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               navigation: navigation,
               teleblitzAnzeigen: teleblitz.anzeigen,
               anmeldebutton: parentAnmeldeButton,
+              navigationMap: widget.navigationMap,
               moreaLoading: moreaLoading.loading());
         else
           return Scaffold(
@@ -309,31 +310,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             accountName: new Text(moreafire.getDisplayName),
             accountEmail: new Text(widget.auth.getUserEmail),
             decoration: new BoxDecoration(
-                image: new DecorationImage(
-                    fit: BoxFit.fill,
-                    image: new NetworkImage(
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+                color: MoreaColors.orange),
           ),
-          new ListTile(
-              title: new Text('Agenda'),
-              trailing: new Icon(Icons.event),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new AgendaState(
-                        auth: widget.auth,
-                        moreaFire: moreafire,
-                        firestore: widget.firestore,
-                        navigationMap: widget.navigationMap,
-                      )))),
-          new ListTile(
-              title: new Text('Profil'),
-              trailing: new Icon(Icons.person),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        firestore: widget.firestore,
-                        crud0: crud0,
-                      )))),
-          new Divider(),
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
@@ -347,21 +325,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             accountName: Text(moreafire.getDisplayName),
             accountEmail: Text(widget.auth.getUserEmail),
             decoration: new BoxDecoration(
-                image: new DecorationImage(
-                    fit: BoxFit.fill,
-                    image: new NetworkImage(
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+                color: MoreaColors.orange),
           ),
-          new ListTile(
-              title: new Text('Agenda'),
-              trailing: new Icon(Icons.event),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new AgendaState(
-                        moreaFire: moreafire,
-                        firestore: widget.firestore,
-                        auth: widget.auth,
-                        navigationMap: widget.navigationMap,
-                      )))),
           new ListTile(
               title: new Text('Profil'),
               trailing: new Icon(Icons.person),
@@ -399,8 +364,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget anmeldebutton(
       String groupID, String eventID, String uid, String anmelden, abmelden) {
     return Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Expanded(
                 child: Container(

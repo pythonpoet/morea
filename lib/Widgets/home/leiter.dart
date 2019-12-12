@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:morea/Pages/Agenda/Agenda_page.dart';
-import 'package:morea/Pages/Nachrichten/messages_page.dart';
-import 'package:morea/Pages/Profil/profil.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 Widget leiterView(
@@ -36,8 +34,9 @@ Widget leiterView(
         child: new ListView(children: navigation()),
       ),
       body: TabBarView(
-          children: getTeleblizWidgetList(groupID, stream, subscribedGroups,
-              teleblitzAnzeigen, moreaLoading)),
+        children: getTeleblizWidgetList(
+            groupID, stream, subscribedGroups, teleblitzAnzeigen, moreaLoading),
+      ),
       floatingActionButton: moreaEditActionbutton(route),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
@@ -195,11 +194,13 @@ Widget getLayoutBuilderWidget(
           .forEach((String eventID, tlbz) {
         anzeige.add(tlbz);
       });
-      return SingleChildScrollView(
-          child: Column(
-        key: ObjectKey(anzeige),
-        children: anzeige,
-      ));
+      return MoreaBackgroundContainer(
+        child: SingleChildScrollView(
+            child: Column(
+          key: ObjectKey(anzeige),
+          children: anzeige,
+        )),
+      );
     },
   );
 }

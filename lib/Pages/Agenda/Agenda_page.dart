@@ -264,6 +264,25 @@ class _AgendaStatePage extends State<AgendaState>
         appBar: new AppBar(
           title: new Text('Agenda'),
         ),
+        bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: new Text(moreafire.getDisplayName),
+                accountEmail: new Text(moreafire.getEmail),
+                decoration: new BoxDecoration(
+                  color: MoreaColors.orange,
+                ),
+              ),
+              ListTile(
+                title: Text('Logout'),
+                trailing: Icon(Icons.cancel),
+                onTap: _signedOut,
+              )
+            ],
+          ),
+        ),
         body: Agenda(moreafire.getUserMap[userMapgroupID]),
       ));
     }
@@ -328,13 +347,14 @@ class _AgendaStatePage extends State<AgendaState>
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                         child: MoreaDivider(),
                       ),
                       ListView.separated(
                           itemCount: slagenda.data.length,
                           shrinkWrap: true,
-                          separatorBuilder: (context, int index){
+                          separatorBuilder: (context, int index) {
                             return Padding(
                               padding: EdgeInsets.symmetric(horizontal: 15),
                               child: MoreaDivider(),
@@ -347,34 +367,52 @@ class _AgendaStatePage extends State<AgendaState>
 
                             if (_info['Event']) {
                               return ListTile(
-                                subtitle: ListView(
-                                  shrinkWrap: true,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Text(_info['Datum'].toString(), style: MoreaTextStyle.normal,),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Text('Event', style: MoreaTextStyle.normal,),
-                                    )
-                                  ],
-                                ),
-                                  title: Text(_info['Eventname'].toString(), style: MoreaTextStyle.lable,),
-                                  onTap: () => viewEvent(context, _info));
-                            } else if (_info['Lager']) {
-                              return ListTile(
-                                  title: Text(_info['Lagername'], style: MoreaTextStyle.lable,),
                                   subtitle: ListView(
                                     shrinkWrap: true,
                                     children: <Widget>[
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
-                                        child: Text(_info['Lagername'], style: MoreaTextStyle.normal,),
+                                        child: Text(
+                                          _info['Datum'].toString(),
+                                          style: MoreaTextStyle.normal,
+                                        ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
-                                        child: Text('Lager', style: MoreaTextStyle.normal,),
+                                        child: Text(
+                                          'Event',
+                                          style: MoreaTextStyle.normal,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  title: Text(
+                                    _info['Eventname'].toString(),
+                                    style: MoreaTextStyle.lable,
+                                  ),
+                                  onTap: () => viewEvent(context, _info));
+                            } else if (_info['Lager']) {
+                              return ListTile(
+                                  title: Text(
+                                    _info['Lagername'],
+                                    style: MoreaTextStyle.lable,
+                                  ),
+                                  subtitle: ListView(
+                                    shrinkWrap: true,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          _info['Lagername'],
+                                          style: MoreaTextStyle.normal,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          'Lager',
+                                          style: MoreaTextStyle.normal,
+                                        ),
                                       )
                                     ],
                                   ),

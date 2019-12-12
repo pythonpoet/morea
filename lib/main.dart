@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: MaterialColor(
             MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
+        fontFamily: 'Raleway',
       ),
       home: new RootPage(auth: new Auth(), firestore: firestore),
     );

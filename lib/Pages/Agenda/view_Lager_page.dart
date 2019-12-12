@@ -97,7 +97,7 @@ class ViewLagerPageState extends StatelessWidget {
         ),
         ListTile(
           title: Text(
-            'Besammlung',
+            'Beginn',
             style: MoreaTextStyle.lable,
           ),
           subtitle: Text(

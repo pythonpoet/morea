@@ -35,7 +35,7 @@ enum AuthStatus {
   profilePage
 }
 
-class _RootPageState extends State<RootPage> with TickerProviderStateMixin{
+class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   Auth auth = Auth();
   AuthStatus authStatus = AuthStatus.loading;
   MoreaFirebase moreaFire;
@@ -83,27 +83,35 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin{
   }
 
   void homePage() {
-    setState(() {
-      authStatus = AuthStatus.homePage;
-    });
+    if (!(authStatus == AuthStatus.homePage)) {
+      setState(() {
+        authStatus = AuthStatus.homePage;
+      });
+    }
   }
 
   void messagePage() {
-    setState(() {
-      authStatus = AuthStatus.messagePage;
-    });
+    if (!(authStatus == AuthStatus.messagePage)) {
+      setState(() {
+        authStatus = AuthStatus.messagePage;
+      });
+    }
   }
 
   void agendaPage() {
-    setState(() {
-      authStatus = AuthStatus.agendaPage;
-    });
+    if (!(authStatus == AuthStatus.agendaPage)) {
+      setState(() {
+            authStatus = AuthStatus.agendaPage;
+          });
+    }
   }
 
   void profilePage() {
-    setState(() {
-      authStatus = AuthStatus.profilePage;
-    });
+    if (!(authStatus == AuthStatus.profilePage)) {
+      setState(() {
+            authStatus = AuthStatus.profilePage;
+          });
+    }
   }
 
   void signedOut() {
@@ -163,7 +171,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin{
         );
         break;
       case AuthStatus.loading:
-        return Container(child: moreaLoading.loading(), color: Colors.white,);
+        return Container(
+          child: moreaLoading.loading(),
+          color: Colors.white,
+        );
         break;
     }
   }

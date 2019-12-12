@@ -371,7 +371,6 @@ class EventAddPageState extends State<EventAddPage> {
   }
 
   void changemitnehmen(int index) {
-    String zwischensp;
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => new Form(
@@ -502,7 +501,7 @@ class EventAddPageState extends State<EventAddPage> {
                             children: <Widget>[
                               Expanded(
                                 flex: 3,
-                                child: Text('Anfang'),
+                                child: Text('Beginn'),
                               ),
                               Expanded(
                                 flex: 3,
@@ -796,7 +795,7 @@ class EventAddPageState extends State<EventAddPage> {
                                 children: <Widget>[
                                   Expanded(
                                     flex: 3,
-                                    child: Text('Anfang'),
+                                    child: Text('Beginn'),
                                   ),
                                   Expanded(
                                     flex: 3,
