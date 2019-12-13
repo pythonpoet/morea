@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/morealayout.dart';
 
 class SendMessages extends StatefulWidget {
-  SendMessages({this.firestore});
-  final Firestore firestore;
+  SendMessages({this.moreaFire});
+
+  final MoreaFirebase moreaFire;
+
   @override
   State<StatefulWidget> createState() {
     return _SendMessagesState();
@@ -39,7 +42,7 @@ class _SendMessagesState extends State<SendMessages> {
   void initState() {
     super.initState();
     _getUserInformation();
-    moreaFire = new MoreaFirebase(widget.firestore);
+    moreaFire = widget.moreaFire;
   }
 
   @override
@@ -77,12 +80,12 @@ class _SendMessagesState extends State<SendMessages> {
               if (_formKey.currentState.validate()) {
                 Map<String, dynamic> data = {
                   'body': inhaltController.text,
-                  'read': Map<String, bool>(),
+                  'read': List<String>(),
                   'sender': userInfo['Pfadinamen'],
                   'snippet': vorschauController.text,
                   'title': titleController.text
                 };
-                for(String i in receiver){
+                for (String i in receiver) {
                   moreaFire.uploadMessage(i, data);
                 }
                 print('Successful');
@@ -118,67 +121,79 @@ class _SendMessagesState extends State<SendMessages> {
                   value: biberCheckBox,
                   onChanged: (bool val) {
                     setState(() {
-                      if(val) {
-                        receiver.add('Biber');
+                      if (val) {
+                        receiver.add(midatanamebiber);
                       } else {
-                        receiver.remove('Biber');
+                        receiver.remove(midatanamebiber);
                       }
                       biberCheckBox = val;
                     });
                   },
-                  title: Text('Biber', style: TextStyle(fontSize: 20),),
+                  title: Text(
+                    'Biber',
+                    style: TextStyle(fontSize: 20),
+                  ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
                 CheckboxListTile(
                   value: woelfeCheckBox,
                   onChanged: (bool val) {
                     setState(() {
-                      if(val) {
-                        receiver.add('WombatWlfe');
+                      if (val) {
+                        receiver.add(midatanamewoelf);
                       } else {
-                        receiver.remove('WombatWlfe');
+                        receiver.remove(midatanamewoelf);
                       }
                       woelfeCheckBox = val;
                     });
                   },
-                  title: Text('Wölfe', style: TextStyle(fontSize: 20),),
+                  title: Text(
+                    'Wölfe',
+                    style: TextStyle(fontSize: 20),
+                  ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
                 CheckboxListTile(
                   value: meitliCheckBox,
                   onChanged: (bool val) {
                     setState(() {
-                      if(val) {
-                        receiver.add('NahaniMeitli');
+                      if (val) {
+                        receiver.add(midatanamemeitli);
                       } else {
-                        receiver.remove('NahaniMeitli');
+                        receiver.remove(midatanamemeitli);
                       }
                       meitliCheckBox = val;
                     });
                   },
-                  title: Text('Meitli', style: TextStyle(fontSize: 20),),
+                  title: Text(
+                    'Meitli',
+                    style: TextStyle(fontSize: 20),
+                  ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
                 CheckboxListTile(
                   value: buebeCheckBox,
                   onChanged: (bool val) {
                     setState(() {
-                      if(val) {
-                        receiver.add('DrasonBuebe');
+                      if (val) {
+                        receiver.add(midatanamebuebe);
                       } else {
-                        receiver.remove('DrasonBuebe');
+                        receiver.remove(midatanamebuebe);
                       }
                       buebeCheckBox = val;
                     });
                   },
-                  title: Text('Buebe', style: TextStyle(fontSize: 20),),
+                  title: Text(
+                    'Buebe',
+                    style: TextStyle(fontSize: 20),
+                  ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
                 CheckboxListTile(
                   value: pioCheckBox,
                   onChanged: (bool val) {
                     setState(() {
-                      if(val) {
+                      if (val) {
                         receiver.add('Pios');
                       } else {
                         receiver.remove('Pios');
@@ -186,7 +201,10 @@ class _SendMessagesState extends State<SendMessages> {
                       pioCheckBox = val;
                     });
                   },
-                  title: Text('Pios', style: TextStyle(fontSize: 20),),
+                  title: Text(
+                    'Pios',
+                    style: TextStyle(fontSize: 20),
+                  ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
                 Padding(
@@ -235,7 +253,8 @@ class _SendMessagesState extends State<SendMessages> {
                   minLines: 2,
                   maxLines: 4,
                   decoration: InputDecoration(
-                    helperText: 'Dieser Text wird in der Benachrichtigung angezeigt.',
+                    helperText:
+                        'Dieser Text wird in der Benachrichtigung angezeigt.',
                     border: OutlineInputBorder(),
                   ),
                   onSaved: (newValue) {
@@ -273,7 +292,8 @@ class _SendMessagesState extends State<SendMessages> {
                   decoration: InputDecoration(
                     labelText: 'Nachricht',
                     alignLabelWithHint: true,
-                    helperText: 'Dieser Text wird in der App beim Öffnen der Nachricht angezeigt.',
+                    helperText:
+                        'Dieser Text wird in der App beim Öffnen der Nachricht angezeigt.',
                     border: OutlineInputBorder(),
                   ),
                   onSaved: (newValue) {

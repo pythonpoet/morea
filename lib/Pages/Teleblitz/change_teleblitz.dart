@@ -279,7 +279,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                     color: Colors.black26,
                                   )),
                               ListTile(
-                                title: Text('Ende',
+                                title: Text('Schluss',
                                     style: TextStyle(fontSize: 18)),
                                 subtitle: Text(abtreten),
                                 onTap: () {
@@ -462,12 +462,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   }
 
   void setBeginn(String ort, String zeit, String map) {
-    this.antreten = ort + ', ' + zeit + ' Uhr';
+    this.antreten = zeit + ' Uhr, ' + ort;
     this.mapAntreten = map;
   }
 
   void setEnde(String ort, String zeit, String map) {
-    this.abtreten = ort + ', ' + zeit + ' Uhr';
+    this.abtreten = zeit + ' Uhr, ' + ort;
     this.mapAbtreten = map;
   }
 

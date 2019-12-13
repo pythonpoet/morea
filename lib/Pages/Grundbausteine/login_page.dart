@@ -101,7 +101,6 @@ class _LoginPageState extends State<LoginPage> {
         if (devTokenOld == null) {
           firebaseMessaging.getToken().then((token) {
             devtoken = [token];
-            Map<String, List> devtokens = {'devtoken': devtoken};
             userInfo.data['devtoken'] = devtoken;
             moreafire.createUserInformation(userInfo.data);
           });
@@ -433,7 +432,9 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
         body: Stack(
           children: <Widget>[
             Container(
@@ -773,7 +774,7 @@ class _LoginPageState extends State<LoginPage> {
                                     border: UnderlineInputBorder(),
                                     filled: true,
                                     labelText: 'PLZ'),
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 onSaved: (value) => _plz = value,
                               )),
                               Expanded(
@@ -1065,7 +1066,7 @@ class _LoginPageState extends State<LoginPage> {
                                     border: UnderlineInputBorder(),
                                     filled: true,
                                     labelText: 'PLZ'),
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 onSaved: (value) => _plz = value,
                               )),
                               Expanded(

@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/agenda.dart';
+import 'package:morea/services/morea_firestore.dart';
 
 class ViewLagerPageState extends StatelessWidget {
-  ViewLagerPageState({this.info, this.pos});
-
-  var info;
-  String pos;
+  ViewLagerPageState({this.info, this.pos, this.moreaFire, this.agenda});
+  final MoreaFirebase moreaFire;
+  final Agenda agenda;
+  final Map info;
+  final String pos;
 
   @override
   Widget build(BuildContext context) {
+    if(info == null)
+    return Card(
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(15),
+          child: Text("Dieses Lager ist nicht eingetragen, wende dich an deine Leiter", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
+      ),
+    );
     print(info['Kontakt']['Pfadiname']);
     return Container(
         child: Scaffold(
@@ -39,320 +50,143 @@ class ViewLagerPageState extends StatelessWidget {
   }
 
   Widget viewLager() {
-    return Container(
-      margin: EdgeInsets.only(top: 10, bottom: 10),
-      padding: EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: Text(info['Lagername'], style: MoreaTextStyle.title,),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            info['Lagername'],
+            style: MoreaTextStyle.title,
           ),
-          Container(
-            alignment: Alignment.center, //
-            decoration: new BoxDecoration(
-              border: new Border.all(color: Colors.black, width: 2),
-              borderRadius: new BorderRadius.all(
-                Radius.circular(4.0),
-              ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+            title: Text(
+              'Datum',
+              style: MoreaTextStyle.lable,
             ),
-            child: Container(
-              padding: EdgeInsets.all(5),
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        child: Text(
-                          'Datum',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      )
-                    ],
+            subtitle: ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    'von: ' + info['Datum'],
+                    style: MoreaTextStyle.normal,
                   ),
-                  Container(
-                      child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          'vom: ' + info['Datum'],
-                          style: TextStyle(fontSize: 15),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'bis: ' + info['Datum bis'],
-                          style: TextStyle(fontSize: 15),
-                        ),
-                      )
-                    ],
-                  )),
-                  SizedBox(
-                    height: 5,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Text(
+                    'bis: ' + info['Datum bis'],
+                    style: MoreaTextStyle.normal,
                   ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                            child: Text(
-                          'Lagerort',
-                          style: TextStyle(fontSize: 20),
-                        ))
-                      ],
-                    ),
+                )
+              ],
+            )),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+          title: Text(
+            'Lagerort',
+            style: MoreaTextStyle.lable,
+          ),
+          subtitle: Text(
+            info['Lagerort'],
+            style: MoreaTextStyle.normal,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+          title: Text(
+            'Beginn',
+            style: MoreaTextStyle.lable,
+          ),
+          subtitle: Text(
+            info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
+            style: MoreaTextStyle.normal,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+          title: Text(
+            'Schluss',
+            style: MoreaTextStyle.lable,
+          ),
+          subtitle: Text(
+            info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
+            style: MoreaTextStyle.normal,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+          title: Text(
+            'Beschreibung',
+            style: MoreaTextStyle.lable,
+          ),
+          contentPadding: EdgeInsets.all(15),
+          subtitle: Text(
+            info['Beschreibung'],
+            style: MoreaTextStyle.normal,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+          title: Text(
+            'Mitnehmen',
+            style: MoreaTextStyle.lable,
+          ),
+          contentPadding: EdgeInsets.all(15),
+          subtitle: ListView.builder(
+              itemCount: info['Mitnehmen'].length,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    info['Mitnehmen'][index],
+                    style: MoreaTextStyle.normal,
                   ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          child: Text(info['Lagerort'],
-                              style: TextStyle(fontSize: 15)),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                child: Text('Besammlung',
-                                    style: TextStyle(fontSize: 20)),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Row(
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text('Zeit: '),
-                                    ),
-                                    Container(
-                                      child: Text(info['Anfangszeit']),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Row(
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text('Ort: '),
-                                    ),
-                                    Container(
-                                      child: Text(info['Anfangsort']),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                child: Text('Schluss',
-                                    style: TextStyle(fontSize: 20)),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Row(
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text('Zeit: '),
-                                    ),
-                                    Container(
-                                      child: Text(info['Schlusszeit']),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Row(
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text('Ort: '),
-                                    ),
-                                    Container(
-                                      child: Text(info['Schlussort']),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+                );
+              }),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: MoreaDivider(),
+        ),
+        ListTile(
+          title: Text(
+            'Kontakt',
+            style: MoreaTextStyle.lable,
           ),
-          SizedBox(
-            height: 15,
+          subtitle: Text(
+            info['Kontakt']['Pfadiname'] + ': ' + info['Kontakt']['Email'],
+            style: MoreaTextStyle.normal,
           ),
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Flexible(
-                        child: Row(
-                      children: <Widget>[
-                        Container(
-                          child: Text('Beschreibung',
-                              style: TextStyle(fontSize: 20)),
-                        ),
-                      ],
-                    )),
-                    Flexible(
-                        child: Container(
-                      padding: EdgeInsets.only(left: 5),
-                      child: Text(info['Beschreibung']),
-                    ))
-                  ],
-                ),
-              )),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                  padding: EdgeInsets.all(5),
-                  child: Column(
-                    children: <Widget>[
-                      Row(children: <Widget>[
-                        Expanded(
-                          flex: 4,
-                          child: Text(
-                            'Mitnehmen:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ),
-                      ]),
-                      Container(
-                        height: 18 * info['Mitnehmen'].length.toDouble(),
-                        child: ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: this.info['Mitnehmen'].length,
-                          itemBuilder: (context, int index) {
-                            return Container(
-                                child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                    flex: 1,
-                                    child: Icon(
-                                      Icons.brightness_1,
-                                      size: 7,
-                                    )),
-                                Expanded(
-                                  flex: 9,
-                                  child: Text(info['Mitnehmen'][index],
-                                      style: new TextStyle(
-                                        fontSize: 15,
-                                      )),
-                                ),
-                              ],
-                            ));
-                          },
-                        ),
-                      )
-                    ],
-                  ))),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                  padding: EdgeInsets.all(5),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              'Kontakt:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text('Kontaktperson: ',
-                                style: TextStyle(fontSize: 15)),
-                          ),
-                          Expanded(
-                            child: Text(
-                              info['Kontakt']['Pfadiname'],
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child:
-                                Text('Email:', style: TextStyle(fontSize: 15)),
-                          ),
-                          Expanded(
-                            child: Text(
-                              info['Kontakt']['Email'],
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ))),
-        ],
-      ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(bottom: 20),
+        )
+      ],
     );
   }
 
@@ -370,6 +204,8 @@ class ViewLagerPageState extends StatelessWidget {
             builder: (BuildContext context) => EventAddPage(
                   eventinfo: info,
                   agendaModus: AgendaModus.lager,
+                  agenda: agenda,
+                  moreaFire: moreaFire,
                 )))
         .then((onValue) {});
   }
