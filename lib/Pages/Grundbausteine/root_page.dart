@@ -68,8 +68,6 @@ class _RootPageState extends State<RootPage> {
 
       case AuthStatus.blockedByDevToken:
         return new BlockedByDevToken();
-      default:
-        
     }
   }
 }

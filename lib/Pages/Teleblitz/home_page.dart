@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/About/about.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
@@ -312,6 +313,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                       new PersonenVerzeichnisState()))),
           new Divider(),
           new ListTile(
+            title: new Text("Über dieses App"),
+            trailing: new Icon(Icons.info),
+            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AboutThisApp()))), 
+          new Divider(),
+          new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
             onTap: _signedOut,
@@ -344,6 +352,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                       )))),
           new Divider(),
           new ListTile(
+            title: new Text("Über dieses App"),
+            trailing: new Icon(Icons.info),
+            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AboutThisApp()))), 
+          new Divider(),
+          new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
             onTap: _signedOut,
@@ -374,6 +389,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin{
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,firestore: widget.firestore, crud0: crud0,
                       )))),
+          new Divider(),
+          new ListTile(
+            title: new Text("Über dieses App"),
+            trailing: new Icon(Icons.info),
+            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AboutThisApp()))), 
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
