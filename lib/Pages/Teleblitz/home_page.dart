@@ -321,6 +321,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             decoration: new BoxDecoration(
                 color: MoreaColors.orange),
           ),
+          ListTile(
+              title: new Text('Eltern hinzufügen'),
+              trailing: new Icon(Icons.add),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ProfilePageState(
+                    profile: moreafire.getUserMap,
+                    firestore: widget.firestore,
+                    crud0: crud0,
+                  )))),
+          Divider(),
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
@@ -337,8 +347,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 color: MoreaColors.orange),
           ),
           new ListTile(
-              title: new Text('Profil'),
-              trailing: new Icon(Icons.person),
+              title: new Text('Kinder hinzufügen'),
+              trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
