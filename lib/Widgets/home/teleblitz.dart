@@ -42,40 +42,32 @@ class Teleblitz {
   }
 
   Widget keineAktivitat() {
-    return MoreaBackgroundContainer(
-      child: SingleChildScrollView(
-        child: MoreaShadowContainer(
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: <Widget>[
-                info.getTitel(),
-                info.getKeineAktivitat(),
-                info.getDatum(),
-                info.getGrund()
-              ],
-            ),
-          ),
+    return MoreaShadowContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: <Widget>[
+            info.getTitel(),
+            info.getKeineAktivitat(),
+            info.getDatum(),
+            info.getGrund()
+          ],
         ),
       ),
     );
   }
 
   Widget ferien() {
-    return MoreaBackgroundContainer(
-      child: SingleChildScrollView(
-        child: MoreaShadowContainer(
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: <Widget>[
-                info.getTitel(),
-                info.getKeineAktivitat(),
-                info.getFerien(),
-                info.getEndeFerien(),
-              ],
-            ),
-          ),
+    return MoreaShadowContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: <Widget>[
+            info.getTitel(),
+            info.getKeineAktivitat(),
+            info.getFerien(),
+            info.getEndeFerien(),
+          ],
         ),
       ),
     );
