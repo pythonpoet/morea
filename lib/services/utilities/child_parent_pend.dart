@@ -37,6 +37,9 @@ class ChildParendPend extends BaseChildParendPend{
       })
     ));
   }
+  Future<String> parentCreatesChild(String _childEmail, _childPasswort)async{
+    //TODO
+  }
   Future<void> createChildAndPendIt(String _childEmail, String _childPasswort, Map<String,dynamic> childData, Map<String, dynamic> parentData, BuildContext context)async{
     Auth childAuth = new Auth();
     try{
