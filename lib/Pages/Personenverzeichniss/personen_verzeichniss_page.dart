@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Personenverzeichniss/view_userprofile_page.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/utilities/MiData.dart';
 
 class PersonenVerzeichnisState extends StatefulWidget {
   PersonenVerzeichnisState({this.userInfo});
@@ -15,34 +17,35 @@ class PersonenVerzeichnisState extends StatefulWidget {
 class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
   Auth auth0 = new Auth();
   List woelfe=[' '], nahani=[' '], drason=[' '], biber=[' '], pios=[' '], leiter=[' '];
-
+  QuerySnapshot qsAllUsers;
   sortlist()async{
     await Firestore.instance.collection('user')
       .getDocuments().then((qsdata){
+        qsAllUsers = qsdata;
         for(int i=0; i < qsdata.documents.length; i++){
-        switch (qsdata.documents[i].data['Stufe']) {
-          case 'Wombat (Wölfe)':
+        switch (qsdata.documents[i].data[userMapgroupID]) {
+          case "3776":
             if(woelfe[0] == ' '){
             woelfe[0]=qsdata.documents[i].data;
             }else{
             woelfe.add(qsdata.documents[i].data);
             }  
             break;
-          case 'Nahani (Meitli)':
+          case "3776":
             if(nahani[0] == ' '){
             nahani[0]=qsdata.documents[i].data;
             }else{
             nahani.add(qsdata.documents[i].data);
             }  
             break;
-          case 'Drason (Buebe)':
+          case '4013':
             if(drason[0] == ' '){
             drason[0]=qsdata.documents[i].data;
             }else{
             drason.add(qsdata.documents[i].data);
             }  
             break;
-          case 'Biber':
+          case '3775':
             if(biber[0] == ' '){
             biber[0]=qsdata.documents[i].data;
             }else{
@@ -244,6 +247,6 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState> {
   }
   navigatetoprofile(userdata){
     Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new ViewUserProfilePageState(profile: userdata,)));
+                builder: (BuildContext context) => new ViewUserProfilePageState( qsAllUsers, Map<String,dynamic>.from(userdata))));
   }
 }

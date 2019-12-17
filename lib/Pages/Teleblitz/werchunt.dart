@@ -65,7 +65,7 @@ class _WerChuntState extends State<WerChunt> {
     return StreamBuilder(
       stream: teleblitzAnmeldungen.getAnmeldungen,
       builder: (context,  AsyncSnapshot<dynamic> aSAngemolden){
-        if(!aSAngemolden.hasData) return moreaLoadingIndicator();
+        if(!aSAngemolden.hasData) return simpleMoreaLoadingIndicator();
         if(aSAngemolden.data.length==0) return  Center(child:Text('Niemand hat sich angemolden', style: TextStyle(fontSize: 20),));
         return ListView.builder(
           itemCount: aSAngemolden.data.length,
@@ -82,7 +82,7 @@ class _WerChuntState extends State<WerChunt> {
     return StreamBuilder(
       stream: teleblitzAnmeldungen.getAbmeldungen,
       builder: (context, AsyncSnapshot<dynamic> asAbgemolden){
-        if(!asAbgemolden.hasData) return moreaLoadingIndicator();
+        if(!asAbgemolden.hasData) return simpleMoreaLoadingIndicator();
         if(asAbgemolden.data.length==0) return  Center(child:Text('Niemand hat sich abgemolden', style: TextStyle(fontSize: 20),));
         return ListView.builder(
           itemCount: asAbgemolden.data.length,

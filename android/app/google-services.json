@@ -30,6 +30,13 @@
             {
               "client_id": "20884476221-mggtj83cfup1et1cnep84qucs56b4vni.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "20884476221-jnfu6klpjbqekaoeofmjnf9ndsjlt0rg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "MCBK5KYUS5.ch.morea.app"
+              }
             }
           ]
         }

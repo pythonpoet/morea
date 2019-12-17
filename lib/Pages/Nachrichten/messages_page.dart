@@ -1,9 +1,7 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Agenda/Agenda_page.dart';
-import 'package:morea/Pages/Teleblitz/home_page.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/Pages/Nachrichten/send_message.dart';
@@ -11,54 +9,51 @@ import 'package:morea/morealayout.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
-  MessagesPage({this.userInfo, this.firestore, this.auth, this.moreaFire, this.onSignedOut});
-  final Map userInfo;
-  final Firestore firestore;
-  final Auth auth;
-  final MoreaFirebase moreaFire;
-  final VoidCallback onSignedOut;
+  MessagesPage(
+      {@required this.auth,
+      @required this.moreaFire,
+      @required this.navigationMap});
 
+  final MoreaFirebase moreaFire;
+  final Auth auth;
+  final Map navigationMap;
 
   @override
   State<StatefulWidget> createState() => _MessagesPageState();
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  MoreaFirebase firestore;
- 
   var messages;
   var date;
   var uid;
   var stufe;
-  
-  
+  String anzeigename;
+  MoreaFirebase moreaFire;
+
   @override
   void initState() {
     super.initState();
+    this.moreaFire = widget.moreaFire;
     _getMessages(this.context);
-    firestore = new MoreaFirebase(widget.firestore);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.userInfo['Pos'] == 'Leiter') {
-      if(widget.userInfo['Pfadinamen'] == null){
-        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+    if (moreaFire.getPos == 'Leiter') {
+      if (moreaFire.getPfandiName == null) {
+        this.anzeigename = moreaFire.getVorName;
+      } else {
+        this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
         drawer: Drawer(
           child: ListView(
             children: <Widget>[
               UserAccountsDrawerHeader(
-                accountName: Text(widget.userInfo['Pfadinamen']),
-                accountEmail: Text(widget.userInfo['Email']),
-                decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                        fit: BoxFit.fill,
-                        image: new NetworkImage(
-                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+                accountName: Text(anzeigename),
+                accountEmail: Text(moreaFire.getEmail),
+                decoration: BoxDecoration(color: MoreaColors.orange),
               ),
-              Divider(),
               ListTile(
                 title: new Text('Logout'),
                 trailing: new Icon(Icons.cancel),
@@ -70,15 +65,7 @@ class _MessagesPageState extends State<MessagesPage> {
         appBar: AppBar(
           title: Text('Nachrichten'),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => SendMessages()));
-          },
-          child: Icon(Icons.edit),
-          backgroundColor: MoreaColors.violett,
-          shape: CircleBorder(side: BorderSide(color: Colors.white)),
-        ),
+        floatingActionButton: moreaEditActionbutton(this.routeToSendMessage),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           child: Container(
@@ -108,13 +95,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => AgendaState(
-                             firestore: widget.firestore,
-                             moreaFire: widget.moreaFire,
-                              )));
-                    }),
+                    onPressed: widget.navigationMap[toAgendaPage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.event, color: Colors.white),
@@ -148,16 +129,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    //TODO Delete this if possible
-                    /*onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(
-                          firestore: widget.firestore,
-                          auth: widget.auth,
-                          onSigedOut:,
-                        ),
-                      ));
-                    }),*/
+                    onPressed: widget.navigationMap[toHomePage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.flash_on, color: Colors.white),
@@ -177,7 +149,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
+                    onPressed: widget.navigationMap[toProfilePage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.person, color: Colors.white),
@@ -210,6 +182,36 @@ class _MessagesPageState extends State<MessagesPage> {
                     child: SingleChildScrollView(
                         child:
                             MoreaShadowContainer(child: Text('Loading...'))));
+              } else if (snapshot.data.documents.length == 0) {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text('Keine Nachrichten vorhanden'),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               } else {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -230,8 +232,16 @@ class _MessagesPageState extends State<MessagesPage> {
                                 itemCount: snapshot.data.documents.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
-                                  var document = snapshot.data.documents[index];
-                                  return _buildListItem(context, document);
+                                  if (snapshot.data.documents.length == 0) {
+                                    return ListTile(
+                                      title:
+                                          Text('Keine Nachrichten vorhanden'),
+                                    );
+                                  } else {
+                                    var document =
+                                        snapshot.data.documents[index];
+                                    return _buildListItem(context, document);
+                                  }
                                 }),
                           ],
                         ),
@@ -243,8 +253,10 @@ class _MessagesPageState extends State<MessagesPage> {
             }),
       );
     } else {
-      if(widget.userInfo['Pfadinamen'] == null){
-        widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+      if (moreaFire.getPfandiName == null) {
+        this.anzeigename = moreaFire.getVorName;
+      } else {
+        this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
         appBar: AppBar(
@@ -254,15 +266,11 @@ class _MessagesPageState extends State<MessagesPage> {
           child: ListView(
             children: <Widget>[
               UserAccountsDrawerHeader(
-                accountName: Text(widget.userInfo['Pfadinamen']),
-                accountEmail: Text(widget.userInfo['Email']),
+                accountName: Text(this.anzeigename),
+                accountEmail: Text(moreaFire.getEmail),
                 decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                        fit: BoxFit.fill,
-                        image: new NetworkImage(
-                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9ZVZvX1fYVOXQdPMzwVE9TrmpLrZlVIiqvjvLGMRPKD-5W8rHA'))),
+                    color: MoreaColors.orange),
               ),
-              Divider(),
               ListTile(
                 title: new Text('Logout'),
                 trailing: new Icon(Icons.cancel),
@@ -299,13 +307,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: (() {
-                      /*Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) => AgendaState(
-                              widget.userInfo,
-                              widget.auth,
-                              widget.onSignedOut)));*/
-                    }),
+                    onPressed: widget.navigationMap[toAgendaPage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.event, color: Colors.white),
@@ -323,31 +325,9 @@ class _MessagesPageState extends State<MessagesPage> {
                   flex: 1,
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Text(
-                      'Verfassen',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    /*onPressed: (() {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(
-                          userInfo: widget.userInfo,
-                          auth: widget.auth,
-                          onSigedOut: widget.onSignedOut,
-                        ),
-                      ));
-                    }),*/
+                    onPressed: widget.navigationMap[toHomePage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.flash_on, color: Colors.white),
@@ -367,7 +347,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 Expanded(
                   child: FlatButton(
                     padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
+                    onPressed: widget.navigationMap[toProfilePage],
                     child: Column(
                       children: <Widget>[
                         Icon(Icons.person, color: Colors.white),
@@ -406,10 +386,19 @@ class _MessagesPageState extends State<MessagesPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: ListView.builder(
+                                shrinkWrap: true,
                                 itemCount: snapshot.data.documents.length,
                                 itemBuilder: (context, index) {
-                                  var document = snapshot.data.documents[index];
-                                  return _buildListItem(context, document);
+                                  if (snapshot.data.documents.length == 0) {
+                                    return ListTile(
+                                      title:
+                                          Text('Keine Nachrichten vorhanden'),
+                                    );
+                                  } else {
+                                    var document =
+                                        snapshot.data.documents[index];
+                                    return _buildListItem(context, document);
+                                  }
                                 }),
                           ),
                         ),
@@ -425,11 +414,8 @@ class _MessagesPageState extends State<MessagesPage> {
 
   void _signedOut() async {
     try {
-      if(Navigator.of(context).canPop()){
-        Navigator.of(context).popUntil(ModalRoute.withName('/'));
-      }
       await widget.auth.signOut();
-      widget.onSignedOut();
+      widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
@@ -437,15 +423,22 @@ class _MessagesPageState extends State<MessagesPage> {
 
   _getMessages(BuildContext context) async {
     this.uid = widget.auth.getUserID;
-    this.stufe = widget.moreaFire.getGroupID;
+    this.stufe = moreaFire.getGroupID;
     setState(() {
-      this.messages = firestore.getMessages(this.stufe);
+      this.messages = moreaFire.getMessages(this.stufe);
     });
+  }
+
+  routeToSendMessage() {
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (BuildContext context) => SendMessages(
+              moreaFire: moreaFire,
+            )));
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var message = document;
-    if (!(document['read'].containsKey(this.uid))) {
+    if (!(document['read'].contains(this.uid))) {
       return Container(
           padding: EdgeInsets.only(right: 20, left: 20),
           child: ListTile(
@@ -461,7 +454,7 @@ class _MessagesPageState extends State<MessagesPage> {
             ),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () async {
-              await firestore.setMessageRead(
+              await moreaFire.setMessageRead(
                   this.uid, document.documentID, this.stufe);
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (BuildContext context) {
@@ -469,31 +462,31 @@ class _MessagesPageState extends State<MessagesPage> {
               }));
             },
           ));
-    } else if (!(document['read'][this.uid])) {
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: ListTile(
-          key: UniqueKey(),
-          title: Text(document['title'],
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(document['sender'],
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          contentPadding: EdgeInsets.only(),
-          leading: CircleAvatar(
-            child: Text(document['sender'][0]),
-          ),
-          trailing: Icon(Icons.arrow_forward_ios),
-          onTap: () async {
-            await firestore.setMessageRead(
-                this.uid, document.documentID, this.stufe);
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) {
-              return SingleMessagePage(message);
-            }));
-          },
-        ),
-      );
+//    } else if (!(document['read'][this.uid])) {
+//      return Container(
+//        padding: EdgeInsets.symmetric(horizontal: 20),
+//        child: ListTile(
+//          key: UniqueKey(),
+//          title: Text(document['title'],
+//              style: TextStyle(fontWeight: FontWeight.bold)),
+//          subtitle: Text(document['sender'],
+//              style:
+//                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+//          contentPadding: EdgeInsets.only(),
+//          leading: CircleAvatar(
+//            child: Text(document['sender'][0]),
+//          ),
+//          trailing: Icon(Icons.arrow_forward_ios),
+//          onTap: () async {
+//            await moreaFire.setMessageRead(
+//                this.uid, document.documentID, this.stufe);
+//            Navigator.of(context)
+//                .push(MaterialPageRoute(builder: (BuildContext context) {
+//              return SingleMessagePage(message);
+//            }));
+//          },
+//        ),
+//      );
     } else {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 20),

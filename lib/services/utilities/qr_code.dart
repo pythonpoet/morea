@@ -30,7 +30,7 @@ class QrCode implements BaseQrCode{
     }on FormatException{
       germanError = "Du hast den Scannvorgang abgebrochen";
     }catch (e){
-      germanError = "Etwas ist schief gelaufen: $e";
+      germanError = "Etwas ist hat nicht funktioniert, bitte kontaktiere ein Leiter: $e";
     }
     return;
   }

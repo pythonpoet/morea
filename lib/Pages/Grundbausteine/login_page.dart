@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:intl/intl.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'datenschutz.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
@@ -39,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       _pfadinamen = ' ',
       _vorname,
       _nachname,
+      _alter ="[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
   String _password,
@@ -89,15 +94,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   updatedevtoken() async {
-    List devtoken;
+    List devtoken = new List();
     await moreafire.getUserInformation(userId).then((userInfo) {
       try {
         List devTokenOld = userInfo.data['devtoken'];
         if (devTokenOld == null) {
           firebaseMessaging.getToken().then((token) {
             devtoken = [token];
-            Map<String, List> devtokens = {'devtoken': devtoken};
-            userInfo.data.addAll(devtokens);
+            userInfo.data['devtoken'] = devtoken;
             moreafire.createUserInformation(userInfo.data);
           });
         } else {
@@ -125,7 +129,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void validateAndSubmit() async {
-
     if (validateAndSave()) {
       try {
         switch (_formType) {
@@ -254,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
-        widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
+        await widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
@@ -298,7 +301,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         actions: <Widget>[
           new FlatButton(
-              child: const Text('CANCEL'),
+              child: const Text('Abbrechen'),
               onPressed: () {
                 Navigator.pop(context);
               }),
@@ -359,6 +362,7 @@ class _LoginPageState extends State<LoginPage> {
           userMapPfadiName: this._pfadinamen,
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
+          userMapAlter: this._alter,
           userMapgroupID: convWebflowtoMiData(_selectedstufe),
           userMapMessagingGroups: {
             biberwebflowname: biberCheckbox,
@@ -428,7 +432,9 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
         body: Stack(
           children: <Widget>[
             Container(
@@ -768,7 +774,7 @@ class _LoginPageState extends State<LoginPage> {
                                     border: UnderlineInputBorder(),
                                     filled: true,
                                     labelText: 'PLZ'),
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 onSaved: (value) => _plz = value,
                               )),
                               Expanded(
@@ -967,6 +973,40 @@ class _LoginPageState extends State<LoginPage> {
                           onSaved: (value) => _nachname = value,
                         ),
                         Container(
+                          color: Colors.grey[200],
+                          height: 55,
+                          width: 1000,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Text("   Geburtstag", style:  TextStyle(color: Colors.grey[600], fontSize: 16), ),
+                              new FlatButton(
+                                child: Text(_alter, style:  TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                onPressed: () async {
+                                 
+                                  await DatePicker.showDatePicker(context,
+                                    showTitleActions: true,
+                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
+                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
+                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
+                                    onConfirm: (date) {
+                                      _alter  = DateFormat.yMd().format(date).toString();
+                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
+          
+                                  setState(() {
+                                    
+                                  });
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                        Container(
+                          color: Colors.grey[800],
+                          height: 0.5,
+                          width: 1000,
+                        ),
+                        Container(
                           padding: EdgeInsets.only(left: 12),
                           width: 1000,
                           color: Colors.grey[200],
@@ -1026,7 +1066,7 @@ class _LoginPageState extends State<LoginPage> {
                                     border: UnderlineInputBorder(),
                                     filled: true,
                                     labelText: 'PLZ'),
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 onSaved: (value) => _plz = value,
                               )),
                               Expanded(

@@ -14,6 +14,7 @@ abstract class BaseMoreaFirebase {
   String get getNachName;
   String get getPos;
   String get getEventID;
+  String get getEmail;
   List<String> get getSubscribedGroups;
   Map<String,dynamic> get getGroupMap;
   Map<String,dynamic> get getUserMap;
@@ -36,7 +37,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   TeleblizFirestore tbz;
   Map<String,dynamic> _userMap, _groupMap;
   Map<String, Map<String,String>> _subscribedGroupsMap, _childMap;
-  String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID;
+  String _displayName, _pfadiName, _groupID, _vorName, _nachName, _pos, _eventID, _email;
   Map<String,dynamic> _messagingGroups;
   List<String> _subscribedGroups = new List<String>();
   Firestore firestore;
@@ -53,6 +54,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   String get getVorName => _vorName;
   String get getNachName => _nachName;
   String get getPos => _pos;
+  String get getEmail => _email;
   
   String get getEventID => _eventID;
   List<String> get getSubscribedGroups => _subscribedGroups;
@@ -68,6 +70,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
     _vorName = _userMap[userMapVorName];
     _nachName = _userMap[userMapNachName];
     _pos = _userMap[userMapPos];
+    _email = _userMap[userMapEmail];
     _subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]?? []);
     if(_pfadiName == '')
       _displayName = _vorName;
@@ -215,7 +218,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uploadMessage(groupnr, Map data) async {
-    await crud0.setDataMessage('groups/$groupnr/messages', data);
+    await crud0.setDataWithoutDocumentName('groups/$groupnr/messages', data);
     return null;
   }
 
@@ -223,9 +226,14 @@ class MoreaFirebase extends BaseMoreaFirebase {
       String userUID, String messageID, String groupnr) async {
     userUID = dwiformat.simplestring(userUID);
     var oldMessage =
-        await crud0.getMessage('/groups/$groupnr/messages', messageID);
-    oldMessage.data['read'][userUID] = true;
-    await crud0.updateMessage(
+        await crud0.getDocument('/groups/$groupnr/messages', messageID);
+    List newRead = [];
+    for(String index in oldMessage.data['read']){
+      newRead.add(index);
+    }
+    newRead.add(userUID);
+    oldMessage.data['read'] = newRead;
+    await crud0.setData(
         'groups/$groupnr/messages', messageID, oldMessage.data);
     return null;
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -12,19 +13,21 @@ import 'change_name.dart';
 
 class Profile extends StatefulWidget {
   final auth;
-  final onSignedOut;
-  final userInfo;
   final MoreaFirebase moreaFire;
-  final Firestore firestore;
+  final Map<String, Function> navigationMap;
 
-  Profile(this.userInfo, this.auth, this.onSignedOut, this.moreaFire, this.firestore);
+  Profile(
+      {@required this.auth,
+      @required this.moreaFire,
+      @required this.navigationMap});
 
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  var userInfo;
+  Map userInfo;
+  List nachrichtenGruppen = [];
   Auth auth0 = Auth();
   TextEditingController password = TextEditingController();
   final _passwordKey = GlobalKey<FormState>();
@@ -34,7 +37,8 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    this.userInfo = widget.userInfo;
+    this.userInfo = widget.moreaFire.getUserMap;
+    this._getNachrichtenGruppen();
   }
 
   @override
@@ -45,16 +49,16 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.userInfo['Pfadinamen'] == null) {
-      widget.userInfo['Pfadinamen'] = widget.userInfo['Name'];
+    if (this.userInfo['Pfadinamen'] == null) {
+      this.userInfo['Pfadinamen'] = this.userInfo['Name'];
     }
     return Scaffold(
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text(widget.userInfo['Pfadinamen']),
-              accountEmail: Text(widget.userInfo['Email']),
+              accountName: Text(this.userInfo['Pfadinamen']),
+              accountEmail: Text(this.userInfo['Email']),
               decoration: new BoxDecoration(color: MoreaColors.orange),
             ),
             ListTile(
@@ -101,14 +105,12 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () =>
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              ChangeName(
-                                  userInfo['Vorname'],
-                                  userInfo['Nachname'],
-                                  userInfo['Pfadinamen'],
-                                  _changeName))),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => ChangeName(
+                          userInfo['Vorname'],
+                          userInfo['Nachname'],
+                          userInfo['Pfadinamen'],
+                          _changeName))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -130,13 +132,8 @@ class _ProfileState extends State<Profile> {
                       color: Colors.black,
                     ),
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          ChangeEmail(
-                            userInfo['Email'],
-                            this._showReauthenticate
-                          )
-                    ))
-                ),
+                        builder: (BuildContext context) => ChangeEmail(
+                            userInfo['Email'], this._showReauthenticate)))),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Divider(
@@ -210,18 +207,13 @@ class _ProfileState extends State<Profile> {
                   ),
                   subtitle: ListView.builder(
                     shrinkWrap: true,
-                    itemCount: userInfo['messagingGroups'].length,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: nachrichtenGruppen.length,
                     itemBuilder: (context, index) {
-                      List<String> results = [];
-                      for (var u in userInfo['messagingGroups'].keys) {
-                        if (userInfo['messagingGroups'][u]) {
-                          results.add(u);
-                        }
-                      }
                       return Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: Text(
-                          results[index],
+                          nachrichtenGruppen[index],
                           style: MoreaTextStyle.normal,
                         ),
                       );
@@ -251,12 +243,7 @@ class _ProfileState extends State<Profile> {
               Expanded(
                 child: FlatButton(
                   padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: (() {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            MessagesPage(
-                             userInfo:   userInfo, auth: widget.auth, moreaFire: widget.moreaFire)));
-                  }),
+                  onPressed: widget.navigationMap[toMessagePage],
                   child: Column(
                     children: <Widget>[
                       Icon(Icons.message, color: Colors.white),
@@ -276,12 +263,7 @@ class _ProfileState extends State<Profile> {
               Expanded(
                 child: FlatButton(
                   padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: (() {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            AgendaState(
-                                moreaFire: widget.moreaFire ,firestore: widget.firestore,)));
-                  }),
+                  onPressed: widget.navigationMap[toAgendaPage],
                   child: Column(
                     children: <Widget>[
                       Icon(Icons.event, color: Colors.white),
@@ -307,16 +289,7 @@ class _ProfileState extends State<Profile> {
               Expanded(
                 child: FlatButton(
                   padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: (() {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          HomePage(
-                            
-                            auth: widget.auth,
-                            onSigedOut: widget.onSignedOut,
-                          ),
-                    ));
-                  }),
+                  onPressed: widget.navigationMap[toHomePage],
                   child: Column(
                     children: <Widget>[
                       Icon(Icons.flash_on, color: Colors.white),
@@ -366,11 +339,8 @@ class _ProfileState extends State<Profile> {
 
   void _signedOut() async {
     try {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/'));
-      }
       await widget.auth.signOut();
-      widget.onSignedOut();
+      widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
@@ -396,7 +366,7 @@ class _ProfileState extends State<Profile> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).popUntil(ModalRoute.withName('/'));
     }
-    widget.onSignedOut();
+    this._signedOut();
   }
 
   Future<bool> _validateAndSave() async {
@@ -415,11 +385,18 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  void _getNachrichtenGruppen() {
+    for (var u in userInfo['messageGroups'].keys) {
+      if (userInfo['messageGroups'][u]) {
+        nachrichtenGruppen.add(u);
+      }
+    }
+  }
+
   void _showReauthenticate(String email) {
     showDialog(
         context: context,
-        builder: (context) =>
-            AlertDialog(
+        builder: (context) => AlertDialog(
               title: Text(
                 'Achtung',
                 style: MoreaTextStyle.title,
@@ -463,13 +440,11 @@ class _ProfileState extends State<Profile> {
                     ),
                     label: Text(
                       "Abbrechen",
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 18),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                     color: MoreaColors.violett,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(5)))),
+                        borderRadius: BorderRadius.all(Radius.circular(5)))),
                 RaisedButton.icon(
                     onPressed: () async {
                       var result = await _validateAndSave();
@@ -484,13 +459,11 @@ class _ProfileState extends State<Profile> {
                     ),
                     label: Text(
                       "Anmelden",
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 18),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                     color: MoreaColors.violett,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(5)))),
+                        borderRadius: BorderRadius.all(Radius.circular(5)))),
               ],
             ));
   }

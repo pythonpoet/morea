@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';

@@ -26,7 +26,7 @@ abstract class BaseCrudMethods {
 
   Future deletedocument(String path, String document);
 
-  Future<void> setDataMessage(
+  Future<void> setDataWithoutDocumentName(
       String path, Map<dynamic, dynamic> data);
 
   Future<DocumentSnapshot> getMessage(String path, String document);
@@ -60,10 +60,12 @@ class CrudMedthods implements BaseCrudMethods {
   Future<DocumentSnapshot> getDocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
+    print("get Doc: $path/$document");
     return await Firestore.instance.collection(path).document(document).get();
   }
 
   Stream<DocumentSnapshot> streamDocument(String path, String document) {
+    print("stream doc: $path/$document");
     return Firestore.instance.collection(path).document(document).snapshots();
   }
 
@@ -85,6 +87,7 @@ class CrudMedthods implements BaseCrudMethods {
   }
   Future<void> setData(
       String path, String document, Map<String, dynamic> data) async {
+        print("set doc: $path/$document");
     path = dwiformat.pathstring(path);
     await Firestore.instance
         .collection(path)
@@ -110,7 +113,7 @@ class CrudMedthods implements BaseCrudMethods {
                 await tran.set(docRef, data);
               }
             }).catchError((err)=>{
-              print(err)
+             throw err
             });
         };
       return await db.runTransaction(transactionHandler);
@@ -133,7 +136,7 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
 //TODO --> an Maxi, CrudMethods sind universelle Methoden. Kannst du diese in eine andere Klasse verschieben?
-  Future<void> setDataMessage(
+  Future<void> setDataWithoutDocumentName(
       String path, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
     await Firestore.instance

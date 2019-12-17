@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'change_teleblitz_abtreten.dart';
 import 'change_teleblitz_antreten.dart';
 import 'change_teleblitz_bemerkung.dart';
@@ -278,7 +279,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                     color: Colors.black26,
                                   )),
                               ListTile(
-                                title: Text('Ende',
+                                title: Text('Schluss',
                                     style: TextStyle(fontSize: 18)),
                                 subtitle: Text(abtreten),
                                 onTap: () {
@@ -427,8 +428,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       '_draft': false,
       '_archived': false
     };
-     teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-    await moreaFire.uploadteleblitz(this.stufe, newTeleblitz);
+      teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
+      await widget.moreaFire.uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
     Navigator.of(context).pop();
   }
 
@@ -461,12 +462,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   }
 
   void setBeginn(String ort, String zeit, String map) {
-    this.antreten = ort + ', ' + zeit + ' Uhr';
+    this.antreten = zeit + ' Uhr, ' + ort;
     this.mapAntreten = map;
   }
 
   void setEnde(String ort, String zeit, String map) {
-    this.abtreten = ort + ', ' + zeit + ' Uhr';
+    this.abtreten = zeit + ' Uhr, ' + ort;
     this.mapAbtreten = map;
   }
 
