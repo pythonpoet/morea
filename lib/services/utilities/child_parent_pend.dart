@@ -43,7 +43,7 @@ class ChildParendPend extends BaseChildParendPend{
   Future<void> createChildAndPendIt(String _childEmail, String _childPasswort, Map<String,dynamic> childData, Map<String, dynamic> parentData, BuildContext context)async{
     Auth childAuth = new Auth();
     try{
-    String childUID = await 
+    //String childUID = await 
     String childUID  = await childAuth.createUserWithEmailAndPassword(_childEmail, _childPasswort);
     childData[userMapUID] = childUID;
     await childAuth.createUserInformation(childData);
