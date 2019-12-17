@@ -60,6 +60,7 @@ class MergeChildParent extends BaseMergeChildParent {
   ) {
     this.moreafire = moreaFirebase;
     this.crud0 = crudMedthods;
+    this.childParendPend = new ChildParendPend(crud0: crud0);
   }
   Widget registernewChild(
       Map<String, dynamic> parentData, BuildContext context, Function setProfileState, Function newKidakt) {
