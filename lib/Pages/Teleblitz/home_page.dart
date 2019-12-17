@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/About/about.dart';
+import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
@@ -298,6 +300,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       new PersonenVerzeichnisState()))),
           new Divider(),
           new ListTile(
+            title: new Text("Über dieses App"),
+            trailing: new Icon(Icons.info),
+            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AboutThisApp()))), 
+          new Divider(),
+          new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
             onTap: _signedOut,
@@ -312,6 +321,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             decoration: new BoxDecoration(
                 color: MoreaColors.orange),
           ),
+          ListTile(
+              title: new Text('Eltern hinzufügen'),
+              trailing: new Icon(Icons.add),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ProfilePageState(
+                    profile: moreafire.getUserMap,
+                    moreaFire: moreafire,
+                    crud0: crud0,
+                  )))),
+          Divider(),
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
@@ -328,13 +347,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 color: MoreaColors.orange),
           ),
           new ListTile(
-              title: new Text('Profil'),
-              trailing: new Icon(Icons.person),
+              title: new Text('Kinder hinzufügen'),
+              trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
                         crud0: crud0,
                       )))),
+          new Divider(),
+          new ListTile(
+            title: new Text("Über dieses App"),
+            trailing: new Icon(Icons.info),
+            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new AboutThisApp()))), 
           new Divider(),
           new ListTile(
             title: new Text('Logout'),

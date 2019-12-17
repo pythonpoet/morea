@@ -62,8 +62,8 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  Stream<List> _getAgenda(groupID) {
-    return agenda.getAgendaOverview(groupID);
+  Stream<List> _getAgenda(groupID)async* {
+    yield* agenda.getTotalAgendaOverview(["3776", ...widget.moreaFire.getSubscribedGroups]);
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) {
@@ -82,6 +82,20 @@ class _AgendaStatePage extends State<AgendaState>
       return false;
     }
   }
+  bool isEltern(){
+   switch (moreafire.getPos) {
+        case 'Mutter':
+          return true;
+        case 'Vater':
+          return true;
+        case 'Erziehungsberechtigter':
+          return true;
+        case 'Erziehungsberechtigte':
+          return true;
+        default:
+          return false;
+      }
+  }
 
   routetoAddevent() {
     if (istLeiter()) {
@@ -90,6 +104,8 @@ class _AgendaStatePage extends State<AgendaState>
                 eventinfo: quickfix,
                 agendaModus: AgendaModus.beides,
                 firestore: widget.firestore,
+                moreaFire: moreafire,
+                agenda: agenda,
               )));
     }
   }
@@ -99,7 +115,7 @@ class _AgendaStatePage extends State<AgendaState>
     moreaLoading = MoreaLoading(this);
     moreafire = widget.moreaFire;
 
-    agenda = new prefix0.Agenda(widget.firestore);
+    agenda = new prefix0.Agenda(widget.firestore,widget.moreaFire);
 
     //_getAgenda("3776");
     quickfix['Stufen'] = stufen;
@@ -293,7 +309,10 @@ class _AgendaStatePage extends State<AgendaState>
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) => new ViewLagerPageState(
-            info: info, pos: moreafire.getUserMap['Pos'])));
+          moreaFire: moreafire, 
+          agenda: agenda,
+          info: info, pos: 
+          moreafire.getUserMap['Pos'])));
   }
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
@@ -301,12 +320,14 @@ class _AgendaStatePage extends State<AgendaState>
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) => new ViewEventPageState(
-              info: info,
-              pos: moreafire.getUserMap['Pos'],
+          moreaFire: moreafire, 
+          agenda: agenda,
+          info: info, pos: 
+          moreafire.getUserMap['Pos'],
             )));
   }
 
-  Widget Agenda(String groupID) {
+  Widget Agenda(String groupID){
     return StreamBuilder(
         stream: _getAgenda(groupID).asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {

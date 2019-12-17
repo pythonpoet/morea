@@ -477,6 +477,7 @@ class MergeChildParent extends BaseMergeChildParent {
       userMapPfadiName: this._pfadinamen,
       userMapVorName: this._vorname,
       userMapNachName: this._nachname,
+      userMapAccountCreated: DateTime.now(),
       userMapgroupID: convWebflowtoMiData(_selectedstufe),
       'Adresse': this._adresse,
       'PLZ': this._plz,

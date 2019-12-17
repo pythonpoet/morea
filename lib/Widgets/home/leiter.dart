@@ -23,8 +23,9 @@ Widget leiterView(
         Map navigationMap,
     @required
         Widget moreaLoading}) {
+  print('Subscribed Groups = ' + subscribedGroups.length.toString());
   return DefaultTabController(
-    length: subscribedGroups.length + 1,
+    length: subscribedGroups.length + (groupID.isNotEmpty? 1 : 0),
     child: Scaffold(
       appBar: new AppBar(
         title: new Text('Teleblitz'),
@@ -176,7 +177,6 @@ List<Widget> getTeleblizWidgetList(
     listTeleblitzWidget.add(getLayoutBuilderWidget(
         groupID, stream, teleblitzAnzeigen, moreaLoading));
   }
-  print(listTeleblitzWidget.length);
   return listTeleblitzWidget;
 }
 
@@ -194,6 +194,7 @@ Widget getLayoutBuilderWidget(
           .forEach((String eventID, tlbz) {
         anzeige.add(tlbz);
       });
+      print(anzeige.length);
       return MoreaBackgroundContainer(
         child: SingleChildScrollView(
             child: Column(

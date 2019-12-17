@@ -9,8 +9,8 @@ import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 
 class EventAddPage extends StatefulWidget {
-  EventAddPage({this.eventinfo, this.agendaModus, this.firestore, this.agenda});
-
+  EventAddPage({this.eventinfo, this.agendaModus, this.firestore, this.agenda, this.moreaFire});
+  final MoreaFirebase moreaFire;
   final Map eventinfo;
   final AgendaModus agendaModus;
   final Firestore firestore;
@@ -23,11 +23,10 @@ class EventAddPage extends StatefulWidget {
 enum AgendaModus { lager, event, beides }
 
 class EventAddPageState extends State<EventAddPage> {
-  MoreaFirebase moreafire;
   DWIFormat dwiFormat = new DWIFormat();
   CrudMedthods crud0;
   Agenda agenda;
-
+  MoreaFirebase moreafire;
   int value = 2;
   List<String> mitnehemen = ['Pfadihämpt'];
   final _addkey = new GlobalKey<FormState>();
@@ -296,13 +295,13 @@ class EventAddPageState extends State<EventAddPage> {
 
     anfangzeit = widget.eventinfo['Anfangszeit'];
     schlusszeit = widget.eventinfo['Schlusszeit'];
-
-    stufen = Map.from(widget.eventinfo['Stufen']);
+    if(widget.eventinfo.containsKey("Stufen"))
+    stufen = Map<String,bool>.from(widget.eventinfo['Stufen']);
     mitnehemen = List<String>.from(widget.eventinfo['Mitnehmen']);
     order = widget.eventinfo['Order'];
-    moreafire = new MoreaFirebase(widget.firestore);
+    moreafire = widget.moreaFire;
     crud0 = new CrudMedthods(widget.firestore);
-    agenda = new Agenda(widget.firestore);
+    agenda = widget.agenda;
     initSubgoup();
 
     super.initState();

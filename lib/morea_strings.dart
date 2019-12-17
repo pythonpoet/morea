@@ -49,6 +49,8 @@ final String userMapPLZ = "PLZ";
 final String userMapOrt = "Ort";
 final String userMapHandynummer ="Handynummer";
 final String userMapEmail = "Email";
+final String userMapAccountCreated= "AccountCreated";
+final String userMapDeviceToken = "devtoken";
 
 //groupMap
 final String groupMapEventID = "eventID";
