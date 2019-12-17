@@ -25,7 +25,7 @@ Widget leiterView(
         Widget moreaLoading}) {
   print('Subscribed Groups = ' + subscribedGroups.length.toString());
   return DefaultTabController(
-    length: subscribedGroups.length + 1,
+    length: subscribedGroups.length + (groupID.isNotEmpty? 1 : 0),
     child: Scaffold(
       appBar: new AppBar(
         title: new Text('Teleblitz'),
