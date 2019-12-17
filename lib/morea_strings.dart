@@ -1,6 +1,4 @@
 //Config
-import 'package:flutter/cupertino.dart';
-
 final String appVersion = "1";
 final String configMapMinAppVerson = "minAppVersion";
 final String configMapBlockedDevToken= "blockedDevTokens";

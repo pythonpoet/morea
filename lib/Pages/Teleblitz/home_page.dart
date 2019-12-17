@@ -42,7 +42,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   MoreaLoading moreaLoading;
 
-  final formKey = new GlobalKey<FormState>();
+  //final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.loading;
@@ -327,7 +327,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
                     profile: moreafire.getUserMap,
-                    firestore: widget.firestore,
+                    moreaFire: moreafire,
                     crud0: crud0,
                   )))),
           Divider(),
@@ -352,7 +352,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
-                        firestore: widget.firestore,
                         crud0: crud0,
                       )))),
           new Divider(),
