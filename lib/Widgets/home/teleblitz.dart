@@ -178,7 +178,7 @@ class Info {
   String grund;
   String ferien;
   String endeferien;
-  double _sizeleft = 110;
+  double _sizeleft = 120;
 
   void setTitel(String titel) {
     this.titel = titel;
