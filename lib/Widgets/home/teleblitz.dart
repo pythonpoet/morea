@@ -1,3 +1,4 @@
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
@@ -74,22 +75,47 @@ class Teleblitz {
   }
 
   Widget teleblitz() {
-    return MoreaShadowContainer(
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: <Widget>[
-            info.getTitel(),
-            info.getDatum(),
-            info.getAntreten(),
-            info.getAbtreten(),
-            info.getMitnehmen(),
-            info.getBemerkung(),
-            info.getSender(),
-          ],
+    if (moreaFire.getPos != "Leiter") {
+      return MoreaShadowContainer(
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: <Widget>[
+              info.getTitel(),
+              info.getDatum(),
+              info.getAntreten(),
+              info.getAbtreten(),
+              info.getMitnehmen(),
+              info.getBemerkung(),
+              info.getSender(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return FlipCard(
+        direction: FlipDirection.HORIZONTAL,
+        front: MoreaShadowContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: <Widget>[
+                info.getTitel(),
+                info.getDatum(),
+                info.getAntreten(),
+                info.getAbtreten(),
+                info.getMitnehmen(),
+                info.getBemerkung(),
+                info.getSender(),
+              ],
+            ),
+          ),
+        ),
+        back: MoreaShadowContainer(
+          child: Text('Back'),
+        ),
+      );
+    }
   }
 
   Widget element(Map<String, dynamic> tlbz) {
@@ -97,7 +123,7 @@ class Teleblitz {
       return keineAktivitat();
     } else if (tlbz["ferien"]) {
       return ferien();
-    } else{
+    } else {
       return teleblitz();
     }
   }
@@ -529,7 +555,8 @@ class Info {
 
   Container getEndeFerien() {
     List<String> listEndeFerien = this.endeferien.split("T")[0].split("-");
-    String formatedEndeFerien = listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
+    String formatedEndeFerien =
+        listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
     return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Column(

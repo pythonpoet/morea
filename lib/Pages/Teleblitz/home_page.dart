@@ -290,7 +290,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new WerChunt(
-                        firestore: widget.firestore,
+                        firestore: widget.firestore, eventID: moreafire.getHomeFeedMainEventID,
                       )))),
           new ListTile(
               title: new Text('Personen'),

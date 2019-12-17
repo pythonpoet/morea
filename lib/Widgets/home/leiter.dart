@@ -23,7 +23,6 @@ Widget leiterView(
         Map navigationMap,
     @required
         Widget moreaLoading}) {
-  print('Subscribed Groups = ' + subscribedGroups.length.toString());
   return DefaultTabController(
     length: subscribedGroups.length + 1,
     child: Scaffold(
@@ -194,7 +193,6 @@ Widget getLayoutBuilderWidget(
           .forEach((String eventID, tlbz) {
         anzeige.add(tlbz);
       });
-      print(anzeige.length);
       return MoreaBackgroundContainer(
         child: SingleChildScrollView(
             child: Column(
