@@ -195,7 +195,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> parentAnmeldet(String eventID, String childUID,
-      String anmeldeUID, String anmeldeStatus) async {
+      String anmeldeUID, String anmeldeStatus, String name) async {
     crud0.runTransaction(
         "$pathEvents/$eventID/Anmeldungen",
         anmeldeUID,
@@ -204,7 +204,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
           eventMapAnmeldeUID: anmeldeUID,
           "UID": childUID,
           "ParentUID": getUserMap[userMapUID],
-          "Timestamp": DateTime.now()
+          "Timestamp": DateTime.now(),
+          "Name": name
         }));
     return null;
   }

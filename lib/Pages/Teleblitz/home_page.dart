@@ -82,7 +82,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden, moreafire.getDisplayName);
     } else {
       moreafire.parentAnmeldet(
-          eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden);
+          eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden, moreafire.getDisplayName);
     }
   }
 
