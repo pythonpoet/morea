@@ -1,100 +1,45 @@
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Widgets/standart/info.dart';
-import 'package:morea/services/Teleblitz/teleblitzAnmeldungen.dart';
+import 'package:morea/morea_strings.dart';
+import 'package:morea/services/morea_firestore.dart';
 
-class WerChunt extends StatefulWidget {
-  WerChunt({ this.onSigedOut, this.firestore, this.eventID});
+class WerChunnt {
+  final StreamController _controller = StreamController<List<List<String>>>();
+  final StreamController _incoming = StreamController();
+
+  final MoreaFirebase moreaFire;
   final String eventID;
-  final VoidCallback onSigedOut;
-  final Firestore firestore;
 
-
-  @override
-  State<StatefulWidget> createState() => _WerChuntState();
-}
-
-class _WerChuntState extends State<WerChunt> {
-  TeleblitzAnmeldungen teleblitzAnmeldungen;
-  
-  
-  @override
-  void initState() {
-    teleblitzAnmeldungen = new TeleblitzAnmeldungen(widget.firestore, widget.eventID);
-    super.initState();
+  WerChunnt(this.moreaFire, this.eventID){
+    initChunnt();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-    length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Wer chunt?'),
-          backgroundColor: Color(0xff7a62ff),
-          bottom: TabBar(
-            tabs: <Widget>[
-              Tab(
-                text: 'Chunt',
-              ),
-              Tab(
-                text: 'Chunt nöd',
-              )
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: <Widget>[
-            Container(
-              child: chunt(),
-              height: 50,
-            ),
-           
-            Container(
-              child: chuntnoed(),
-              height: 50,
-            ),
-          ],
-        ),
-      ),
-    );
+  void dispose() {
+    print("Ending WerchunntStream");
+    this._incoming.close();
+    this._controller.close();
   }
-   
-  Widget chunt(){
-    return StreamBuilder(
-      stream: teleblitzAnmeldungen.getAnmeldungen,
-      builder: (context,  AsyncSnapshot<dynamic> aSAngemolden){
-        if(!aSAngemolden.hasData) return simpleMoreaLoadingIndicator();
-        if(aSAngemolden.data.length==0) return  Center(child:Text('Niemand hat sich angemolden', style: TextStyle(fontSize: 20),));
-        return ListView.builder(
-          itemCount: aSAngemolden.data.length,
-          itemBuilder: (context, int index){
-            return ListTile(
-              title: new Text(aSAngemolden.data[index].toString()),
-            );
-          }
-        );
+
+  Stream<List<List<String>>> get stream => _controller.stream.asBroadcastStream();
+
+  void initChunnt() {
+    _incoming.sink.addStream(moreaFire.streamCollectionWerChunnt(eventID));
+    _incoming.stream.listen((data) {
+      List<String> chunnt = [];
+      List<String> chunntNoed = [];
+      List<DocumentSnapshot> documents = data.documents;
+      for (DocumentSnapshot document in documents) {
+        if (document.data['AnmeldeStatus'] == eventMapAnmeldeStatusPositiv) {
+          print(document.data);
+          chunnt.add(document.data['Name']);
+        } else {
+          print(document.data);
+          chunntNoed.add(document.data['Name']);
+        }
       }
-    );
+      _controller.sink.add([chunnt, chunntNoed]);
+    });
   }
-  Widget chuntnoed(){
-    return StreamBuilder(
-      stream: teleblitzAnmeldungen.getAbmeldungen,
-      builder: (context, AsyncSnapshot<dynamic> asAbgemolden){
-        if(!asAbgemolden.hasData) return simpleMoreaLoadingIndicator();
-        if(asAbgemolden.data.length==0) return  Center(child:Text('Niemand hat sich abgemolden', style: TextStyle(fontSize: 20),));
-        return ListView.builder(
-          itemCount: asAbgemolden.data.length,
-          itemBuilder: (context, int index){
-            return ListTile(
-              title: new Text(asAbgemolden.data[index].toString()),
-            );
-          }
-        );
-      }
-    );
-  }
-
-
 }

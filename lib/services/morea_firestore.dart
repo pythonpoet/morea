@@ -1,3 +1,4 @@
+import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
@@ -45,6 +46,8 @@ abstract class BaseMoreaFirebase {
   Stream<QuerySnapshot> getMessages(String groupnr);
 
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
+
+  Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -177,7 +180,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> childAnmelden(String eventID, String userUID, String anmeldeUID,
-      String anmeldeStatus) async {
+      String anmeldeStatus, String name) async {
     crud0.runTransaction(
         "$pathEvents/$eventID/Anmeldungen",
         anmeldeUID,
@@ -185,6 +188,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
           "AnmeldeStatus": anmeldeStatus,
           "AnmedeUID": anmeldeUID,
           "UID": userUID,
+          "Name": name,
           "Timestamp": DateTime.now()
         }));
     return null;
@@ -291,5 +295,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
     oldMessage.data['read'] = newRead;
     await crud0.setData('groups/$groupnr/messages', messageID, oldMessage.data);
     return null;
+  }
+  
+  Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID){
+    return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
 }

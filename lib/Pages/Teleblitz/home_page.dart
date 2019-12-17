@@ -79,7 +79,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
     if (_formType != FormType.eltern) {
       moreafire.childAnmelden(
-          eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden);
+          eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden, moreafire.getDisplayName);
     } else {
       moreafire.parentAnmeldet(
           eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden);
@@ -203,6 +203,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     moreaLoading.dispose();
+    teleblitz.dispose();
     super.dispose();
   }
 
@@ -284,14 +285,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               color: MoreaColors.orange,
             ),
           ),
-          //TODO eventID übertragen
-          new ListTile(
-              title: new Text('Wer chunt?'),
-              trailing: new Icon(Icons.people),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new WerChunt(
-                        firestore: widget.firestore, eventID: moreafire.getHomeFeedMainEventID,
-                      )))),
           new ListTile(
               title: new Text('Personen'),
               trailing: new Icon(Icons.people),
@@ -407,7 +400,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             Expanded(
               child: Container(
                 child: new RaisedButton(
-                  child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                  child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
                   onPressed: () => submit(eventMapAnmeldeStatusPositiv,
                       moreafire.getGroupID, eventID, uid),
                   shape: new RoundedRectangleBorder(
