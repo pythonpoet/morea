@@ -363,6 +363,7 @@ class _LoginPageState extends State<LoginPage> {
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
           userMapAlter: this._alter,
+          userMapAccountCreated : DateTime.now(),
           userMapgroupID: convWebflowtoMiData(_selectedstufe),
           userMapMessagingGroups: {
             biberwebflowname: biberCheckbox,
@@ -370,14 +371,14 @@ class _LoginPageState extends State<LoginPage> {
             meitliwebflowname: meitliCheckbox,
             buebewebflowname: buebeCheckbox,
             },
-          'Adresse': this._adresse,
-          'PLZ': this._plz,
-          'Ort': this._ort,
-          'Handynummer': this._handynummer,
-          'Pos': 'Teilnehmer',
-          'UID': this.userId,
-          'Email': this._email,
-          'devtoken': devtoken
+          userMapAdresse: this._adresse,
+          userMapPLZ: this._plz,
+          userMapOrt: this._ort,
+          userMapHandynummer: this._handynummer,
+          userMapPos: 'Teilnehmer',
+          userMapUID: this.userId,
+          userMapEmail: this._email,
+          userMapDeviceToken: devtoken
         };
         return userInfo;
         break;
@@ -386,21 +387,22 @@ class _LoginPageState extends State<LoginPage> {
           userMapPfadiName: " ",
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
-          userMapgroupID: convWebflowtoMiData(_selectedstufe),
+          userMapgroupID: '',
+          userMapAccountCreated : DateTime.now(),
           userMapMessagingGroups: {
             biberwebflowname: biberCheckbox,
             woelfewebflowname: woelfeCheckbox,
             meitliwebflowname: meitliCheckbox,
             buebewebflowname: buebeCheckbox,
             },
-          'Adresse': this._adresse,
-          'PLZ': this._plz,
-          'Ort': this._ort,
-          'Handynummer': this._handynummer,
-          'Pos': this._selectedverwandtschaft,
-          'UID': this.userId,
-          'Email': this._email,
-          'devtoken': devtoken
+          userMapAdresse: this._adresse,
+          userMapPLZ: this._plz,
+          userMapOrt: this._ort,
+          userMapHandynummer: this._handynummer,
+          userMapPos: this._selectedverwandtschaft,
+          userMapUID: this.userId,
+          userMapEmail: this._email,
+          userMapDeviceToken: devtoken
         };
         return userInfo;
         break;
