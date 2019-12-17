@@ -6,7 +6,6 @@ import 'package:morea/morea_strings.dart';
 import 'dart:async';
 import 'package:morea/services/utilities/dwi_core.dart';
 
-
 //enum PlatformType { isAndroid, isIOS }
 enum AuthProblems {
   userNotFound,
@@ -19,7 +18,9 @@ enum AuthProblems {
 
 abstract class BaseAuth {
   String get getUserID;
+
   String get getUserEmail;
+
   Future<String> signInWithEmailAndPassword(String email, String password);
 
   Future<String> createUserWithEmailAndPassword(String email, String password);
@@ -30,7 +31,7 @@ abstract class BaseAuth {
 
   Future<void> signOut();
 
-   AuthProblems checkForAuthErrors(
+  AuthProblems checkForAuthErrors(
       BuildContext context, PlatformException error);
 
   Future<void> displayAuthError(AuthProblems errorType, BuildContext context);
@@ -47,18 +48,26 @@ class Auth implements BaseAuth {
   DWICore dwiHardware = new DWICore();
   FirebaseUser _user;
 
-  String get getUserID => _user != null? _user.uid: "not loaded";
-  String get getUserEmail => _user != null? _user.email: "nod loaded";
+  String get getUserID => _user != null ? _user.uid : "not loaded";
 
-  Future<String> signInWithEmailAndPassword(String email, String password)async{
-    this._user = (await  _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).catchError((onError){
-     throw onError;
-    })).user;
+  String get getUserEmail => _user != null ? _user.email : "nod loaded";
+
+  Future<String> signInWithEmailAndPassword(
+      String email, String password) async {
+    this._user = (await _firebaseAuth
+            .signInWithEmailAndPassword(email: email, password: password)
+            .catchError((onError) {
+      throw onError;
+    }))
+        .user;
     return _user.uid;
   }
 
-  Future<String> createUserWithEmailAndPassword(String email, String password) async {
-    this._user = (await  _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password)).user;
+  Future<String> createUserWithEmailAndPassword(
+      String email, String password) async {
+    this._user = (await _firebaseAuth.createUserWithEmailAndPassword(
+            email: email, password: password))
+        .user;
     return this._user.uid;
   }
 
@@ -86,12 +95,6 @@ class Auth implements BaseAuth {
     return _user != null ? _user.email : null;
   }
 
-  Future<void> changePassword(String newPassword) async {
-    this._user = await _firebaseAuth.currentUser();
-    _user.updatePassword(newPassword);
-    return null;
-  }
-
   Future<bool> reauthenticate(String email, String password) async {
     bool reAuthenticated;
     AuthCredential credential =
@@ -100,19 +103,14 @@ class Auth implements BaseAuth {
     print(email);
     FirebaseUser user = await _firebaseAuth.currentUser();
     print('got current user');
-    user.reauthenticateWithCredential(credential).then(
-        (AuthResult result){
-          if(result.user == null){
-            print(false);
-            reAuthenticated = false;
-          } else {
-            print(true);
-            reAuthenticated = true;
-          }
-        }
-    ).catchError((error){
-      print(error);
-    });
+    var result = await user.reauthenticateWithCredential(credential);
+    if (result.user == null) {
+      print(false);
+      reAuthenticated = false;
+    } else {
+      print(true);
+      reAuthenticated = true;
+    }
     print('reauthenticated');
     return reAuthenticated;
   }
@@ -122,7 +120,7 @@ class Auth implements BaseAuth {
   }
 
   AuthProblems checkForAuthErrors(
-      BuildContext context, PlatformException error)  {
+      BuildContext context, PlatformException error) {
     PlatformType platform = dwiHardware.getDevicePlatform();
     AuthProblems errorType;
     if (platform == PlatformType.isAndroid) {
@@ -181,7 +179,8 @@ class Auth implements BaseAuth {
         errorMessage = 'Du brauchst Internet um fortzufahren';
         break;
       case AuthProblems.undefinedError:
-        errorMessage = 'Etwas ist hat nicht funktioniert, bitte kontaktiere ein Leiter';
+        errorMessage =
+            'Etwas ist hat nicht funktioniert, bitte kontaktiere ein Leiter';
         break;
       case AuthProblems.emailNotValid:
         errorMessage = "Die eingegebene Email Adresse ist nicht korrekt";
@@ -245,7 +244,15 @@ class Auth implements BaseAuth {
 
   Future<void> changeEmail(String email) async {
     FirebaseUser user = await _firebaseAuth.currentUser();
+    await user.reload();
     await user.updateEmail(email);
+    return null;
+  }
+
+  Future<void> changePassword(String password) async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    await user.reload();
+    await user.updatePassword(password);
     return null;
   }
 }

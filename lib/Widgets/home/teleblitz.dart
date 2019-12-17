@@ -42,40 +42,32 @@ class Teleblitz {
   }
 
   Widget keineAktivitat() {
-    return MoreaBackgroundContainer(
-      child: SingleChildScrollView(
-        child: MoreaShadowContainer(
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: <Widget>[
-                info.getTitel(),
-                info.getKeineAktivitat(),
-                info.getDatum(),
-                info.getGrund()
-              ],
-            ),
-          ),
+    return MoreaShadowContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: <Widget>[
+            info.getTitel(),
+            info.getKeineAktivitat(),
+            info.getDatum(),
+            info.getGrund()
+          ],
         ),
       ),
     );
   }
 
   Widget ferien() {
-    return MoreaBackgroundContainer(
-      child: SingleChildScrollView(
-        child: MoreaShadowContainer(
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: <Widget>[
-                info.getTitel(),
-                info.getKeineAktivitat(),
-                info.getFerien(),
-                info.getEndeFerien(),
-              ],
-            ),
-          ),
+    return MoreaShadowContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: <Widget>[
+            info.getTitel(),
+            info.getKeineAktivitat(),
+            info.getFerien(),
+            info.getEndeFerien(),
+          ],
         ),
       ),
     );
@@ -536,6 +528,8 @@ class Info {
   }
 
   Container getEndeFerien() {
+    List<String> listEndeFerien = this.endeferien.split("T")[0].split("-");
+    String formatedEndeFerien = listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
     return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Column(
@@ -556,7 +550,7 @@ class Info {
               children: <Widget>[
                 Expanded(
                     child: Html(
-                  data: this.endeferien,
+                  data: formatedEndeFerien,
                   defaultTextStyle: _getStyleRight(),
                 ))
               ],
