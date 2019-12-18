@@ -63,15 +63,19 @@ class _AgendaStatePage extends State<AgendaState>
   MoreaLoading moreaLoading;
 
   Stream<List> _getAgenda(groupID)async* {
-    yield* agenda.getTotalAgendaOverview(["3776", ...widget.moreaFire.getSubscribedGroups]);
+    yield* agenda.getTotalAgendaOverview([groupID, ...widget.moreaFire.getSubscribedGroups]);
   }
 
-  altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) {
-    DateTime _agdatum = DateTime.parse(_agedaTitledatum);
+  altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
+    DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
     DateTime now = DateTime.now();
 
     if (_agdatum.difference(now).inDays < 0) {
-      agenda.deleteAgendaEvent(event);
+      Map fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+      if(fullevent != null)
+      agenda.deleteAgendaEvent(fullevent);
+      else
+      agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
     }
   }
 
@@ -415,7 +419,7 @@ class _AgendaStatePage extends State<AgendaState>
                             } else if (_info['Lager']) {
                               return ListTile(
                                   title: Text(
-                                    _info['Lagername'],
+                                    _info['Eventname'],
                                     style: MoreaTextStyle.lable,
                                   ),
                                   subtitle: ListView(
@@ -424,7 +428,7 @@ class _AgendaStatePage extends State<AgendaState>
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: Text(
-                                          _info['Lagername'],
+                                          _info['Eventname'],
                                           style: MoreaTextStyle.normal,
                                         ),
                                       ),
