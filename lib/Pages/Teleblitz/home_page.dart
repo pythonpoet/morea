@@ -51,7 +51,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool chunnt = false;
   var messagingGroups;
 
-  void submit(String anabmelden, String groupnr, String eventID, String uid) {
+  void submit(String anabmelden, String groupnr, String eventID, String uid, {String name}) {
     String anmeldung;
 
     anmeldeDaten = {
@@ -77,12 +77,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   content: new Text(anmeldung),
                 ));
     });
+    if(name == null){
+      name = moreafire.getDisplayName;
+    }
     if (_formType != FormType.eltern) {
-      moreafire.childAnmelden(
-          eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden, moreafire.getDisplayName);
+      moreafire.childAnmelden(eventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden, name);
     } else {
-      moreafire.parentAnmeldet(
-          eventID, widget.auth.getUserID, widget.auth.getUserID, anabmelden, moreafire.getDisplayName);
+      moreafire.parentAnmeldet(eventID, widget.auth.getUserID,
+          widget.auth.getUserID, anabmelden, name);
     }
   }
 
@@ -293,11 +296,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       new PersonenVerzeichnisState()))),
           new Divider(),
           new ListTile(
-            title: new Text("Über dieses App"),
-            trailing: new Icon(Icons.info),
-            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new AboutThisApp()))), 
+              title: new Text("Über dieses App"),
+              trailing: new Icon(Icons.info),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AboutThisApp()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -311,18 +313,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           new UserAccountsDrawerHeader(
             accountName: new Text(moreafire.getDisplayName),
             accountEmail: new Text(widget.auth.getUserEmail),
-            decoration: new BoxDecoration(
-                color: MoreaColors.orange),
+            decoration: new BoxDecoration(color: MoreaColors.orange),
           ),
           ListTile(
               title: new Text('Eltern hinzufügen'),
               trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                    profile: moreafire.getUserMap,
-                    firestore: widget.firestore,
-                    crud0: crud0,
-                  )))),
+                        profile: moreafire.getUserMap,
+                        firestore: widget.firestore,
+                        crud0: crud0,
+                      )))),
           Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -336,8 +337,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           new UserAccountsDrawerHeader(
             accountName: Text(moreafire.getDisplayName),
             accountEmail: Text(widget.auth.getUserEmail),
-            decoration: new BoxDecoration(
-                color: MoreaColors.orange),
+            decoration: new BoxDecoration(color: MoreaColors.orange),
           ),
           new ListTile(
               title: new Text('Kinder hinzufügen'),
@@ -350,11 +350,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       )))),
           new Divider(),
           new ListTile(
-            title: new Text("Über dieses App"),
-            trailing: new Icon(Icons.info),
-            onTap:() => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new AboutThisApp()))), 
+              title: new Text("Über dieses App"),
+              trailing: new Icon(Icons.info),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AboutThisApp()))),
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -370,7 +369,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     List<Widget> anmeldebuttons = new List();
     moreafire.getChildMap[groupID].forEach((String vorname, uid) {
       anmeldebuttons.add(anmeldebutton(
-          groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden"));
+          groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden",
+          name: vorname));
     });
     return Column(children: anmeldebuttons);
   }
@@ -381,7 +381,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget anmeldebutton(
-      String groupID, String eventID, String uid, String anmelden, abmelden) {
+      String groupID, String eventID, String uid, String anmelden, abmelden,
+      {String name}) {
     return Container(
         padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Row(
@@ -391,8 +392,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Container(
               child: new RaisedButton(
                 child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
-                onPressed: () =>
-                    submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid),
+                onPressed: () {
+                  if (name == null) {
+                    submit(eventMapAnmeldeStatusNegativ, moreafire.getGroupID, eventID, uid);
+                  } else {
+                    submit(eventMapAnmeldeStatusNegativ, moreafire.getGroupID, eventID, uid,
+                        name: name);
+                  }
+                },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
               ),
@@ -401,8 +408,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: Container(
                 child: new RaisedButton(
                   child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
-                  onPressed: () => submit(eventMapAnmeldeStatusPositiv,
-                      moreafire.getGroupID, eventID, uid),
+                  onPressed: () {
+                    if (name == null) {
+                      submit(eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid);
+                    } else {
+                      submit(eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid,
+                          name: name);
+                    }
+                  },
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0)),
                   color: Color(0xff7a62ff),

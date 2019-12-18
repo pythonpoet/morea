@@ -21,10 +21,12 @@ class Teleblitz {
   Teleblitz(MoreaFirebase moreaFire) {
     this.moreaFire = moreaFire;
     this.eventID = moreaFire.getHomeFeedMainEventID;
-    this.werChunnt = WerChunnt(this.moreaFire, this.eventID);
+    if (moreaFire.getPos == "Leiter") {
+      this.werChunnt = WerChunnt(this.moreaFire, this.eventID);
+    }
   }
 
-  void dispose(){
+  void dispose() {
     werChunnt.dispose();
   }
 
@@ -148,8 +150,8 @@ class Teleblitz {
                       Text('Chunnt:'),
                       StreamBuilder(
                         stream: werChunnt.stream,
-                        builder:
-                            (context, AsyncSnapshot<List<List<String>>> snapshot) {
+                        builder: (context,
+                            AsyncSnapshot<List<List<String>>> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Text('Loading...');
@@ -185,7 +187,8 @@ class Teleblitz {
                         ],
                       ),
                       StreamBuilder(
-                        stream: moreaFire.streamCollectionWerChunnt(this.eventID),
+                        stream:
+                            moreaFire.streamCollectionWerChunnt(this.eventID),
                         builder:
                             (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.connectionState ==
@@ -194,10 +197,12 @@ class Teleblitz {
                           } else if (snapshot.hasError) {
                             return Text('Error');
                           } else {
-                            List<DocumentSnapshot> documents = snapshot.data.documents;
+                            List<DocumentSnapshot> documents =
+                                snapshot.data.documents;
                             List<String> chunntNoed = [];
-                            for(DocumentSnapshot document in documents){
-                              if(document.data['AnmeldeStatus'] == eventMapAnmeldeStatusNegativ){
+                            for (DocumentSnapshot document in documents) {
+                              if (document.data['AnmeldeStatus'] ==
+                                  eventMapAnmeldeStatusNegativ) {
                                 chunntNoed.add(document.data['Name']);
                               }
                             }
@@ -236,7 +241,11 @@ class Teleblitz {
   Widget getTeleblitzButton() {
     return MaterialButton(
       onPressed: () => teleblitzCardKey.currentState.toggleCard(),
-      child: Icon(Icons.autorenew, size: 20, color: MoreaColors.violett,),
+      child: Icon(
+        Icons.autorenew,
+        size: 20,
+        color: MoreaColors.violett,
+      ),
       padding: EdgeInsets.all(0),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       minWidth: 40,
