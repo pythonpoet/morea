@@ -89,16 +89,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> getdevtoken() async {
-    var token = await firebaseMessaging.getToken();
-    moreafire.uploaddevtocken(messagingGroups, token, widget.auth.getUserID);
-  }
-
+  
   void getuserinfo() async {
     await moreafire.getData(widget.auth.getUserID);
     await moreafire.initTeleblitz();
     forminit();
-    getdevtoken();
     teleblitz = new Teleblitz(moreafire);
     setState(() {});
   }

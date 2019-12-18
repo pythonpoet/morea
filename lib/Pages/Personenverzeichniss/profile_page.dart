@@ -158,7 +158,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     mergeChildParent = new MergeChildParent(widget.crud0, widget.moreaFire);
      moreaFire = widget.moreaFire;
      crud0 = widget.crud0;
-     childParendPend = new ChildParendPend(crud0: widget.crud0);
+     childParendPend = new ChildParendPend(crud0: widget.crud0, moreaFirebase: widget.moreaFire);
     if (widget.profile['Pos'] == 'Teilnehmer') {
       reload();
       erziungsberechtigte();

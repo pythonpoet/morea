@@ -1,6 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
+import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'auth.dart';
 import 'crud.dart';
@@ -40,9 +42,6 @@ abstract class BaseMoreaFirebase {
 
   Stream<QuerySnapshot> getChildren();
 
-  Future<void> uploaddevtocken(
-      var messagingGroups, String token, String userUID);
-
   Stream<QuerySnapshot> getMessages(String groupnr);
 
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
@@ -68,6 +67,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, dynamic> _messagingGroups;
   List<String> _subscribedGroups = new List<String>();
   Firestore firestore;
+  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
   MoreaFirebase(Firestore firestore, {List groupIDs}) {
     this.firestore = firestore;
@@ -261,17 +261,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-//TODO Macht immer son error
-  Future<void> uploaddevtocken(
-      var messagingGroups, String token, String userUID) async {
-    Map<String, dynamic> tokendata = {'devtoken': token};
-    if (messagingGroups != null)
-      for (var u in messagingGroups.keys) {
-        if (messagingGroups[u]) {
-          await crud0.setData('groups/$u/Devices', userUID, tokendata);
-        }
-      }
-    return null;
+  Future<void> subscribeToGroup(String groupID) async {
+    Map<String, dynamic> tokendata = {'devtoken': await firebaseMessaging.getToken()};
+    return await crud0.setData('groups/$groupID/Devices', auth0.getUserID, tokendata);
   }
 
   Stream<QuerySnapshot> getMessages(String groupnr) {
@@ -300,5 +292,13 @@ class MoreaFirebase extends BaseMoreaFirebase {
   
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID){
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
+  }
+  Future<void> uploadDevTocken() async {
+    await callFunction(getcallable("appendDeviceToken"),param: Map<String,String>.from(
+      {
+        userMapDeviceToken: await firebaseMessaging.getToken(),
+        userMapUID: auth0.getUserID
+      }
+    ));
   }
 }
