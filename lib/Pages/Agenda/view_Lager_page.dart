@@ -56,7 +56,7 @@ class ViewLagerPageState extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(20.0),
           child: Text(
-            info['Lagername'],
+            info['Eventname'],
             style: MoreaTextStyle.title,
           ),
         ),

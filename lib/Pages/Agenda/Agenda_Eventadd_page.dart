@@ -103,7 +103,8 @@ class EventAddPageState extends State<EventAddPage> {
         'groupIDs': this.goupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
-        'Mitnehmen': mitnehemen
+        'Mitnehmen': mitnehemen,
+        'DeleteDate': datum,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, event);
@@ -125,7 +126,7 @@ class EventAddPageState extends State<EventAddPage> {
         'Order': order,
         'Lager': true,
         'Event': false,
-        'Lagername': lagername,
+        'Eventname': eventname,
         'Datum': datumvon,
         'Datum bis': datumbis,
         'Lagerort': lagerort,
@@ -137,6 +138,7 @@ class EventAddPageState extends State<EventAddPage> {
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
+        'DeleteDate': datumbis,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, lager);
@@ -295,11 +297,11 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    if(subgroups==null)
+      return Card(child: Container(padding: EdgeInsets.all(100),child: simpleMoreaLoadingIndicator(),),);
     switch (widget.agendaModus) {
       case AgendaModus.beides:
-        return this.subgroups == null
-            ? simpleMoreaLoadingIndicator()
-            : DefaultTabController(
+        return DefaultTabController(
                 length: 2,
                 child: new Scaffold(
                   appBar: new AppBar(
@@ -316,9 +318,7 @@ class EventAddPageState extends State<EventAddPage> {
               );
         break;
       case AgendaModus.event:
-        return this.subgroups == null
-            ? simpleMoreaLoadingIndicator()
-            : Scaffold(
+        return Scaffold(
                 appBar: new AppBar(
                   title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
                   backgroundColor: Color(0xff7a62ff),
@@ -342,9 +342,7 @@ class EventAddPageState extends State<EventAddPage> {
 
         break;
       case AgendaModus.lager:
-        return this.subgroups == null
-            ? simpleMoreaLoadingIndicator()
-            : Scaffold(
+        return Scaffold(
                 appBar: new AppBar(
                   title:
                       new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
@@ -420,7 +418,7 @@ class EventAddPageState extends State<EventAddPage> {
                                     border: OutlineInputBorder(),
                                     filled: false,
                                   ),
-                                  onSaved: (value) => lagername = value,
+                                  onSaved: (value) => eventname = value,
                                 ),
                               )
                             ],

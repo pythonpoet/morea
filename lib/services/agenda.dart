@@ -123,7 +123,8 @@ class Agenda extends BaseAgenda{
       "eventID": event["eventID"],
       "Lager" : event["Lager"],
       "Event" : event["Event"],
-      "Eventname": event["Eventname"]
+      "Eventname": event["Eventname"],
+      "DeleteDate": event["DeleteDate"]
     });
   }
 
