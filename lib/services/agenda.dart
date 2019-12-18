@@ -81,11 +81,11 @@ class Agenda extends BaseAgenda{
   }
  Future<DocumentSnapshot> getAgendaTitle(String eventID)async{
    return await crud0.getDocument(pathEvents, eventID);
-   
   }
   Future<void> deleteAgendaEvent(Map<String, dynamic> event)async{
-    List<String> groupIDs = event["groupIDs"];
+    List<String> groupIDs = new List<String>.from(event["groupIDs"]);
     String eventID = event["eventID"];
+    if(groupIDs.isNotEmpty)
     for(String groupID in groupIDs){
     this.deleteAgendaOverviewTitle(groupID, eventID);
     }

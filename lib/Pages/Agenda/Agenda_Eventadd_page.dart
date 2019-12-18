@@ -229,14 +229,7 @@ class EventAddPageState extends State<EventAddPage> {
       ),
     );
     if (delete) {
-      //TODO alternative
-      String name = dwiFormat.simplestring(
-          widget.eventinfo['Datum'] + widget.eventinfo['Lagername']);
-      crud0.deletedocument('Stufen/Biber/Agenda', name);
-      crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
-      crud0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
-      crud0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
-      crud0.deletedocument('Stufen/Pios/Agenda', name);
+      await agenda.deleteAgendaEvent(widget.eventinfo);
       Navigator.pop(context);
     }
   }
@@ -265,14 +258,7 @@ class EventAddPageState extends State<EventAddPage> {
       ),
     );
     if (delete) {
-      //agenda.deleteAgendaEvent(groupID, eventID)
-      String name = dwiFormat.simplestring(
-          widget.eventinfo['Datum'] + widget.eventinfo['Eventname']);
-      crud0.deletedocument('Stufen/Biber/Agenda', name);
-      crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
-      crud0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
-      crud0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
-      crud0.deletedocument('Stufen/Pios/Agenda', name);
+      await agenda.deleteAgendaEvent(widget.eventinfo);
       Navigator.pop(context);
     }
   }
@@ -565,7 +551,7 @@ class EventAddPageState extends State<EventAddPage> {
                                       physics: NeverScrollableScrollPhysics(),
                                       children: subgroups
                                           .map((Map<dynamic, dynamic> group) {
-                                        print("group: " + group.toString());
+                                       
                                         return new CheckboxListTile(
                                           title: new Text(
                                               group[groupMapgroupNickName]),
