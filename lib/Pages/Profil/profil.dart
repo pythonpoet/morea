@@ -271,110 +271,14 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         title: Text('Profil'),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          color: Color.fromRGBO(43, 16, 42, 0.9),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: FlatButton(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: widget.navigationMap[toMessagePage],
-                  child: Column(
-                    children: <Widget>[
-                      Icon(Icons.message, color: Colors.white),
-                      Text(
-                        'Nachrichten',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: Colors.white),
-                      )
-                    ],
-                    mainAxisSize: MainAxisSize.min,
-                  ),
-                ),
-                flex: 1,
-              ),
-              Expanded(
-                child: FlatButton(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: widget.navigationMap[toAgendaPage],
-                  child: Column(
-                    children: <Widget>[
-                      Icon(Icons.event, color: Colors.white),
-                      Text(
-                        'Agenda',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: Colors.white),
-                      )
-                    ],
-                    mainAxisSize: MainAxisSize.min,
-                  ),
-                ),
-                flex: 1,
-              ),
-              Expanded(
-                child: Text('Änderungen speichern'),
-                flex: 1,
-              ),
-              Expanded(
-                child: FlatButton(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: widget.navigationMap[toHomePage],
-                  child: Column(
-                    children: <Widget>[
-                      Icon(Icons.flash_on, color: Colors.white),
-                      Text(
-                        'Teleblitz',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: Colors.white),
-                      )
-                    ],
-                    mainAxisSize: MainAxisSize.min,
-                  ),
-                ),
-                flex: 1,
-              ),
-              Expanded(
-                child: FlatButton(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  onPressed: null,
-                  child: Column(
-                    children: <Widget>[
-                      Icon(Icons.person, color: Colors.white),
-                      Text(
-                        'Profil',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: Colors.white),
-                      )
-                    ],
-                    mainAxisSize: MainAxisSize.min,
-                  ),
-                ),
-                flex: 1,
-              ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            textBaseline: TextBaseline.alphabetic,
-          ),
-        ),
-        shape: CircularNotchedRectangle(),
-      ),
+      bottomNavigationBar: _bottomAppBarBuilder(),
     );
   }
 
   void _signedOut() async {
     try {
       await widget.auth.signOut();
-      widget.navigationMap[signedOut](this.dispose);
+      widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
@@ -613,6 +517,14 @@ class _ProfileState extends State<Profile> {
       return FloatingActionButtonLocation.centerDocked;
     } else {
       return FloatingActionButtonLocation.endFloat;
+    }
+  }
+
+  BottomAppBar _bottomAppBarBuilder() {
+    if(widget.moreaFire.getPos == "Leiter"){
+      return moreaLeiterBottomAppBar(widget.navigationMap, 'Speichern');
+    } else {
+      return moreaChildBottomAppBar(widget.navigationMap);
     }
   }
 }
