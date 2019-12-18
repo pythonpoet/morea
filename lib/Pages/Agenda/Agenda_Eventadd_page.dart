@@ -29,10 +29,10 @@ class EventAddPageState extends State<EventAddPage> {
   MoreaFirebase moreafire;
   int value = 2;
   List<String> mitnehemen = ['Pfadihämpt'];
-  final _addkey = new GlobalKey<FormState>();
-  final _changekey = new GlobalKey<FormState>();
-  final _addEvent = new GlobalKey<FormState>();
-  final _addLager = new GlobalKey<FormState>();
+  final _addkey = new GlobalKey<FormState>(debugLabel: "_addkey");
+  final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
+  final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
+  final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
 
   String eventname = ' ',
       datum = 'Datum wählen',
@@ -297,7 +297,7 @@ class EventAddPageState extends State<EventAddPage> {
   Widget build(BuildContext context) {
     switch (widget.agendaModus) {
       case AgendaModus.beides:
-        return this.subgroups.isEmpty
+        return this.subgroups == null
             ? simpleMoreaLoadingIndicator()
             : DefaultTabController(
                 length: 2,
@@ -316,7 +316,7 @@ class EventAddPageState extends State<EventAddPage> {
               );
         break;
       case AgendaModus.event:
-        return this.subgroups.isEmpty
+        return this.subgroups == null
             ? simpleMoreaLoadingIndicator()
             : Scaffold(
                 appBar: new AppBar(
@@ -342,7 +342,7 @@ class EventAddPageState extends State<EventAddPage> {
 
         break;
       case AgendaModus.lager:
-        return this.subgroups.isEmpty
+        return this.subgroups == null
             ? simpleMoreaLoadingIndicator()
             : Scaffold(
                 appBar: new AppBar(
