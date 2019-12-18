@@ -37,14 +37,21 @@ class ChildParendPend extends BaseChildParendPend{
       })
     ));
   }
+  Future<String> parentCreatesUser(String _email, String _password) async{
+    return (await cloudFunctions.callFunction(
+      cloudFunctions.getcallable("createAccount"), param:Map.from({
+        "email": _email,
+        "password": _password
+      })
+    )).data;
+  }
   Future<void> createChildAndPendIt(String _childEmail, String _childPasswort, Map<String,dynamic> childData, Map<String, dynamic> parentData, BuildContext context)async{
     Auth childAuth = new Auth();
     try{
-    String childUID  = await childAuth.createUserWithEmailAndPassword(_childEmail, _childPasswort);
+    String childUID  = await this.parentCreatesUser(_childEmail, _childPasswort);
     childData[userMapUID] = childUID;
-    await childAuth.createUserInformation(childData);
+    await crud0.setData(pathUser, childUID, childData);
     String requestStr = await this.childGenerateRequestString(childData);
-    childAuth.signOut();
     return parentSendsRequestString(requestStr, parentData); 
     }catch(error){
       AuthProblems problem = childAuth.checkForAuthErrors(context, error);

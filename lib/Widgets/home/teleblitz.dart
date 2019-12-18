@@ -255,9 +255,18 @@ class Teleblitz {
   }
 
   Widget element(Map<String, dynamic> tlbz) {
-    if (tlbz["keine-aktivitat"]) {
+    var keineAkt = tlbz["keine-aktivitat"];
+    var keineFerien =tlbz["ferien"];
+    if(keineAkt.runtimeType == String){
+      keineAkt = keineAkt.toLowerCase() == 'true';
+    }
+    if(keineFerien.runtimeType == String){
+      keineFerien = keineFerien.toLowerCase() == 'true';
+    }
+
+    if (keineAkt) {
       return keineAktivitat();
-    } else if (tlbz["ferien"]) {
+    } else if (keineFerien) {
       return ferien();
     } else {
       return teleblitz();
@@ -331,7 +340,7 @@ class Info {
   String grund;
   String ferien;
   String endeferien;
-  double _sizeleft = 110;
+  double _sizeleft = 120;
 
   void setTitel(String titel) {
     this.titel = titel;

@@ -66,7 +66,7 @@ Widget getLayoutBuilderWidget(
         child: SingleChildScrollView(
           child: Column(
               key:
-                  ObjectKey(teleblitzAnzeigen(groupID, snapshot, moreaLoading)),
+                  ObjectKey(anzeige),
               children: anzeige),
         ),
       );
@@ -75,7 +75,7 @@ Widget getLayoutBuilderWidget(
 }
 
 List<Widget> getTabList(List<String> subscribedGroups) {
-  List<Widget> tabList = [];
+  List<Widget> tabList = new List();
   for (String groupID in subscribedGroups) {
     tabList.add(new Tab(
       text: convMiDatatoWebflow(groupID),

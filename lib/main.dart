@@ -19,7 +19,8 @@ Future<void> main() async {
   await firestore.settings(timestampsInSnapshotsEnabled: true);
 
   */
-  Firestore firestore = new Firestore();
+  
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
         title: 'Morea App',
@@ -28,17 +29,18 @@ Future<void> main() async {
             fontFamily: 'Raleway',
             primarySwatch: MaterialColor(
                 MoreaColors.appBarInt, MoreaColors.violettMaterialColor)),
-        home: MyApp(firestore: firestore)),
+        home: MyApp()),
   );
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({this.firestore});
+  //MyApp({this.firestore});
 
-  final Firestore firestore;
+   Firestore firestore;
 
   @override
   Widget build(BuildContext context) {
+    Firestore firestore = new Firestore();
     return new MaterialApp(
       title: 'Pfadi Morea',
       debugShowCheckedModeBanner: false,
