@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flip_card/flip_card.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/Teleblitz/werchunt.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -9,9 +14,20 @@ import 'package:morea/services/utilities/url_launcher.dart';
 class Teleblitz {
   MoreaFirebase moreaFire;
   Info info = new Info();
+  GlobalKey<FlipCardState> teleblitzCardKey = GlobalKey<FlipCardState>();
+  String eventID;
+  WerChunnt werChunnt;
 
   Teleblitz(MoreaFirebase moreaFire) {
     this.moreaFire = moreaFire;
+    this.eventID = moreaFire.getHomeFeedMainEventID;
+    if (moreaFire.getPos == "Leiter") {
+      this.werChunnt = WerChunnt(this.moreaFire, this.eventID);
+    }
+  }
+
+  void dispose() {
+    werChunnt.dispose();
   }
 
   void defineInfo(Map<String, dynamic> tlbz, groupID) {
@@ -74,21 +90,167 @@ class Teleblitz {
   }
 
   Widget teleblitz() {
-    return MoreaShadowContainer(
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: <Widget>[
-            info.getTitel(),
-            info.getDatum(),
-            info.getAntreten(),
-            info.getAbtreten(),
-            info.getMitnehmen(),
-            info.getBemerkung(),
-            info.getSender(),
-          ],
+    if (moreaFire.getPos != "Leiter") {
+      return MoreaShadowContainer(
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: <Widget>[
+              info.getTitel(),
+              info.getDatum(),
+              info.getAntreten(),
+              info.getAbtreten(),
+              info.getMitnehmen(),
+              info.getBemerkung(),
+              info.getSender(),
+            ],
+          ),
         ),
+      );
+    } else {
+      return FlipCard(
+        direction: FlipDirection.HORIZONTAL,
+        flipOnTouch: false,
+        key: teleblitzCardKey,
+        front: MoreaShadowContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[info.getTitel(), getWerChunntButton()],
+                ),
+                info.getDatum(),
+                info.getAntreten(),
+                info.getAbtreten(),
+                info.getMitnehmen(),
+                info.getBemerkung(),
+                info.getSender(),
+              ],
+            ),
+          ),
+        ),
+        back: MoreaShadowContainer(
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('Chunnt:'),
+                      StreamBuilder(
+                        stream: werChunnt.stream,
+                        builder: (context,
+                            AsyncSnapshot<List<List<String>>> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text('Loading...');
+                          } else if (snapshot.hasError) {
+                            return Text('Error');
+                          } else {
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data[0].length,
+                                itemBuilder: (context, i) {
+                                  return Text(snapshot.data[0][i]);
+                                });
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text("Chunnt nöd:"),
+                          getTeleblitzButton(),
+                        ],
+                      ),
+                      StreamBuilder(
+                        stream:
+                            moreaFire.streamCollectionWerChunnt(this.eventID),
+                        builder:
+                            (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text('Loading...');
+                          } else if (snapshot.hasError) {
+                            return Text('Error');
+                          } else {
+                            List<DocumentSnapshot> documents =
+                                snapshot.data.documents;
+                            List<String> chunntNoed = [];
+                            for (DocumentSnapshot document in documents) {
+                              if (document.data['AnmeldeStatus'] ==
+                                  eventMapAnmeldeStatusNegativ) {
+                                chunntNoed.add(document.data['Name']);
+                              }
+                            }
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: chunntNoed.length,
+                                itemBuilder: (context, i) {
+                                  return Text(chunntNoed[i]);
+                                });
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget getWerChunntButton() {
+    return RaisedButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: MoreaColors.violett,
+      onPressed: () => teleblitzCardKey.currentState.toggleCard(),
+      child: Text(
+        "Wer chunnt?",
+        style: TextStyle(color: Colors.white),
       ),
+    );
+  }
+
+  Widget getTeleblitzButton() {
+    return MaterialButton(
+      onPressed: () => teleblitzCardKey.currentState.toggleCard(),
+      child: Icon(
+        Icons.autorenew,
+        size: 20,
+        color: MoreaColors.violett,
+      ),
+      padding: EdgeInsets.all(0),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      minWidth: 40,
+      height: 20,
+      elevation: 0,
     );
   }
 
@@ -106,7 +268,7 @@ class Teleblitz {
       return keineAktivitat();
     } else if (keineFerien) {
       return ferien();
-    } else{
+    } else {
       return teleblitz();
     }
   }
@@ -538,7 +700,8 @@ class Info {
 
   Container getEndeFerien() {
     List<String> listEndeFerien = this.endeferien.split("T")[0].split("-");
-    String formatedEndeFerien = listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
+    String formatedEndeFerien =
+        listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
     return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Column(

@@ -48,7 +48,6 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
   Stream<QuerySnapshot> streamCollection(String path) {
-    path = dwiformat.pathstring(path);
     return Firestore.instance.collection(path).snapshots();
   }
 
