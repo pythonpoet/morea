@@ -3,6 +3,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 
 abstract class BaseChildParendPend{
   Future<String> childGenerateRequestString(Map<String, dynamic> userMap);
@@ -10,7 +11,8 @@ abstract class BaseChildParendPend{
 class ChildParendPend extends BaseChildParendPend{
   MCloudFunctions cloudFunctions = new MCloudFunctions();
   CrudMedthods crud0;
-  ChildParendPend({this.crud0});
+  MoreaFirebase moreaFirebase;
+  ChildParendPend({this.crud0, this.moreaFirebase});
 
   Future<String> childGenerateRequestString(Map<String, dynamic> userMap) async {
     var someData = (await cloudFunctions.callFunction(
@@ -51,6 +53,7 @@ class ChildParendPend extends BaseChildParendPend{
     String childUID  = await this.parentCreatesUser(_childEmail, _childPasswort);
     childData[userMapUID] = childUID;
     await crud0.setData(pathUser, childUID, childData);
+    moreaFirebase.subscribeToGroup(childData[userMapgroupID]);
     String requestStr = await this.childGenerateRequestString(childData);
     return parentSendsRequestString(requestStr, parentData); 
     }catch(error){

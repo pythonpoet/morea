@@ -94,38 +94,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   updatedevtoken() async {
-    List devtoken = new List();
-    await moreafire.getUserInformation(userId).then((userInfo) {
-      try {
-        List devTokenOld = userInfo.data['devtoken'];
-        if (devTokenOld == null) {
-          firebaseMessaging.getToken().then((token) {
-            devtoken = [token];
-            userInfo.data['devtoken'] = devtoken;
-            moreafire.createUserInformation(userInfo.data);
-          });
-        } else {
-          firebaseMessaging.getToken().then((token) {
-            if (devTokenOld[0] == 'leer') {
-              devtoken = [token];
-            } else {
-              for (int i = 0; i < devTokenOld.length; i++) {
-                if (devTokenOld[i] == token) {
-                  return;
-                }
-              }
-              devtoken = [token];
-            }
-
-            userInfo.data['devtoken'] = devtoken;
-
-            moreafire.createUserInformation(userInfo.data);
-          });
-        }
-      } catch (e) {
-        print(e);
-      }
-    });
+    moreafire.uploadDevTocken();
   }
 
   void validateAndSubmit() async {
@@ -139,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
             userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
             print('Sign in: $userId');
             if (userId != null) {
-              updatedevtoken();
+              moreafire.uploadDevTocken();
               setState(() {
                 _load = false;
               });
@@ -164,6 +133,8 @@ class _LoginPageState extends State<LoginPage> {
                     print('Registered user: $userId');
                     if (userId != null) {
                       moreafire.createUserInformation(await mapUserData());
+                      moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
+                      moreafire.uploadDevTocken();
                       widget.onSignedIn();
                     }
                   } else {
@@ -194,7 +165,6 @@ class _LoginPageState extends State<LoginPage> {
                         "Passwort muss aus mindistens 6 Zeichen bestehen"),
                   ));
             }
-
             break;
           case FormType.registereltern:
             if (_password.length >= 6) {
@@ -215,6 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                       print('Registered user: $userId');
                       if (userId != null) {
                         moreafire.createUserInformation(await mapUserData());
+                        moreafire.uploadDevTocken();
                         setState(() {
                           _load = false;
                         });
