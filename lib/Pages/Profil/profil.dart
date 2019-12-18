@@ -79,7 +79,7 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: _locationFloatingActionButton(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
@@ -317,9 +317,7 @@ class _ProfileState extends State<Profile> {
                 flex: 1,
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                ),
+                child: Text('Änderungen speichern'),
                 flex: 1,
               ),
               Expanded(
@@ -608,5 +606,13 @@ class _ProfileState extends State<Profile> {
             )).then((onValue) {
       return null;
     });
+  }
+
+  FloatingActionButtonLocation _locationFloatingActionButton() {
+    if(widget.moreaFire.getPos == "Leiter"){
+      return FloatingActionButtonLocation.centerDocked;
+    } else {
+      return FloatingActionButtonLocation.endFloat;
+    }
   }
 }
