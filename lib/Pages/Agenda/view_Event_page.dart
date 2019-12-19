@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/agenda.dart';
+import 'package:morea/services/morea_firestore.dart';
 
 class ViewEventPageState extends StatelessWidget {
-  ViewEventPageState({this.info, this.pos});
-
-  var info;
-  String pos;
+  ViewEventPageState({this.info, this.pos, this.moreaFire, this.agenda});
+  final MoreaFirebase moreaFire;
+  final Agenda agenda;
+  final Map info;
+  final String pos;
 
   @override
   Widget build(BuildContext context) {
+    if(info == null)
+    return Card(
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(15),
+          child: Text("Dieses Event ist nicht eingetragen, wende dich an deine Leiter", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
+      ),
+    );
     if (istLeiter()) {
       return Container(
           child: Scaffold(
@@ -186,6 +197,8 @@ class ViewEventPageState extends StatelessWidget {
             builder: (BuildContext context) => EventAddPage(
                   eventinfo: info,
                   agendaModus: AgendaModus.event,
+                  moreaFire: moreaFire,
+                  agenda: agenda,
                 )))
         .then((onValue) {});
   }

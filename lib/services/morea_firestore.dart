@@ -91,13 +91,16 @@ class MoreaFirebase extends BaseMoreaFirebase {
     Map<String,Map<String,String>> childMap = new Map();
      for(String vorname in childs.keys){
       Map<String,dynamic> childUserDat = (await crud0.getDocument(pathUser, childs[vorname])).data;
-      childMap[childUserDat[userMapgroupID]] = {vorname:childs[vorname]};
+      if(childMap.containsKey(childUserDat[userMapgroupID]))
+      childMap[childUserDat[userMapgroupID]][vorname] = childs[vorname];
+      else
+       childMap[childUserDat[userMapgroupID]] = {vorname:childs[vorname]};
       if(!_subscribedGroups.contains(childUserDat[userMapgroupID]))
         _subscribedGroups.add(childUserDat[userMapgroupID]);
     }
     return childMap;
   }
-  Future<void> initTeleblitz(){
+   initTeleblitz(){
     List<String> groupIDs = new List<String>();
     groupIDs.addAll(_subscribedGroups);
     groupIDs.add(_groupID);

@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
+import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 
+import 'change_address.dart';
 import 'change_email.dart';
+import 'change_message_groups.dart';
 import 'change_name.dart';
+import 'change_password.dart';
 
 class Profile extends StatefulWidget {
   final auth;
@@ -31,6 +35,8 @@ class _ProfileState extends State<Profile> {
   Auth auth0 = Auth();
   TextEditingController password = TextEditingController();
   final _passwordKey = GlobalKey<FormState>();
+  String oldEmail;
+  String newPassword;
 
   _ProfileState();
 
@@ -39,12 +45,16 @@ class _ProfileState extends State<Profile> {
     super.initState();
     this.userInfo = widget.moreaFire.getUserMap;
     this._getNachrichtenGruppen();
+    this.oldEmail = userInfo['Email'];
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
     password.dispose();
+    newPassword = null;
+    await widget.moreaFire.getData(userInfo['UID']);
+    this.userInfo = widget.moreaFire.getUserMap;
   }
 
   @override
@@ -68,6 +78,13 @@ class _ProfileState extends State<Profile> {
             )
           ],
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.check),
+        backgroundColor: MoreaColors.violett,
+        shape: CircleBorder(side: BorderSide(color: Colors.white)),
+        onPressed: _changeProfil,
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -133,7 +150,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext context) => ChangeEmail(
-                            userInfo['Email'], this._showReauthenticate)))),
+                            userInfo['Email'], this._changeEmail)))),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Divider(
@@ -149,6 +166,9 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          ChangePassword(this._changePassword))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -169,6 +189,9 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => ChangePhoneNumber(
+                          userInfo['Handynummer'], _changePhoneNumber))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -193,6 +216,12 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => ChangeAddress(
+                          userInfo['Adresse'],
+                          userInfo['PLZ'],
+                          userInfo['Ort'],
+                          _changeAddress))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -223,6 +252,13 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => ChangeMessageGroups(
+                          userInfo['messageGroups']['Biber'],
+                          userInfo['messageGroups']['Wombat (Wölfe)'],
+                          userInfo['messageGroups']['Nahani (Meitli)'],
+                          userInfo['messageGroups']['Drason (Buebe)'],
+                          this._changeMessageGroups))),
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 10),
@@ -340,39 +376,63 @@ class _ProfileState extends State<Profile> {
   void _signedOut() async {
     try {
       await widget.auth.signOut();
-      widget.navigationMap[signedOut]();
+      widget.navigationMap[signedOut](this.dispose);
     } catch (e) {
       print(e);
     }
   }
 
-  void _changeName(String vorname, String nachname, String pfadiname) async {
+  void _changeName(String vorname, String nachname, String pfadiname) {
     this.userInfo['Vorname'] = vorname;
     this.userInfo['Nachname'] = nachname;
     if (pfadiname == null) {
-      this.userInfo['Pfadinamen'] = vorname;
+      this.userInfo['Pfadinamen'] = "";
     } else {
       this.userInfo['Pfadinamen'] = pfadiname;
     }
-    await widget.moreaFire.createUserInformation(userInfo);
     setState(() {});
   }
 
-  void _changeEmail(String email) async {
-    this.userInfo['Email'] = email;
-    await widget.moreaFire.createUserInformation(userInfo);
-    await auth0.changeEmail(email);
-    await widget.auth.signOut();
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).popUntil(ModalRoute.withName('/'));
-    }
-    this._signedOut();
+  void _changeEmail(String email) {
+    setState(() {
+      this.userInfo['Email'] = email;
+    });
   }
 
-  Future<bool> _validateAndSave() async {
+  void _changePassword(String password) {
+    this.newPassword = password;
+  }
+
+  void _changePhoneNumber(String phoneNumber) {
+    setState(() {
+      this.userInfo['Handynummer'] = phoneNumber;
+    });
+  }
+
+  void _changeAddress(String address, String plz, String ort) {
+    setState(() {
+      this.userInfo['Adresse'] = address;
+      this.userInfo['PLZ'] = plz;
+      this.userInfo['Ort'] = ort;
+    });
+  }
+
+  void _changeMessageGroups(bool biber, bool wombat, bool nahani, bool drason) {
+    setState(() {
+      this.userInfo['messageGroups'] = {
+        'Biber': biber,
+        'Drason (Buebe)': drason,
+        'Nahani (Meitli)': nahani,
+        'Wombat (Wölfe)': wombat
+      };
+      this._getNachrichtenGruppen();
+    });
+  }
+
+  Future<bool> _validateAndSave(String email) async {
     final form = _passwordKey.currentState;
     if (form.validate()) {
-      var result = await auth0.reauthenticate(userInfo['Email'], password.text);
+      var result = await auth0.reauthenticate(email, password.text);
       print(result);
       if (result) {
         form.save();
@@ -386,11 +446,13 @@ class _ProfileState extends State<Profile> {
   }
 
   void _getNachrichtenGruppen() {
+    List<String> neuNachrichtenGruppen = [];
     for (var u in userInfo['messageGroups'].keys) {
       if (userInfo['messageGroups'][u]) {
-        nachrichtenGruppen.add(u);
+        neuNachrichtenGruppen.add(u);
       }
     }
+    nachrichtenGruppen = neuNachrichtenGruppen;
   }
 
   void _showReauthenticate(String email) {
@@ -404,7 +466,7 @@ class _ProfileState extends State<Profile> {
               content: Column(
                 children: <Widget>[
                   Text(
-                      'Aus Sicherheitsgründen müssen sie ihr Passwort erneut eingeben, um ihre E-Mail-Adresse zu ändern.'),
+                      'Aus Sicherheitsgründen müssen sie ihr Passwort erneut eingeben, um ihre E-Mail oder ihr Passwort zu ändern.'),
                   Form(
                     key: _passwordKey,
                     child: TextFormField(
@@ -447,9 +509,27 @@ class _ProfileState extends State<Profile> {
                         borderRadius: BorderRadius.all(Radius.circular(5)))),
                 RaisedButton.icon(
                     onPressed: () async {
-                      var result = await _validateAndSave();
+                      var result = await _validateAndSave(email);
                       if (result) {
-                        this._changeEmail(email);
+                        if (oldEmail != userInfo['Email']) {
+                          await auth0.changeEmail(userInfo['Email']);
+                        }
+                        if (newPassword != null) {
+                          await auth0.changePassword(newPassword);
+                        }
+                        await widget.moreaFire
+                            .updateUserInformation(userInfo['UID'], userInfo);
+                        if (oldEmail != userInfo['Email'] ||
+                            newPassword != null) {
+                          _showSignOutInformation().then((onValue) {
+                            Navigator.of(context).pop();
+                            _signedOut();
+                          });
+                        } else {
+                          Navigator.of(context).pop();
+                        }
+                      } else {
+                        _showReauthenticateError();
                       }
                     },
                     icon: Icon(
@@ -466,5 +546,67 @@ class _ProfileState extends State<Profile> {
                         borderRadius: BorderRadius.all(Radius.circular(5)))),
               ],
             ));
+  }
+
+  void _changeProfil() async {
+    if (oldEmail != userInfo['Email'] || newPassword != null) {
+      _showReauthenticate(oldEmail);
+    } else {
+      await widget.moreaFire.updateUserInformation(userInfo['UID'], userInfo);
+    }
+  }
+
+  void _showReauthenticateError() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(
+                'Fehler',
+                style: MoreaTextStyle.title,
+              ),
+              content: Text(
+                  'Leider hat etwas mit dem Neuanmelden nicht geklappt. Überprüfen sie das Password nochmals.'),
+              actions: <Widget>[
+                RaisedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Ok',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    color: MoreaColors.violett,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+              ],
+            ));
+  }
+
+  Future<void> _showSignOutInformation() async {
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(
+                'Abmeldung',
+                style: MoreaTextStyle.title,
+              ),
+              content: Text(
+                  'Weil sie ihre E-Mail oder das Passwort geändert haben, werden sie nun ausgeloggt.'),
+              actions: <Widget>[
+                RaisedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Ok',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    color: MoreaColors.violett,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+              ],
+            )).then((onValue) {
+      return null;
+    });
   }
 }

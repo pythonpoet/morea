@@ -14,7 +14,8 @@ class ProfilePageState extends StatefulWidget {
   final CrudMedthods crud0;
 
   var profile;
- // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
+
+  // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
 
   @override
   State<StatefulWidget> createState() => ProfilePageStatePage();
@@ -31,23 +32,23 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   MoreaFirebase moreaFire;
   CrudMedthods crud0;
   ChildParendPend childParendPend;
-  bool hatEltern = false, hatKinder = false, display = false, newKidDisplay = false;
+  bool hatEltern = false,
+      hatKinder = false,
+      display = false,
+      newKidDisplay = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
   Future<String> qrCodeString;
   List elternMapList = ['Liam Bebecho'], kinderMapList = ['Walter'];
-  
- 
 
   void reload() async {
     value = controller.stream;
     controller.add(false);
-    
-      var newData = await moreaFire.getUserInformation(widget.profile['UID']);
-      if (newData.data != widget.profile) {
-        widget.profile = newData.data;
-        erziungsberechtigte();
-      
+
+    var newData = await moreaFire.getUserInformation(widget.profile['UID']);
+    if (newData.data != widget.profile) {
+      widget.profile = newData.data;
+      erziungsberechtigte();
     }
   }
 
@@ -73,7 +74,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
   }
 
-  void childaktuallisieren()async {
+  void childaktuallisieren() async {
     if (display) {
       display = false;
       if (qrCodeString != null) {
@@ -86,14 +87,14 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
     setState(() {});
   }
-  void documentChangeListender()async{
+
+  void documentChangeListender() async {
     await Future.delayed(Duration(seconds: 2));
     await childParendPend.waitOnUserDataChange(widget.profile[userMapUID]);
     display = false;
-    setState(() {
-      
-    });
+    setState(() {});
   }
+
   void parentaktuallisieren() {
     if (display) {
       if (!mergeChildParent.parentReaderror) {
@@ -104,15 +105,14 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
     setState(() {});
   }
-  void newKidakt(){
-    if(newKidDisplay){
+
+  void newKidakt() {
+    if (newKidDisplay) {
       newKidDisplay = false;
-    }else{
+    } else {
       newKidDisplay = true;
     }
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   Future<void> getElternMap() async {
@@ -140,15 +140,16 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
     return null;
   }
-  void setProfileState(){
-    setState(() {
-    });
+
+  void setProfileState() {
+    setState(() {});
   }
+
   @override
   void dispose() {
     //_instance.dispose();
-     
-  controller.close();
+
+    controller.close();
     super.dispose();
   }
 
@@ -174,7 +175,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
           child: Scaffold(
               appBar: AppBar(
                 title: Text(widget.profile['Vorname'].toString()),
-                backgroundColor: Color(0xff7a62ff),
               ),
               body: Stack(
                 children: <Widget>[
@@ -192,8 +192,11 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? mergeChildParent
-                            .childShowQrCode(widget.profile, context, this.childaktuallisieren, childParendPend.deleteRequest)
+                        ? mergeChildParent.childShowQrCode(
+                            widget.profile,
+                            context,
+                            this.childaktuallisieren,
+                            childParendPend.deleteRequest)
                         : Container(),
                   )
                 ],
@@ -203,7 +206,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
           child: Scaffold(
               appBar: AppBar(
                 title: Text(widget.profile['Vorname'].toString()),
-                backgroundColor: Color(0xff7a62ff),
               ),
               body: Stack(
                 children: <Widget>[
@@ -226,224 +228,20 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                         : Container(),
                   ),
                   new Align(
-                    child: newKidDisplay?
-                    mergeChildParent.registernewChild(widget.profile ,context, this.setProfileState, this.newKidakt): Container()
-                  )
+                      child: newKidDisplay
+                          ? mergeChildParent.registernewChild(widget.profile,
+                              context, this.setProfileState, this.newKidakt)
+                          : Container())
                 ],
               )));
     }
   }
-  
 
   Widget viewChildprofile(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(15),
       child: Column(
         children: <Widget>[
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Vorname:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Vorname'],
-                            style: TextStyle(fontSize: 20),
-                          )))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Nachname:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Nachname'],
-                            style: TextStyle(fontSize: 20),
-                          ))),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Pfadinamen:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Pfadinamen'],
-                            style: TextStyle(fontSize: 20),
-                          ))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Telefon:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Handynummer'],
-                            style: TextStyle(fontSize: 20),
-                          )))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Email:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Email'],
-                            style: TextStyle(fontSize: 20),
-                          )))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            alignment: Alignment.center, //
-            decoration: new BoxDecoration(
-              border: new Border.all(color: Colors.black, width: 2),
-              borderRadius: new BorderRadius.all(
-                Radius.circular(4.0),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.all(5),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          child: Text(
-                            'Adresse:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                        Expanded(
-                            child: Container(
-                                child: Text(
-                          widget.profile['Adresse'],
-                          style: TextStyle(fontSize: 20),
-                        )))
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          child: Text(
-                            'Ort:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                        Expanded(
-                            child: Container(
-                                child: Text(
-                          widget.profile['Ort'],
-                          style: TextStyle(fontSize: 20),
-                        )))
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          child: Text(
-                            'PLZ:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                        Expanded(
-                            child: Container(
-                                child: Text(
-                          widget.profile['PLZ'],
-                          style: TextStyle(fontSize: 20),
-                        )))
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           hatEltern ? elternAnzeigen() : Container(),
           SizedBox(
             height: 10,
@@ -454,8 +252,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 'Mit Eltern Koppeln',
                 style: TextStyle(fontSize: 20),
               ),
-              onPressed: () => {
-                childaktuallisieren()},
+              onPressed: () => {childaktuallisieren()},
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),
               color: Color(0xff7a62ff),
@@ -465,14 +262,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
           SizedBox(
             height: 24,
           ),
-          Container(
-            child: Center(
-              child: Text(
-                'Sind deine Angaben nicht korrekt?\nWende dich bitte an ein Leiter',
-                style: new TextStyle(fontSize: 20),
-              ),
-            ),
-          )
         ],
       ),
     );
@@ -483,254 +272,40 @@ class ProfilePageStatePage extends State<ProfilePageState> {
       padding: EdgeInsets.all(15),
       child: Column(
         children: <Widget>[
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Vorname:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Vorname'],
-                            style: TextStyle(fontSize: 20),
-                          )))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Nachname:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Nachname'],
-                            style: TextStyle(fontSize: 20),
-                          ))),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Pfadinamen:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Pfadinamen'],
-                            style: TextStyle(fontSize: 20),
-                          ))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-              alignment: Alignment.center, //
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.black, width: 2),
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(4.0),
-                ),
-              ),
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Telefon:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Handynummer'],
-                            style: TextStyle(fontSize: 20),
-                          )))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            child: Text(
-                              'Email:',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )),
-                          Expanded(
-                              child: Container(
-                                  child: Text(
-                            widget.profile['Email'],
-                            style: TextStyle(fontSize: 20),
-                          )))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            alignment: Alignment.center, //
-            decoration: new BoxDecoration(
-              border: new Border.all(color: Colors.black, width: 2),
-              borderRadius: new BorderRadius.all(
-                Radius.circular(4.0),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.all(5),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          child: Text(
-                            'Adresse:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                        Expanded(
-                            child: Container(
-                                child: Text(
-                          widget.profile['Adresse'],
-                          style: TextStyle(fontSize: 20),
-                        )))
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          child: Text(
-                            'Ort:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                        Expanded(
-                            child: Container(
-                                child: Text(
-                          widget.profile['Ort'],
-                          style: TextStyle(fontSize: 20),
-                        )))
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          child: Text(
-                            'PLZ:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        )),
-                        Expanded(
-                            child: Container(
-                                child: Text(
-                          widget.profile['PLZ'],
-                          style: TextStyle(fontSize: 20),
-                        )))
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           hatKinder ? kinderAnzeigen() : Container(),
           SizedBox(
             height: 10,
           ),
           Container(
-            child: Column(
-              children: <Widget>[
-                RaisedButton(
-              child: Text(
-                'Mit Kind Koppeln',
-                style: TextStyle(fontSize: 20),
+              child: Column(
+            children: <Widget>[
+              RaisedButton(
+                child: Text(
+                  'Mit Kind Koppeln',
+                  style: TextStyle(fontSize: 20),
+                ),
+                onPressed: () => parentaktuallisieren(),
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                color: Color(0xff7a62ff),
+                textColor: Colors.white,
               ),
-              onPressed: () => parentaktuallisieren(),
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
-            ),
-            RaisedButton(
-              child: Text(
-                'Neues Kind registrieren',
-                style: TextStyle(fontSize: 20),
+              RaisedButton(
+                child: Text(
+                  'Neues Kind registrieren',
+                  style: TextStyle(fontSize: 20),
+                ),
+                onPressed: () => this.newKidakt(),
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                color: Color(0xff7a62ff),
+                textColor: Colors.white,
               ),
-              onPressed: () => this.newKidakt(),
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
-            ),
-              ],
-            )
-            
-          ),
+            ],
+          )),
           SizedBox(
             height: 24,
           ),
-          Container(
-            child: Center(
-              child: Text(
-                'Sind deine Angaben nicht korrekt?\nWende dich bitte an ein Leiter',
-                style: new TextStyle(fontSize: 20),
-              ),
-            ),
-          )
         ],
       ),
     );
