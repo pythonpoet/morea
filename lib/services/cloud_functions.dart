@@ -15,3 +15,11 @@ class MCloudFunctions extends BaseMCloudFunctions{
      return await callable.call(param);
    }
 }
+HttpsCallable getcallable(String functionName){
+     return CloudFunctions.instance.getHttpsCallable(
+      functionName: functionName,
+    );
+   }
+   Future<HttpsCallableResult> callFunction(HttpsCallable callable, {Map<String, dynamic> param})async{
+     return await callable.call(param);
+   }

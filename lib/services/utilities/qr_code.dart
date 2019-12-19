@@ -2,11 +2,10 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
-import 'package:qrcode_reader/qrcode_reader.dart';
 
 abstract class BaseQrCode{
   Widget generate(String str);
-  Future<void> german_scanQR();
+  Future<void> germanScanQR();
 }
 class QrCode implements BaseQrCode{
   String qrResult, germanError = 'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.';
@@ -16,7 +15,7 @@ class QrCode implements BaseQrCode{
       size: 200,
     );
   }
-  Future<void> german_scanQR() async{
+  Future<void> germanScanQR() async{
     try{
       qrResult = await BarcodeScanner.scan();
       return;

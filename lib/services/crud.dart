@@ -48,7 +48,6 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
   Stream<QuerySnapshot> streamCollection(String path) {
-    path = dwiformat.pathstring(path);
     return Firestore.instance.collection(path).snapshots();
   }
 
@@ -135,7 +134,6 @@ class CrudMedthods implements BaseCrudMethods {
     });
   }
 
-//TODO --> an Maxi, CrudMethods sind universelle Methoden. Kannst du diese in eine andere Klasse verschieben?
   Future<void> setDataWithoutDocumentName(
       String path, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);

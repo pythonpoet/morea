@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
-import 'view_userprofile_page.dart';
 import 'package:flutter/material.dart';
 
 class EditUserProfilePage extends StatefulWidget {
@@ -10,7 +9,7 @@ class EditUserProfilePage extends StatefulWidget {
 
   final BaseAuth auth;
   final Firestore firestore;
-  var profile;
+  final Map profile;
 
   @override
   State<StatefulWidget> createState() => new EditUserPoriflePageState();

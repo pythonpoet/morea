@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'parents.dart';
-import 'chilld_Qr_code.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
@@ -158,7 +156,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     mergeChildParent = new MergeChildParent(widget.crud0, widget.moreaFire);
      moreaFire = widget.moreaFire;
      crud0 = widget.crud0;
-     childParendPend = new ChildParendPend(crud0: widget.crud0);
+     childParendPend = new ChildParendPend(crud0: widget.crud0, moreaFirebase: widget.moreaFire);
     if (widget.profile['Pos'] == 'Teilnehmer') {
       reload();
       erziungsberechtigte();

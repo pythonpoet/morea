@@ -94,38 +94,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   updatedevtoken() async {
-    List devtoken = new List();
-    await moreafire.getUserInformation(userId).then((userInfo) {
-      try {
-        List devTokenOld = userInfo.data['devtoken'];
-        if (devTokenOld == null) {
-          firebaseMessaging.getToken().then((token) {
-            devtoken = [token];
-            userInfo.data['devtoken'] = devtoken;
-            moreafire.createUserInformation(userInfo.data);
-          });
-        } else {
-          firebaseMessaging.getToken().then((token) {
-            if (devTokenOld[0] == 'leer') {
-              devtoken = [token];
-            } else {
-              for (int i = 0; i < devTokenOld.length; i++) {
-                if (devTokenOld[i] == token) {
-                  return;
-                }
-              }
-              devtoken = [token];
-            }
-
-            userInfo.data['devtoken'] = devtoken;
-
-            moreafire.createUserInformation(userInfo.data);
-          });
-        }
-      } catch (e) {
-        print(e);
-      }
-    });
+    moreafire.uploadDevTocken();
   }
 
   void validateAndSubmit() async {
@@ -139,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
             userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
             print('Sign in: $userId');
             if (userId != null) {
-              updatedevtoken();
+              moreafire.uploadDevTocken();
               setState(() {
                 _load = false;
               });
@@ -157,13 +126,15 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _load = true;
                   });
-                  await datenschutz.morea_datenschutzerklaerung(context);
+                  await datenschutz.moreaDatenschutzerklaerung(context);
                   if (datenschutz.akzeptiert) {
                     userId = await widget.auth.createUserWithEmailAndPassword(
                         _email, _password);
                     print('Registered user: $userId');
                     if (userId != null) {
                       moreafire.createUserInformation(await mapUserData());
+                      moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
+                      moreafire.uploadDevTocken();
                       widget.onSignedIn();
                     }
                   } else {
@@ -194,7 +165,6 @@ class _LoginPageState extends State<LoginPage> {
                         "Passwort muss aus mindistens 6 Zeichen bestehen"),
                   ));
             }
-
             break;
           case FormType.registereltern:
             if (_password.length >= 6) {
@@ -208,13 +178,14 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       _load = true;
                     });
-                    await datenschutz.morea_datenschutzerklaerung(context);
+                    await datenschutz.moreaDatenschutzerklaerung(context);
                     if (datenschutz.akzeptiert) {
                       userId = await widget.auth
                           .createUserWithEmailAndPassword(_email, _password);
                       print('Registered user: $userId');
                       if (userId != null) {
                         moreafire.createUserInformation(await mapUserData());
+                        moreafire.uploadDevTocken();
                         setState(() {
                           _load = false;
                         });
@@ -363,6 +334,7 @@ class _LoginPageState extends State<LoginPage> {
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
           userMapAlter: this._alter,
+          userMapAccountCreated : DateTime.now(),
           userMapgroupID: convWebflowtoMiData(_selectedstufe),
           userMapMessagingGroups: {
             biberwebflowname: biberCheckbox,
@@ -370,14 +342,14 @@ class _LoginPageState extends State<LoginPage> {
             meitliwebflowname: meitliCheckbox,
             buebewebflowname: buebeCheckbox,
             },
-          'Adresse': this._adresse,
-          'PLZ': this._plz,
-          'Ort': this._ort,
-          'Handynummer': this._handynummer,
-          'Pos': 'Teilnehmer',
-          'UID': this.userId,
-          'Email': this._email,
-          'devtoken': devtoken
+          userMapAdresse: this._adresse,
+          userMapPLZ: this._plz,
+          userMapOrt: this._ort,
+          userMapHandynummer: this._handynummer,
+          userMapPos: 'Teilnehmer',
+          userMapUID: this.userId,
+          userMapEmail: this._email,
+          userMapDeviceToken: devtoken
         };
         return userInfo;
         break;
@@ -386,21 +358,22 @@ class _LoginPageState extends State<LoginPage> {
           userMapPfadiName: " ",
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
-          userMapgroupID: convWebflowtoMiData(_selectedstufe),
+          userMapgroupID: '',
+          userMapAccountCreated : DateTime.now(),
           userMapMessagingGroups: {
             biberwebflowname: biberCheckbox,
             woelfewebflowname: woelfeCheckbox,
             meitliwebflowname: meitliCheckbox,
             buebewebflowname: buebeCheckbox,
             },
-          'Adresse': this._adresse,
-          'PLZ': this._plz,
-          'Ort': this._ort,
-          'Handynummer': this._handynummer,
-          'Pos': this._selectedverwandtschaft,
-          'UID': this.userId,
-          'Email': this._email,
-          'devtoken': devtoken
+          userMapAdresse: this._adresse,
+          userMapPLZ: this._plz,
+          userMapOrt: this._ort,
+          userMapHandynummer: this._handynummer,
+          userMapPos: this._selectedverwandtschaft,
+          userMapUID: this.userId,
+          userMapEmail: this._email,
+          userMapDeviceToken: devtoken
         };
         return userInfo;
         break;

@@ -177,11 +177,41 @@ class _MessagesPageState extends State<MessagesPage> {
         body: StreamBuilder(
             stream: this.messages,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                         child:
                             MoreaShadowContainer(child: Text('Loading...'))));
+              } else if (!snapshot.hasData) {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text('Keine Nachrichten vorhanden'),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               } else if (snapshot.data.documents.length == 0) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -232,16 +262,8 @@ class _MessagesPageState extends State<MessagesPage> {
                                 itemCount: snapshot.data.documents.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
-                                  if (snapshot.data.documents.length == 0) {
-                                    return ListTile(
-                                      title:
-                                          Text('Keine Nachrichten vorhanden'),
-                                    );
-                                  } else {
-                                    var document =
-                                        snapshot.data.documents[index];
-                                    return _buildListItem(context, document);
-                                  }
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
                                 }),
                           ],
                         ),
@@ -268,8 +290,7 @@ class _MessagesPageState extends State<MessagesPage> {
               UserAccountsDrawerHeader(
                 accountName: Text(this.anzeigename),
                 accountEmail: Text(moreaFire.getEmail),
-                decoration: new BoxDecoration(
-                    color: MoreaColors.orange),
+                decoration: new BoxDecoration(color: MoreaColors.orange),
               ),
               ListTile(
                 title: new Text('Logout'),
@@ -375,8 +396,68 @@ class _MessagesPageState extends State<MessagesPage> {
         body: StreamBuilder(
             stream: this.messages,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return Text('Loading...');
+              } else if (!snapshot.hasData) {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text('Keine Nachrichten vorhanden'),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              } else if (snapshot.data.documents.length == 0) {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text('Keine Nachrichten vorhanden'),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               } else {
                 return LayoutBuilder(
                   builder: (context, viewportConstraints) {
@@ -385,21 +466,25 @@ class _MessagesPageState extends State<MessagesPage> {
                         child: MoreaShadowContainer(
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: snapshot.data.documents.length,
-                                itemBuilder: (context, index) {
-                                  if (snapshot.data.documents.length == 0) {
-                                    return ListTile(
-                                      title:
-                                          Text('Keine Nachrichten vorhanden'),
-                                    );
-                                  } else {
-                                    var document =
-                                        snapshot.data.documents[index];
-                                    return _buildListItem(context, document);
-                                  }
-                                }),
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 10),
+                                  child: Text(
+                                    'Nachrichten',
+                                    style: MoreaTextStyle.title,
+                                  ),
+                                ),
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data.documents.length,
+                                    itemBuilder: (context, index) {
+                                      var document =
+                                          snapshot.data.documents[index];
+                                      return _buildListItem(context, document);
+                                    }),
+                              ],
+                            ),
                           ),
                         ),
                       ),

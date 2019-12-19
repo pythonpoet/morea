@@ -34,7 +34,7 @@ abstract class BaseAuth {
   AuthProblems checkForAuthErrors(
       BuildContext context, PlatformException error);
 
-  Future<void> displayAuthError(AuthProblems errorType, BuildContext context);
+  void displayAuthError(AuthProblems errorType, BuildContext context);
 
   Future<void> changePassword(String newPassword);
 
@@ -166,7 +166,7 @@ class Auth implements BaseAuth {
     return errorType;
   }
 
-  Future<void> displayAuthError(AuthProblems errorType, BuildContext context) {
+  void displayAuthError(AuthProblems errorType, BuildContext context) {
     String errorMessage;
     switch (errorType) {
       case AuthProblems.userNotFound:

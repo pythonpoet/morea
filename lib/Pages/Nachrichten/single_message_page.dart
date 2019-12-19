@@ -5,12 +5,12 @@ import '../../morealayout.dart';
 class SingleMessagePage extends StatelessWidget {
   SingleMessagePage(message) {
     final data = message.data;
-    title = data['title'];
-    body = data['body'];
-    sender = data['sender'];
+    this.title = data['title'];
+    this.body = data['body'];
+    this.sender = data['sender'];
   }
 
-  String title, body, sender;
+   String title, body, sender;
 
   @override
   Widget build(BuildContext context) {

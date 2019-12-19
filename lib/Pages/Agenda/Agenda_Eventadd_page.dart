@@ -29,10 +29,10 @@ class EventAddPageState extends State<EventAddPage> {
   MoreaFirebase moreafire;
   int value = 2;
   List<String> mitnehemen = ['Pfadihämpt'];
-  final _addkey = new GlobalKey<FormState>();
-  final _changekey = new GlobalKey<FormState>();
-  final _addEvent = new GlobalKey<FormState>();
-  final _addLager = new GlobalKey<FormState>();
+  final _addkey = new GlobalKey<FormState>(debugLabel: "_addkey");
+  final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
+  final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
+  final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
 
   String eventname = ' ',
       datum = 'Datum wählen',
@@ -103,7 +103,8 @@ class EventAddPageState extends State<EventAddPage> {
         'groupIDs': this.goupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
-        'Mitnehmen': mitnehemen
+        'Mitnehmen': mitnehemen,
+        'DeleteDate': datum,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, event);
@@ -125,7 +126,7 @@ class EventAddPageState extends State<EventAddPage> {
         'Order': order,
         'Lager': true,
         'Event': false,
-        'Lagername': lagername,
+        'Eventname': eventname,
         'Datum': datumvon,
         'Datum bis': datumbis,
         'Lagerort': lagerort,
@@ -137,6 +138,7 @@ class EventAddPageState extends State<EventAddPage> {
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
+        'DeleteDate': datumbis,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, lager);
@@ -229,14 +231,7 @@ class EventAddPageState extends State<EventAddPage> {
       ),
     );
     if (delete) {
-      //TODO alternative
-      String name = dwiFormat.simplestring(
-          widget.eventinfo['Datum'] + widget.eventinfo['Lagername']);
-      crud0.deletedocument('Stufen/Biber/Agenda', name);
-      crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
-      crud0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
-      crud0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
-      crud0.deletedocument('Stufen/Pios/Agenda', name);
+      await agenda.deleteAgendaEvent(widget.eventinfo);
       Navigator.pop(context);
     }
   }
@@ -265,14 +260,7 @@ class EventAddPageState extends State<EventAddPage> {
       ),
     );
     if (delete) {
-      //agenda.deleteAgendaEvent(groupID, eventID)
-      String name = dwiFormat.simplestring(
-          widget.eventinfo['Datum'] + widget.eventinfo['Eventname']);
-      crud0.deletedocument('Stufen/Biber/Agenda', name);
-      crud0.deletedocument('Stufen/WombatWlfe/Agenda', name);
-      crud0.deletedocument('Stufen/NahaniMeitli/Agenda', name);
-      crud0.deletedocument('Stufen/DrasonBuebe/Agenda', name);
-      crud0.deletedocument('Stufen/Pios/Agenda', name);
+      await agenda.deleteAgendaEvent(widget.eventinfo);
       Navigator.pop(context);
     }
   }
@@ -309,11 +297,11 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    if(subgroups==null)
+      return Card(child: Container(padding: EdgeInsets.all(100),child: simpleMoreaLoadingIndicator(),),);
     switch (widget.agendaModus) {
       case AgendaModus.beides:
-        return this.subgroups.isEmpty
-            ? simpleMoreaLoadingIndicator()
-            : DefaultTabController(
+        return DefaultTabController(
                 length: 2,
                 child: new Scaffold(
                   appBar: new AppBar(
@@ -330,9 +318,7 @@ class EventAddPageState extends State<EventAddPage> {
               );
         break;
       case AgendaModus.event:
-        return this.subgroups.isEmpty
-            ? simpleMoreaLoadingIndicator()
-            : Scaffold(
+        return Scaffold(
                 appBar: new AppBar(
                   title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
                   backgroundColor: Color(0xff7a62ff),
@@ -356,9 +342,7 @@ class EventAddPageState extends State<EventAddPage> {
 
         break;
       case AgendaModus.lager:
-        return this.subgroups.isEmpty
-            ? simpleMoreaLoadingIndicator()
-            : Scaffold(
+        return Scaffold(
                 appBar: new AppBar(
                   title:
                       new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
@@ -434,7 +418,7 @@ class EventAddPageState extends State<EventAddPage> {
                                     border: OutlineInputBorder(),
                                     filled: false,
                                   ),
-                                  onSaved: (value) => lagername = value,
+                                  onSaved: (value) => eventname = value,
                                 ),
                               )
                             ],
@@ -565,7 +549,7 @@ class EventAddPageState extends State<EventAddPage> {
                                       physics: NeverScrollableScrollPhysics(),
                                       children: subgroups
                                           .map((Map<dynamic, dynamic> group) {
-                                        print("group: " + group.toString());
+                                       
                                         return new CheckboxListTile(
                                           title: new Text(
                                               group[groupMapgroupNickName]),

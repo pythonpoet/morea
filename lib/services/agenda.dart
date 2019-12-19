@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -81,11 +80,11 @@ class Agenda extends BaseAgenda{
   }
  Future<DocumentSnapshot> getAgendaTitle(String eventID)async{
    return await crud0.getDocument(pathEvents, eventID);
-   
   }
   Future<void> deleteAgendaEvent(Map<String, dynamic> event)async{
-    List<String> groupIDs = event["groupIDs"];
+    List<String> groupIDs = new List<String>.from(event["groupIDs"]);
     String eventID = event["eventID"];
+    if(groupIDs.isNotEmpty)
     for(String groupID in groupIDs){
     this.deleteAgendaOverviewTitle(groupID, eventID);
     }
@@ -123,7 +122,8 @@ class Agenda extends BaseAgenda{
       "eventID": event["eventID"],
       "Lager" : event["Lager"],
       "Event" : event["Event"],
-      "Eventname": event["Eventname"]
+      "Eventname": event["Eventname"],
+      "DeleteDate": event["DeleteDate"]
     });
   }
 
@@ -153,7 +153,7 @@ class Agenda extends BaseAgenda{
     DocumentReference docRef = db.collection(pathGroups).document(groupID);
     List<dynamic> agendaOverview = new List();
    
-    DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
+    //DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
     
     try{
           TransactionHandler transactionHandler =  (Transaction tran)async {
