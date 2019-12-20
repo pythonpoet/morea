@@ -293,11 +293,11 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID){
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
-  Future<void> uploadDevTocken() async {
-    await callFunction(getcallable("appendDeviceToken"),param: Map<String,String>.from(
+  Future<void> uploadDevTocken(String userID) async {
+    await callFunction(getcallable("uploadDevTocken"),param: Map<String,String>.from(
       {
         userMapDeviceToken: await firebaseMessaging.getToken(),
-        userMapUID: auth0.getUserID
+        userMapUID: userID
       }
     ));
   }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
@@ -55,13 +56,7 @@ class _LoginPageState extends State<LoginPage> {
       userId,
       error;
   FormType _formType = FormType.login;
-  List<String> _stufenselect = [
-    'Biber',
-    'Wombat (Wölfe)',
-    'Nahani (Meitli)',
-    'Drason (Buebe)',
-    'Pios'
-  ];
+  List<Map> _stufenselect = new List();
   List<String> _verwandtschaft = [
     'Mutter',
     'Vater',
@@ -81,6 +76,7 @@ class _LoginPageState extends State<LoginPage> {
   bool buebeCheckbox = false;
   bool pioCheckbox = false;
 
+  
 
 
   bool validateAndSave() {
@@ -94,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   updatedevtoken() async {
-    moreafire.uploadDevTocken();
+    moreafire.uploadDevTocken(userId);
   }
 
   void validateAndSubmit() async {
@@ -108,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
             userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
             print('Sign in: $userId');
             if (userId != null) {
-              moreafire.uploadDevTocken();
+              moreafire.uploadDevTocken(userId);
               setState(() {
                 _load = false;
               });
@@ -134,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (userId != null) {
                       moreafire.createUserInformation(await mapUserData());
                       moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
-                      moreafire.uploadDevTocken();
+                      moreafire.uploadDevTocken(userId);
                       widget.onSignedIn();
                     }
                   } else {
@@ -170,11 +166,6 @@ class _LoginPageState extends State<LoginPage> {
             if (_password.length >= 6) {
               if (_password == _passwordneu) {
                 if (_selectedverwandtschaft != "Verwandtschaftsgrad wählen") {
-                  if (biberCheckbox ||
-                      woelfeCheckbox ||
-                      meitliCheckbox ||
-                      buebeCheckbox ||
-                      pioCheckbox) {
                     setState(() {
                       _load = true;
                     });
@@ -185,22 +176,14 @@ class _LoginPageState extends State<LoginPage> {
                       print('Registered user: $userId');
                       if (userId != null) {
                         moreafire.createUserInformation(await mapUserData());
-                        moreafire.uploadDevTocken();
+                        moreafire.uploadDevTocken(userId);
                         setState(() {
                           _load = false;
                         });
                         widget.onSignedIn();
                       }
                     }
-                  } else {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Stufe auswählen"),
-                          );
-                        });
-                  }
+                 
                 } else {
                   showDialog(
                       context: context,
@@ -335,7 +318,7 @@ class _LoginPageState extends State<LoginPage> {
           userMapNachName: this._nachname,
           userMapAlter: this._alter,
           userMapAccountCreated : DateTime.now(),
-          userMapgroupID: convWebflowtoMiData(_selectedstufe),
+          userMapgroupID: _selectedstufe,
           userMapMessagingGroups: {
             biberwebflowname: biberCheckbox,
             woelfewebflowname: woelfeCheckbox,
@@ -390,6 +373,16 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
+    
+    initSubgoup();
+  }
+  initSubgoup() async {
+    CrudMedthods crud0 = new CrudMedthods(widget.firestore);
+    Map<String, dynamic> data =
+        (await crud0.getDocument(pathGroups, "1165")).data;
+    this._stufenselect =
+        new List<Map>.from(data[groupMapSubgroup]);
+    setState(() {});
   }
 
   @override
@@ -984,10 +977,10 @@ class _LoginPageState extends State<LoginPage> {
                           width: 1000,
                           color: Colors.grey[200],
                           child: new DropdownButton<String>(
-                              items: _stufenselect.map((String val) {
+                              items: _stufenselect.map((Map group) {
                                 return new DropdownMenuItem<String>(
-                                  value: val,
-                                  child: new Text(val),
+                                  value: group[userMapgroupID],
+                                  child: new Text(group[groupMapgroupNickName]),
                                 );
                               }).toList(),
                               hint: Text(_selectedstufe),
