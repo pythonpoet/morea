@@ -16,19 +16,13 @@ class Teleblitz {
   Info info = new Info();
   GlobalKey<FlipCardState> teleblitzCardKey = GlobalKey<FlipCardState>();
   String eventID;
-  WerChunnt werChunnt;
 
   Teleblitz(MoreaFirebase moreaFire) {
     this.moreaFire = moreaFire;
-    this.eventID = moreaFire.getHomeFeedMainEventID;
-    if (moreaFire.getPos == "Leiter") {
-      this.werChunnt = WerChunnt(this.moreaFire, this.eventID);
-    }
+   
   }
 
-  void dispose() {
-    werChunnt.dispose();
-  }
+
 
   void defineInfo(Map<String, dynamic> tlbz, groupID) {
     info.setTitel(convMiDatatoWebflow(groupID));
@@ -89,7 +83,7 @@ class Teleblitz {
     );
   }
 
-  Widget teleblitz() {
+  Widget teleblitz(String eventID) {
     if (moreaFire.getPos != "Leiter") {
       return MoreaShadowContainer(
         child: Padding(
@@ -108,6 +102,7 @@ class Teleblitz {
         ),
       );
     } else {
+      WerChunnt werChunnt = new WerChunnt(moreaFire, eventID);
       return FlipCard(
         direction: FlipDirection.HORIZONTAL,
         flipOnTouch: false,
@@ -188,7 +183,7 @@ class Teleblitz {
                       ),
                       StreamBuilder(
                         stream:
-                            moreaFire.streamCollectionWerChunnt(this.eventID),
+                            moreaFire.streamCollectionWerChunnt(eventID),
                         builder:
                             (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.connectionState ==
@@ -254,7 +249,7 @@ class Teleblitz {
     );
   }
 
-  Widget element(Map<String, dynamic> tlbz) {
+  Widget element(String eventID, Map<String, dynamic> tlbz) {
     var keineAkt = tlbz["keine-aktivitat"];
     var keineFerien =tlbz["ferien"];
     if(keineAkt.runtimeType == String){
@@ -269,7 +264,7 @@ class Teleblitz {
     } else if (keineFerien) {
       return ferien();
     } else {
-      return teleblitz();
+      return teleblitz(eventID);
     }
   }
 
@@ -308,7 +303,7 @@ class Teleblitz {
     if (mapTeleblitz != null)
       mapTeleblitz.forEach((eventID, tlbz) {
         defineInfo(tlbz, groupID);
-        returnTelebliz[eventID] = element(tlbz);
+        returnTelebliz[eventID] = element(eventID, tlbz);
       });
     else {
       returnTelebliz[tlbzMapNoElement] = noElement();

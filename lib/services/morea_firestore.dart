@@ -22,7 +22,7 @@ abstract class BaseMoreaFirebase {
 
   String get getPos;
 
-  String get getHomeFeedMainEventID;
+  //String get getHomeFeedMainEventID;
 
   String get getEmail;
 
@@ -62,7 +62,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       _vorName,
       _nachName,
       _pos,
-      _homeFeedMainEventID,
+      //_homeFeedMainEventID,
       _email;
   Map<String, dynamic> _messagingGroups;
   List<String> _subscribedGroups = new List<String>();
@@ -89,7 +89,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   String get getEmail => _email;
 
-  String get getHomeFeedMainEventID => _homeFeedMainEventID;
+  //String get getHomeFeedMainEventID => _homeFeedMainEventID;
 
   List<String> get getSubscribedGroups => _subscribedGroups;
 
@@ -119,7 +119,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       //init groupMap
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-      _homeFeedMainEventID = _groupMap["homeFeed"][0];
+     // _homeFeedMainEventID = _groupMap["homeFeed"][0];
     } else {
       if (_userMap.containsKey(userMapKinder)) {
         Map<String, String> kinderMap =
