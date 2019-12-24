@@ -55,6 +55,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
   Map<String, dynamic> _userMap, _groupMap;
+  Map<String, int> _groupPrivilege= new Map();
   Map<String, Map<String, String>> _subscribedGroupsMap, _childMap;
   String _displayName,
       _pfadiName,
@@ -98,6 +99,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, dynamic> get getUserMap => _userMap;
 
   Map<String, Map<String, String>> get getChildMap => _childMap;
+  Map<String, int> get getGroupPrivilege => _groupPrivilege;
 
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
@@ -116,10 +118,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
     else
       _displayName = _pfadiName;
     if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
-      //init groupMap
+      
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-     // _homeFeedMainEventID = _groupMap["homeFeed"][0];
+      _groupPrivilege[_groupID] = _groupMap["Access"][_userMap[userMapUID]]["privilege"];
+
+     
     } else {
       if (_userMap.containsKey(userMapKinder)) {
         Map<String, String> kinderMap =
@@ -142,9 +146,14 @@ class MoreaFirebase extends BaseMoreaFirebase {
       if (!_subscribedGroups.contains(childUserDat[userMapgroupID]))
         _subscribedGroups.add(childUserDat[userMapgroupID]);
     }
+    parentGroupPrivilege(childMap);
     return childMap;
   }
-
+  //TODO GroupPrivilege aus groupMap nehmen
+parentGroupPrivilege(Map<String, Map<String, String>> childMap){
+  for (String groupID in childMap.keys)
+    _groupPrivilege[groupID] = 2;
+}
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
     groupIDs.addAll(_subscribedGroups);

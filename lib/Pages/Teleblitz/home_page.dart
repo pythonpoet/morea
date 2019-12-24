@@ -94,7 +94,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     await moreafire.getData(widget.auth.getUserID);
     await moreafire.initTeleblitz();
     forminit();
-    teleblitz = new Teleblitz(moreafire);
+    teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
   }
 
