@@ -142,7 +142,6 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     DocumentSnapshot doc = await crud0.getDocument(pathEvents, eventID);
     return doc.exists;
   }
-  //TODO Auf Teleblitz Home ändern
   Future<void> uploadTelbzAkt(String groupnr, Map<String, dynamic> data) async {
     return await crud0.runTransaction(pathGroups, groupnr, data);
   }

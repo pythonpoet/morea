@@ -152,7 +152,7 @@ class _AgendaStatePage extends State<AgendaState>
         appBar: new AppBar(
           title: new Text('Agenda'),
         ),
-        body: Agenda(moreafire.getUserMap[userMapgroupID]),
+        body: aAgenda(moreafire.getUserMap[userMapgroupID]),
         floatingActionButton: new FloatingActionButton(
           child: Icon(Icons.add),
           backgroundColor: Color(0xff7a62ff),
@@ -311,7 +311,7 @@ class _AgendaStatePage extends State<AgendaState>
             ],
           ),
         ),
-        body: Agenda(moreafire.getUserMap[userMapgroupID]),
+        body: aAgenda(moreafire.getUserMap[userMapgroupID]),
       ));
     }
   }
@@ -339,7 +339,7 @@ class _AgendaStatePage extends State<AgendaState>
             )));
   }
 
-  Widget Agenda(String groupID){
+  Widget aAgenda(String groupID){
     return StreamBuilder(
         stream: _getAgenda(groupID).asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {

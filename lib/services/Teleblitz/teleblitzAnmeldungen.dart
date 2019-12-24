@@ -24,7 +24,7 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen{
     _anmeldeController.addStream(this.getTNAngemolden(eventID));
     _abmeldeController.addStream(this.getTNAbgemolden(eventID));
   }
-  @override
+
   void dispose(){
     _anmeldeController.close();
     _abmeldeController.close();

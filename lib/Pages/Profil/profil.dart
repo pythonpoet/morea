@@ -1,9 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Agenda/Agenda_page.dart';
-import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Profil/change_phone_number.dart';
-import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
@@ -44,7 +40,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     this.userInfo = widget.moreaFire.getUserMap;
-    this._getNachrichtenGruppen();
+    //this._getNachrichtenGruppen();
     this.oldEmail = userInfo['Email'];
   }
 
@@ -327,7 +323,7 @@ class _ProfileState extends State<Profile> {
         'Nahani (Meitli)': nahani,
         'Wombat (Wölfe)': wombat
       };
-      this._getNachrichtenGruppen();
+      //this._getNachrichtenGruppen();
     });
   }
 
@@ -346,6 +342,7 @@ class _ProfileState extends State<Profile> {
       return false;
     }
   }
+  /*
 
   void _getNachrichtenGruppen() {
     List<String> neuNachrichtenGruppen = [];
@@ -356,7 +353,7 @@ class _ProfileState extends State<Profile> {
     }
     nachrichtenGruppen = neuNachrichtenGruppen;
   }
-
+*/
   void _showReauthenticate(String email) {
     showDialog(
         context: context,

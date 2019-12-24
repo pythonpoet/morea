@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
@@ -31,13 +29,11 @@ class MergeChildParent extends BaseMergeChildParent {
       _pfadinamen = ' ',
       _vorname = "",
       _nachname = "",
-      _selectedstufe = 'Stufe wählen',
-      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
+      _selectedstufe = 'Stufe wählen';
   String _password,
       _adresse,
       _ort,
       _plz,
-      _handynummer,
       _passwordneu,
       userId,
       error,
@@ -178,7 +174,7 @@ class MergeChildParent extends BaseMergeChildParent {
   }
 
   void parentReadsQrCode(Map<String, dynamic> userMap, Function parentaktuallisieren) async {
-    await qrCode.german_scanQR();
+    await qrCode.germanScanQR();
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
       childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);

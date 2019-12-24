@@ -122,15 +122,21 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _load = true;
                   });
-                  await datenschutz.morea_datenschutzerklaerung(context);
+                  await datenschutz.moreaDatenschutzerklaerung(context);
                   if (datenschutz.akzeptiert) {
                     userId = await widget.auth.createUserWithEmailAndPassword(
                         _email, _password);
                     print('Registered user: $userId');
                     if (userId != null) {
+                      //Creates userMap
                       moreafire.createUserInformation(await mapUserData());
+                      //writes Devicetoken to collection of groupID
                       moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
+                      //uploads devtoken to userMap
                       moreafire.uploadDevTocken(userId);
+                      //Writes tn rights to groupMap
+                      moreafire.groupPriviledgeTN(_selectedstufe ,userId, (_pfadinamen == ' '? _vorname: _pfadinamen));
+                      //sends user to rootpage
                       widget.onSignedIn();
                     }
                   } else {
@@ -169,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       _load = true;
                     });
-                    await datenschutz.morea_datenschutzerklaerung(context);
+                    await datenschutz.moreaDatenschutzerklaerung(context);
                     if (datenschutz.akzeptiert) {
                       userId = await widget.auth
                           .createUserWithEmailAndPassword(_email, _password);
@@ -211,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
-        await widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
+         widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
@@ -281,37 +287,6 @@ class _LoginPageState extends State<LoginPage> {
     List devtoken = [token];
     switch (_formType) {
       case FormType.register:
-        if (_selectedstufe == 'Biber') {
-          biberCheckbox = true;
-          woelfeCheckbox = false;
-          meitliCheckbox = false;
-          buebeCheckbox = false;
-          pioCheckbox = false;
-        } else if (_selectedstufe == 'Wombat (Wölfe)') {
-          biberCheckbox = false;
-          woelfeCheckbox = true;
-          meitliCheckbox = false;
-          buebeCheckbox = false;
-          pioCheckbox = false;
-        } else if (_selectedstufe == 'Nahani (Meitli)') {
-          biberCheckbox = false;
-          woelfeCheckbox = false;
-          meitliCheckbox = true;
-          buebeCheckbox = false;
-          pioCheckbox = false;
-        } else if (_selectedstufe == 'Drason (Buebe)') {
-          biberCheckbox = false;
-          woelfeCheckbox = false;
-          meitliCheckbox = false;
-          buebeCheckbox = true;
-          pioCheckbox = false;
-        } else if (_selectedstufe == 'Pios') {
-          biberCheckbox = false;
-          woelfeCheckbox = false;
-          meitliCheckbox = false;
-          buebeCheckbox = false;
-          pioCheckbox = true;
-        }
         Map<String, dynamic> userInfo = {
           userMapPfadiName: this._pfadinamen,
           userMapVorName: this._vorname,
@@ -319,12 +294,7 @@ class _LoginPageState extends State<LoginPage> {
           userMapAlter: this._alter,
           userMapAccountCreated : DateTime.now(),
           userMapgroupID: _selectedstufe,
-          userMapMessagingGroups: {
-            biberwebflowname: biberCheckbox,
-            woelfewebflowname: woelfeCheckbox,
-            meitliwebflowname: meitliCheckbox,
-            buebewebflowname: buebeCheckbox,
-            },
+  
           userMapAdresse: this._adresse,
           userMapPLZ: this._plz,
           userMapOrt: this._ort,
@@ -343,12 +313,6 @@ class _LoginPageState extends State<LoginPage> {
           userMapNachName: this._nachname,
           userMapgroupID: '',
           userMapAccountCreated : DateTime.now(),
-          userMapMessagingGroups: {
-            biberwebflowname: biberCheckbox,
-            woelfewebflowname: woelfeCheckbox,
-            meitliwebflowname: meitliCheckbox,
-            buebewebflowname: buebeCheckbox,
-            },
           userMapAdresse: this._adresse,
           userMapPLZ: this._plz,
           userMapOrt: this._ort,

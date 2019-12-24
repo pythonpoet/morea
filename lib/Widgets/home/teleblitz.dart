@@ -3,7 +3,6 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
-import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/crud.dart';
@@ -646,6 +645,8 @@ class Info {
       ),
       padding: EdgeInsets.symmetric(horizontal: 20),*/
       );
+    }else{
+      return Container();
     }
   }
 

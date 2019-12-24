@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/About/about.dart';
-import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
@@ -14,7 +13,6 @@ import 'package:morea/Widgets/home/teilnehmer.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
-import 'werchunt.dart';
 import 'select_stufe.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
@@ -263,6 +261,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               body: requestPrompttoParent());
         break;
+        default:
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Teleblitz'),
+            ),
+            drawer: new Drawer(
+              child: new ListView(children: navigation()),
+            ),
+            body: moreaLoading.loading());
     }
   }
 
@@ -356,6 +363,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           )
         ];
         break;
+        default:
+          return [
+            ListTile(
+              leading: Text('Loading...'),
+            )
+          ];
     }
   }
 

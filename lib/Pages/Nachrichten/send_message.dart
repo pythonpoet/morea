@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/morea_firestore.dart';

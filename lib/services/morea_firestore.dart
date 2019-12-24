@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/cloud_functions.dart';
@@ -56,7 +55,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   TeleblizFirestore tbz;
   Map<String, dynamic> _userMap, _groupMap;
   Map<String, int> _groupPrivilege= new Map();
-  Map<String, Map<String, String>> _subscribedGroupsMap, _childMap;
+  Map<String, Map<String, String>>_childMap;
   String _displayName,
       _pfadiName,
       _groupID,
@@ -121,7 +120,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-      _groupPrivilege[_groupID] = _groupMap["Access"][_userMap[userMapUID]]["privilege"];
+      _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
 
      
     } else {
@@ -307,6 +306,15 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
       {
         userMapDeviceToken: await firebaseMessaging.getToken(),
         userMapUID: userID
+      }
+    ));
+  }
+  Future<void> groupPriviledgeTN(String groupID, String userID, String displayName) async {
+    return callFunction(getcallable("priviledgeTN"),param: Map<String,String>.from(
+      {
+        userMapgroupID: groupID,
+        userMapUID: userID,
+        "displayName": displayName
       }
     ));
   }

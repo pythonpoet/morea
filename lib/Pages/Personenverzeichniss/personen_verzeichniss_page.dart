@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Personenverzeichniss/view_userprofile_page.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
-import 'package:morea/services/utilities/MiData.dart';
 
 class PersonenVerzeichnisState extends StatefulWidget {
   PersonenVerzeichnisState({this.userInfo});
-  var userInfo;
+  final Map userInfo;
   @override
   State<StatefulWidget> createState() => PersonenVerzeichnisStatePage();
 }

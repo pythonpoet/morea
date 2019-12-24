@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -154,7 +153,7 @@ class Agenda extends BaseAgenda{
     DocumentReference docRef = db.collection(pathGroups).document(groupID);
     List<dynamic> agendaOverview = new List();
    
-    DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
+    //DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
     
     try{
           TransactionHandler transactionHandler =  (Transaction tran)async {
