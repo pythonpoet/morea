@@ -26,7 +26,9 @@ class Teleblitz {
   }
 
   void dispose() {
-    werChunnt.dispose();
+    if (moreaFire.getPos == "Leiter"){
+      werChunnt.dispose();
+    }
   }
 
   void defineInfo(Map<String, dynamic> tlbz, groupID) {
