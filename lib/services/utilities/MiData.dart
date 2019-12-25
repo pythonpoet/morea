@@ -1,5 +1,3 @@
-
-
 import 'package:morea/services/utilities/dwi_format.dart'; 
 
   String convWebflowtoMiData(String stufe){
@@ -21,7 +19,8 @@ import 'package:morea/services/utilities/dwi_format.dart';
       case 'Drason (Buebe)':
         return '4013';
       default:
-        throw "convWebflowtoMiData Error";
+        print("stufe = "+ stufe);
+        return stufe;
     }
   }
    String convMiDatatoWebflow(String groupID){

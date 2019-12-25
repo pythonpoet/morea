@@ -29,7 +29,6 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Map<String, dynamic> _teleblitze = new Map<String,dynamic>();
   Map<String,List<String>> mapHomeFeed = new Map<String,List<String>>();
   Map<String,Map<String, Map<String, dynamic>>> mapOfGroupEvent = new Map<String,Map<String, Map<String, dynamic>>>();
- 
   StreamController<Map<String, List<String>>> _mapHomeFeedController = new BehaviorSubject();
   StreamController<Map<String, Map<String, Map<String,dynamic>>>> _mapofEventsController = new BehaviorSubject();
   
@@ -148,6 +147,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
 
   Future<void> uploadTelbz(String eventID, Map<String, dynamic> data) async {
     data['Timestamp'] = DateTime.now().toString();
+    data['TeleblitzType']= "Teleblitz";
     return await crud0.runTransaction(pathEvents, eventID, data);
   }
 }
