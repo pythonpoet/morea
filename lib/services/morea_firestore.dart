@@ -171,7 +171,8 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
     Map userInfo,
   ) async {
     userUID = dwiformat.simplestring(userUID);
-    await crud0.setData(pathUser, userUID, userInfo);
+    Map<String, dynamic> request = {"type": "updateUserInformation", "content": userInfo};
+    await crud0.setData(pathRequest, userUID, request);
     return null;
   }
 
@@ -297,8 +298,8 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
     await crud0.setData('groups/$groupnr/messages', messageID, oldMessage.data);
     return null;
   }
-  
-  Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID){
+
+  Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID) {
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
   Future<void> uploadDevTocken(String userID) async {
