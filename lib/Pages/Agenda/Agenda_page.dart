@@ -67,16 +67,31 @@ class _AgendaStatePage extends State<AgendaState>
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
-    DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
-    DateTime now = DateTime.now();
+    if(event.containsKey("DeleteDate")){
+      DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
+      DateTime now = DateTime.now();
 
-    if (_agdatum.difference(now).inDays < 0) {
-      Map fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
-      if(fullevent != null)
-      agenda.deleteAgendaEvent(fullevent);
-      else
-      agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
+      if (_agdatum.difference(now).inDays < 0) {
+        Map fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+        if(fullevent != null)
+        agenda.deleteAgendaEvent(fullevent);
+        else
+        agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
+      }
+    }else{
+      Map fullevent;
+      try{
+         fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+      }catch(e){
+        throw e;
+         
+      }
+        if(fullevent != null)
+        agenda.deleteAgendaEvent(fullevent);
+        else
+        agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
     }
+    
   }
 
   bool istLeiter() {

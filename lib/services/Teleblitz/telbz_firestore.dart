@@ -16,7 +16,7 @@ abstract class BaseTeleblitzFirestore {
   Stream<Map<String,dynamic>> steramTelebliz(eventID);
 
   Stream<Map<String, List<String>>> streamMapHomeFeed(List<String> groupIDs);
-  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs);
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(List<String> groupIDs);
   Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs);
   Future<bool> eventIDExists(String eventID);
 
@@ -86,20 +86,19 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     return listStream[0];
   }
    Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEventsHelper(MapEntry<String, List<String>> homeFeed)async*{
-
-    await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value)){
+    await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value).asBroadcastStream()){
           print(mapofEvents);
           mapOfGroupEvent[homeFeed.key] = mapofEvents;
           yield mapOfGroupEvent;
         }
   }
-  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs)async*{
+  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(List<String> groupIDs)async*{
     List<Stream<Map<String, Map<String, Map<String,dynamic>>>>> listStream = new List();
-    Stream<Map<String, List<String>>> someStream = this.streamMapHomeFeed(groupIDs);
-    await for(Map<String, List<String>>listHomeFeed in someStream){
+    await for(Map<String, List<String>>listHomeFeed in this.streamMapHomeFeed(groupIDs)){
       for(MapEntry<String, List<String>> homeFeed in listHomeFeed.entries){
         if(homeFeed.value.isNotEmpty)
         listStream.add(streamMapofGroupEventsHelper(homeFeed));
+        print("ck1");
       }
       yield* StreamGroup.merge(listStream);
     }    

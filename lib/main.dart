@@ -1,11 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Grundbausteine/root_page.dart';
 import 'package:morea/services/auth.dart';
 import 'morealayout.dart';
 
-Future<void> main() async {
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   /*final FirebaseApp app = await FirebaseApp.configure(
     name: 'Pfadi Morea',
     options: const FirebaseOptions(
@@ -20,10 +20,10 @@ Future<void> main() async {
 
   */
   
-  WidgetsFlutterBinding.ensureInitialized();
+  
   runApp(
     MaterialApp(
-        title: 'Morea App',
+        title: 'Pfadi Morea',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
             fontFamily: 'Raleway',
@@ -36,11 +36,10 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   //MyApp({this.firestore});
 
-   Firestore firestore;
+   final Firestore firestore = new Firestore();
 
   @override
   Widget build(BuildContext context) {
-    Firestore firestore = new Firestore();
     return new MaterialApp(
       title: 'Pfadi Morea',
       debugShowCheckedModeBanner: false,
