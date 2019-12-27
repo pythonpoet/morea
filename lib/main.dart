@@ -1,4 +1,17 @@
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:random_string/random_string.dart';
+import 'package:share/share.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() => runApp(MyApp());
 
@@ -57,47 +70,113 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void testFirebaseAuth() {
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    print(_firebaseAuth.createUserWithEmailAndPassword(
+        email: "adam@eva.mapf", password: "123456"));
+  }
+
+  void testCloudFunction() {
+    Firestore.instance
+        .collection('books')
+        .document()
+        .setData({'title': 'title', 'author': 'author'});
+  }
+
+  void testHttp() async {
+    var url = 'http://example.com/whatsit/create';
+    var response =
+        await http.post(url, body: {'name': 'doodle', 'color': 'blue'});
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    print(await http.read('https://morea.ch'));
+  }
+
+  void testIntl() {
+    Intl.defaultLocale = 'pt_BR';
+  }
+
+  void testlaunchURL() async {
+    const url = 'https://flutter.dev';
+    print("object");
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void testshare() {
+    Share.share('check out my website https://example.com');
+  }
+
+  void testMaskedtext() {
+    var controller = new MaskedTextController(mask: '000.000.000-00');
+  }
+
+  void testRandom() {
+    print("RandomNumber" + randomBetween(10, 20).toString());
+  }
+  void testBarcodeScan(){
+  BarcodeScanner.scan();
+  }
+  void testFCM(){
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  }
+
+  Widget testButton(String text, Function execution) {
+    return RaisedButton(
+      child: Text(text),
+      onPressed: execution,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    print("i Live");
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("Testing libs for Pfadi-Morea app"),
       ),
-      body: Center(
+      body: new Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              'Test-Methods',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+            testButton("AUTH", testFirebaseAuth),
+            testButton("Firestore", this.testCloudFunction),
+            testButton("HTTP", this.testHttp),
+            testButton("Intl", this.testIntl),
+            testButton("Launch URL", this.testlaunchURL),
+            testButton("Random", this.testRandom),
+            testButton("Share", this.testshare),
+            testButton("Masket Text", testMaskedtext),
+            testButton("Barconscann", this.testBarcodeScan),
+            testButton("FCM", testFCM),
+            ExpandablePanel(
+              header: Text("Expanable"),
+              collapsed: Text(
+                "collapsed",
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              expanded: QrImage(
+                data: 'This is a simple QR code',
+                version: QrVersions.auto,
+                size: 320,
+                gapless: false,
+              ),
+              tapHeaderToExpand: true,
+              hasIcon: true,
+            )
           ],
         ),
       ),
