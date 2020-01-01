@@ -92,7 +92,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     await moreafire.getData(widget.auth.getUserID);
     await moreafire.initTeleblitz();
     forminit();
-    teleblitz = new Teleblitz(moreafire);
+    teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
   }
 
@@ -198,10 +198,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    moreaLoading.dispose();
-    if(_formType == FormType.leiter){
-      teleblitz.dispose();
-    }
+    moreaLoading.dispose()
     super.dispose();
   }
 
