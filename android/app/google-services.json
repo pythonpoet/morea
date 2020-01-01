@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "20884476221",
+    "firebase_url": "https://dev-pfadi-morea.firebaseio.com",
+    "project_id": "dev-pfadi-morea",
+    "storage_bucket": "dev-pfadi-morea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20884476221:android:da0ee1d9ef987290793554",
+        "android_client_info": {
+          "package_name": "ch.morea.morea"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "20884476221-mggtj83cfup1et1cnep84qucs56b4vni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2a0cQBNwWtYY95mrAy99q-w_YD_PrYvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "20884476221-mggtj83cfup1et1cnep84qucs56b4vni.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "20884476221-jnfu6klpjbqekaoeofmjnf9ndsjlt0rg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "MCBK5KYUS5.ch.morea.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
