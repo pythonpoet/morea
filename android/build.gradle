@@ -1,10 +1,12 @@
 buildscript {
+    ext.kotlin_version = '1.2.71'
     repositories {
         google()
         jcenter()
     }
 
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.android.tools.build:gradle:3.3.0'
         classpath 'com.google.gms:google-services:4.3.2'
 
@@ -29,6 +31,8 @@ subprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+<<<<<<< HEAD
+=======
 
 subprojects {
     project.configurations.all {
@@ -40,3 +44,4 @@ subprojects {
         }
     }
 }
+>>>>>>> 5dd79079baef7c4d6772bbef7d4d352f188f26b9

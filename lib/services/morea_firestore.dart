@@ -103,7 +103,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
         (await crud0.getDocument(pathUser, userID)).data);
-    //init userMap
+    print("tpck _userMap contains data: ${_userMap.isNotEmpty}");
     _pfadiName = _userMap[userMapPfadiName];
     _groupID = _userMap[userMapgroupID];
     _vorName = _userMap[userMapVorName];
@@ -117,19 +117,20 @@ class MoreaFirebase extends BaseMoreaFirebase {
     else
       _displayName = _pfadiName;
     if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
-      
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
       _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
 
      
     } else {
+      print("tpck get child map");
       if (_userMap.containsKey(userMapKinder)) {
         Map<String, String> kinderMap =
             Map<String, String>.from(_userMap[userMapKinder]);
         _childMap = await createChildMap(kinderMap);
       }
     }
+    print("tpck getData exit");
   }
 
   Future<Map<String, Map<String, String>>> createChildMap(
@@ -171,7 +172,8 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
     Map userInfo,
   ) async {
     userUID = dwiformat.simplestring(userUID);
-    await crud0.setData(pathUser, userUID, userInfo);
+    Map<String, dynamic> request = {"type": "updateUserInformation", "content": userInfo};
+    await crud0.setData(pathRequest, userUID, request);
     return null;
   }
 
@@ -297,8 +299,8 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
     await crud0.setData('groups/$groupnr/messages', messageID, oldMessage.data);
     return null;
   }
-  
-  Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID){
+
+  Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID) {
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
   Future<void> uploadDevTocken(String userID) async {

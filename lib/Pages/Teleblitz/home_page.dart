@@ -198,8 +198,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    moreaLoading.dispose();
-    //teleblitz.dispose();
+    moreaLoading.dispose()
     super.dispose();
   }
 
