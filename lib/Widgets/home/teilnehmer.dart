@@ -14,8 +14,6 @@ Widget teilnehmerView(
         Map<String, Widget> Function(String, AsyncSnapshot, Widget)
             teleblitzAnzeigen,
     @required
-        Widget Function(String, String) anmeldebutton,
-    @required
         Widget moreaLoading,
     @required
         Map navigationMap}) {
@@ -33,11 +31,6 @@ Widget teilnehmerView(
         List<Widget> anzeige = new List();
         teleblitzAnzeigen(groupID, snapshot, moreaLoading)
             .forEach((String eventID, tlbz) {
-          if ((eventID != tlbzMapNoElement) && (eventID != tlbzMapLoading))
-            anzeige.add(new Column(
-              children: <Widget>[tlbz, anmeldebutton(groupID, eventID)],
-            ));
-          else
             anzeige.add(tlbz);
         });
         return MoreaBackgroundContainer(
