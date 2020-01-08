@@ -40,7 +40,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     this.userInfo = widget.moreaFire.getUserMap;
-    this._getNachrichtenGruppen();
+    //this._getNachrichtenGruppen();
     this.oldEmail = userInfo['Email'];
   }
 
@@ -323,7 +323,7 @@ class _ProfileState extends State<Profile> {
         'Nahani (Meitli)': nahani,
         'Wombat (Wölfe)': wombat
       };
-      this._getNachrichtenGruppen();
+      //this._getNachrichtenGruppen();
     });
   }
 
@@ -342,6 +342,7 @@ class _ProfileState extends State<Profile> {
       return false;
     }
   }
+  /*
 
   void _getNachrichtenGruppen() {
     List<String> neuNachrichtenGruppen = [];
@@ -352,7 +353,7 @@ class _ProfileState extends State<Profile> {
     }
     nachrichtenGruppen = neuNachrichtenGruppen;
   }
-
+*/
   void _showReauthenticate(String email) {
     showDialog(
         context: context,

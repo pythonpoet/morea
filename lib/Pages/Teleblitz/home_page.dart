@@ -49,50 +49,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool chunnt = false;
   var messagingGroups;
 
-  void submit(String anabmelden, String groupnr, String eventID, String uid, {String name}) {
-    String anmeldung;
 
-    anmeldeDaten = {
-      'Anmeldename': moreafire.getDisplayName,
-      'Anmeldung': anabmelden
-    };
-
-    if (anabmelden == 'Chunt') {
-      anmeldung = 'Du hast dich Angemolden';
-      chunnt = true;
-    } else {
-      anmeldung = 'Du hast dich Abgemolden';
-      chunnt = false;
-    }
-    crud0
-        .waitOnDocumentChanged("$pathEvents/$eventID/Anmeldungen", uid)
-        .then((onValue) {
-      if (onValue)
-        showDialog(
-            context: context,
-            builder: (context) => new AlertDialog(
-                  title: new Text("Teleblitz"),
-                  content: new Text(anmeldung),
-                ));
-    });
-    if(name == null){
-      name = moreafire.getDisplayName;
-    }
-    if (_formType != FormType.eltern) {
-      moreafire.childAnmelden(eventID, widget.auth.getUserID,
-          widget.auth.getUserID, anabmelden, name);
-    } else {
-      moreafire.parentAnmeldet(eventID, widget.auth.getUserID,
-          widget.auth.getUserID, anabmelden, name);
-    }
-  }
 
   
   void getuserinfo() async {
     await moreafire.getData(widget.auth.getUserID);
     await moreafire.initTeleblitz();
     forminit();
-    teleblitz = new Teleblitz(moreafire);
+    teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
   }
 
@@ -199,9 +163,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     moreaLoading.dispose();
-    if(_formType == FormType.leiter){
-      teleblitz.dispose();
-    }
+    //teleblitz.dispose();
     super.dispose();
   }
 
@@ -239,7 +201,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             groupID: moreafire.getGroupID,
             navigation: navigation,
             teleblitzAnzeigen: teleblitz.anzeigen,
-            anmeldebutton: this.childAnmeldeButton,
             navigationMap: widget.navigationMap,
             moreaLoading: moreaLoading.loading());
         break;
@@ -250,7 +211,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               subscribedGroups: moreafire.getSubscribedGroups,
               navigation: navigation,
               teleblitzAnzeigen: teleblitz.anzeigen,
-              anmeldebutton: parentAnmeldeButton,
               navigationMap: widget.navigationMap,
               moreaLoading: moreaLoading.loading());
         else
@@ -374,67 +334,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  Widget parentAnmeldeButton(String groupID, String eventID) {
-    List<Widget> anmeldebuttons = new List();
-    moreafire.getChildMap[groupID].forEach((String vorname, uid) {
-      anmeldebuttons.add(anmeldebutton(
-          groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden",
-          name: vorname));
-    });
-    return Column(children: anmeldebuttons);
-  }
 
-  Widget childAnmeldeButton(String groupID, String eventID) {
-    return anmeldebutton(moreafire.getGroupID, eventID, widget.auth.getUserID,
-        'Chume', 'Chume nöd');
-  }
-
-  Widget anmeldebutton(
-      String groupID, String eventID, String uid, String anmelden, abmelden,
-      {String name}) {
-    return Container(
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-                child: Container(
-              child: new RaisedButton(
-                child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
-                onPressed: () {
-                  if (name == null) {
-                    submit(eventMapAnmeldeStatusNegativ, moreafire.getGroupID, eventID, uid);
-                  } else {
-                    submit(eventMapAnmeldeStatusNegativ, moreafire.getGroupID, eventID, uid,
-                        name: name);
-                  }
-                },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-              ),
-            )),
-            Expanded(
-              child: Container(
-                child: new RaisedButton(
-                  child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
-                  onPressed: () {
-                    if (name == null) {
-                      submit(eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid);
-                    } else {
-                      submit(eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid,
-                          name: name);
-                    }
-                  },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
-                  textColor: Colors.white,
-                ),
-              ),
-            )
-          ],
-        ));
-  }
 
   void routeEditTelebliz() {
     Navigator.of(context)
