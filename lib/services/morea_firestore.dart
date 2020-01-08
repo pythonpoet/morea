@@ -119,8 +119,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
     if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+      if(_groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
       _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
-
+      else _groupPrivilege[_groupID] = 0;
      
     } else {
       print("tpck get child map");
