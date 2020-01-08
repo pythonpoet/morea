@@ -9,7 +9,6 @@ Widget elternView(
     @required List<String> subscribedGroups,
     @required Function navigation,
     @required Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
-    @required Widget Function(String, String) anmeldebutton,
     @required Map navigationMap,
     @required Widget moreaLoading}) {
   return DefaultTabController(
@@ -25,7 +24,7 @@ Widget elternView(
         bottomNavigationBar: moreaChildBottomAppBar(navigationMap),
         body: TabBarView(
             children: getTeleblizWidgetList(subscribedGroups, stream,
-                teleblitzAnzeigen, anmeldebutton, moreaLoading)),
+                teleblitzAnzeigen, moreaLoading)),
       ));
 }
 
@@ -33,12 +32,11 @@ List<Widget> getTeleblizWidgetList(
     List<String> subscribedGroups,
     Stream stream,
     Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
-    Function anmeldebutton,
     Widget moreaLoading) {
   List<Widget> listTeleblitzWidget = new List<Widget>();
   for (String groupID in subscribedGroups) {
     listTeleblitzWidget.add(getLayoutBuilderWidget(
-        groupID, stream, teleblitzAnzeigen, anmeldebutton, moreaLoading));
+        groupID, stream, teleblitzAnzeigen, moreaLoading));
   }
   return listTeleblitzWidget;
 }
@@ -47,7 +45,6 @@ Widget getLayoutBuilderWidget(
     String groupID,
     Stream stream,
     Function(String, AsyncSnapshot, Widget) teleblitzAnzeigen,
-    Function(String, String) anmeldebutton,
     Widget moreaLoading) {
   return StreamBuilder(
     stream: stream,

@@ -103,7 +103,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
         (await crud0.getDocument(pathUser, userID)).data);
-    //init userMap
+    print("tpck _userMap contains data: ${_userMap.isNotEmpty}");
     _pfadiName = _userMap[userMapPfadiName];
     _groupID = _userMap[userMapgroupID];
     _vorName = _userMap[userMapVorName];
@@ -117,19 +117,21 @@ class MoreaFirebase extends BaseMoreaFirebase {
     else
       _displayName = _pfadiName;
     if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
-      
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+      if(_groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
       _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
-
+      else _groupPrivilege[_groupID] = 0;
      
     } else {
+      print("tpck get child map");
       if (_userMap.containsKey(userMapKinder)) {
         Map<String, String> kinderMap =
             Map<String, String>.from(_userMap[userMapKinder]);
         _childMap = await createChildMap(kinderMap);
       }
     }
+    print("tpck getData exit");
   }
 
   Future<Map<String, Map<String, String>>> createChildMap(
