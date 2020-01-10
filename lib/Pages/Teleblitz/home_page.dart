@@ -256,7 +256,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState()))),
+                      new PersonenVerzeichnisState(moreaFire: moreafire,crud0: crud0,)))),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),
