@@ -5,23 +5,30 @@ import 'package:morea/services/crud.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:async' show Stream;
 import 'package:async/async.dart' show StreamGroup;
+/*
+Author David Wild aka. Rumpelstilzli,
+Date 10.01.2020
 
+This class contains all teleblitz function
+
+If an instance of this class is initialized, getMapHomeFeed and getMapofEvents are
+beeing initialized as well.
+*/
 abstract class BaseTeleblitzFirestore {
   Stream<Map<String, List<String>>> get getMapHomeFeed;
+  //Returns a stream with a Map that contains the groupID as key and the "homeFeed" of the groupMap as value
   Stream<Map<String, Map<String, Map<String,dynamic>>>> get getMapofEvents;
-
-  Future<String> getTelbzAkt(String groupnr);
-  Future<Map> getTelbz(String eventID);
-  Stream<List<String>> streamHomeFeed(String groupID);
-  Stream<Map<String,dynamic>> steramTelebliz(eventID);
-
-  Stream<Map<String, List<String>>> streamMapHomeFeed(List<String> groupIDs);
-  Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs);
-  Stream<Map<String, Map<String,dynamic>>> steamMapofEvents(List<String> eventIDs);
+  /*Returns a stream with a Map that contains the groupID as key and a further Map as value. 
+  The Map contains the eventID as key and the teleblitz (event content) as value.*/
+  
   Future<bool> eventIDExists(String eventID);
+  //Returns true if a given eventID exists in the firestore
 
-  Future<void> uploadTelbzAkt(String groupnr, Map<String, dynamic> data);
+  Future<void> uploadTelbzAkt(String groupID, Map<String, dynamic> data);
+  /*Uploads the eventID to a specified group. The eventID is stored as a Map. 
+  Key is homeFeed while the eventID is stored as a array as value*/
   Future<void> uploadTelbz(String eventID, Map<String, dynamic> data);
+  //Stores the teleblitz (event content) with the given eventID
 }
 
 class TeleblizFirestore implements BaseTeleblitzFirestore {
@@ -32,7 +39,6 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Map<String,Map<String, Map<String, dynamic>>> mapOfGroupEvent = new Map<String,Map<String, Map<String, dynamic>>>();
   StreamController<Map<String, List<String>>> _mapHomeFeedController = new BehaviorSubject();
   StreamController<Map<String, Map<String, Map<String,dynamic>>>> _mapofEventsController = new BehaviorSubject();
-  StreamController test = new BehaviorSubject();
   Stream<Map<String, List<String>>> get getMapHomeFeed => _mapHomeFeedController.stream;
   Stream<Map<String, Map<String, Map<String,dynamic>>>> get getMapofEvents => _mapofEventsController.stream;
 
@@ -42,33 +48,21 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     this.streamMapofGroupEvents(groupIDs).first;
   }
 
-
-  Stream<List<String>> streamHomeFeed(String groupID)async*{
+  Stream<Map<String,List<String>>> streamHomeFeed(String groupID)async*{
     Stream<DocumentSnapshot> sDhomeFeed = crud0.streamDocument(pathGroups, groupID); 
-    yield* sDhomeFeed.map((DocumentSnapshot dsHomeFeed){
+    await for(List<String>homeFeed in sDhomeFeed.map((DocumentSnapshot dsHomeFeed){
        return new List<String>.from(dsHomeFeed.data[groupMapHomeFeed]?? new List());
-    }); 
-  }
-  Stream<Map<String,List<String>>> somestream(String groupID)async*{
-    await for(List<String>homeFeed in this.streamHomeFeed(groupID)){
+          })){
         mapHomeFeed[groupID]=homeFeed;
         yield mapHomeFeed;
       }
   }
   Stream<Map<String, List<String>>> streamMapHomeFeed(List<String> groupIDs)async*{
-    List<Stream<Map<String, List<String>>>> streamList = new List();
-    /*for(String groupID in groupIDs){   
-      streamList.add(somestream(groupID));
-    }*/
-    Stream<Map<String, List<String>>> helper = StreamGroup.merge(groupIDs.map((groupID){
-      return somestream(groupID);
+    yield* StreamGroup.merge(groupIDs.map((groupID){
+      return streamHomeFeed(groupID);
     }));
-    await for (Map<String, List<String>> event in helper){
-      print("action: " + event.toString());
-      yield event;
-    }
-   // yield* helper;
   }
+
   Stream<Map<String,dynamic>> steramTelebliz(eventID)async*{
     yield* crud0.streamDocument(pathEvents, eventID).map((dsEvent){
       return dsEvent.data;
@@ -91,7 +85,6 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
    Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEventsHelper(MapEntry<String, List<String>> homeFeed)async*{
 
     await for(Map<String, Map<String, dynamic>>mapofEvents in steamMapofEvents(homeFeed.value)){
-          print(mapofEvents);
           mapOfGroupEvent[homeFeed.key] = mapofEvents;
           yield mapOfGroupEvent;
         }
@@ -102,33 +95,19 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     for(MapEntry<String, List<String>> homeFeed in listHomeFeed.entries ){
      list.add(streamMapofGroupEventsHelper(homeFeed).asBroadcastStream());
     }
-    
      helpertow(StreamGroup.merge(list).asBroadcastStream()).first;
     }
-   Stream<String> helpertow(Stream<Map<String, Map<String, Map<String,dynamic>>>>stream)async*{
 
+   Stream<String> helpertow(Stream<Map<String, Map<String, Map<String,dynamic>>>>stream)async*{
       await for(Map<String, Map<String, Map<String,dynamic>>>event in stream){
          _mapofEventsController.add(event);
       }
-      
     }
   Stream<Map<String, Map<String, Map<String,dynamic>>>>streamMapofGroupEvents(groupIDs)async*{
-     await for(dynamic listHomeFeed in this.streamMapHomeFeed(groupIDs).asBroadcastStream()){
+     await for(dynamic listHomeFeed in getMapHomeFeed){
         helper(listHomeFeed).first;   
   }
-  }
-  
-  Future<String> getTelbzAkt(String groupID) async {
-    try {
-      DocumentSnapshot akteleblitz = await crud0.getDocument(pathGroups, groupID);
-      _teleblitze[groupID] = Map<String,dynamic>.from(akteleblitz.data);
-      return akteleblitz.data[groupMapAktuellerTeleblitz];
-    } catch (e) {
-      print(e.toString());
-      return DateTime.parse('2019-03-07T13:30:16.388642').toString();
-    }
-  }
-  
+  } 
 
   Future<Map> getTelbz(String eventID) async {
     if(this._teleblitze.isNotEmpty)
