@@ -3,17 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 import 'edit_userprofile_page.dart';
- 
+import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/Widgets/standart/info.dart';
+import 'package:morea/services/crud.dart';
 
 class ViewUserProfilePageState extends StatelessWidget {
-  ViewUserProfilePageState(this.allUsers, this.profile);
-  final Map<String,dynamic> profile;
-  final QuerySnapshot allUsers;
+  ViewUserProfilePageState(this.userData, this.moreaFire, this.crud0);
+  final Future<DocumentSnapshot> userData;
+  final CrudMedthods crud0;
+   Map<String,dynamic> profile;
+
   final Urllauncher urllauncher = new Urllauncher();
+  final MoreaFirebase moreaFire;
  
   @override
   Widget build(BuildContext context) {
     return Container(
+      child: FutureBuilder(
+        future: userData,
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> aSProfile){
+          if(!aSProfile.hasData)
+            return simpleMoreaLoadingIndicator();
+          profile = aSProfile.data.data;
+
+            return Container(
         child: Scaffold(
             appBar: AppBar(
               title: Text(profile['Vorname'].toString()),
@@ -36,8 +49,10 @@ class ViewUserProfilePageState extends StatelessWidget {
               child: new Icon(Icons.edit),
               backgroundColor: Color(0xff7a62ff),
               onPressed: () => Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new EditUserProfilePage(profile: profile,)))
+                builder: (BuildContext context) => new EditUserProfilePage(profile: profile, moreaFire: moreaFire,crud0: crud0)))
             )));
+        },
+      ) ,);
   }
 
   Widget viewprofile() {
@@ -288,9 +303,25 @@ class ViewUserProfilePageState extends StatelessWidget {
   }
   List<Widget> parentWidget(){
     List<Widget> elternWidget = new List();
-    for(Map<String,dynamic> eltern in getParentMap()){
+    for(Future<DocumentSnapshot> dSParent in getParentMap()){
       elternWidget.add(
-        Column(
+        Container(
+          child: FutureBuilder(
+            future: dSParent,
+            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> aSParent){
+              if(!aSParent.hasData)
+                return simpleMoreaLoadingIndicator();
+              else
+                return displayEltern(aSParent.data.data);
+            },
+          ),)
+      );
+    }
+    return elternWidget;
+  }
+
+    Widget displayEltern(Map<String,dynamic> eltern){
+     return   Column(
           children: <Widget>[
             Container(
                  alignment: Alignment.center, //
@@ -416,23 +447,15 @@ class ViewUserProfilePageState extends StatelessWidget {
                   ))),
                   SizedBox(height: 15,)
           ],
-        )
-              );
-    }
-    return elternWidget;
+        );
+            
   }
-  getParentMap(){
-    List<Map> elternMap = new List();
-    if(profile.containsKey(userMapEltern)){
+  List<Future<DocumentSnapshot>>getParentMap(){
+    List<Future<DocumentSnapshot>> elternMap = new List();
       Map<String,String> elt = Map<String,String>.from(profile[userMapEltern]);
       List<String> elternUID = new List();
       elternUID.addAll(elt.values);
-      allUsers.documents.forEach((test){
-        if(elternUID.contains(test.documentID)){
-          elternMap.add(Map<String,dynamic>.from(test.data));
-        }
-      });
-    }
+      elternUID.forEach((uid) => elternMap.add(moreaFire.getUserInformation(uid)));    
     return elternMap;
   }
   

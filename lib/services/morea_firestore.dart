@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
@@ -103,7 +104,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
         (await crud0.getDocument(pathUser, userID)).data);
-    print("tpck _userMap contains data: ${_userMap.isNotEmpty}");
     _pfadiName = _userMap[userMapPfadiName];
     _groupID = _userMap[userMapgroupID];
     _vorName = _userMap[userMapVorName];
@@ -124,14 +124,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
       else _groupPrivilege[_groupID] = 0;
      
     } else {
-      print("tpck get child map");
       if (_userMap.containsKey(userMapKinder)) {
         Map<String, String> kinderMap =
             Map<String, String>.from(_userMap[userMapKinder]);
         _childMap = await createChildMap(kinderMap);
       }
     }
-    print("tpck getData exit");
   }
 
   Future<Map<String, Map<String, String>>> createChildMap(
@@ -168,15 +166,22 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
     return null;
   }
 
-  Future<void> updateUserInformation(
-    String userUID,
-    Map userInfo,
-  ) async {
-    userUID = dwiformat.simplestring(userUID);
-    Map<String, dynamic> request = {"type": "updateUserInformation", "content": userInfo};
-    await crud0.setData(pathRequest, userUID, request);
-    return null;
+  //Vorschlag an Maxi
+  Future<void> updateUserInformation(String userUID, Map userInfo){
+    if(userInfo[userMapAccountCreated] is Timestamp)
+      userInfo[userMapAccountCreated] = userInfo[userMapAccountCreated].toString();
+    return callFunction(getcallable("updateUserProfile"),param: userInfo);
   }
+
+  Future<HttpsCallableResult> goToNewGroup(String userID, String displayName, String oldGroup, String newGroup){
+    return callFunction(getcallable("goToNewGroup"), param: {
+      userMapUID: userID,
+      "oldGroup": oldGroup,
+      "newGroup": newGroup,
+      groupMapDisplayName :displayName
+    });
+  }
+  
 
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
     return await crud0.getDocument(pathUser, userUID);
