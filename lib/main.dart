@@ -5,7 +5,7 @@ import 'package:morea/services/auth.dart';
 import 'morealayout.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+   WidgetsFlutterBinding.ensureInitialized();
   /*final FirebaseApp app = await FirebaseApp.configure(
     name: 'Pfadi Morea',
     options: const FirebaseOptions(
