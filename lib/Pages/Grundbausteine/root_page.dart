@@ -60,12 +60,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     };
   }
 
-  Future<void> initMoreaFire() async {
-    this.moreaFire = new MoreaFirebase(widget.firestore);
-    await this.moreaFire.getData(await auth.currentUser());
-    this.moreaFire.initTeleblitz();
-    return true;
-  }
+  //Checks if App has the min required Version
+  //Checks if User has been Blocked by DevToken
+  //Checks if User is logged in or out
+  //Returns the fitting AuthStatus
 
   Future authStatusInit() async {
     authStatus = await check4BlockedAuthStatus(
@@ -76,61 +74,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void signedIn() async {
-    await initMoreaFire();
-    setState(() {
-      authStatus = AuthStatus.homePage;
-    });
-  }
+  //initializes MoreaFirebase and downloads User Data with getData()
 
-  void homePage({dispose}) {
-    if (!(authStatus == AuthStatus.homePage)) {
-      if (dispose != null) {
-        dispose();
-      }
-      setState(() {
-        authStatus = AuthStatus.homePage;
-
-      });
-    }
-  }
-
-  void messagePage({dispose}) {
-    if (!(authStatus == AuthStatus.messagePage)) {
-      if (dispose != null) {
-        dispose();
-      }
-      setState(() {
-        authStatus = AuthStatus.messagePage;
-      });
-    }
-  }
-
-  void agendaPage({dispose}) {
-    if (!(authStatus == AuthStatus.agendaPage)) {
-      if (dispose != null) {
-        dispose();
-      }
-      setState(() {
-        authStatus = AuthStatus.agendaPage;
-
-      });
-    }
-  }
-
-  void profilePage({dispose}) {
-    if (!(authStatus == AuthStatus.profilePage)) {
-      setState(() {
-        authStatus = AuthStatus.profilePage;
-      });
-    }
-  }
-
-  void signedOut() {
-    moreaFire = null;
-    setState(() {
-      authStatus = AuthStatus.notSignedIn;
-    });
+  Future<void> initMoreaFire() async {
+    this.moreaFire = new MoreaFirebase(widget.firestore);
+    await this.moreaFire.getData(await auth.currentUser());
+    this.moreaFire.initTeleblitz();
+    return true;
   }
 
   @override
@@ -190,4 +140,66 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         break;
     }
   }
+
+  //Functions for the Navigation
+  //Switches authStatus and rebuilds RootPage
+
+  void signedIn() async {
+    await initMoreaFire();
+    setState(() {
+      authStatus = AuthStatus.homePage;
+    });
+  }
+
+  void homePage({dispose}) {
+    if (!(authStatus == AuthStatus.homePage)) {
+      if (dispose != null) {
+        dispose();
+      }
+      setState(() {
+        authStatus = AuthStatus.homePage;
+
+      });
+    }
+  }
+
+  void messagePage({dispose}) {
+    if (!(authStatus == AuthStatus.messagePage)) {
+      if (dispose != null) {
+        dispose();
+      }
+      setState(() {
+        authStatus = AuthStatus.messagePage;
+      });
+    }
+  }
+
+  void agendaPage({dispose}) {
+    if (!(authStatus == AuthStatus.agendaPage)) {
+      if (dispose != null) {
+        dispose();
+      }
+      setState(() {
+        authStatus = AuthStatus.agendaPage;
+
+      });
+    }
+  }
+
+  void profilePage({dispose}) {
+    if (!(authStatus == AuthStatus.profilePage)) {
+      setState(() {
+        authStatus = AuthStatus.profilePage;
+      });
+    }
+  }
+
+  void signedOut() {
+    moreaFire = null;
+    setState(() {
+      authStatus = AuthStatus.notSignedIn;
+    });
+  }
+
+
 }
