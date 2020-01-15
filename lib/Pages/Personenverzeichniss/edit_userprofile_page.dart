@@ -1,14 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/MiData.dart';
 
 class EditUserProfilePage extends StatefulWidget {
-  EditUserProfilePage({this.profile, this.auth, this.firestore});
-
-  final BaseAuth auth;
-  final Firestore firestore;
+  EditUserProfilePage({this.profile, this.moreaFire, this.crud0});
+  final MoreaFirebase moreaFire;
+  final CrudMedthods crud0;
   final Map profile;
 
   @override
@@ -16,7 +21,6 @@ class EditUserProfilePage extends StatefulWidget {
 }
 
 class EditUserPoriflePageState extends State<EditUserProfilePage> {
-  Auth auth0 = new Auth();
   MoreaFirebase moreafire;
   CrudMedthods crud0;
 
@@ -27,25 +31,22 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
       _pfadinamen = ' ',
       _vorname,
       _nachname,
-      _stufe,
-      _selectedstufe,
-      selectedrolle;
-  String _password, _adresse, _ort, _plz, _handynummer, _passwordneu;
-  List<String> _stufenselect = [
-    'Biber',
-    'Wombat (Wölfe)',
-    'Nahani (Meitli)',
-    'Drason (Buebe)',
-    'Pios'
-  ];
+      _alter ="[Datum auswählen]",
+      _selectedstufe = 'Stufe wählen',
+      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
+  String _password,
+      _adresse,
+      _ort,
+      _plz,
+      _handynummer,
+      _passwordneu,
+      userId,
+      error,
+      selectedrolle,
+      oldGroup;
+  List<Map> _stufenselect = new List();
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
-  String error;
 
-  EditUserPoriflePageState(){
-    moreafire = new MoreaFirebase(widget.firestore);
-    crud0 = new CrudMedthods(widget.firestore);
-    auth0 = widget.auth;
-  }
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -61,10 +62,11 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
     if (validateAndSave()) {
       try {
         if (_selectedstufe != 'Stufe wählen') {
-          var userdata = mapUserData();
+          Map<String,dynamic> userdata = mapUserData();
           await moreafire
-              .updateUserInformation(userdata['UID'], userdata)
-              .then((onValue) {});
+              .updateUserInformation(userdata['UID'], userdata);
+          await moreafire.goToNewGroup(userdata['UID'], (userdata[userMapPfadiName]==" ")?userdata[userMapVorName]:  userdata[userMapPfadiName], oldGroup, userdata[userMapgroupID]).then((onValue)=> setState);
+           Navigator.pop(context);
         } else {
           showDialog(
               context: context,
@@ -108,28 +110,36 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
   }
 
   Map mapUserData() {
-    Map<String, dynamic> userInfo = {
-      'Pfadinamen': this._pfadinamen,
-      'Vorname': this._vorname,
-      'Nachname': this._nachname,
-      'Stufe': this._selectedstufe,
-      'Adresse': this._adresse,
-      'PLZ': this._plz,
-      'Ort': this._ort,
-      'Handynummer': this._handynummer,
-      'Pos': selectedrolle,
-      'UID': widget.profile['UID'],
-      'Email': widget.profile['Email'],
-      'devtoken': widget.profile['devtoken']
-    };
+   Map<String,dynamic> userInfo = widget.profile;
+      userInfo[userMapPfadiName] = this._pfadinamen;
+          userInfo[userMapVorName]= this._vorname;
+          userInfo[userMapNachName]= this._nachname;
+          userInfo[userMapAlter]= this._alter;
+          userInfo[userMapgroupID]= _selectedstufe;
+          userInfo[userMapAdresse]= this._adresse;
+          userInfo[userMapPLZ]= this._plz;
+          userInfo[userMapOrt]= this._ort;
+          userInfo[userMapHandynummer]= this._handynummer;
+          userInfo[userMapPos]= selectedrolle;
+          userInfo[userMapEmail]= this._email;
+
     return userInfo;
   }
 
   @override
   void initState() {
-    _selectedstufe = widget.profile['Stufe'];
     selectedrolle = widget.profile['Pos'];
+    moreafire = widget.moreaFire;
+    crud0 = widget.crud0;
+    oldGroup = widget.profile[userMapgroupID];
+    initSubgoup();
     super.initState();
+  }
+   initSubgoup() async {
+    Map<String, dynamic> data =
+        (await crud0.getDocument(pathGroups, "1165")).data;
+    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
+    setState(() {});
   }
 
   @override
@@ -207,6 +217,40 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
                       keyboardType: TextInputType.text,
                       onSaved: (value) => _nachname = value,
                     ),
+                                            Container(
+                          color: Colors.grey[200],
+                          height: 55,
+                          width: 1000,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Text("   Geburtstag", style:  TextStyle(color: Colors.grey[600], fontSize: 16), ),
+                              new FlatButton(
+                                child: Text(_alter, style:  TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                onPressed: () async {
+                                 
+                                  await DatePicker.showDatePicker(context,
+                                    showTitleActions: true,
+                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
+                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
+                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
+                                    onConfirm: (date) {
+                                      _alter  = DateFormat.yMd().format(date).toString();
+                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
+          
+                                  setState(() {
+                                    
+                                  });
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                        Container(
+                          color: Colors.grey[800],
+                          height: 0.5,
+                          width: 1000,
+                        ),
                     Container(
                       padding: EdgeInsets.only(left: 12),
                       width: 1000,
@@ -220,18 +264,23 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
                             ),
                           ),
                           Expanded(
-                            child: new DropdownButton<String>(
-                                items: _stufenselect.map((String val) {
-                                  return new DropdownMenuItem<String>(
-                                    value: val,
-                                    child: new Text(val),
-                                  );
-                                }).toList(),
-                                hint: Text(_selectedstufe),
-                                onChanged: (newVal) {
-                                  _selectedstufe = newVal;
-                                  this.setState(() {});
-                                }),
+                            child:Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: _stufenselect.map((Map group) {
+                                return new DropdownMenuItem<String>(
+                                  value: group[userMapgroupID],
+                                  child: new Text(group[groupMapgroupNickName]),
+                                );
+                              }).toList(),
+                              hint: Text(_selectedstufe),
+                              onChanged: (newVal) {
+                                _selectedstufe = newVal;
+                                this.setState(() {});
+                              }),
+                        )
                           )
                         ],
                       ),

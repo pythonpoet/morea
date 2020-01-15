@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
@@ -21,7 +22,7 @@ abstract class BaseMoreaFirebase {
 
   String get getPos;
 
-  String get getHomeFeedMainEventID;
+  //String get getHomeFeedMainEventID;
 
   String get getEmail;
 
@@ -54,14 +55,15 @@ class MoreaFirebase extends BaseMoreaFirebase {
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
   Map<String, dynamic> _userMap, _groupMap;
-  Map<String, Map<String, String>>  _childMap;
+  Map<String, int> _groupPrivilege= new Map();
+  Map<String, Map<String, String>>_childMap;
   String _displayName,
       _pfadiName,
       _groupID,
       _vorName,
       _nachName,
       _pos,
-      _homeFeedMainEventID,
+      //_homeFeedMainEventID,
       _email;
   Map<String, dynamic> _messagingGroups;
   List<String> _subscribedGroups = new List<String>();
@@ -88,7 +90,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   String get getEmail => _email;
 
-  String get getHomeFeedMainEventID => _homeFeedMainEventID;
+  //String get getHomeFeedMainEventID => _homeFeedMainEventID;
 
   List<String> get getSubscribedGroups => _subscribedGroups;
 
@@ -97,11 +99,11 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, dynamic> get getUserMap => _userMap;
 
   Map<String, Map<String, String>> get getChildMap => _childMap;
+  Map<String, int> get getGroupPrivilege => _groupPrivilege;
 
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
         (await crud0.getDocument(pathUser, userID)).data);
-    //init userMap
     _pfadiName = _userMap[userMapPfadiName];
     _groupID = _userMap[userMapgroupID];
     _vorName = _userMap[userMapVorName];
@@ -115,10 +117,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
     else
       _displayName = _pfadiName;
     if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
-      //init groupMap
       _groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-      _homeFeedMainEventID = _groupMap["homeFeed"][0];
+      if(_groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
+      _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
+      else _groupPrivilege[_groupID] = 0;
+     
     } else {
       if (_userMap.containsKey(userMapKinder)) {
         Map<String, String> kinderMap =
@@ -141,9 +145,14 @@ class MoreaFirebase extends BaseMoreaFirebase {
       if (!_subscribedGroups.contains(childUserDat[userMapgroupID]))
         _subscribedGroups.add(childUserDat[userMapgroupID]);
     }
+    parentGroupPrivilege(childMap);
     return childMap;
   }
-
+  //TODO GroupPrivilege aus groupMap nehmen
+parentGroupPrivilege(Map<String, Map<String, String>> childMap){
+  for (String groupID in childMap.keys)
+    _groupPrivilege[groupID] = 2;
+}
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
     groupIDs.addAll(_subscribedGroups);
@@ -157,15 +166,22 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  Future<void> updateUserInformation(
-    String userUID,
-    Map userInfo,
-  ) async {
-    userUID = dwiformat.simplestring(userUID);
-    Map<String, dynamic> request = {"type": "updateUserInformation", "content": userInfo};
-    await crud0.setData(pathRequest, userUID, request);
-    return null;
+  //Vorschlag an Maxi
+  Future<void> updateUserInformation(String userUID, Map userInfo){
+    if(userInfo[userMapAccountCreated] is Timestamp)
+      userInfo[userMapAccountCreated] = userInfo[userMapAccountCreated].toString();
+    return callFunction(getcallable("updateUserProfile"),param: userInfo);
   }
+
+  Future<HttpsCallableResult> goToNewGroup(String userID, String displayName, String oldGroup, String newGroup){
+    return callFunction(getcallable("goToNewGroup"), param: {
+      userMapUID: userID,
+      "oldGroup": oldGroup,
+      "newGroup": newGroup,
+      groupMapDisplayName :displayName
+    });
+  }
+  
 
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
     return await crud0.getDocument(pathUser, userUID);
@@ -293,11 +309,20 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID) {
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
-  Future<void> uploadDevTocken() async {
-    await callFunction(getcallable("appendDeviceToken"),param: Map<String,String>.from(
+  Future<void> uploadDevTocken(String userID) async {
+    await callFunction(getcallable("uploadDevTocken"),param: Map<String,String>.from(
       {
         userMapDeviceToken: await firebaseMessaging.getToken(),
-        userMapUID: auth0.getUserID
+        userMapUID: userID
+      }
+    ));
+  }
+  Future<void> groupPriviledgeTN(String groupID, String userID, String displayName) async {
+    return callFunction(getcallable("priviledgeTN"),param: Map<String,String>.from(
+      {
+        userMapgroupID: groupID,
+        userMapUID: userID,
+        "displayName": displayName
       }
     ));
   }

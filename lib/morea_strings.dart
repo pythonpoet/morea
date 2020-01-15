@@ -58,6 +58,8 @@ final String groupMapgroupNickName = "groupNickName";
 final String groupMapSubgroup = "subgroups";
 final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
+final String groupMapPriviledge = "Priviledge";
+final String groupMapDisplayName = "DisplayName";
 
 //eventMap
 final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
