@@ -21,7 +21,6 @@ class ViewLagerPageState extends StatelessWidget {
           child: Text("Dieses Lager ist nicht eingetragen, wende dich an deine Leiter", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
       ),
     );
-    print(info['Kontakt']['Pfadiname']);
     return Container(
         child: Scaffold(
       appBar: AppBar(

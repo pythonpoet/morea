@@ -102,7 +102,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                           if (value.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else if (value != passwordController.text) {
-                            print('error');
                             return 'Die Passwörter stimmen nicht überein';
                           } else {
                             return null;

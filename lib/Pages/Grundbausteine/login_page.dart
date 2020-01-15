@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                     print('Registered user: $userId');
                     if (userId != null) {
                       //Creates userMap
-                      moreafire.createUserInformation(await mapUserData());
+                      await moreafire.createUserInformation(await mapUserData());
                       //writes Devicetoken to collection of groupID
                       moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
                       //uploads devtoken to userMap
@@ -181,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                           .createUserWithEmailAndPassword(_email, _password);
                       print('Registered user: $userId');
                       if (userId != null) {
-                        moreafire.createUserInformation(await mapUserData());
+                        await moreafire.createUserInformation(await mapUserData());
                         moreafire.uploadDevTocken(userId);
                         setState(() {
                           _load = false;

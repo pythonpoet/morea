@@ -44,7 +44,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    print("tpck init rootpage");
     super.initState();
     moreaLoading = MoreaLoading(this);
     initializeDateFormatting();
@@ -72,11 +71,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     authStatus = await check4BlockedAuthStatus(
         await auth.currentUser(), widget.firestore);
     if (authStatus == AuthStatus.homePage) {
-      print("tpck init moreafire");
       await initMoreaFire();
     }
     setState(() {});
-    print("tpck exit authstatusinit");
   }
 
   void signedIn() async {

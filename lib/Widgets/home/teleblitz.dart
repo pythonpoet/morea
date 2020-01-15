@@ -154,9 +154,9 @@ class Teleblitz {
                 child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
                 onPressed: () {
                   if (name == null) {
-                    submit(eventMapAnmeldeStatusNegativ, moreaFire.getGroupID, eventID, uid);
+                    submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
                   } else {
-                    submit(eventMapAnmeldeStatusNegativ, moreaFire.getGroupID, eventID, uid,
+                    submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
                         name: name);
                   }
                 },
@@ -170,9 +170,9 @@ class Teleblitz {
                   child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
                   onPressed: () {
                     if (name == null) {
-                      submit(eventMapAnmeldeStatusPositiv, moreaFire.getGroupID, eventID, uid);
+                      submit(eventMapAnmeldeStatusPositiv,groupID, eventID, uid);
                     } else {
-                      submit(eventMapAnmeldeStatusPositiv, moreaFire.getGroupID, eventID, uid,
+                      submit(eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
                           name: name);
                     }
                   },
@@ -472,11 +472,16 @@ class Teleblitz {
     
   }
   HomeScreenType getHomeScreenType( AsyncSnapshot snapshot){
+    try{
     if(snapshot.connectionState == ConnectionState.waiting)
       return HomeScreenType.loading;
     if(snapshot.data == null)
       return HomeScreenType.noElement;
     return HomeScreenType.info;
+    }catch(e){
+      print(e);
+      return HomeScreenType.loading;
+    }
   }
 
   Map<String, Widget> anzeigen(

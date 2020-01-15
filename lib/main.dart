@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("tpck init App");
     Firestore firestore = new Firestore();
     return new MaterialApp(
       title: 'Pfadi Morea',
