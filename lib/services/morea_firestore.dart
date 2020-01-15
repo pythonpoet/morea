@@ -322,7 +322,7 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
       {
         userMapgroupID: groupID,
         userMapUID: userID,
-        "displayName": displayName
+        "DisplayName": displayName
       }
     ));
   }
