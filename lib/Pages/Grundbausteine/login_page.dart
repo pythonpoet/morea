@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                       //uploads devtoken to userMap
                       moreafire.uploadDevTocken(userId);
                       //Writes tn rights to groupMap
-                      moreafire.groupPriviledgeTN(_selectedstufe ,userId, (_pfadinamen == ' '? _vorname: _pfadinamen));
+                      await moreafire.groupPriviledgeTN(_selectedstufe ,userId, (_pfadinamen == ' '? _vorname: _pfadinamen));
                       //sends user to rootpage
                       widget.onSignedIn();
                     }
