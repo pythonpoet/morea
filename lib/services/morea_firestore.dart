@@ -214,7 +214,7 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
       String anmeldeUID, String anmeldeStatus, String name) async {
     crud0.runTransaction(
         "$pathEvents/$eventID/Anmeldungen",
-        anmeldeUID,
+        childUID,
         Map<String, dynamic>.from({
           "AnmeldeStatus": anmeldeStatus,
           eventMapAnmeldeUID: anmeldeUID,

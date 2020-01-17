@@ -130,11 +130,12 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
       return null;
     }
   }
-  Stream<String> anmeldeStatus(String eventID, userID)async*{
+  Stream<String> anmeldeStatus(String userID, eventID)async*{
     Stream<DocumentSnapshot> sdSAnmeldung = crud0.streamDocument(pathEvents+"/"+ eventID+"/"+"Anmeldungen", userID);
     await for (DocumentSnapshot dSAnmeldung in sdSAnmeldung){
       if(!dSAnmeldung.exists)
         yield "un-initialized";
+      else
       yield dSAnmeldung.data["AnmeldeStatus"];
     }
   }

@@ -29,7 +29,7 @@ Widget teilnehmerView(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         List<Widget> anzeige = new List();
-        teleblitzAnzeigen(groupID, snapshot, moreaLoading)
+        teleblitzAnzeigen(groupID, snapshot, moreaLoading, )
             .forEach((String eventID, tlbz) {
             anzeige.add(tlbz);
         });
