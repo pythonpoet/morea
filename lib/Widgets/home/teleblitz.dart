@@ -12,6 +12,7 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
+import 'package:share/share.dart';
 
 enum ElementType{ferien, keineAktivitaet, teleblitz, notImplemented}
 enum HomeScreenType{loading, noElement, info}
@@ -214,6 +215,37 @@ class Teleblitz {
       },
     );
   }
+  Widget childShare(String groupID){
+    return Container(
+      child: Row(
+        children: <Widget>[
+          Text("Erzähle deinen Freunden von dieser Akivität", style: TextStyle(color: Colors.grey[600])),
+           IconButton(
+            icon: Icon(Icons.share,  color: Colors.grey[600]),
+            onPressed: () =>{
+                  Share.share("Lust auf Pfadi? Komm mal bei den ${convMiDatatoWebflow(groupID)} vorbei: https://www.morea.ch/teleblitz")
+                },
+          )
+        ],
+      )
+    );
+  }
+  Widget parentShare(String groupID){
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text("Teile diese Akivität", style: TextStyle(color: Colors.grey[600]),),
+          IconButton(
+            icon: Icon(Icons.share, color: Colors.grey[600]),
+            onPressed: () =>{
+                  Share.share("Lust auf Pfadi? Komm mal bei den ${convMiDatatoWebflow(groupID)} vorbei: https://www.morea.ch/teleblitz")
+                },
+          )
+        ],
+      )
+    );
+  }
 
   Widget teleblitz(String groupID, String eventID,Stream<String> Function(String userID, String eventID) function) {
     switch (moreaFire.getGroupPrivilege[groupID]) {
@@ -230,6 +262,7 @@ class Teleblitz {
                   info.getMitnehmen(),
                   info.getBemerkung(),
                   info.getSender(),
+                  parentShare(groupID)
                 ],
               ),
             ),
@@ -248,7 +281,8 @@ class Teleblitz {
               info.getMitnehmen(),
               info.getBemerkung(),
               info.getSender(),
-              childAnmeldeButton(groupID, eventID)
+              childAnmeldeButton(groupID, eventID),
+              childShare(groupID),
             ],
           ),
         ),
@@ -267,7 +301,8 @@ class Teleblitz {
               info.getMitnehmen(),
               info.getBemerkung(),
               info.getSender(),
-              parentAnmeldeButton(groupID, eventID)
+              parentAnmeldeButton(groupID, eventID),
+              parentShare(groupID)
             ],
           ),
         ),
@@ -293,6 +328,7 @@ class Teleblitz {
                 info.getMitnehmen(),
                 info.getBemerkung(),
                 info.getSender(),
+                parentShare(groupID)
               ],
             ),
           ),
