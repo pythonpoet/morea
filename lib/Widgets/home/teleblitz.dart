@@ -201,13 +201,13 @@ class Teleblitz {
                child: Center(child:Text(abgemolden, style: TextStyle(fontSize: 20),),),
                width: double.infinity,
                decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(4),),
-                                        color: Colors.red),);
+                                        color: Colors.grey[300]),);
           case "Chunt":
               return Container(height: 40, 
                child: Center(child:Text(angemolden, style: TextStyle(fontSize: 20),),),
                width: double.infinity,
                decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(4),),
-                                        color: Colors.green),);
+                                        color: MoreaColors.violett),);
           default:
             return Text(snap.data);
         }

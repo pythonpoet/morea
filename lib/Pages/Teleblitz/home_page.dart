@@ -21,11 +21,12 @@ import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.firestore, this.navigationMap});
+  HomePage({this.auth, this.firestore, this.navigationMap, this.moreafire});
 
   final BaseAuth auth;
   final Firestore firestore;
   final Map<String, Function> navigationMap;
+  final MoreaFirebase moreafire;
 
   @override
   State<StatefulWidget> createState() => HomePageState();
@@ -52,8 +53,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   var messagingGroups;
 
   void getuserinfo() async {
-    await moreafire.getData(widget.auth.getUserID);
-    await moreafire.initTeleblitz();
     forminit();
     teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
@@ -98,7 +97,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    moreafire = new MoreaFirebase(widget.firestore);
+    moreafire = widget.moreafire;
     crud0 = new CrudMedthods(widget.firestore);
     moreaLoading = new MoreaLoading(this);
     firebaseMessaging.configure(
@@ -212,101 +211,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } else
       return Container();
 
-    switch (_formType) {
-      case FormType.loading:
-        
-      case FormType.leiter:
-        if (moreafire.getSubscribedGroups.length > 0) {
-          List<Widget> anzeige = new List();
-          anzeige.add(teleblitz.displayContent(
-              moreaLoading.loading, moreafire.getGroupID));
-          moreafire.getSubscribedGroups.forEach((groupID) {
-            anzeige
-                .add(teleblitz.displayContent(moreaLoading.loading, groupID));
-          });
-
-          return DefaultTabController(
-            length: moreafire.getSubscribedGroups.length +
-                (moreafire.getGroupID.isNotEmpty ? 1 : 0),
-            child: Scaffold(
-              appBar: new AppBar(
-                title: new Text('Teleblitz'),
-                bottom: TabBar(
-                    tabs: getTabList([
-                  moreafire.getGroupID,
-                  ...moreafire.getSubscribedGroups
-                ])),
-              ),
-              drawer: new Drawer(
-                child: new ListView(children: navigation()),
-              ),
-              body: TabBarView(children: anzeige),
-              floatingActionButton: moreaEditActionbutton(routeEditTelebliz),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerDocked,
-              bottomNavigationBar:
-                  moreaLeiterBottomAppBar(widget.navigationMap, "Ändern"),
-            ),
-          );
-        }
-
-        break;
-      case FormType.teilnehmer:
-        return Scaffold(
-            appBar: new AppBar(
-              title: new Text('Teleblitz'),
-            ),
-            drawer: new Drawer(
-              child: new ListView(children: navigation()),
-            ),
-            bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
-            body: teleblitz.displayContent(
-                moreafire.getGroupID, moreaLoading.loading));
-        break;
-      case FormType.eltern:
-        if (moreafire.getSubscribedGroups.length > 0) {
-          List<Widget> anzeige = new List();
-          moreafire.getSubscribedGroups.forEach((groupID) {
-            anzeige
-                .add(teleblitz.displayContent(moreaLoading.loading, groupID));
-          });
-
-          return DefaultTabController(
-              length: moreafire.getSubscribedGroups.length,
-              child: Scaffold(
-                  appBar: new AppBar(
-                    title: new Text('Teleblitz'),
-                    bottom:
-                        TabBar(tabs: getTabList(moreafire.getSubscribedGroups)),
-                  ),
-                  drawer: new Drawer(
-                    child: new ListView(children: navigation()),
-                  ),
-                  bottomNavigationBar:
-                      moreaChildBottomAppBar(widget.navigationMap),
-                  body: TabBarView(
-                    children: anzeige,
-                  )));
-        } else
-          return Scaffold(
-              appBar: AppBar(
-                title: Text('Teleblitz'),
-              ),
-              drawer: new Drawer(
-                child: new ListView(children: navigation()),
-              ),
-              body: requestPrompttoParent());
-        break;
-      default:
-        return Scaffold(
-            appBar: AppBar(
-              title: Text('Teleblitz'),
-            ),
-            drawer: new Drawer(
-              child: new ListView(children: navigation()),
-            ),
-            body: moreaLoading.loading());
-    }
+    
   }
 
   List<Widget> getTabList(List<String> subscribedGroups) {

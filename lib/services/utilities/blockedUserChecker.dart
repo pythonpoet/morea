@@ -12,5 +12,5 @@ Future<AuthStatus> check4BlockedAuthStatus(String userID, Firestore firestore)as
     return AuthStatus.blockedByAppVersion;
   if(blockedDevTokens.contains(firebaseMessaging.getToken()))
     return AuthStatus.blockedByDevToken;
-  return userID == null ?  AuthStatus.notSignedIn : AuthStatus.homePage;
+  return userID == null ?  AuthStatus.notSignedIn : AuthStatus.loading;
 }
