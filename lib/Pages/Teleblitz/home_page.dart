@@ -15,6 +15,8 @@ import 'select_stufe.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
+import 'package:morea/Widgets/home/elternpend.dart';
+
 
 class HomePage extends StatefulWidget {
   HomePage({this.auth, this.firestore, this.navigationMap, this.moreafire});
@@ -177,6 +179,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             body: moreaLoading.loading());
     if (moreafire.getSubscribedGroups.length > 0) {
       List<Widget> anzeige = new List();
+      if(moreafire.getGroupID != null)
       anzeige.add(
           teleblitz.displayContent(moreaLoading.loading, moreafire.getGroupID));
       moreafire.getSubscribedGroups.forEach((groupID) {
@@ -185,14 +188,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       return DefaultTabController(
         length: moreafire.getSubscribedGroups.length +
-            (moreafire.getGroupID.isNotEmpty ? 1 : 0),
+            ((moreafire.getGroupID != null) ? 1 : 0),
         child: Scaffold(
           appBar: new AppBar(
             title: new Text('Teleblitz'),
             bottom: TabBar(
                 tabs: getTabList(
-                    [moreafire.getGroupID, ...moreafire.getSubscribedGroups])),
-          ),
+                  ((moreafire.getGroupID == null) ? moreafire.getSubscribedGroups : [moreafire.getGroupID, ...moreafire.getSubscribedGroups]))
+          ),),
           drawer: new Drawer(
             child: new ListView(children: navigation()),
           ),
@@ -205,7 +208,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     } else
-      return Container();
+      return Scaffold(
+              appBar: AppBar(
+                title: Text('Teleblitz'),
+              ),
+              drawer: new Drawer(
+                child: new ListView(children: navigation()),
+              ),
+              body: requestPrompttoParent());
 
     
   }
