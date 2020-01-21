@@ -13,6 +13,7 @@ import 'package:morea/services/utilities/dwi_format.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -88,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            moreaUser.userID = await widget.auth.signInWithEmailAndPassword(moreaUser.userID, _password);
+            moreaUser.userID = await widget.auth.signInWithEmailAndPassword(moreaUser.email, _password);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               moreafire.uploadDevTocken(moreaUser.userID);
@@ -182,6 +183,7 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
+        
          widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }

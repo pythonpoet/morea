@@ -186,10 +186,11 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         );
         break;
       case AuthStatus.loading:
-        return Container(
-          child: moreaLoading.loading(),
-          color: Colors.white,
-        );
+        return Scaffold(
+            appBar: AppBar(
+              title: Text('Teleblitz'),
+            ),
+            body: moreaLoading.loading());
         break;
     }
   }

@@ -5,8 +5,10 @@ import 'package:morea/Pages/About/about.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/Widgets/Action/scan.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/dialog.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
@@ -256,12 +258,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         moreaFire: moreafire,
                         crud0: crud0,
                       )))),
+          new ListTile(
+              title: new Text("TN zu Leiter machen"),
+              trailing: new Icon(Icons.enhanced_encryption),
+              onTap: () => makeLeiterWidget(context,moreafire.getUserMap[userMapUID],moreafire.getGroupID) ,
+          ),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),
               trailing: new Icon(Icons.info),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new AboutThisApp()))),
+          
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
