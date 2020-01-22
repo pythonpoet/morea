@@ -1,4 +1,6 @@
 //Config
+import 'package:morea/services/mailchimp_api_manager.dart';
+
 final String appVersion = "1";
 final String configMapMinAppVerson = "minAppVersion";
 final String configMapBlockedDevToken= "blockedDevTokens";
@@ -51,6 +53,7 @@ final String userMapHandynummer ="Handynummer";
 final String userMapEmail = "Email";
 final String userMapAccountCreated= "AccountCreated";
 final String userMapDeviceToken = "devtoken";
+final String userMapGeschlecht = 'Geschlecht';
 
 //groupMap
 final String groupMapEventID = "eventID";
@@ -77,3 +80,7 @@ final String toHomePage = 'homePage';
 final String toMessagePage = 'messagePage';
 final String toAgendaPage = 'agendaPage';
 final String toProfilePage = 'profilePage';
+
+//MailChimp
+final String urlInfoMailListMembers = 'https://us13.api.mailchimp.com/3.0/lists/54c3988cea/members/';
+final String uIDInfoMailList = '54c3988cea';

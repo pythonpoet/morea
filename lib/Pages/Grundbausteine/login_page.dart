@@ -6,13 +6,13 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'datenschutz.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
@@ -30,12 +30,10 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
-  
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
- 
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
@@ -44,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
       _pfadinamen = ' ',
       _vorname,
       _nachname,
-      _alter ="[Datum auswählen]",
+      _alter = "[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
   String _password,
@@ -55,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       _passwordneu,
       userId,
       error;
+  String _geschlecht = 'Bitte wählen';
   FormType _formType = FormType.login;
   List<Map> _stufenselect = new List();
   List<String> _verwandtschaft = [
@@ -76,8 +75,8 @@ class _LoginPageState extends State<LoginPage> {
   bool buebeCheckbox = false;
   bool pioCheckbox = false;
 
-  
-
+  //Mailchimp
+  MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -101,7 +100,8 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
+            userId =
+                await widget.auth.signInWithEmailAndPassword(_email, _password);
             print('Sign in: $userId');
             if (userId != null) {
               moreafire.uploadDevTocken(userId);
@@ -119,31 +119,46 @@ class _LoginPageState extends State<LoginPage> {
             if (_password.length >= 6) {
               if (_password == _passwordneu) {
                 if (_selectedstufe != 'Stufe wählen') {
-                  setState(() {
-                    _load = true;
-                  });
-                  await datenschutz.moreaDatenschutzerklaerung(context);
-                  if (datenschutz.akzeptiert) {
-                    userId = await widget.auth.createUserWithEmailAndPassword(
-                        _email, _password);
-                    print('Registered user: $userId');
-                    if (userId != null) {
-                      //Creates userMap
-                      moreafire.createUserInformation(await mapUserData());
-                      //writes Devicetoken to collection of groupID
-                      moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
-                      //uploads devtoken to userMap
-                      moreafire.uploadDevTocken(userId);
-                      //Writes tn rights to groupMap
-                      moreafire.groupPriviledgeTN(_selectedstufe ,userId, (_pfadinamen == ' '? _vorname: _pfadinamen));
-                      //sends user to rootpage
-                      widget.onSignedIn();
+                  if (_geschlecht != 'Bitte wählen') {
+                    setState(() {
+                      _load = true;
+                    });
+                    await datenschutz.moreaDatenschutzerklaerung(context);
+                    if (datenschutz.akzeptiert) {
+                      userId = await widget.auth
+                          .createUserWithEmailAndPassword(_email, _password);
+                      print('Registered user: $userId');
+                      if (userId != null) {
+                        //Creates userMap
+                        moreafire.createUserInformation(await mapUserData());
+                        //writes Devicetoken to collection of groupID
+                        moreafire.subscribeToGroup(
+                            convWebflowtoMiData(_selectedstufe));
+                        //uploads devtoken to userMap
+                        moreafire.uploadDevTocken(userId);
+                        //Writes tn rights to groupMap
+                        moreafire.groupPriviledgeTN(_selectedstufe, userId,
+                            (_pfadinamen == ' ' ? _vorname : _pfadinamen));
+                        //Writes user information to MailChimp List
+                        await mailChimpAPIManager.updateUserInfo(_email,
+                            _vorname, _nachname, _geschlecht, _selectedstufe);
+                        //sends user to rootpage
+                        widget.onSignedIn();
+                      }
+                    } else {
+                      setState(() {
+                        _load = false;
+                      });
+                      return null;
                     }
                   } else {
-                    setState(() {
-                      _load = false;
-                    });
-                    return null;
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Bitte Geschlecht auswählen'),
+                          );
+                        });
                   }
                 } else {
                   showDialog(
@@ -172,24 +187,23 @@ class _LoginPageState extends State<LoginPage> {
             if (_password.length >= 6) {
               if (_password == _passwordneu) {
                 if (_selectedverwandtschaft != "Verwandtschaftsgrad wählen") {
-                    setState(() {
-                      _load = true;
-                    });
-                    await datenschutz.moreaDatenschutzerklaerung(context);
-                    if (datenschutz.akzeptiert) {
-                      userId = await widget.auth
-                          .createUserWithEmailAndPassword(_email, _password);
-                      print('Registered user: $userId');
-                      if (userId != null) {
-                        moreafire.createUserInformation(await mapUserData());
-                        moreafire.uploadDevTocken(userId);
-                        setState(() {
-                          _load = false;
-                        });
-                        widget.onSignedIn();
-                      }
+                  setState(() {
+                    _load = true;
+                  });
+                  await datenschutz.moreaDatenschutzerklaerung(context);
+                  if (datenschutz.akzeptiert) {
+                    userId = await widget.auth
+                        .createUserWithEmailAndPassword(_email, _password);
+                    print('Registered user: $userId');
+                    if (userId != null) {
+                      moreafire.createUserInformation(await mapUserData());
+                      moreafire.uploadDevTocken(userId);
+                      setState(() {
+                        _load = false;
+                      });
+                      widget.onSignedIn();
                     }
-                 
+                  }
                 } else {
                   showDialog(
                       context: context,
@@ -217,7 +231,8 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
-         widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
+        widget.auth.displayAuthError(
+            widget.auth.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
@@ -291,10 +306,10 @@ class _LoginPageState extends State<LoginPage> {
           userMapPfadiName: this._pfadinamen,
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
+          userMapGeschlecht: this._geschlecht,
           userMapAlter: this._alter,
-          userMapAccountCreated : DateTime.now(),
+          userMapAccountCreated: DateTime.now(),
           userMapgroupID: _selectedstufe,
-  
           userMapAdresse: this._adresse,
           userMapPLZ: this._plz,
           userMapOrt: this._ort,
@@ -311,8 +326,9 @@ class _LoginPageState extends State<LoginPage> {
           userMapPfadiName: " ",
           userMapVorName: this._vorname,
           userMapNachName: this._nachname,
+          userMapGeschlecht: this._geschlecht,
           userMapgroupID: '',
-          userMapAccountCreated : DateTime.now(),
+          userMapAccountCreated: DateTime.now(),
           userMapAdresse: this._adresse,
           userMapPLZ: this._plz,
           userMapOrt: this._ort,
@@ -337,15 +353,15 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
-    
+
     initSubgoup();
   }
+
   initSubgoup() async {
     CrudMedthods crud0 = new CrudMedthods(widget.firestore);
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
-    this._stufenselect =
-        new List<Map>.from(data[groupMapSubgroup]);
+    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
     setState(() {});
   }
 
@@ -362,9 +378,9 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-      ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+        ),
         body: Stack(
           children: <Widget>[
             Container(
@@ -569,6 +585,23 @@ class _LoginPageState extends State<LoginPage> {
                               : null,
                           keyboardType: TextInputType.text,
                           onSaved: (value) => _nachname = value,
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: [
+                                DropdownMenuItem(
+                                    value: "Weiblich", child: Text('weiblich')),
+                                DropdownMenuItem(
+                                    value: 'Männlich', child: Text('männlich'))
+                              ],
+                              hint: Text(_geschlecht),
+                              onChanged: (newVal) {
+                                _geschlecht = newVal;
+                                this.setState(() {});
+                              }),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 12),
@@ -829,29 +862,59 @@ class _LoginPageState extends State<LoginPage> {
                           onSaved: (value) => _nachname = value,
                         ),
                         Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: [
+                                DropdownMenuItem(
+                                    value: "Weiblich", child: Text('weiblich')),
+                                DropdownMenuItem(
+                                    value: 'Männlich', child: Text('männlich'))
+                              ],
+                              hint: Text(_geschlecht),
+                              onChanged: (newVal) {
+                                _geschlecht = newVal;
+                                this.setState(() {});
+                              }),
+                        ),
+                        Container(
                           color: Colors.grey[200],
                           height: 55,
                           width: 1000,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              new Text("   Geburtstag", style:  TextStyle(color: Colors.grey[600], fontSize: 16), ),
+                              new Text(
+                                "   Geburtstag",
+                                style: TextStyle(
+                                    color: Colors.grey[600], fontSize: 16),
+                              ),
                               new FlatButton(
-                                child: Text(_alter, style:  TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                child: Text(_alter,
+                                    style: TextStyle(
+                                        color: Colors.grey[500], fontSize: 16)),
                                 onPressed: () async {
-                                 
                                   await DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
-                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
-                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
-                                    onConfirm: (date) {
-                                      _alter  = DateFormat.yMd().format(date).toString();
-                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
-          
-                                  setState(() {
-                                    
-                                  });
+                                      showTitleActions: true,
+                                      theme: DatePickerTheme(
+                                          doneStyle: TextStyle(
+                                              color: MoreaColors.violett,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      minTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 25)),
+                                      maxTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 3)),
+                                      onConfirm: (date) {
+                                    _alter = DateFormat.yMd()
+                                        .format(date)
+                                        .toString();
+                                  },
+                                      currentTime: DateTime.now(),
+                                      locale: LocaleType.de);
+
+                                  setState(() {});
                                 },
                               )
                             ],

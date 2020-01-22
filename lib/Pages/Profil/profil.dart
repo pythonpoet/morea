@@ -4,6 +4,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/mailchimp_api_manager.dart';
 
 import 'change_address.dart';
 import 'change_email.dart';
@@ -16,10 +17,9 @@ class Profile extends StatefulWidget {
   final MoreaFirebase moreaFire;
   final Map<String, Function> navigationMap;
 
-  Profile(
-      {@required this.auth,
-      @required this.moreaFire,
-      @required this.navigationMap});
+  Profile({@required this.auth,
+    @required this.moreaFire,
+    @required this.navigationMap});
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -33,6 +33,7 @@ class _ProfileState extends State<Profile> {
   final _passwordKey = GlobalKey<FormState>();
   String oldEmail;
   String newPassword;
+  MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   _ProfileState();
 
@@ -42,6 +43,7 @@ class _ProfileState extends State<Profile> {
     this.userInfo = widget.moreaFire.getUserMap;
     //this._getNachrichtenGruppen();
     this.oldEmail = userInfo['Email'];
+    mailChimpAPIManager.printUserInfo('roran@morea.ch');
   }
 
   @override
@@ -118,12 +120,14 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ChangeName(
-                          userInfo['Vorname'],
-                          userInfo['Nachname'],
-                          userInfo['Pfadinamen'],
-                          _changeName))),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChangeName(
+                                  userInfo['Vorname'],
+                                  userInfo['Nachname'],
+                                  userInfo['Pfadinamen'],
+                                  _changeName))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -144,9 +148,11 @@ class _ProfileState extends State<Profile> {
                       Icons.arrow_forward_ios,
                       color: Colors.black,
                     ),
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => ChangeEmail(
-                            userInfo['Email'], this._changeEmail)))),
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                ChangeEmail(
+                                    userInfo['Email'], this._changeEmail)))),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Divider(
@@ -162,9 +168,10 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          ChangePassword(this._changePassword))),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChangePassword(this._changePassword))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -185,9 +192,12 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ChangePhoneNumber(
-                          userInfo['Handynummer'], _changePhoneNumber))),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChangePhoneNumber(
+                                  userInfo['Handynummer'],
+                                  _changePhoneNumber))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -212,12 +222,14 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ChangeAddress(
-                          userInfo['Adresse'],
-                          userInfo['PLZ'],
-                          userInfo['Ort'],
-                          _changeAddress))),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChangeAddress(
+                                  userInfo['Adresse'],
+                                  userInfo['PLZ'],
+                                  userInfo['Ort'],
+                                  _changeAddress))),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -248,13 +260,15 @@ class _ProfileState extends State<Profile> {
                     Icons.arrow_forward_ios,
                     color: Colors.black,
                   ),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ChangeMessageGroups(
-                          userInfo['messageGroups']['Biber'],
-                          userInfo['messageGroups']['Wombat (Wölfe)'],
-                          userInfo['messageGroups']['Nahani (Meitli)'],
-                          userInfo['messageGroups']['Drason (Buebe)'],
-                          this._changeMessageGroups))),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChangeMessageGroups(
+                                  userInfo['messageGroups']['Biber'],
+                                  userInfo['messageGroups']['Wombat (Wölfe)'],
+                                  userInfo['messageGroups']['Nahani (Meitli)'],
+                                  userInfo['messageGroups']['Drason (Buebe)'],
+                                  this._changeMessageGroups))),
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 10),
@@ -342,6 +356,7 @@ class _ProfileState extends State<Profile> {
       return false;
     }
   }
+
   /*
 
   void _getNachrichtenGruppen() {
@@ -357,7 +372,8 @@ class _ProfileState extends State<Profile> {
   void _showReauthenticate(String email) {
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) =>
+            AlertDialog(
               title: Text(
                 'Achtung',
                 style: MoreaTextStyle.title,
@@ -418,6 +434,10 @@ class _ProfileState extends State<Profile> {
                         }
                         await widget.moreaFire
                             .updateUserInformation(userInfo['UID'], userInfo);
+                        await mailChimpAPIManager.updateUserInfo(
+                            userInfo['Email'], userInfo['Vorname'],
+                            userInfo['Nachname'], userInfo['Geschlecht'],
+                            userInfo['groupID']);
                         if (oldEmail != userInfo['Email'] ||
                             newPassword != null) {
                           _showSignOutInformation().then((onValue) {
@@ -452,13 +472,17 @@ class _ProfileState extends State<Profile> {
       _showReauthenticate(oldEmail);
     } else {
       await widget.moreaFire.updateUserInformation(userInfo['UID'], userInfo);
+      await mailChimpAPIManager.updateUserInfo(
+          userInfo['Email'], userInfo['Vorname'], userInfo['Nachname'],
+          userInfo['Geschlecht'], userInfo['groupID']);
     }
   }
 
   void _showReauthenticateError() {
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) =>
+            AlertDialog(
               title: Text(
                 'Fehler',
                 style: MoreaTextStyle.title,
@@ -484,7 +508,8 @@ class _ProfileState extends State<Profile> {
   Future<void> _showSignOutInformation() async {
     await showDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) =>
+            AlertDialog(
               title: Text(
                 'Abmeldung',
                 style: MoreaTextStyle.title,
@@ -510,7 +535,7 @@ class _ProfileState extends State<Profile> {
   }
 
   FloatingActionButtonLocation _locationFloatingActionButton() {
-    if(widget.moreaFire.getPos == "Leiter"){
+    if (widget.moreaFire.getPos == "Leiter") {
       return FloatingActionButtonLocation.centerDocked;
     } else {
       return FloatingActionButtonLocation.endFloat;
@@ -518,7 +543,7 @@ class _ProfileState extends State<Profile> {
   }
 
   BottomAppBar _bottomAppBarBuilder() {
-    if(widget.moreaFire.getPos == "Leiter"){
+    if (widget.moreaFire.getPos == "Leiter") {
       return moreaLeiterBottomAppBar(widget.navigationMap, 'Speichern');
     } else {
       return moreaChildBottomAppBar(widget.navigationMap);

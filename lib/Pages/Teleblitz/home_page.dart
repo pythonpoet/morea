@@ -5,6 +5,7 @@ import 'package:morea/Pages/About/about.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/Pages/test/test_mailchimp.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/home/eltern.dart';
 import 'package:morea/Widgets/home/elternpend.dart';
@@ -49,9 +50,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool chunnt = false;
   var messagingGroups;
 
-
-
-  
   void getuserinfo() async {
     await moreafire.getData(widget.auth.getUserID);
     await moreafire.initTeleblitz();
@@ -222,8 +220,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               body: requestPrompttoParent());
         break;
-        default:
-          return Scaffold(
+      default:
+        return Scaffold(
             appBar: AppBar(
               title: Text('Teleblitz'),
             ),
@@ -256,7 +254,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState(moreaFire: moreafire,crud0: crud0,)))),
+                      new PersonenVerzeichnisState(
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),
@@ -283,10 +284,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                    profile: moreafire.getUserMap,
-                    moreaFire: moreafire,
-                    crud0: crud0,
-                  )))),
+                        profile: moreafire.getUserMap,
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
+          ListTile(
+              title: new Text('Test Mailchimp'),
+              trailing: new Icon(Icons.add),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new TestMailchimp()))),
           Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -324,16 +330,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           )
         ];
         break;
-        default:
-          return [
-            ListTile(
-              leading: Text('Loading...'),
-            )
-          ];
+      default:
+        return [
+          ListTile(
+            leading: Text('Loading...'),
+          )
+        ];
     }
   }
-
- 
 
   void routeEditTelebliz() {
     Navigator.of(context)
