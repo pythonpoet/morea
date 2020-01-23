@@ -142,7 +142,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15),
+                                    EdgeInsets.only(right: 15, left: 15, bottom: 15),
                               ),
                             ],
                           ),
@@ -194,7 +194,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 onTap: () => _selectDatumEndeFerien(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding:
-                                EdgeInsets.only(right: 15, left: 15),
+                                EdgeInsets.only(right: 15, left: 15, bottom: 15),
                               ),
                             ],
                           ),

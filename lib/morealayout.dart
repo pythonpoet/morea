@@ -217,7 +217,7 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
           Expanded(
             child: FlatButton(
               padding: EdgeInsets.symmetric(vertical: 15),
-              onPressed: null,
+              onPressed: navigationMap[toMessagePage],
               child: Column(
                 children: <Widget>[
                   Icon(Icons.message, color: Colors.white),

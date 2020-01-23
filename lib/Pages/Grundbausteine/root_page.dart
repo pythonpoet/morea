@@ -59,7 +59,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       prefix0.toProfilePage: this.profilePage,
     };
   }
-
+  
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
     await this.moreaFire.getData(await auth.currentUser());
@@ -78,62 +78,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void signedIn() async {
-    await initMoreaFire();
-    setState(() {
-      authStatus = AuthStatus.homePage;
-    });
-  }
-
-  void homePage({dispose}) {
-    if (!(authStatus == AuthStatus.homePage)) {
-      if (dispose != null) {
-        dispose();
-      }
-      setState(() {
-        authStatus = AuthStatus.homePage;
-
-      });
-    }
-  }
-
-  void messagePage({dispose}) {
-    if (!(authStatus == AuthStatus.messagePage)) {
-      if (dispose != null) {
-        dispose();
-      }
-      setState(() {
-        authStatus = AuthStatus.messagePage;
-      });
-    }
-  }
-
-  void agendaPage({dispose}) {
-    if (!(authStatus == AuthStatus.agendaPage)) {
-      if (dispose != null) {
-        dispose();
-      }
-      setState(() {
-        authStatus = AuthStatus.agendaPage;
-
-      });
-    }
-  }
-
-  void profilePage({dispose}) {
-    if (!(authStatus == AuthStatus.profilePage)) {
-      setState(() {
-        authStatus = AuthStatus.profilePage;
-      });
-    }
-  }
-
-  void signedOut() {
-    moreaFire = null;
-    setState(() {
-      authStatus = AuthStatus.notSignedIn;
-    });
-  }
+  //initializes MoreaFirebase and downloads User Data with getData()
 
   @override
   Widget build(BuildContext context) {
@@ -194,4 +139,66 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         break;
     }
   }
+
+  //Functions for the Navigation
+  //Switches authStatus and rebuilds RootPage
+
+  void signedIn() async {
+    await initMoreaFire();
+    setState(() {
+      authStatus = AuthStatus.homePage;
+    });
+  }
+
+  void homePage({dispose}) {
+    if (!(authStatus == AuthStatus.homePage)) {
+      if (dispose != null) {
+        dispose();
+      }
+      setState(() {
+        authStatus = AuthStatus.homePage;
+
+      });
+    }
+  }
+
+  void messagePage({dispose}) {
+    if (!(authStatus == AuthStatus.messagePage)) {
+      if (dispose != null) {
+        dispose();
+      }
+      setState(() {
+        authStatus = AuthStatus.messagePage;
+      });
+    }
+  }
+
+  void agendaPage({dispose}) {
+    if (!(authStatus == AuthStatus.agendaPage)) {
+      if (dispose != null) {
+        dispose();
+      }
+      setState(() {
+        authStatus = AuthStatus.agendaPage;
+
+      });
+    }
+  }
+
+  void profilePage({dispose}) {
+    if (!(authStatus == AuthStatus.profilePage)) {
+      setState(() {
+        authStatus = AuthStatus.profilePage;
+      });
+    }
+  }
+
+  void signedOut() {
+    moreaFire = null;
+    setState(() {
+      authStatus = AuthStatus.notSignedIn;
+    });
+  }
+
+
 }

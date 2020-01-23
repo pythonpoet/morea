@@ -25,9 +25,9 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
   @override
   void initState() {
     super.initState();
-    var splitAntreten = widget.antreten.split(',');
-    this.ortAntreten = splitAntreten[0];
-    this.zeitAntreten = splitAntreten[1].split(' ')[1];
+    var splitAntreten = widget.antreten.split(', ');
+    this.ortAntreten = splitAntreten[1];
+    this.zeitAntreten = splitAntreten[0].split(' ')[0];
     this.mapAntreten = widget.mapAntreten;
     ortAntretenController.text = ortAntreten;
     mapAntretenController.text = mapAntreten;

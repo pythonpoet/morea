@@ -19,7 +19,7 @@ class WerChunnt {
     this._controller.close();
   }
 
-  Stream<List<List<String>>> get stream => _controller.stream.asBroadcastStream();
+  Stream<List<List<String>>> get stream => _controller.stream;
 
   void initChunnt() {
     moreaFire.streamCollectionWerChunnt(eventID).listen((data) {
