@@ -44,7 +44,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    print("tpck init rootpage");
     super.initState();
     moreaLoading = MoreaLoading(this);
     initializeDateFormatting();
@@ -60,31 +59,26 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       prefix0.toProfilePage: this.profilePage,
     };
   }
-
-  //Checks if App has the min required Version
-  //Checks if User has been Blocked by DevToken
-  //Checks if User is logged in or out
-  //Returns the fitting AuthStatus
+  
+  Future<void> initMoreaFire() async {
+    this.moreaFire = new MoreaFirebase(widget.firestore);
+    await this.moreaFire.getData(await auth.currentUser());
+    await this.moreaFire.initTeleblitz();
+    authStatus = AuthStatus.homePage;
+    setState(() {
+    });return true;
+  }
 
   Future authStatusInit() async {
     authStatus = await check4BlockedAuthStatus(
         await auth.currentUser(), widget.firestore);
-    if (authStatus == AuthStatus.homePage) {
-      print("tpck init moreafire");
-      await initMoreaFire();
+    if (authStatus == AuthStatus.loading) {
+       initMoreaFire();
     }
     setState(() {});
-    print("tpck exit authstatusinit");
   }
 
   //initializes MoreaFirebase and downloads User Data with getData()
-
-  Future<void> initMoreaFire() async {
-    this.moreaFire = new MoreaFirebase(widget.firestore);
-    await this.moreaFire.getData(await auth.currentUser());
-    this.moreaFire.initTeleblitz();
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +95,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           auth: auth,
           firestore: widget.firestore,
           navigationMap: navigationMap,
+          moreafire: moreaFire,
         );
         break;
       case AuthStatus.blockedByAppVersion:
@@ -136,10 +131,11 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         );
         break;
       case AuthStatus.loading:
-        return Container(
-          child: moreaLoading.loading(),
-          color: Colors.white,
-        );
+        return Scaffold(
+            appBar: AppBar(
+              title: Text('Teleblitz'),
+            ),
+            body: moreaLoading.loading());
         break;
     }
   }

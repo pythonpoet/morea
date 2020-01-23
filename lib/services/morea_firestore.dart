@@ -4,6 +4,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:morea/services/utilities/user.dart';
 import 'auth.dart';
 import 'crud.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -49,7 +50,7 @@ abstract class BaseMoreaFirebase {
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
 }
 
-class MoreaFirebase extends BaseMoreaFirebase {
+class MoreaFirebase extends BaseMoreaFirebase  {
   CrudMedthods crud0;
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
@@ -57,106 +58,54 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, dynamic> _userMap, _groupMap;
   Map<String, int> _groupPrivilege= new Map();
   Map<String, Map<String, String>>_childMap;
-  String _displayName,
-      _pfadiName,
-      _groupID,
-      _vorName,
-      _nachName,
-      _pos,
-      //_homeFeedMainEventID,
-      _email;
-  Map<String, dynamic> _messagingGroups;
-  List<String> _subscribedGroups = new List<String>();
+  
   Firestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  User moreaUser;
 
   MoreaFirebase(Firestore firestore, {List groupIDs}) {
     this.firestore = firestore;
     crud0 = new CrudMedthods(firestore);
+    moreaUser = new User(crud0);
     if (groupIDs != null) tbz = new TeleblizFirestore(firestore, groupIDs);
   }
 
-  String get getDisplayName => _displayName;
+  String get getDisplayName => moreaUser.displayName;
 
-  String get getPfandiName => _pfadiName;
+  String get getPfandiName => moreaUser.pfadiName;
 
-  String get getGroupID => _groupID;
+  String get getGroupID => moreaUser.groupID;
 
-  String get getVorName => _vorName;
+  String get getVorName => moreaUser.vorName;
 
-  String get getNachName => _nachName;
+  String get getNachName => moreaUser.nachName;
 
-  String get getPos => _pos;
+  String get getPos => moreaUser.pos;
 
-  String get getEmail => _email;
+  String get getEmail => moreaUser.email;
 
   //String get getHomeFeedMainEventID => _homeFeedMainEventID;
 
-  List<String> get getSubscribedGroups => _subscribedGroups;
+  List<String> get getSubscribedGroups => moreaUser.subscribedGroups;
 
-  Map<String, dynamic> get getGroupMap => _groupMap;
+  Map<String, dynamic> get getGroupMap => moreaUser.groupMap;
 
   Map<String, dynamic> get getUserMap => _userMap;
 
-  Map<String, Map<String, String>> get getChildMap => _childMap;
-  Map<String, int> get getGroupPrivilege => _groupPrivilege;
+  Map<String, Map<String, String>> get getChildMap => moreaUser.childMap;
+  Map<String, int> get getGroupPrivilege => moreaUser.groupPrivilege;
 
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
         (await crud0.getDocument(pathUser, userID)).data);
-    _pfadiName = _userMap[userMapPfadiName];
-    _groupID = _userMap[userMapgroupID];
-    _vorName = _userMap[userMapVorName];
-    _nachName = _userMap[userMapNachName];
-    _pos = _userMap[userMapPos];
-    _email = _userMap[userMapEmail];
-    _subscribedGroups =
-        List<String>.from(_userMap[userMapSubscribedGroups] ?? []);
-    if (_pfadiName == '')
-      _displayName = _vorName;
-    else
-      _displayName = _pfadiName;
-    if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
-      _groupMap =
-          (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-      if(_groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
-      _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
-      else _groupPrivilege[_groupID] = 0;
-     
-    } else {
-      if (_userMap.containsKey(userMapKinder)) {
-        Map<String, String> kinderMap =
-            Map<String, String>.from(_userMap[userMapKinder]);
-        _childMap = await createChildMap(kinderMap);
-      }
-    }
+    await moreaUser.getUserData(_userMap);
   }
-
-  Future<Map<String, Map<String, String>>> createChildMap(
-      Map<String, String> childs) async {
-    Map<String, Map<String, String>> childMap = new Map();
-    for (String vorname in childs.keys) {
-      Map<String, dynamic> childUserDat =
-          (await crud0.getDocument(pathUser, childs[vorname])).data;
-      if (childMap.containsKey(childUserDat[userMapgroupID]))
-        childMap[childUserDat[userMapgroupID]][vorname] = childs[vorname];
-      else
-        childMap[childUserDat[userMapgroupID]] = {vorname: childs[vorname]};
-      if (!_subscribedGroups.contains(childUserDat[userMapgroupID]))
-        _subscribedGroups.add(childUserDat[userMapgroupID]);
-    }
-    parentGroupPrivilege(childMap);
-    return childMap;
-  }
-  //TODO GroupPrivilege aus groupMap nehmen
-parentGroupPrivilege(Map<String, Map<String, String>> childMap){
-  for (String groupID in childMap.keys)
-    _groupPrivilege[groupID] = 2;
-}
+    
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
-    groupIDs.addAll(_subscribedGroups);
-    groupIDs.add(_groupID);
+    groupIDs.addAll(getSubscribedGroups);
+    if(getGroupID !=null)
+    groupIDs.add(getGroupID);
     tbz = new TeleblizFirestore(firestore, groupIDs);
   }
 
@@ -214,7 +163,7 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
       String anmeldeUID, String anmeldeStatus, String name) async {
     crud0.runTransaction(
         "$pathEvents/$eventID/Anmeldungen",
-        anmeldeUID,
+        childUID,
         Map<String, dynamic>.from({
           "AnmeldeStatus": anmeldeStatus,
           eventMapAnmeldeUID: anmeldeUID,
@@ -322,8 +271,10 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
       {
         userMapgroupID: groupID,
         userMapUID: userID,
-        "displayName": displayName
+        "DisplayName": displayName
       }
     ));
   }
+
+
 }

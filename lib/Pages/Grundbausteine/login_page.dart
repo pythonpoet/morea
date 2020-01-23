@@ -10,8 +10,10 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -35,26 +37,17 @@ class _LoginPageState extends State<LoginPage> {
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
+  User moreaUser;
  
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String _email,
-      _pfadinamen = ' ',
-      _vorname,
-      _nachname,
+  String 
       _alter ="[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
-      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
-  String _password,
-      _adresse,
-      _ort,
-      _plz,
-      _handynummer,
-      _passwordneu,
-      userId,
-      error;
+      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen', _password, _passwordneu;
+  String error;
   FormType _formType = FormType.login;
   List<Map> _stufenselect = new List();
   List<String> _verwandtschaft = [
@@ -69,12 +62,7 @@ class _LoginPageState extends State<LoginPage> {
   Color left = Colors.black;
   Color right = Colors.white;
 
-  //Für Eltern Stufenauswahl
-  bool biberCheckbox = false;
-  bool woelfeCheckbox = false;
-  bool meitliCheckbox = false;
-  bool buebeCheckbox = false;
-  bool pioCheckbox = false;
+
 
   
 
@@ -90,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   updatedevtoken() async {
-    moreafire.uploadDevTocken(userId);
+    moreafire.uploadDevTocken(moreaUser.userID);
   }
 
   void validateAndSubmit() async {
@@ -101,10 +89,10 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
-            print('Sign in: $userId');
-            if (userId != null) {
-              moreafire.uploadDevTocken(userId);
+            moreaUser.userID = await widget.auth.signInWithEmailAndPassword(moreaUser.email, _password);
+            print('Sign in: ${moreaUser.userID}');
+            if (moreaUser.userID != null) {
+              moreafire.uploadDevTocken(moreaUser.userID);
               setState(() {
                 _load = false;
               });
@@ -124,21 +112,8 @@ class _LoginPageState extends State<LoginPage> {
                   });
                   await datenschutz.moreaDatenschutzerklaerung(context);
                   if (datenschutz.akzeptiert) {
-                    userId = await widget.auth.createUserWithEmailAndPassword(
-                        _email, _password);
-                    print('Registered user: $userId');
-                    if (userId != null) {
-                      //Creates userMap
-                      moreafire.createUserInformation(await mapUserData());
-                      //writes Devicetoken to collection of groupID
-                      moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
-                      //uploads devtoken to userMap
-                      moreafire.uploadDevTocken(userId);
-                      //Writes tn rights to groupMap
-                      moreafire.groupPriviledgeTN(_selectedstufe ,userId, (_pfadinamen == ' '? _vorname: _pfadinamen));
-                      //sends user to rootpage
-                      widget.onSignedIn();
-                    }
+                    moreaUser.pos = "Teilnehmer";
+                    await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
                   } else {
                     setState(() {
                       _load = false;
@@ -177,17 +152,8 @@ class _LoginPageState extends State<LoginPage> {
                     });
                     await datenschutz.moreaDatenschutzerklaerung(context);
                     if (datenschutz.akzeptiert) {
-                      userId = await widget.auth
-                          .createUserWithEmailAndPassword(_email, _password);
-                      print('Registered user: $userId');
-                      if (userId != null) {
-                        moreafire.createUserInformation(await mapUserData());
-                        moreafire.uploadDevTocken(userId);
-                        setState(() {
-                          _load = false;
-                        });
-                        widget.onSignedIn();
-                      }
+                      moreaUser.pos = _selectedverwandtschaft;
+                      await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
                     }
                  
                 } else {
@@ -217,6 +183,7 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
+        
          widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }
@@ -253,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: 'z.B. maxi@stinkt.undso',
                 ),
                 onChanged: (String value) {
-                  this._email = value;
+                  this.moreaUser.email = value;
                 },
               ),
             )
@@ -273,64 +240,15 @@ class _LoginPageState extends State<LoginPage> {
                     context: context,
                     child: new AlertDialog(
                       title: new Text(
-                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
+                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $moreaUser.email erhalten'),
                     ));
-                widget.auth.sendPasswordResetEmail(_email);
+                widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
         ],
       ),
     );
   }
 
-  Future<Map> mapUserData() async {
-    var token = await firebaseMessaging.getToken();
-    List devtoken = [token];
-    switch (_formType) {
-      case FormType.register:
-        Map<String, dynamic> userInfo = {
-          userMapPfadiName: this._pfadinamen,
-          userMapVorName: this._vorname,
-          userMapNachName: this._nachname,
-          userMapAlter: this._alter,
-          userMapAccountCreated : DateTime.now(),
-          userMapgroupID: _selectedstufe,
-  
-          userMapAdresse: this._adresse,
-          userMapPLZ: this._plz,
-          userMapOrt: this._ort,
-          userMapHandynummer: this._handynummer,
-          userMapPos: 'Teilnehmer',
-          userMapUID: this.userId,
-          userMapEmail: this._email,
-          userMapDeviceToken: devtoken
-        };
-        return userInfo;
-        break;
-      case FormType.registereltern:
-        Map<String, dynamic> userInfo = {
-          userMapPfadiName: " ",
-          userMapVorName: this._vorname,
-          userMapNachName: this._nachname,
-          userMapgroupID: '',
-          userMapAccountCreated : DateTime.now(),
-          userMapAdresse: this._adresse,
-          userMapPLZ: this._plz,
-          userMapOrt: this._ort,
-          userMapHandynummer: this._handynummer,
-          userMapPos: this._selectedverwandtschaft,
-          userMapUID: this.userId,
-          userMapEmail: this._email,
-          userMapDeviceToken: devtoken
-        };
-        return userInfo;
-        break;
-      case FormType.login:
-        return null;
-        break;
-      default:
-        return null;
-    }
-  }
 
   @override
   void initState() {
@@ -342,6 +260,7 @@ class _LoginPageState extends State<LoginPage> {
   }
   initSubgoup() async {
     CrudMedthods crud0 = new CrudMedthods(widget.firestore);
+    moreaUser = new User(crud0);
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
     this._stufenselect =
@@ -454,7 +373,7 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) =>
                       value.isEmpty ? 'Email darf nicht leer sein' : null,
                   keyboardType: TextInputType.emailAddress,
-                  onSaved: (value) => _email = value,
+                  onSaved: (value) => moreaUser.email = value,
                 ),
                 new TextFormField(
                   decoration: new InputDecoration(
@@ -557,7 +476,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? 'Vornamen darf nicht leer sein'
                               : null,
                           keyboardType: TextInputType.text,
-                          onSaved: (value) => _vorname = value,
+                          onSaved: (value) => moreaUser.vorName = value,
                         ),
                         new TextFormField(
                           decoration: new InputDecoration(
@@ -568,7 +487,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? 'Nachname darf nicht leer sein'
                               : null,
                           keyboardType: TextInputType.text,
-                          onSaved: (value) => _nachname = value,
+                          onSaved: (value) => moreaUser.nachName = value,
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 12),
@@ -620,7 +539,7 @@ class _LoginPageState extends State<LoginPage> {
                                 filled: true,
                                 labelText: 'Adresse'),
                             keyboardType: TextInputType.text,
-                            onSaved: (value) => _adresse = value,
+                            onSaved: (value) => moreaUser.adresse = value,
                           ),
                           new Row(
                             children: <Widget>[
@@ -631,7 +550,7 @@ class _LoginPageState extends State<LoginPage> {
                                     filled: true,
                                     labelText: 'PLZ'),
                                 keyboardType: TextInputType.number,
-                                onSaved: (value) => _plz = value,
+                                onSaved: (value) => moreaUser.plz = value,
                               )),
                               Expanded(
                                 child: new TextFormField(
@@ -640,7 +559,7 @@ class _LoginPageState extends State<LoginPage> {
                                       filled: true,
                                       labelText: 'Ort'),
                                   keyboardType: TextInputType.text,
-                                  onSaved: (value) => _ort = value,
+                                  onSaved: (value) => moreaUser.ort = value,
                                 ),
                               ),
                             ],
@@ -678,7 +597,7 @@ class _LoginPageState extends State<LoginPage> {
                           ? 'Handynummer darf nicht leer sein'
                           : null,
                       keyboardType: TextInputType.phone,
-                      onSaved: (value) => _handynummer = value,
+                      onSaved: (value) => moreaUser.handynummer = value,
                     ),
                   ),
                 )
@@ -709,7 +628,7 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (value) =>
                           value.isEmpty ? 'Email darf nicht leer sein' : null,
                       keyboardType: TextInputType.emailAddress,
-                      onSaved: (value) => _email = value,
+                      onSaved: (value) => moreaUser.email = value,
                     ),
                   ),
                 )
@@ -804,7 +723,7 @@ class _LoginPageState extends State<LoginPage> {
                             filled: true,
                             labelText: 'Pfadinamen',
                           ),
-                          onSaved: (value) => _pfadinamen = value,
+                          onSaved: (value) => moreaUser.pfadiName = value,
                         ),
                         new TextFormField(
                           decoration: new InputDecoration(
@@ -815,7 +734,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? 'Vornamen darf nicht leer sein'
                               : null,
                           keyboardType: TextInputType.text,
-                          onSaved: (value) => _vorname = value,
+                          onSaved: (value) => moreaUser.vorName = value,
                         ),
                         new TextFormField(
                           decoration: new InputDecoration(
@@ -826,7 +745,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? 'Nachname darf nicht leer sein'
                               : null,
                           keyboardType: TextInputType.text,
-                          onSaved: (value) => _nachname = value,
+                          onSaved: (value) => moreaUser.nachName = value,
                         ),
                         Container(
                           color: Colors.grey[200],
@@ -912,7 +831,7 @@ class _LoginPageState extends State<LoginPage> {
                                 filled: true,
                                 labelText: 'Adresse'),
                             keyboardType: TextInputType.text,
-                            onSaved: (value) => _adresse = value,
+                            onSaved: (value) => moreaUser.adresse = value,
                           ),
                           new Row(
                             children: <Widget>[
@@ -923,7 +842,7 @@ class _LoginPageState extends State<LoginPage> {
                                     filled: true,
                                     labelText: 'PLZ'),
                                 keyboardType: TextInputType.number,
-                                onSaved: (value) => _plz = value,
+                                onSaved: (value) => moreaUser.plz = value,
                               )),
                               Expanded(
                                 child: new TextFormField(
@@ -932,7 +851,7 @@ class _LoginPageState extends State<LoginPage> {
                                       filled: true,
                                       labelText: 'Ort'),
                                   keyboardType: TextInputType.text,
-                                  onSaved: (value) => _ort = value,
+                                  onSaved: (value) => moreaUser.ort = value,
                                 ),
                               ),
                             ],
@@ -970,7 +889,7 @@ class _LoginPageState extends State<LoginPage> {
                           ? 'Handynummer darf nicht leer sein'
                           : null,
                       keyboardType: TextInputType.phone,
-                      onSaved: (value) => _handynummer = value,
+                      onSaved: (value) => moreaUser.handynummer = value,
                     ),
                   ),
                 )
@@ -1001,7 +920,7 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (value) =>
                           value.isEmpty ? 'Email darf nicht leer sein' : null,
                       keyboardType: TextInputType.emailAddress,
-                      onSaved: (value) => _email = value,
+                      onSaved: (value) => moreaUser.email = value,
                     ),
                   ),
                 )

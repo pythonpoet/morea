@@ -315,7 +315,10 @@ class _SendMessagesState extends State<SendMessages> {
   }
 
   void _getUserInformation() async {
-    this.uid = await auth.currentUser();
+    //Das funktioniert glaubs nöd / unzueferlässig (weg neue instance vo auth, d registrierig isch uf em e andere instance)
+    //this.uid = await auth.currentUser();
+    this.uid = moreaFire.getUserMap[userMapUID];
+    //Muess userInfo neu aktuallisiert werde? Wenn nöd eifach moreaFire.getUserMap
     var userInfo = await moreaFire.getUserInformation(this.uid);
     this.userInfo = userInfo.data;
     print(uid);

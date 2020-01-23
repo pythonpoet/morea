@@ -20,6 +20,8 @@ abstract class BaseTeleblitzFirestore {
   Stream<Map<String, Map<String, Map<String,dynamic>>>> get getMapofEvents;
   /*Returns a stream with a Map that contains the groupID as key and a further Map as value. 
   The Map contains the eventID as key and the teleblitz (event content) as value.*/
+
+  Stream<String> anmeldeStatus(String eventID, userID);
   
   Future<bool> eventIDExists(String eventID);
   //Returns true if a given eventID exists in the firestore
@@ -126,6 +128,15 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     } catch (e) {
       print(e);
       return null;
+    }
+  }
+  Stream<String> anmeldeStatus(String userID, eventID)async*{
+    Stream<DocumentSnapshot> sdSAnmeldung = crud0.streamDocument(pathEvents+"/"+ eventID+"/"+"Anmeldungen", userID);
+    await for (DocumentSnapshot dSAnmeldung in sdSAnmeldung){
+      if(!dSAnmeldung.exists)
+        yield "un-initialized";
+      else
+      yield dSAnmeldung.data["AnmeldeStatus"];
     }
   }
 

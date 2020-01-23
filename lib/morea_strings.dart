@@ -51,6 +51,8 @@ final String userMapHandynummer ="Handynummer";
 final String userMapEmail = "Email";
 final String userMapAccountCreated= "AccountCreated";
 final String userMapDeviceToken = "devtoken";
+final String userMapGeburtstag = "Geburtstag";
+final String userMapAccountEdit= "edit";
 
 //groupMap
 final String groupMapEventID = "eventID";

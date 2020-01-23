@@ -5,25 +5,28 @@ import 'package:morea/Pages/About/about.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/Widgets/Action/scan.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
-import 'package:morea/Widgets/home/eltern.dart';
-import 'package:morea/Widgets/home/elternpend.dart';
-import 'package:morea/Widgets/home/leiter.dart';
-import 'package:morea/Widgets/home/teilnehmer.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/dialog.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'select_stufe.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
+import 'package:morea/Widgets/home/elternpend.dart';
+
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.firestore, this.navigationMap});
+  HomePage({this.auth, this.firestore, this.navigationMap, this.moreafire});
 
   final BaseAuth auth;
   final Firestore firestore;
   final Map<String, Function> navigationMap;
+  final MoreaFirebase moreafire;
 
   @override
   State<StatefulWidget> createState() => HomePageState();
@@ -49,12 +52,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool chunnt = false;
   var messagingGroups;
 
-
-
-  
   void getuserinfo() async {
-    await moreafire.getData(widget.auth.getUserID);
-    await moreafire.initTeleblitz();
     forminit();
     teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
@@ -99,7 +97,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    moreafire = new MoreaFirebase(widget.firestore);
+    moreafire = widget.moreafire;
     crud0 = new CrudMedthods(widget.firestore);
     moreaLoading = new MoreaLoading(this);
     firebaseMessaging.configure(
@@ -172,9 +170,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget teleblitzwidget() {
-    switch (_formType) {
-      case FormType.loading:
-        return Scaffold(
+    if(_formType == FormType.loading)
+     return Scaffold(
             appBar: AppBar(
               title: Text('Teleblitz'),
             ),
@@ -182,38 +179,38 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: new ListView(children: navigation()),
             ),
             body: moreaLoading.loading());
-      case FormType.leiter:
-        return leiterView(
-            stream: moreafire.tbz.getMapofEvents,
-            groupID: moreafire.getGroupID,
-            subscribedGroups: moreafire.getSubscribedGroups,
-            navigation: navigation,
-            teleblitzAnzeigen: teleblitz.anzeigen,
-            route: routeEditTelebliz,
-            navigationMap: widget.navigationMap,
-            moreaLoading: moreaLoading.loading());
+    if (moreafire.getSubscribedGroups.length > 0) {
+      List<Widget> anzeige = new List();
+      if(moreafire.getGroupID != null)
+      anzeige.add(
+          teleblitz.displayContent(moreaLoading.loading, moreafire.getGroupID));
+      moreafire.getSubscribedGroups.forEach((groupID) {
+        anzeige.add(teleblitz.displayContent(moreaLoading.loading, groupID));
+      });
 
-        break;
-      case FormType.teilnehmer:
-        return teilnehmerView(
-            stream: moreafire.tbz.getMapofEvents,
-            groupID: moreafire.getGroupID,
-            navigation: navigation,
-            teleblitzAnzeigen: teleblitz.anzeigen,
-            navigationMap: widget.navigationMap,
-            moreaLoading: moreaLoading.loading());
-        break;
-      case FormType.eltern:
-        if (moreafire.getSubscribedGroups.length > 0)
-          return elternView(
-              stream: moreafire.tbz.getMapofEvents,
-              subscribedGroups: moreafire.getSubscribedGroups,
-              navigation: navigation,
-              teleblitzAnzeigen: teleblitz.anzeigen,
-              navigationMap: widget.navigationMap,
-              moreaLoading: moreaLoading.loading());
-        else
-          return Scaffold(
+      return DefaultTabController(
+        length: moreafire.getSubscribedGroups.length +
+            ((moreafire.getGroupID != null) ? 1 : 0),
+        child: Scaffold(
+          appBar: new AppBar(
+            title: new Text('Teleblitz'),
+            bottom: TabBar(
+                tabs: getTabList(
+                  ((moreafire.getGroupID == null) ? moreafire.getSubscribedGroups : [moreafire.getGroupID, ...moreafire.getSubscribedGroups]))
+          ),),
+          drawer: new Drawer(
+            child: new ListView(children: navigation()),
+          ),
+          body: TabBarView(children: anzeige),
+          floatingActionButton: (moreafire.getPos == "Leiter")? moreaEditActionbutton(routeEditTelebliz): SizedBox(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar:(moreafire.getPos == "Leiter")?
+              moreaLeiterBottomAppBar(widget.navigationMap, "Ändern"): moreaChildBottomAppBar(widget.navigationMap),
+        ),
+      );
+    } else
+      return Scaffold(
               appBar: AppBar(
                 title: Text('Teleblitz'),
               ),
@@ -221,17 +218,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: new ListView(children: navigation()),
               ),
               body: requestPrompttoParent());
-        break;
-        default:
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Teleblitz'),
-            ),
-            drawer: new Drawer(
-              child: new ListView(children: navigation()),
-            ),
-            body: moreaLoading.loading());
+
+    
+  }
+
+  List<Widget> getTabList(List<String> subscribedGroups) {
+    List<Widget> tabList = new List();
+    for (String groupID in subscribedGroups) {
+      tabList.add(new Tab(
+        text: convMiDatatoWebflow(groupID),
+      ));
     }
+    return tabList;
   }
 
   List<Widget> navigation() {
@@ -256,13 +254,22 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState(moreaFire: moreafire,crud0: crud0,)))),
+                      new PersonenVerzeichnisState(
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
+          new ListTile(
+              title: new Text("TN zu Leiter machen"),
+              trailing: new Icon(Icons.enhanced_encryption),
+              onTap: () => makeLeiterWidget(context,moreafire.getUserMap[userMapUID],moreafire.getGroupID) ,
+          ),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),
               trailing: new Icon(Icons.info),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new AboutThisApp()))),
+          
           new Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -283,10 +290,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                    profile: moreafire.getUserMap,
-                    moreaFire: moreafire,
-                    crud0: crud0,
-                  )))),
+                        profile: moreafire.getUserMap,
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
           Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -324,16 +331,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           )
         ];
         break;
-        default:
-          return [
-            ListTile(
-              leading: Text('Loading...'),
-            )
-          ];
+      default:
+        return [
+          ListTile(
+            leading: Text('Loading...'),
+          )
+        ];
     }
   }
-
- 
 
   void routeEditTelebliz() {
     Navigator.of(context)

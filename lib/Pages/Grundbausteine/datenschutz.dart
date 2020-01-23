@@ -18,7 +18,6 @@ bool akzeptiert = false;
 bool expand = false;
 void expandpressed(){
   expand = !expand;
-  print(expand);
 }
 
   Future<void> moreaDatenschutzerklaerung(BuildContext context)async{

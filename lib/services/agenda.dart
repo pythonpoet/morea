@@ -72,10 +72,8 @@ class Agenda extends BaseAgenda{
   }
   Stream<List<Map>> getTotalAgendaOverview(List<String> groupIDs)async*{
     for(String groupID in groupIDs){
-      print("Loop of: $groupID");
       addToList(groupID).firstWhere((bool test) => test==true);
     }
-    print("loop terminated");
     yield* eventStream.stream;
   }
  Future<DocumentSnapshot> getAgendaTitle(String eventID)async{

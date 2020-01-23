@@ -848,7 +848,6 @@ class EventAddPageState extends State<EventAddPage> {
                                               NeverScrollableScrollPhysics(),
                                           children: subgroups.map(
                                               (Map<dynamic, dynamic> group) {
-                                            print("group: " + group.toString());
                                             return new CheckboxListTile(
                                               title: new Text(
                                                   group[groupMapgroupNickName]),
