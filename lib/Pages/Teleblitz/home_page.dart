@@ -292,7 +292,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               title: new Text('Test Mailchimp'),
               trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new TestMailchimp()))),
+                  builder: (BuildContext context) => new TestMailchimp(moreafire)))),
           Divider(),
           new ListTile(
             title: new Text('Logout'),

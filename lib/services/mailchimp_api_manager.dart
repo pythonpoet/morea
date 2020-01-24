@@ -2,13 +2,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/services/morea_firestore.dart';
 
 class MailChimpAPIManager {
-  final String apiKey = '36068e99be1a9254da7c6c32aa391d02-us13';
 
   MailChimpAPIManager();
 
-  printUserInfo(String email) async {
+  printUserInfo(String email, MoreaFirebase moreafire) async {
+    String apiKey = await moreafire.getMailChimpAPIKey();
     String hash = generateMd5(email);
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('pfadimorea:$apiKey'));
@@ -19,7 +20,8 @@ class MailChimpAPIManager {
   }
 
   updateUserInfo(String email, String vorname, String nachname,
-      String geschlecht, String stufe) async {
+      String geschlecht, String stufe, MoreaFirebase moreafire) async {
+    String apiKey = await moreafire.getMailChimpAPIKey();
     String biber = 'Nein',
         woelfe = 'Nein',
         meitli = 'Nein',

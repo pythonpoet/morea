@@ -47,6 +47,8 @@ abstract class BaseMoreaFirebase {
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
 
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
+  
+  Future<String> getMailChimpAPIKey();
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -325,5 +327,12 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
         "displayName": displayName
       }
     ));
+  }
+
+  @override
+  Future<String> getMailChimpAPIKey() async {
+    DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
+    String result = document.data['mailchimp'];
+    return result;
   }
 }

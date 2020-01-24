@@ -141,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                             (_pfadinamen == ' ' ? _vorname : _pfadinamen));
                         //Writes user information to MailChimp List
                         await mailChimpAPIManager.updateUserInfo(_email,
-                            _vorname, _nachname, _geschlecht, _selectedstufe);
+                            _vorname, _nachname, _geschlecht, _selectedstufe, moreafire);
                         //sends user to rootpage
                         widget.onSignedIn();
                       }

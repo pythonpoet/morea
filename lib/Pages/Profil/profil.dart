@@ -43,7 +43,6 @@ class _ProfileState extends State<Profile> {
     this.userInfo = widget.moreaFire.getUserMap;
     //this._getNachrichtenGruppen();
     this.oldEmail = userInfo['Email'];
-    mailChimpAPIManager.printUserInfo('roran@morea.ch');
   }
 
   @override
@@ -437,7 +436,7 @@ class _ProfileState extends State<Profile> {
                         await mailChimpAPIManager.updateUserInfo(
                             userInfo['Email'], userInfo['Vorname'],
                             userInfo['Nachname'], userInfo['Geschlecht'],
-                            userInfo['groupID']);
+                            userInfo['groupID'], widget.moreaFire);
                         if (oldEmail != userInfo['Email'] ||
                             newPassword != null) {
                           _showSignOutInformation().then((onValue) {
@@ -474,7 +473,7 @@ class _ProfileState extends State<Profile> {
       await widget.moreaFire.updateUserInformation(userInfo['UID'], userInfo);
       await mailChimpAPIManager.updateUserInfo(
           userInfo['Email'], userInfo['Vorname'], userInfo['Nachname'],
-          userInfo['Geschlecht'], userInfo['groupID']);
+          userInfo['Geschlecht'], userInfo['groupID'], widget.moreaFire);
     }
   }
 
