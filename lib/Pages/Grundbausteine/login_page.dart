@@ -38,14 +38,14 @@ class _LoginPageState extends State<LoginPage> {
   Datenschutz datenschutz = new Datenschutz();
   User moreaUser;
 
-
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String
-      _alter ="[Datum auswählen]",
+  String _alter = "[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
-      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen', _password, _passwordneu;
+      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen',
+      _password,
+      _passwordneu;
   String error;
   String _geschlecht = 'Bitte wählen';
   FormType _formType = FormType.login;
@@ -61,8 +61,6 @@ class _LoginPageState extends State<LoginPage> {
   PageController pageController;
   Color left = Colors.black;
   Color right = Colors.white;
-
-
 
   //Mailchimp
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
@@ -89,7 +87,8 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            moreaUser.userID = await widget.auth.signInWithEmailAndPassword(moreaUser.email, _password);
+            moreaUser.userID = await widget.auth
+                .signInWithEmailAndPassword(moreaUser.email, _password);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               moreafire.uploadDevTocken(moreaUser.userID);
@@ -107,25 +106,37 @@ class _LoginPageState extends State<LoginPage> {
             if (_password.length >= 6) {
               if (_password == _passwordneu) {
                 if (_selectedstufe != 'Stufe wählen') {
-                  setState(() {
-                    _load = true;
-                  });
-                  await datenschutz.moreaDatenschutzerklaerung(context);
-                  if (datenschutz.akzeptiert) {
-                    moreaUser.pos = "Teilnehmer";
-                    await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
-                    await mailChimpAPIManager.updateUserInfo(
-                        _email,
-                        _vorname,
-                        _nachname,
-                        _geschlecht,
-                        _selectedstufe,
-                        moreafire);
-                  } else {
+                  if (_geschlecht != 'Bitte wählen') {
                     setState(() {
-                      _load = false;
+                      _load = true;
                     });
-                    return null;
+                    await datenschutz.moreaDatenschutzerklaerung(context);
+                    if (datenschutz.akzeptiert) {
+                      moreaUser.geschlecht = _geschlecht;
+                      moreaUser.pos = "Teilnehmer";
+                      await moreaUser.createMoreaUser(
+                          widget.auth, _password, moreafire, widget.onSignedIn);
+                      await mailChimpAPIManager.updateUserInfo(
+                          moreaUser.email,
+                          moreaUser.vorName,
+                          moreaUser.nachName,
+                          _geschlecht,
+                          _selectedstufe,
+                          moreafire);
+                    } else {
+                      setState(() {
+                        _load = false;
+                      });
+                      return null;
+                    }
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Bitte Geschlecht wählen'),
+                          );
+                        });
                   }
                 } else {
                   showDialog(
@@ -156,15 +167,33 @@ class _LoginPageState extends State<LoginPage> {
             if (_password.length >= 6) {
               if (_password == _passwordneu) {
                 if (_selectedverwandtschaft != "Verwandtschaftsgrad wählen") {
+                  if (_geschlecht != 'Bitte wählen') {
                     setState(() {
                       _load = true;
                     });
                     await datenschutz.moreaDatenschutzerklaerung(context);
                     if (datenschutz.akzeptiert) {
+                      moreaUser.geschlecht = _geschlecht;
                       moreaUser.pos = _selectedverwandtschaft;
-                      await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
+                      await moreaUser.createMoreaUser(
+                          widget.auth, _password, moreafire, widget.onSignedIn);
+                      await mailChimpAPIManager.updateUserInfo(
+                          moreaUser.email,
+                          moreaUser.vorName,
+                          moreaUser.nachName,
+                          _geschlecht,
+                          _selectedstufe,
+                          moreafire);
                     }
-                 
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Bitte Geschlecht wählen'),
+                          );
+                        });
+                  }
                 } else {
                   showDialog(
                       context: context,
@@ -196,8 +225,8 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
-
-         widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
+        widget.auth.displayAuthError(
+            widget.auth.checkForAuthErrors(context, e), context);
       }
     }
     setState(() {
@@ -261,7 +290,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 
   @override
   void initState() {
