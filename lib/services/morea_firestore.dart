@@ -48,6 +48,10 @@ abstract class BaseMoreaFirebase {
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
 
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
+
+  Future<String> getMailChimpApiKey();
+
+  Future<String> getWebflowApiKey();
 }
 
 class MoreaFirebase extends BaseMoreaFirebase  {
@@ -58,7 +62,7 @@ class MoreaFirebase extends BaseMoreaFirebase  {
   Map<String, dynamic> _userMap, _groupMap;
   Map<String, int> _groupPrivilege= new Map();
   Map<String, Map<String, String>>_childMap;
-  
+
   Firestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   User moreaUser;
@@ -100,7 +104,7 @@ class MoreaFirebase extends BaseMoreaFirebase  {
         (await crud0.getDocument(pathUser, userID)).data);
     await moreaUser.getUserData(_userMap);
   }
-    
+
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
     groupIDs.addAll(getSubscribedGroups);
@@ -276,5 +280,15 @@ class MoreaFirebase extends BaseMoreaFirebase  {
     ));
   }
 
+  Future<String> getMailChimpApiKey() async {
+    DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
+    String result = document.data['mailchimp'];
+    return result;
+  }
 
+  Future<String> getWebflowApiKey() async {
+    DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
+    String result = document.data['webflow'];
+    return result;
+  }
 }

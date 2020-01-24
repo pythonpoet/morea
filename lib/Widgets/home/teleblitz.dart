@@ -320,7 +320,7 @@ class Teleblitz {
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[info.getTitel(), getWerChunntButton()],
+                  children: <Widget>[info.getTitel(), turnFlipCardTeleblitz()],
                 ),
                 info.getDatum(),
                 info.getAntreten(),
@@ -385,7 +385,7 @@ class Teleblitz {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text("Chunnt nöd:"),
-                          getTeleblitzButton(),
+                          turnFlipCardTeleblitz(),
                         ],
                       ),
                       StreamBuilder(
@@ -445,19 +445,7 @@ class Teleblitz {
     } 
   }
 
-  Widget getWerChunntButton() {
-    return RaisedButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      color: MoreaColors.violett,
-      onPressed: () => teleblitzCardKey.currentState.toggleCard(),
-      child: Text(
-        "Wer chunnt?",
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
-  Widget getTeleblitzButton() {
+  Widget turnFlipCardTeleblitz() {
     return MaterialButton(
       onPressed: () => teleblitzCardKey.currentState.toggleCard(),
       child: Icon(

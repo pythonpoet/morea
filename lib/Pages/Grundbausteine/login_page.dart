@@ -6,6 +6,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
@@ -14,7 +15,6 @@ import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
@@ -32,22 +32,22 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
-  
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
   User moreaUser;
- 
+
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String 
+  String
       _alter ="[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen', _password, _passwordneu;
   String error;
+  String _geschlecht = 'Bitte wählen';
   FormType _formType = FormType.login;
   List<Map> _stufenselect = new List();
   List<String> _verwandtschaft = [
@@ -64,8 +64,8 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
-  
-
+  //Mailchimp
+  MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -114,6 +114,13 @@ class _LoginPageState extends State<LoginPage> {
                   if (datenschutz.akzeptiert) {
                     moreaUser.pos = "Teilnehmer";
                     await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
+                    await mailChimpAPIManager.updateUserInfo(
+                        _email,
+                        _vorname,
+                        _nachname,
+                        _geschlecht,
+                        _selectedstufe,
+                        moreafire);
                   } else {
                     setState(() {
                       _load = false;
@@ -137,10 +144,12 @@ class _LoginPageState extends State<LoginPage> {
             } else {
               showDialog(
                   context: context,
-                  child: new AlertDialog(
-                    title: new Text(
-                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
-                  ));
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                          'Passwort muss aus mindestens 6 Zeichen bestehen'),
+                    );
+                  });
             }
             break;
           case FormType.registereltern:
@@ -168,22 +177,26 @@ class _LoginPageState extends State<LoginPage> {
               } else {
                 showDialog(
                     context: context,
-                    child: new AlertDialog(
-                      title: new Text("Passwörter sind nicht identisch"),
-                    ));
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Passwörter sind nicht identisch'),
+                      );
+                    });
               }
             } else {
               showDialog(
                   context: context,
-                  child: new AlertDialog(
-                    title: new Text(
-                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
-                  ));
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                          'Passwort muss aus mindistens 6 Zeichen bestehen'),
+                    );
+                  });
             }
             break;
         }
       } catch (e) {
-        
+
          widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
       }
     }
@@ -255,16 +268,16 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
-    
+
     initSubgoup();
   }
+
   initSubgoup() async {
     CrudMedthods crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
-    this._stufenselect =
-        new List<Map>.from(data[groupMapSubgroup]);
+    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
     setState(() {});
   }
 
@@ -281,9 +294,9 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-      ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+        ),
         body: Stack(
           children: <Widget>[
             Container(
@@ -488,6 +501,23 @@ class _LoginPageState extends State<LoginPage> {
                               : null,
                           keyboardType: TextInputType.text,
                           onSaved: (value) => moreaUser.nachName = value,
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: [
+                                DropdownMenuItem(
+                                    value: "Weiblich", child: Text('weiblich')),
+                                DropdownMenuItem(
+                                    value: 'Männlich', child: Text('männlich'))
+                              ],
+                              hint: Text(_geschlecht),
+                              onChanged: (newVal) {
+                                _geschlecht = newVal;
+                                this.setState(() {});
+                              }),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 12),
@@ -748,29 +778,59 @@ class _LoginPageState extends State<LoginPage> {
                           onSaved: (value) => moreaUser.nachName = value,
                         ),
                         Container(
+                          padding: EdgeInsets.only(left: 12),
+                          width: 1000,
+                          color: Colors.grey[200],
+                          child: new DropdownButton<String>(
+                              items: [
+                                DropdownMenuItem(
+                                    value: "Weiblich", child: Text('weiblich')),
+                                DropdownMenuItem(
+                                    value: 'Männlich', child: Text('männlich'))
+                              ],
+                              hint: Text(_geschlecht),
+                              onChanged: (newVal) {
+                                _geschlecht = newVal;
+                                this.setState(() {});
+                              }),
+                        ),
+                        Container(
                           color: Colors.grey[200],
                           height: 55,
                           width: 1000,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              new Text("   Geburtstag", style:  TextStyle(color: Colors.grey[600], fontSize: 16), ),
+                              new Text(
+                                "   Geburtstag",
+                                style: TextStyle(
+                                    color: Colors.grey[600], fontSize: 16),
+                              ),
                               new FlatButton(
-                                child: Text(_alter, style:  TextStyle(color: Colors.grey[500], fontSize: 16)),
+                                child: Text(_alter,
+                                    style: TextStyle(
+                                        color: Colors.grey[500], fontSize: 16)),
                                 onPressed: () async {
-                                 
                                   await DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
-                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
-                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
-                                    onConfirm: (date) {
-                                      _alter  = DateFormat.yMd().format(date).toString();
-                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
-          
-                                  setState(() {
-                                    
-                                  });
+                                      showTitleActions: true,
+                                      theme: DatePickerTheme(
+                                          doneStyle: TextStyle(
+                                              color: MoreaColors.violett,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      minTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 25)),
+                                      maxTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 3)),
+                                      onConfirm: (date) {
+                                    _alter = DateFormat.yMd()
+                                        .format(date)
+                                        .toString();
+                                  },
+                                      currentTime: DateTime.now(),
+                                      locale: LocaleType.de);
+
+                                  setState(() {});
                                 },
                               )
                             ],
