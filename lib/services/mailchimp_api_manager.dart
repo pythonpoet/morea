@@ -9,7 +9,7 @@ class MailChimpAPIManager {
   MailChimpAPIManager();
 
   printUserInfo(String email, MoreaFirebase moreafire) async {
-    String apiKey = await moreafire.getMailChimpAPIKey();
+    String apiKey = await moreafire.getMailChimpApiKey();
     String hash = generateMd5(email);
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('pfadimorea:$apiKey'));
@@ -21,7 +21,7 @@ class MailChimpAPIManager {
 
   updateUserInfo(String email, String vorname, String nachname,
       String geschlecht, String stufe, MoreaFirebase moreafire) async {
-    String apiKey = await moreafire.getMailChimpAPIKey();
+    String apiKey = await moreafire.getMailChimpApiKey();
     String biber = 'Nein',
         woelfe = 'Nein',
         meitli = 'Nein',

@@ -48,7 +48,9 @@ abstract class BaseMoreaFirebase {
 
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
   
-  Future<String> getMailChimpAPIKey();
+  Future<String> getMailChimpApiKey();
+
+  Future<String> getWebflowApiKey();
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -330,9 +332,15 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
   }
 
   @override
-  Future<String> getMailChimpAPIKey() async {
+  Future<String> getMailChimpApiKey() async {
     DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
     String result = document.data['mailchimp'];
+    return result;
+  }
+
+  Future<String> getWebflowApiKey() async {
+    DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
+    String result = document.data['webflow'];
     return result;
   }
 }
