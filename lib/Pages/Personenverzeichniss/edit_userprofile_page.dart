@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:morea/services/utilities/MiData.dart';
 
 class EditUserProfilePage extends StatefulWidget {
   EditUserProfilePage({this.profile, this.moreaFire, this.crud0});
+
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
   final Map profile;
@@ -27,11 +29,13 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
+  MailChimpAPIManager mailchimpApiManager = MailChimpAPIManager();
+
   String _email,
       _pfadinamen = ' ',
       _vorname,
       _nachname,
-      _alter ="[Datum auswählen]",
+      _alter = "[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
   String _password,
@@ -43,10 +47,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
       userId,
       error,
       selectedrolle,
+      _geschlecht,
       oldGroup;
   List<Map> _stufenselect = new List();
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
-
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -62,17 +66,28 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
     if (validateAndSave()) {
       try {
         if (_selectedstufe != 'Stufe wählen') {
-          Map<String,dynamic> userdata = mapUserData();
+          Map<String, dynamic> userdata = mapUserData();
+          await moreafire.updateUserInformation(userdata['UID'], userdata);
           await moreafire
-              .updateUserInformation(userdata['UID'], userdata);
-          await moreafire.goToNewGroup(userdata['UID'], (userdata[userMapPfadiName]==" ")?userdata[userMapVorName]:  userdata[userMapPfadiName], oldGroup, userdata[userMapgroupID]).then((onValue)=> setState);
-           Navigator.pop(context);
+              .goToNewGroup(
+                  userdata['UID'],
+                  (userdata[userMapPfadiName] == " ")
+                      ? userdata[userMapVorName]
+                      : userdata[userMapPfadiName],
+                  oldGroup,
+                  userdata[userMapgroupID])
+              .then((onValue) => setState);
+          mailchimpApiManager.updateUserInfo(_email, _vorname, _nachname, _geschlecht, _selectedstufe, moreafire);
+          Navigator.pop(context);
         } else {
           showDialog(
-              context: context,
-              child: new AlertDialog(
-                title: new Text("Bitte eine Stufe wählen!"),
-              ));
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Bitte eine Stufe wählen!'),
+              );
+            },
+          );
         }
       } catch (e) {
         print('$e');
@@ -84,44 +99,45 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
     await showDialog<String>(
       context: context,
       builder: (BuildContext context) => new AlertDialog(
-            contentPadding: const EdgeInsets.all(16.0),
-            content: Container(
-              child: Text(
-                  'Es werden nur die Userdaten gelöscht,\num den Account komplett zu löschen,\nkontaktiere Jarvis '),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  }),
-              new FlatButton(
-                  child: const Text(
-                    'Löschen',
-                    style: TextStyle(color: Colors.redAccent),
-                  ),
-                  onPressed: () {
-                    crud0.deletedocument('user', widget.profile['UID']);
-                    Navigator.pop(context);
-                  })
-            ],
-          ),
+        contentPadding: const EdgeInsets.all(16.0),
+        content: Container(
+          child: Text(
+              'Es werden nur die Userdaten gelöscht,\num den Account komplett zu löschen,\nkontaktiere Jarvis '),
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text(
+                'Löschen',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+              onPressed: () {
+                crud0.deletedocument('user', widget.profile['UID']);
+                Navigator.pop(context);
+              })
+        ],
+      ),
     );
   }
 
   Map mapUserData() {
-   Map<String,dynamic> userInfo = widget.profile;
-      userInfo[userMapPfadiName] = this._pfadinamen;
-          userInfo[userMapVorName]= this._vorname;
-          userInfo[userMapNachName]= this._nachname;
-          userInfo[userMapAlter]= this._alter;
-          userInfo[userMapgroupID]= _selectedstufe;
-          userInfo[userMapAdresse]= this._adresse;
-          userInfo[userMapPLZ]= this._plz;
-          userInfo[userMapOrt]= this._ort;
-          userInfo[userMapHandynummer]= this._handynummer;
-          userInfo[userMapPos]= selectedrolle;
-          userInfo[userMapEmail]= this._email;
+    Map<String, dynamic> userInfo = widget.profile;
+    userInfo[userMapPfadiName] = this._pfadinamen;
+    userInfo[userMapVorName] = this._vorname;
+    userInfo[userMapNachName] = this._nachname;
+    userInfo[userMapAlter] = this._alter;
+    userInfo[userMapgroupID] = _selectedstufe;
+    userInfo[userMapAdresse] = this._adresse;
+    userInfo[userMapPLZ] = this._plz;
+    userInfo[userMapOrt] = this._ort;
+    userInfo[userMapHandynummer] = this._handynummer;
+    userInfo[userMapPos] = selectedrolle;
+    userInfo[userMapEmail] = this._email;
+    userInfo[userMapGeschlecht] = this._geschlecht;
 
     return userInfo;
   }
@@ -135,7 +151,8 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
     initSubgoup();
     super.initState();
   }
-   initSubgoup() async {
+
+  initSubgoup() async {
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
     this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
@@ -217,40 +234,69 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
                       keyboardType: TextInputType.text,
                       onSaved: (value) => _nachname = value,
                     ),
-                                            Container(
-                          color: Colors.grey[200],
-                          height: 55,
-                          width: 1000,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              new Text("   Geburtstag", style:  TextStyle(color: Colors.grey[600], fontSize: 16), ),
-                              new FlatButton(
-                                child: Text(_alter, style:  TextStyle(color: Colors.grey[500], fontSize: 16)),
-                                onPressed: () async {
-                                 
-                                  await DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
-                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
-                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
-                                    onConfirm: (date) {
-                                      _alter  = DateFormat.yMd().format(date).toString();
-                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
-          
-                                  setState(() {
-                                    
-                                  });
-                                },
-                              )
-                            ],
+                    Container(
+                      padding: EdgeInsets.only(left: 12),
+                      width: 1000,
+                      color: Colors.grey[200],
+                      child: new DropdownButton<String>(
+                          items: [
+                            DropdownMenuItem(
+                                value: "Weiblich", child: Text('weiblich')),
+                            DropdownMenuItem(
+                                value: 'Männlich', child: Text('männlich'))
+                          ],
+                          hint: Text(_geschlecht),
+                          onChanged: (newVal) {
+                            _geschlecht = newVal;
+                            this.setState(() {});
+                          }),
+                    ),
+                    Container(
+                      color: Colors.grey[200],
+                      height: 55,
+                      width: 1000,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          new Text(
+                            "   Geburtstag",
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 16),
                           ),
-                        ),
-                        Container(
-                          color: Colors.grey[800],
-                          height: 0.5,
-                          width: 1000,
-                        ),
+                          new FlatButton(
+                            child: Text(_alter,
+                                style: TextStyle(
+                                    color: Colors.grey[500], fontSize: 16)),
+                            onPressed: () async {
+                              await DatePicker.showDatePicker(context,
+                                  showTitleActions: true,
+                                  theme: DatePickerTheme(
+                                      doneStyle: TextStyle(
+                                          color: MoreaColors.violett,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  minTime: DateTime.now()
+                                      .add(new Duration(days: -365 * 25)),
+                                  maxTime: DateTime.now()
+                                      .add(new Duration(days: -365 * 3)),
+                                  onConfirm: (date) {
+                                _alter =
+                                    DateFormat.yMd().format(date).toString();
+                              },
+                                  currentTime: DateTime.now(),
+                                  locale: LocaleType.de);
+
+                              setState(() {});
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      color: Colors.grey[800],
+                      height: 0.5,
+                      width: 1000,
+                    ),
                     Container(
                       padding: EdgeInsets.only(left: 12),
                       width: 1000,
@@ -264,24 +310,24 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
                             ),
                           ),
                           Expanded(
-                            child:Container(
-                          padding: EdgeInsets.only(left: 12),
-                          width: 1000,
-                          color: Colors.grey[200],
-                          child: new DropdownButton<String>(
-                              items: _stufenselect.map((Map group) {
-                                return new DropdownMenuItem<String>(
-                                  value: group[userMapgroupID],
-                                  child: new Text(group[groupMapgroupNickName]),
-                                );
-                              }).toList(),
-                              hint: Text(_selectedstufe),
-                              onChanged: (newVal) {
-                                _selectedstufe = newVal;
-                                this.setState(() {});
-                              }),
-                        )
-                          )
+                              child: Container(
+                            padding: EdgeInsets.only(left: 12),
+                            width: 1000,
+                            color: Colors.grey[200],
+                            child: new DropdownButton<String>(
+                                items: _stufenselect.map((Map group) {
+                                  return new DropdownMenuItem<String>(
+                                    value: group[userMapgroupID],
+                                    child:
+                                        new Text(group[groupMapgroupNickName]),
+                                  );
+                                }).toList(),
+                                hint: Text(_selectedstufe),
+                                onChanged: (newVal) {
+                                  _selectedstufe = newVal;
+                                  this.setState(() {});
+                                }),
+                          ))
                         ],
                       ),
                     ),

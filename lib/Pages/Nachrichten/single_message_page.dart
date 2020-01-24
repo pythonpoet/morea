@@ -10,7 +10,7 @@ class SingleMessagePage extends StatelessWidget {
     this.sender = data['sender'];
   }
 
-   String title, body, sender;
+  String title, body, sender;
 
   @override
   Widget build(BuildContext context) {
