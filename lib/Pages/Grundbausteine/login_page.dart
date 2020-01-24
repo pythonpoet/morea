@@ -840,25 +840,17 @@ class _LoginPageState extends State<LoginPage> {
                                         color: Colors.grey[500], fontSize: 16)),
                                 onPressed: () async {
                                   await DatePicker.showDatePicker(context,
-                                      showTitleActions: true,
-                                      theme: DatePickerTheme(
-                                          doneStyle: TextStyle(
-                                              color: MoreaColors.violett,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      minTime: DateTime.now()
-                                          .add(new Duration(days: -365 * 25)),
-                                      maxTime: DateTime.now()
-                                          .add(new Duration(days: -365 * 3)),
-                                      onConfirm: (date) {
-                                    _alter = DateFormat.yMd()
-                                        .format(date)
-                                        .toString();
-                                  },
-                                      currentTime: DateTime.now(),
-                                      locale: LocaleType.de);
-
-                                  setState(() {});
+                                    showTitleActions: true,
+                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
+                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
+                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
+                                    onConfirm: (date) {
+                                      moreaUser.geburtstag  = DateFormat.yMd().format(date).toString();
+                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
+          
+                                  setState(() {
+                                    
+                                  });
                                 },
                               )
                             ],
