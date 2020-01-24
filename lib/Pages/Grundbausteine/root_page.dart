@@ -141,6 +141,11 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           color: Colors.white,
         );
         break;
+      default:
+        return Container(
+          child: moreaLoading.loading(),
+          color: Colors.white,
+        );
     }
   }
 

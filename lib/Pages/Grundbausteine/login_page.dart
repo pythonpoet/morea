@@ -140,8 +140,13 @@ class _LoginPageState extends State<LoginPage> {
                         moreafire.groupPriviledgeTN(_selectedstufe, userId,
                             (_pfadinamen == ' ' ? _vorname : _pfadinamen));
                         //Writes user information to MailChimp List
-                        await mailChimpAPIManager.updateUserInfo(_email,
-                            _vorname, _nachname, _geschlecht, _selectedstufe, moreafire);
+                        await mailChimpAPIManager.updateUserInfo(
+                            _email,
+                            _vorname,
+                            _nachname,
+                            _geschlecht,
+                            _selectedstufe,
+                            moreafire);
                         //sends user to rootpage
                         widget.onSignedIn();
                       }
@@ -163,24 +168,30 @@ class _LoginPageState extends State<LoginPage> {
                 } else {
                   showDialog(
                       context: context,
-                      child: new AlertDialog(
-                        title: new Text("Bitte eine Stufe wählen!"),
-                      ));
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Bitte eine Stufe wählen'),
+                        );
+                      });
                 }
               } else {
                 showDialog(
                     context: context,
-                    child: new AlertDialog(
-                      title: new Text("Passwörter sind nicht identisch"),
-                    ));
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Passwörter sind nicht identisch'),
+                      );
+                    });
               }
             } else {
               showDialog(
                   context: context,
-                  child: new AlertDialog(
-                    title: new Text(
-                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
-                  ));
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                          'Passwort muss aus mindestens 6 Zeichen bestehen'),
+                    );
+                  });
             }
             break;
           case FormType.registereltern:
@@ -216,17 +227,21 @@ class _LoginPageState extends State<LoginPage> {
               } else {
                 showDialog(
                     context: context,
-                    child: new AlertDialog(
-                      title: new Text("Passwörter sind nicht identisch"),
-                    ));
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Passwörter sind nicht identisch'),
+                      );
+                    });
               }
             } else {
               showDialog(
                   context: context,
-                  child: new AlertDialog(
-                    title: new Text(
-                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
-                  ));
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                          'Passwort muss aus mindistens 6 Zeichen bestehen'),
+                    );
+                  });
             }
             break;
         }
@@ -286,10 +301,12 @@ class _LoginPageState extends State<LoginPage> {
                 Navigator.pop(context);
                 showDialog(
                     context: context,
-                    child: new AlertDialog(
-                      title: new Text(
-                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
-                    ));
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(
+                            'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
+                      );
+                    });
                 widget.auth.sendPasswordResetEmail(_email);
               })
         ],
