@@ -28,10 +28,8 @@ class WerChunnt {
       List<DocumentSnapshot> documents = data.documents;
       for (DocumentSnapshot document in documents) {
         if (document.data['AnmeldeStatus'] == eventMapAnmeldeStatusPositiv) {
-          print(document.data);
           chunnt.add(document.data['Name']);
         } else {
-          print(document.data);
           chunntNoed.add(document.data['Name']);
         }
       }

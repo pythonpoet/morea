@@ -116,7 +116,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
 
   navigatetoprofile(Future<DocumentSnapshot> userdata) {
     Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => new ViewUserProfilePageState(
+        builder: (BuildContext context) => new ViewUserProfilePage(
             userdata, widget.moreaFire, widget.crud0)));
   }
 }
