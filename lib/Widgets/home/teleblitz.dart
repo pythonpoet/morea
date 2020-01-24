@@ -215,21 +215,7 @@ class Teleblitz {
       },
     );
   }
-  Widget childShare(String groupID){
-    return Container(
-      child: Row(
-        children: <Widget>[
-          Text("Erzähle deinen Freunden von dieser Akivität", style: TextStyle(color: Colors.grey[600])),
-           IconButton(
-            icon: Icon(Icons.share,  color: Colors.grey[600]),
-            onPressed: () =>{
-                  Share.share("Lust auf Pfadi? Komm mal bei den ${convMiDatatoWebflow(groupID)} vorbei: https://www.morea.ch/teleblitz")
-                },
-          )
-        ],
-      )
-    );
-  }
+
   Widget parentShare(String groupID){
     return Container(
       child: Row(
@@ -282,7 +268,7 @@ class Teleblitz {
               info.getBemerkung(),
               info.getSender(),
               childAnmeldeButton(groupID, eventID),
-              childShare(groupID),
+              parentShare(groupID),
             ],
           ),
         ),
