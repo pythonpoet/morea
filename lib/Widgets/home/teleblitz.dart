@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +14,7 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
 enum ElementType{ferien, keineAktivitaet, teleblitz, notImplemented}
@@ -25,6 +28,8 @@ class Teleblitz {
   Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
   final ScrollController _clickController = new ScrollController();
+  Map<String,Stream<String>> anmeldeStream = new Map();
+  Map<String, StreamController<String>> anmeldeStreamController = new Map();
 
   Teleblitz(MoreaFirebase moreaFire, CrudMedthods crud0) {
     this.moreaFire = moreaFire;
@@ -132,52 +137,99 @@ class Teleblitz {
   Widget anmeldebutton(
       String groupID, String eventID, String uid, String anmelden, abmelden,
       {String name}) {
-    return Container(
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-                child: Container(
-              child: new RaisedButton(
-                child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
-                onPressed: () {
-                  if (name == null) {
-                    submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
-                  } else {
-                    submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
-                        name: name);
-                  }
-                },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-              ),
-            )),
-            Expanded(
-              child: Container(
-                child: new RaisedButton(
-                  child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
-                  onPressed: () {
-                    if (name == null) {
-                      submit(eventMapAnmeldeStatusPositiv,groupID, eventID, uid);
-                    } else {
-                      submit(eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
-                          name: name);
-                    }
-                  },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
-                  textColor: Colors.white,
-                ),
-              ),
-            )
-          ],
-        ));
+    return StreamBuilder(
+      stream: anmeldeStreamController[uid].stream,
+      builder: (BuildContext context, snap){
+          switch (snap.data) {
+          case "un-initialized":
+              return Container(
+                  padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: new RaisedButton(
+                          child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                          onPressed: () {
+                            if (name == null) {
+                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
+                            } else {
+                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
+                                  name: name);
+                            }
+                          },
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0)),
+                        ),
+                      )),
+                      Expanded(
+                        child: Container(
+                          child: new RaisedButton(
+                            child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
+                            onPressed: () {
+                              if (name == null) {
+                                submit(eventMapAnmeldeStatusPositiv,groupID, eventID, uid);
+                              } else {
+                                submit(eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
+                                    name: name);
+                              }
+                            },
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            color: Color(0xff7a62ff),
+                            textColor: Colors.white,
+                          ),
+                        ),
+                      )
+                    ],
+                  ));
+            break;
+          case "ChuntNoed":
+                return Container(
+                          child: new RaisedButton(
+                            child: Container(child: Center(child: new Text(anmelden, style: new TextStyle(fontSize: 20))), width: 120,),
+                            onPressed: () {
+                              if (name == null) {
+                                submit(eventMapAnmeldeStatusPositiv,groupID, eventID, uid);
+                              } else {
+                                submit(eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
+                                    name: name);
+                              }
+                            },
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            color: Color(0xff7a62ff),
+                            textColor: Colors.white,
+                          ),
+                        );
+          case "Chunt":
+              return Container(
+                        child: new RaisedButton(
+                          child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                          onPressed: () {
+                            if (name == null) {
+                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
+                            } else {
+                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
+                                  name: name);
+                            }
+                          },
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0)),
+                        ),
+                      );
+          default:
+            return Text(snap.data);
+        }
+      },
+    );
   }
   Widget parentAnmeldeIndicator(String groupID, String eventID,  Stream<String> Function(String userID, String eventID) function) {
     List<Widget> anmeldebuttons = new List();
     moreaFire.getChildMap[groupID].forEach((String vorname, uid) {
+            anmeldeStreamController[uid] = new BehaviorSubject();
+            anmeldeStreamController[uid].addStream(function(uid, eventID));
       anmeldebuttons.add(anmeldeIndicator(
            uid, eventID, function, "$vorname ist angemolden", "$vorname ist abgemolden",
          ));
@@ -185,11 +237,13 @@ class Teleblitz {
     return Column(children: anmeldebuttons);
   }
   Widget childAnmeldeIndicator(String userID, String eventID, Stream<String> Function(String userID, String eventID) function){
+    anmeldeStreamController[userID] = new BehaviorSubject();
+    anmeldeStreamController[userID].addStream(function(userID, eventID));
     return anmeldeIndicator(userID, eventID, function, "Du hast dich angemolden", "Du hast dich abgemolden");
   }
   Widget anmeldeIndicator(String userID, String eventID, Stream<String> Function(String userID, String eventID) function, String angemolden, String abgemolden){
     return StreamBuilder(
-      stream: function(userID, eventID),
+      stream: anmeldeStreamController[userID].stream,
       builder: (BuildContext context, AsyncSnapshot<String> snap){
         if(!snap.hasData)
           return simpleMoreaLoadingIndicator();

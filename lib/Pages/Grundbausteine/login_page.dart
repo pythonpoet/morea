@@ -766,7 +766,7 @@ class _LoginPageState extends State<LoginPage> {
                                     minTime: DateTime.now().add(new Duration(days: -365*25)),
                                     maxTime: DateTime.now().add(new Duration(days: -365*3)),
                                     onConfirm: (date) {
-                                      _alter  = DateFormat.yMd().format(date).toString();
+                                      moreaUser.geburtstag  = DateFormat.yMd().format(date).toString();
                                     }, currentTime: DateTime.now(), locale: LocaleType.de);
           
                                   setState(() {
