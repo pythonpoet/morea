@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                           moreaUser.vorName,
                           moreaUser.nachName,
                           _geschlecht,
-                          _selectedstufe,
+                          moreaUser.groupID,
                           moreafire);
                     } else {
                       setState(() {
@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                           moreaUser.vorName,
                           moreaUser.nachName,
                           _geschlecht,
-                          _selectedstufe,
+                          moreaUser.groupID,
                           moreafire);
                     }
                   } else {
@@ -845,7 +845,8 @@ class _LoginPageState extends State<LoginPage> {
                                     minTime: DateTime.now().add(new Duration(days: -365*25)),
                                     maxTime: DateTime.now().add(new Duration(days: -365*3)),
                                     onConfirm: (date) {
-                                      moreaUser.geburtstag  = DateFormat.yMd().format(date).toString();
+                                      moreaUser.geburtstag  = DateFormat('dd.MM.yyy', 'de').format(date).toString();
+                                      _alter = DateFormat('dd.MM.yyy', 'de').format(date).toString();
                                     }, currentTime: DateTime.now(), locale: LocaleType.de);
           
                                   setState(() {
@@ -874,7 +875,15 @@ class _LoginPageState extends State<LoginPage> {
                               }).toList(),
                               hint: Text(_selectedstufe),
                               onChanged: (newVal) {
-                                _selectedstufe = newVal;
+                                if(newVal == midatanamebiber){
+                                  _selectedstufe = 'Biber';
+                                } else if(newVal == midatanamewoelf){
+                                  _selectedstufe = 'Wombat (Wölfe)';
+                                } else if(newVal == midatanamemeitli){
+                                  _selectedstufe = 'Nahani (Meitli)';
+                                } else if(newVal == midatanamebuebe){
+                                  _selectedstufe = 'Drason(Buebe)';
+                                }
                                 moreaUser.groupID = newVal;
                                 this.setState(() {});
                               }),

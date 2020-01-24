@@ -29,7 +29,7 @@ class Teleblitz {
   Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
   final ScrollController _clickController = new ScrollController();
-  Map<String,Stream<String>> anmeldeStream = new Map();
+  Map<String, Stream<String>> anmeldeStream = new Map();
   Map<String, StreamController<String>> anmeldeStreamController = new Map();
 
   Teleblitz(MoreaFirebase moreaFire, CrudMedthods crud0) {
@@ -141,9 +141,11 @@ class Teleblitz {
       {String name}) {
     return StreamBuilder(
       stream: anmeldeStreamController[uid].stream,
-      builder: (BuildContext context, snap){
+      builder: (BuildContext context, snap) {
+        if (snap.connectionState == ConnectionState.active) {
           switch (snap.data) {
-          case "un-initialized":
+            case "un-initialized":
+              print(snap.connectionState);
               return Container(
                   padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                   child: Row(
@@ -152,12 +154,15 @@ class Teleblitz {
                       Expanded(
                           child: Container(
                         child: new RaisedButton(
-                          child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                          child: new Text(abmelden,
+                              style: new TextStyle(fontSize: 20)),
                           onPressed: () {
                             if (name == null) {
-                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
+                              submit(eventMapAnmeldeStatusNegativ, groupID,
+                                  eventID, uid);
                             } else {
-                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
+                              submit(eventMapAnmeldeStatusNegativ, groupID,
+                                  eventID, uid,
                                   name: name);
                             }
                           },
@@ -168,12 +173,15 @@ class Teleblitz {
                       Expanded(
                         child: Container(
                           child: new RaisedButton(
-                            child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
+                            child: new Text(anmelden,
+                                style: new TextStyle(fontSize: 20)),
                             onPressed: () {
                               if (name == null) {
-                                submit(eventMapAnmeldeStatusPositiv,groupID, eventID, uid);
+                                submit(eventMapAnmeldeStatusPositiv, groupID,
+                                    eventID, uid);
                               } else {
-                                submit(eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
+                                submit(eventMapAnmeldeStatusPositiv, groupID,
+                                    eventID, uid,
                                     name: name);
                               }
                             },
@@ -186,43 +194,58 @@ class Teleblitz {
                       )
                     ],
                   ));
-            break;
-          case "ChuntNoed":
-                return Container(
-                          child: new RaisedButton(
-                            child: Container(child: Center(child: new Text(anmelden, style: new TextStyle(fontSize: 20))), width: 120,),
-                            onPressed: () {
-                              if (name == null) {
-                                submit(eventMapAnmeldeStatusPositiv,groupID, eventID, uid);
-                              } else {
-                                submit(eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
-                                    name: name);
-                              }
-                            },
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(30.0)),
-                            color: Color(0xff7a62ff),
-                            textColor: Colors.white,
-                          ),
-                        );
-          case "Chunt":
+              break;
+            case "ChuntNoed":
+              print(snap.connectionState);
               return Container(
-                        child: new RaisedButton(
-                          child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
-                          onPressed: () {
-                            if (name == null) {
-                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
-                            } else {
-                              submit(eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
-                                  name: name);
-                            }
-                          },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                        ),
-                      );
-          default:
-            return Text(snap.data);
+                child: new RaisedButton(
+                  child: Container(
+                    child: Center(
+                        child: new Text(anmelden,
+                            style: new TextStyle(fontSize: 20))),
+                    width: 120,
+                  ),
+                  onPressed: () {
+                    if (name == null) {
+                      submit(
+                          eventMapAnmeldeStatusPositiv, groupID, eventID, uid);
+                    } else {
+                      submit(
+                          eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
+                          name: name);
+                    }
+                  },
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                  color: Color(0xff7a62ff),
+                  textColor: Colors.white,
+                ),
+              );
+            case "Chunt":
+              print(snap.connectionState);
+              return Container(
+                child: new RaisedButton(
+                  child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                  onPressed: () {
+                    if (name == null) {
+                      submit(
+                          eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
+                    } else {
+                      submit(
+                          eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
+                          name: name);
+                    }
+                  },
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                ),
+              );
+            default:
+              print(snap.connectionState);
+              return Text(snap.data);
+          }
+        } else {
+          return Container();
         }
       },
     );
@@ -232,8 +255,8 @@ class Teleblitz {
       Stream<String> Function(String userID, String eventID) function) {
     List<Widget> anmeldebuttons = new List();
     moreaFire.getChildMap[groupID].forEach((String vorname, uid) {
-            anmeldeStreamController[uid] = new BehaviorSubject();
-            anmeldeStreamController[uid].addStream(function(uid, eventID));
+      anmeldeStreamController[uid] = new BehaviorSubject();
+      anmeldeStreamController[uid].addStream(function(uid, eventID));
       anmeldebuttons.add(anmeldeIndicator(
         uid,
         eventID,
@@ -244,10 +267,13 @@ class Teleblitz {
     });
     return Column(children: anmeldebuttons);
   }
-  Widget childAnmeldeIndicator(String userID, String eventID, Stream<String> Function(String userID, String eventID) function){
+
+  Widget childAnmeldeIndicator(String userID, String eventID,
+      Stream<String> Function(String userID, String eventID) function) {
     anmeldeStreamController[userID] = new BehaviorSubject();
     anmeldeStreamController[userID].addStream(function(userID, eventID));
-    return anmeldeIndicator(userID, eventID, function, "Du hast dich angemolden", "Du hast dich abgemolden");
+    return anmeldeIndicator(userID, eventID, function,
+        "Du hast dich angemolden", "Du hast dich abgemolden");
   }
 
   Widget anmeldeIndicator(
@@ -258,9 +284,8 @@ class Teleblitz {
       String abgemolden) {
     return StreamBuilder(
       stream: anmeldeStreamController[userID].stream,
-      builder: (BuildContext context, AsyncSnapshot<String> snap){
-        if(!snap.hasData)
-          return simpleMoreaLoadingIndicator();
+      builder: (BuildContext context, AsyncSnapshot<String> snap) {
+        if (!snap.hasData) return simpleMoreaLoadingIndicator();
         switch (snap.data) {
           case "un-initialized":
             return Container();
@@ -304,7 +329,7 @@ class Teleblitz {
     );
   }
 
-  Widget parentShare(String groupID){
+  Widget parentShare(String groupID) {
     return Container(
         child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -346,25 +371,26 @@ class Teleblitz {
           ),
         );
       case 1:
-         return MoreaShadowContainer(
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            children: <Widget>[
-              childAnmeldeIndicator(moreaFire.getUserMap[userMapUID], eventID, function),
-              info.getTitel(),
-              info.getDatum(),
-              info.getAntreten(),
-              info.getAbtreten(),
-              info.getMitnehmen(),
-              info.getBemerkung(),
-              info.getSender(),
-              childAnmeldeButton(groupID, eventID),
-              parentShare(groupID),
-            ],
+        return MoreaShadowContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: <Widget>[
+                childAnmeldeIndicator(
+                    moreaFire.getUserMap[userMapUID], eventID, function),
+                info.getTitel(),
+                info.getDatum(),
+                info.getAntreten(),
+                info.getAbtreten(),
+                info.getMitnehmen(),
+                info.getBemerkung(),
+                info.getSender(),
+                childAnmeldeButton(groupID, eventID),
+                parentShare(groupID),
+              ],
+            ),
           ),
-        ),
-      );
+        );
       case 2:
         return MoreaShadowContainer(
           child: Padding(
