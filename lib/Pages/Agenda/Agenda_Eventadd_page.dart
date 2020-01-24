@@ -9,7 +9,13 @@ import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 
 class EventAddPage extends StatefulWidget {
-  EventAddPage({this.eventinfo, this.agendaModus, this.firestore, this.agenda, this.moreaFire});
+  EventAddPage(
+      {this.eventinfo,
+      this.agendaModus,
+      this.firestore,
+      this.agenda,
+      this.moreaFire});
+
   final MoreaFirebase moreaFire;
   final Map eventinfo;
   final AgendaModus agendaModus;
@@ -110,10 +116,13 @@ class EventAddPageState extends State<EventAddPage> {
       agenda.uploadtoAgenda(widget.eventinfo, event);
 
       showDialog(
-          context: context,
-          child: new AlertDialog(
-            title: new Text("Event wurde hinzugefügt"),
-          ));
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Event wurde hinzugefügt'),
+          );
+        },
+      );
     }
   }
 
@@ -283,8 +292,8 @@ class EventAddPageState extends State<EventAddPage> {
 
     anfangzeit = widget.eventinfo['Anfangszeit'];
     schlusszeit = widget.eventinfo['Schlusszeit'];
-    if(widget.eventinfo.containsKey("Stufen"))
-    stufen = Map<String,bool>.from(widget.eventinfo['Stufen']);
+    if (widget.eventinfo.containsKey("Stufen"))
+      stufen = Map<String, bool>.from(widget.eventinfo['Stufen']);
     mitnehemen = List<String>.from(widget.eventinfo['Mitnehmen']);
     order = widget.eventinfo['Order'];
     moreafire = widget.moreaFire;
@@ -297,59 +306,65 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    if(subgroups==null)
-      return Card(child: Container(padding: EdgeInsets.all(100),child: simpleMoreaLoadingIndicator(),),);
+    if (subgroups == null)
+      return Card(
+        child: Container(
+          padding: EdgeInsets.all(100),
+          child: simpleMoreaLoadingIndicator(),
+        ),
+      );
     switch (widget.agendaModus) {
       case AgendaModus.beides:
         return DefaultTabController(
-                length: 2,
-                child: new Scaffold(
-                  appBar: new AppBar(
-                    title: Text('zur Agenda hinzufügen'),
-                    backgroundColor: Color(0xff7a62ff),
-                    bottom: TabBar(
-                      tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
-                    ),
-                  ),
-                  body: TabBarView(
-                    children: <Widget>[eventWidget(), lagerWidget()],
-                  ),
-                ),
-              );
+          length: 2,
+          child: new Scaffold(
+            appBar: new AppBar(
+              title: Text('zur Agenda hinzufügen'),
+              backgroundColor: Color(0xff7a62ff),
+              bottom: TabBar(
+                tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
+              ),
+            ),
+            body: TabBarView(
+              children: <Widget>[eventWidget(), lagerWidget()],
+            ),
+          ),
+        );
         break;
       case AgendaModus.event:
         return Scaffold(
-                appBar: new AppBar(
-                  title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
-                  backgroundColor: Color(0xff7a62ff),
-                ),
-                body: LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: viewportConstraints.maxHeight,
-                          ),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: <Widget>[eventWidget()],
-                          ))),
-                    );
-                  },
-                ),
+          appBar: new AppBar(
+            title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
+            backgroundColor: Color(0xff7a62ff),
+          ),
+          body: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: viewportConstraints.maxHeight,
+                    ),
+                    child: SingleChildScrollView(
+                        child: Column(
+                      children: <Widget>[eventWidget()],
+                    ))),
               );
+            },
+          ),
+        );
 
         break;
       case AgendaModus.lager:
         return Scaffold(
-                appBar: new AppBar(
-                  title:
-                      new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
-                  backgroundColor: Color(0xff7a62ff),
-                ),
-                body: lagerWidget());
+            appBar: new AppBar(
+              title: new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
+              backgroundColor: Color(0xff7a62ff),
+            ),
+            body: lagerWidget());
         break;
+      default:
+        return null;
     }
   }
 
@@ -549,7 +564,6 @@ class EventAddPageState extends State<EventAddPage> {
                                       physics: NeverScrollableScrollPhysics(),
                                       children: subgroups
                                           .map((Map<dynamic, dynamic> group) {
-                                       
                                         return new CheckboxListTile(
                                           title: new Text(
                                               group[groupMapgroupNickName]),

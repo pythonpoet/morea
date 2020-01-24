@@ -35,7 +35,7 @@ class WerChunnt {
           chunntNoed.add(document.data['Name']);
         }
       }
-      _controller.sink.add([chunnt, chunntNoed]);
+      _controller.add([chunnt, chunntNoed]);
     });
   }
 }
