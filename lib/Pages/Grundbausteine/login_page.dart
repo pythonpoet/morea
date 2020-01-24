@@ -114,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                   if (datenschutz.akzeptiert) {
                     moreaUser.pos = "Teilnehmer";
                     await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
+                    print("object");
                   } else {
                     setState(() {
                       _load = false;
@@ -795,6 +796,7 @@ class _LoginPageState extends State<LoginPage> {
                               hint: Text(_selectedstufe),
                               onChanged: (newVal) {
                                 _selectedstufe = newVal;
+                                moreaUser.groupID = newVal;
                                 this.setState(() {});
                               }),
                         )

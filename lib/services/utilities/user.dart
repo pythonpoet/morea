@@ -1,6 +1,7 @@
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 
@@ -101,31 +102,31 @@ Map<String, dynamic> generateUserMap(){
   userMap[userMapAccountCreated] = DateTime.now().toString();
   return userMap;
 }
-Future<dynamic> createMoreaUser(Auth auth,_password, moreafire, onSignedIn )async{
+Future<dynamic> createMoreaUser(Auth auth,_password, MoreaFirebase moreafire, onSignedIn )async{
   try{
     userID = await auth.createUserWithEmailAndPassword(
                         email, _password);
-                    print('Registered user: $userID');
-                    if (userID != null) {
-                      //Creates userMap
-                      await moreafire.createUserInformation( generateUserMap());
-                      //writes Devicetoken to collection of groupID
-                      if(groupID != null){
-                      moreafire.subscribeToGroup(groupID);
-                      //Writes tn rights to groupMap
-                      await moreafire.groupPriviledgeTN(groupID ,userID, (pfadiName == ' '? vorName: pfadiName));
-                      }
+            print('Registered user: $userID');
+            if (userID != null) {
+              //Creates userMap
+              await moreafire.createUserInformation( generateUserMap());
+              //writes Devicetoken to collection of groupID
+              if(groupID != null){
+              moreafire.subscribeToGroup(groupID);
+              //Writes tn rights to groupMap
+              await moreafire.groupPriviledgeTN(groupID ,userID, (pfadiName == ' '? vorName: pfadiName));
+              }
 
-                      //uploads devtoken to userMap
-                      moreafire.uploadDevTocken(userID);
-                      
-                      
-                      //sends user to rootpage
-                      onSignedIn();
-                    }
+              //uploads devtoken to userMap
+              moreafire.uploadDevTocken(userID);
+              
+              
+              //sends user to rootpage
+              onSignedIn();
+            }
           return userID;
   }catch(e){
-    return e;
+    throw e;
   }
   
 }
