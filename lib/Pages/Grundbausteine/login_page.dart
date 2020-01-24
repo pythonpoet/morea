@@ -875,15 +875,7 @@ class _LoginPageState extends State<LoginPage> {
                               }).toList(),
                               hint: Text(_selectedstufe),
                               onChanged: (newVal) {
-                                if(newVal == midatanamebiber){
-                                  _selectedstufe = 'Biber';
-                                } else if(newVal == midatanamewoelf){
-                                  _selectedstufe = 'Wombat (Wölfe)';
-                                } else if(newVal == midatanamemeitli){
-                                  _selectedstufe = 'Nahani (Meitli)';
-                                } else if(newVal == midatanamebuebe){
-                                  _selectedstufe = 'Drason(Buebe)';
-                                }
+                                _selectedstufe = convMiDatatoWebflow(newVal);
                                 moreaUser.groupID = newVal;
                                 this.setState(() {});
                               }),
