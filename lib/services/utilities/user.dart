@@ -1,6 +1,7 @@
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 class User {
@@ -53,7 +54,8 @@ class User {
     } else {
       displayName = vorName;
     }
-    if (_userMap.containsKey(userMapGeschlecht)) geschlecht = _userMap[userMapGeschlecht];
+    if (_userMap.containsKey(userMapGeschlecht))
+      geschlecht = _userMap[userMapGeschlecht];
     if ((pos == userMapLeiter) || (pos == userMapTeilnehmer)) {
       groupMap =
           (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
@@ -111,7 +113,7 @@ class User {
   }
 
   Future<dynamic> createMoreaUser(
-      Auth auth, _password, moreafire, onSignedIn) async {
+      Auth auth, _password, MoreaFirebase moreafire, onSignedIn) async {
     try {
       userID = await auth.createUserWithEmailAndPassword(email, _password);
       print('Registered user: $userID');
@@ -134,7 +136,7 @@ class User {
       }
       return userID;
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 }

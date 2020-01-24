@@ -179,7 +179,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: new ListView(children: navigation()),
             ),
             body: moreaLoading.loading());
-    if (moreafire.getSubscribedGroups.length > 0) {
+    if ((moreafire.getSubscribedGroups.length > 0)||(moreafire.getGroupID != null)) {
       List<Widget> anzeige = new List();
       if(moreafire.getGroupID != null)
       anzeige.add(

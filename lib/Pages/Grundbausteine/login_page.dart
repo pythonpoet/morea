@@ -883,6 +883,7 @@ class _LoginPageState extends State<LoginPage> {
                               hint: Text(_selectedstufe),
                               onChanged: (newVal) {
                                 _selectedstufe = newVal;
+                                moreaUser.groupID = newVal;
                                 this.setState(() {});
                               }),
                         )
