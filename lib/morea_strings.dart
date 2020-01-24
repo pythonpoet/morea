@@ -1,5 +1,4 @@
 //Config
-import 'package:morea/services/mailchimp_api_manager.dart';
 
 final String appVersion = "1";
 final String configMapMinAppVerson = "minAppVersion";

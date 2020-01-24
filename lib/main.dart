@@ -38,8 +38,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   //MyApp({this.firestore});
 
-   Firestore firestore;
-
   @override
   Widget build(BuildContext context) {
     print("tpck init App");
