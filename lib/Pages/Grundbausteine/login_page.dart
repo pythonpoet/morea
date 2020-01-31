@@ -110,7 +110,8 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _load = true;
                   });
-                  await datenschutz.moreaDatenschutzerklaerung(context);
+                  CrudMedthods crud = new CrudMedthods(widget.firestore);
+                  await datenschutz.moreaDatenschutzerklaerung(context, (await crud.getDocument(pathConfig, "init")).data["Datenschutz"] );
                   if (datenschutz.akzeptiert) {
                     moreaUser.pos = "Teilnehmer";
                     await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
@@ -151,7 +152,8 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       _load = true;
                     });
-                    await datenschutz.moreaDatenschutzerklaerung(context);
+                    CrudMedthods crud = new CrudMedthods(widget.firestore);
+                  await datenschutz.moreaDatenschutzerklaerung(context, (await crud.getDocument(pathConfig, "init")).data["Datenschutz"] );
                     if (datenschutz.akzeptiert) {
                       moreaUser.pos = _selectedverwandtschaft;
                       await moreaUser.createMoreaUser(widget.auth, _password, moreafire, widget.onSignedIn);
@@ -767,6 +769,7 @@ class _LoginPageState extends State<LoginPage> {
                                     maxTime: DateTime.now().add(new Duration(days: -365*3)),
                                     onConfirm: (date) {
                                       moreaUser.geburtstag  = DateFormat.yMd().format(date).toString();
+                                      _alter = DateFormat.yMd().format(date).toString();
                                     }, currentTime: DateTime.now(), locale: LocaleType.de);
           
                                   setState(() {

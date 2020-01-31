@@ -4,7 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:expandable/expandable.dart';
 // generiert mit https://datenschutz-generator.de/
 abstract class BaseDatenschutz{
-  Future<void> moreaDatenschutzerklaerung(BuildContext context);
+  Future<void> moreaDatenschutzerklaerung(BuildContext context, String datenschutz);
 }
 
 
@@ -20,7 +20,7 @@ void expandpressed(){
   expand = !expand;
 }
 
-  Future<void> moreaDatenschutzerklaerung(BuildContext context)async{
+  Future<void> moreaDatenschutzerklaerung(BuildContext context, String datenschutz)async{
     await showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -60,64 +60,7 @@ void expandpressed(){
                         ],
                       ),
                     ),
-                    ExpandablePanel(
-                      header: Center(
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              //SizedBox(width: 20,),
-                              Icon(Icons.info_outline, color: Colors.red,),
-                              Text('Das wichtigste in Kurze', 
-                              style: new TextStyle(fontSize: 20, color: Colors.red),),
-                            ]
-                          )
-                        ),
-                      expanded: Column(
-                        children: <Widget>[
-                          new Text('Wir sind Gegner der Verwischung des Datenschutzes durch Juristendeutsch. Deshalb möchten wir transparent sein, weshalb wir eine Dateschutzerklährung benötigen. '),
-                          SizedBox(height: 5,),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                               Column(
-                                children: <Widget>[
-                                  SizedBox(height: 5,),
-                                  Icon(Icons.brightness_1, size: 5,),
-                                ],
-                              ),
-                              Container(
-                                width: 340,
-                                child: Text(' Wir erheben sensible Daten bei der Registration (deine Registrationsdaten). Dies benötig deine Einwilligung.'),
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 5,),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Column(
-                                children: <Widget>[
-                                  SizedBox(height: 5,),
-                                  Icon(Icons.brightness_1, size: 5,),
-                                ],
-                              ),
-                              Container(
-                                width: 340,
-                                child:  Text(' Weiter verwenden wir ein Service namens Firebase, über diesen Service lauft unser Log-in-System und unser Serverbackend, den wir brauchen um Inhalte wie z. B. Aktuelle Informationen, Lager oder Teleblitze anzeigen zu können.'),
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 5,),
-                          new Text('Wir verwenden keine Cookies und deine Daten werden nur für die Pfadi verwendet. Bei Fragen über den Datenschutz wende dich an Jarvis.'),
-                          SizedBox(height: 5,),
-                          new Text('Bei dem Drücken des Knopfes Akzeptieren, akzeptierst du die Datenschutzbestimmungen, dies ist nicht rechtsfähig und dient nur als überblick.')
-                        ],
-                      ),
-                      tapHeaderToExpand: true,
-                      hasIcon: true,
-                    ),
-                    new Divider(),
-                    new Html(data: textdatenschutz.moreaV01,)
+                    new Html(data: datenschutz,)
                   ],
                 ),
               ),
