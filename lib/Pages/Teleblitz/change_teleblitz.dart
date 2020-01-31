@@ -50,13 +50,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   bool draft = false;
   var oldTeleblitz;
 
-  TeleblitzManager teleblitzManager = TeleblitzManager();
+  TeleblitzManager teleblitzManager;
 
   @override
   void initState() {
     super.initState();
     this.stufe = widget.stufe;
     this.moreaFire = widget.moreaFire;
+    this.teleblitzManager = TeleblitzManager(this.moreaFire);
     this.oldTeleblitz = downloadTeleblitz();
     if (widget.formType == "keineAktivitaet") {
       this.formType = FormType.keineAktivitaet;
@@ -493,13 +494,19 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
 }
 
 class TeleblitzManager {
-  TeleblitzManager();
+
+  MoreaFirebase moreaFirebase;
+
+  TeleblitzManager(MoreaFirebase moreaFirebase){
+    this.moreaFirebase = moreaFirebase;
+  }
 
   Future<Map> downloadTeleblitz(String stufe) async {
+    String apiKey = await moreaFirebase.getWebflowApiKey();
     var jsonDecode;
     var jsonString;
     jsonString = await http.get(
-        "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
+        "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=$apiKey");
     jsonDecode = json.decode(jsonString.body);
     Map infos;
     for (var u in jsonDecode['items']) {
@@ -535,7 +542,8 @@ class TeleblitzManager {
     return newMitnehmen;
   }
 
-  void uploadTeleblitz(Map newTeleblitz, String id) {
+  void uploadTeleblitz(Map newTeleblitz, String id) async {
+    String apiKey = await moreaFirebase.getWebflowApiKey();
     String formatedMitnehmen = '<ul>';
     for (String u in newTeleblitz['mitnehmen-test']) {
       formatedMitnehmen = formatedMitnehmen + '<li>' + u + '</li>';
@@ -549,7 +557,7 @@ class TeleblitzManager {
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
     header["Authorization"] =
-        "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
+        "Bearer $apiKey";
     header["accept-version"] = "1.0.0";
     header["Content-Type"] = "application/json";
     http
