@@ -25,16 +25,9 @@ class MergeChildParent extends BaseMergeChildParent {
   bool parentReaderror = false, allowScanner = true;
   final formKey = new GlobalKey<FormState>();
 
-  String _email,
-      _pfadinamen = ' ',
-      _vorname = "",
-      _nachname = "",
+  String 
       _selectedstufe = 'Stufe wählen';
-  String _password,
-      _adresse,
-      _ort,
-      _plz,
-      _passwordneu,
+  String _password, _passwordneu,
       userId,
       error,
       _alter = "[Datum auswählen]";
@@ -55,6 +48,7 @@ class MergeChildParent extends BaseMergeChildParent {
     MoreaFirebase moreaFirebase
   ) {
     this.moreafire = moreaFirebase;
+
     this.crud0 = crudMedthods;
     this.childParendPend = new ChildParendPend(crud0: crud0,moreaFirebase: moreafire);
   }
@@ -62,7 +56,7 @@ class MergeChildParent extends BaseMergeChildParent {
       Map<String, dynamic> parentData, BuildContext context, Function setProfileState, Function newKidakt) {
     return new Container(
         color: Colors.black.withOpacity(0.7),
-        padding: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 40),
+        padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom:10),
         child: new Card(
           child: new Container(
             padding: EdgeInsets.all(20),
@@ -150,10 +144,15 @@ class MergeChildParent extends BaseMergeChildParent {
                     );
                 },
               ),
-              SizedBox(
-                height: 40,
-              ),
-              new RaisedButton(
+              Column(
+                children: <Widget>[
+                  Expanded(
+                    flex: 2,
+                    child: Container(height: 80,),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child:  new RaisedButton(
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () async => {
@@ -166,6 +165,10 @@ class MergeChildParent extends BaseMergeChildParent {
                 color: Color(0xff7a62ff),
                 textColor: Colors.white,
               ),
+                  )
+                ],
+              )
+             
             ],
           ),
         ),
@@ -278,7 +281,7 @@ class MergeChildParent extends BaseMergeChildParent {
                             filled: true,
                             labelText: 'Pfadinamen',
                           ),
-                          onSaved: (value) => _pfadinamen = value,
+                          onSaved: (value) => moreafire.moreaUser.pfadiName = value,
                         ),
                         new TextFormField(
                           decoration: new InputDecoration(
@@ -289,7 +292,7 @@ class MergeChildParent extends BaseMergeChildParent {
                               ? 'Vornamen darf nicht leer sein'
                               : null,
                           keyboardType: TextInputType.text,
-                          onSaved: (value) => _vorname = value,
+                          onSaved: (value) => moreafire.moreaUser.vorName = value,
                         ),
                         new TextFormField(
                           decoration: new InputDecoration(
@@ -300,7 +303,7 @@ class MergeChildParent extends BaseMergeChildParent {
                               ? 'Nachname darf nicht leer sein'
                               : null,
                           keyboardType: TextInputType.text,
-                          onSaved: (value) => _nachname = value,
+                          onSaved: (value) => moreafire.moreaUser.nachName = value,
                         ),
                         Container(
                           color: Colors.grey[200],
@@ -334,6 +337,7 @@ class MergeChildParent extends BaseMergeChildParent {
                                     _alter = DateFormat.yMd()
                                         .format(date)
                                         .toString();
+                                    moreafire.moreaUser.geburtstag = _alter;
                                   },
                                       currentTime: DateTime.now(),
                                       locale: LocaleType.de);
@@ -396,7 +400,7 @@ class MergeChildParent extends BaseMergeChildParent {
                       validator: (value) =>
                           value.isEmpty ? 'Email darf nicht leer sein' : null,
                       keyboardType: TextInputType.emailAddress,
-                      onSaved: (value) => _email = value,
+                      onSaved: (value) => moreafire.moreaUser.email = value,
                     ),
                   ),
                 )
@@ -456,7 +460,7 @@ class MergeChildParent extends BaseMergeChildParent {
             height: 24,
           ),
           new RaisedButton(
-            child: new Text('$_vorname Registrieren',
+            child: new Text('${moreafire.moreaUser.vorName} Registrieren',
                 style: new TextStyle(fontSize: 20)),
             onPressed: () => {registerChild(parentData, context, newKidakt)},
             shape: new RoundedRectangleBorder(
@@ -469,22 +473,7 @@ class MergeChildParent extends BaseMergeChildParent {
     );
   }
 
-  Future<Map<String, dynamic>> mapUserData() async {
-    Map<String, dynamic> userInfo = {
-      userMapPfadiName: this._pfadinamen,
-      userMapVorName: this._vorname,
-      userMapNachName: this._nachname,
-      userMapAccountCreated: DateTime.now(),
-      userMapgroupID: convWebflowtoMiData(_selectedstufe),
-      'Adresse': this._adresse,
-      'PLZ': this._plz,
-      'Ort': this._ort,
-      'Pos': 'Teilnehmer',
-      'UID': this.userId,
-      'Email': this._email,
-    };
-    return userInfo;
-  }
+  
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -499,12 +488,14 @@ class MergeChildParent extends BaseMergeChildParent {
   Future<void> registerChild(
       Map<String, dynamic> parentData, BuildContext context, Function newKidakt) async {
     if (validateAndSave()) {
-      _adresse = parentData[userMapAdresse];
-      _plz = parentData[userMapPLZ];
-      _ort = parentData[userMapOrt];
-      Map<String, dynamic> childData = await this.mapUserData();
+      
+      moreafire.moreaUser.adresse = parentData[userMapAdresse];
+      moreafire.moreaUser.plz = parentData[userMapPLZ];
+      moreafire.moreaUser.ort = parentData[userMapOrt];
+      Map<String, dynamic> childData = moreafire.moreaUser.generateAndValitateUserMap();
+      await moreafire.createUserInformation(childData);
       await childParendPend.createChildAndPendIt(
-          this._email, this._password, childData, parentData, context);
+          moreafire.moreaUser.email, this._password, childData, parentData, context);
       return newKidakt();
     }
     return null;
