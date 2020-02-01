@@ -88,6 +88,8 @@ class MoreaFirebase extends BaseMoreaFirebase  {
 
   String get getEmail => moreaUser.email;
 
+  String get getGeschlecht => moreaUser.geschlecht;
+
   //String get getHomeFeedMainEventID => _homeFeedMainEventID;
 
   List<String> get getSubscribedGroups => moreaUser.subscribedGroups;
