@@ -665,9 +665,11 @@ class Teleblitz {
               returnTelebliz[eventID] = notImplemented();
               break;
             case ElementType.ferien:
+              defineInfo(tlbz, groupID);
               returnTelebliz[eventID] = ferien();
               break;
             case ElementType.keineAktivitaet:
+              defineInfo(tlbz, groupID);
               returnTelebliz[eventID] = keineAktivitat();
               break;
             case ElementType.teleblitz:
