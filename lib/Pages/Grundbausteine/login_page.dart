@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                           moreaUser.vorName,
                           moreaUser.nachName,
                           _geschlecht,
-                          _selectedstufe,
+                          moreaUser.groupID,
                           moreafire);
                     } else {
                       setState(() {
@@ -184,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                           moreaUser.vorName,
                           moreaUser.nachName,
                           _geschlecht,
-                          _selectedstufe,
+                          moreaUser.groupID,
                           moreafire);
                     }
                   } else {
@@ -847,8 +847,8 @@ class _LoginPageState extends State<LoginPage> {
                                     minTime: DateTime.now().add(new Duration(days: -365*25)),
                                     maxTime: DateTime.now().add(new Duration(days: -365*3)),
                                     onConfirm: (date) {
-                                      moreaUser.geburtstag  = DateFormat.yMd().format(date).toString();
-                                      _alter = DateFormat.yMd().format(date).toString();
+                                      moreaUser.geburtstag  = DateFormat('dd.MM.yyy', 'de').format(date).toString();
+                                      _alter = DateFormat('dd.MM.yyy', 'de').format(date).toString();
                                     }, currentTime: DateTime.now(), locale: LocaleType.de);
           
                                   setState(() {
@@ -877,7 +877,7 @@ class _LoginPageState extends State<LoginPage> {
                               }).toList(),
                               hint: Text(_selectedstufe),
                               onChanged: (newVal) {
-                                _selectedstufe = newVal;
+                                _selectedstufe = convMiDatatoWebflow(newVal);
                                 moreaUser.groupID = newVal;
                                 this.setState(() {});
                               }),
