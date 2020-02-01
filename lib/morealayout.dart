@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:morea/services/crud.dart';
+import 'package:morea/services/morea_firestore.dart';
 
+import 'Pages/About/about.dart';
+import 'Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
+import 'Pages/Personenverzeichniss/profile_page.dart';
+import 'Widgets/Action/scan.dart';
 import 'morea_strings.dart';
 
 class MoreaColors {
@@ -316,4 +322,121 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
     ),
     shape: CircularNotchedRectangle(),
   );
+}
+
+Drawer moreaDrawer(
+    String pos,
+    String displayName,
+    String email,
+    BuildContext context,
+    MoreaFirebase moreafire,
+    CrudMedthods crud0,
+    Function signedOut) {
+  if (pos == 'Leiter') {
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          new UserAccountsDrawerHeader(
+            accountName: new Text(displayName),
+            accountEmail: new Text(email),
+            decoration: new BoxDecoration(
+              color: MoreaColors.orange,
+            ),
+          ),
+          new ListTile(
+              title: new Text('Personen'),
+              trailing: new Icon(Icons.people),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new PersonenVerzeichnisState(
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
+          new ListTile(
+            title: new Text("TN zu Leiter machen"),
+            trailing: new Icon(Icons.enhanced_encryption),
+            onTap: () => makeLeiterWidget(context,
+                moreafire.getUserMap[userMapUID], moreafire.getGroupID),
+          ),
+          new Divider(),
+          new ListTile(
+              title: new Text("Über dieses App"),
+              trailing: new Icon(Icons.info),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AboutThisApp()))),
+          new Divider(),
+          new ListTile(
+            title: new Text('Logout'),
+            trailing: new Icon(Icons.cancel),
+            onTap: signedOut,
+          )
+        ],
+      ),
+    );
+  } else if (pos == 'Teilnehmer') {
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          new UserAccountsDrawerHeader(
+            accountName: new Text(displayName),
+            accountEmail: new Text(email),
+            decoration: new BoxDecoration(color: MoreaColors.orange),
+          ),
+          ListTile(
+              title: new Text('Eltern hinzufügen'),
+              trailing: new Icon(Icons.add),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ProfilePageState(
+                        profile: moreafire.getUserMap,
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
+          Divider(),
+          new ListTile(
+            title: new Text('Logout'),
+            trailing: new Icon(Icons.cancel),
+            onTap: signedOut,
+          )
+        ],
+      ),
+    );
+  } else if (pos == 'Mutter' ||
+      pos == 'Vater' ||
+      pos == 'Erziehungsberechtigte' ||
+      pos == 'Erziehungsberechtigter') {
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          new UserAccountsDrawerHeader(
+            accountName: Text(displayName),
+            accountEmail: Text(email),
+            decoration: new BoxDecoration(color: MoreaColors.orange),
+          ),
+          new ListTile(
+              title: new Text('Kinder hinzufügen'),
+              trailing: new Icon(Icons.add),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new ProfilePageState(
+                        profile: moreafire.getUserMap,
+                        crud0: crud0,
+                        moreaFire: moreafire,
+                      )))),
+          new Divider(),
+          new ListTile(
+              title: new Text("Über dieses App"),
+              trailing: new Icon(Icons.info),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AboutThisApp()))),
+          new Divider(),
+          new ListTile(
+            title: new Text('Logout'),
+            trailing: new Icon(Icons.cancel),
+            onTap: signedOut,
+          )
+        ],
+      ),
+    );
+  } else{
+    return Drawer();
+  }
 }

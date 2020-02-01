@@ -59,7 +59,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       prefix0.toProfilePage: this.profilePage,
     };
   }
-  
+
+  @override
+  void dispose(){
+    moreaLoading.dispose();
+    super.dispose();
+  }
+
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
     await this.moreaFire.getData(await auth.currentUser());
@@ -111,6 +117,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           auth: auth,
           moreaFire: moreaFire,
           navigationMap: this.navigationMap,
+          firestore: widget.firestore,
         );
         break;
 
@@ -128,6 +135,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           auth: auth,
           moreaFire: moreaFire,
           navigationMap: navigationMap,
+          firestore: widget.firestore,
         );
         break;
       case AuthStatus.loading:

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/Pages/Nachrichten/send_message.dart';
 import 'package:morea/morealayout.dart';
@@ -12,8 +13,10 @@ class MessagesPage extends StatefulWidget {
   MessagesPage(
       {@required this.auth,
       @required this.moreaFire,
-      @required this.navigationMap});
+      @required this.navigationMap,
+      @required this.firestore});
 
+  final Firestore firestore;
   final MoreaFirebase moreaFire;
   final Auth auth;
   final Map navigationMap;
@@ -23,6 +26,7 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
+  CrudMedthods crud0;
   var messages;
   var date;
   var uid;
@@ -35,6 +39,7 @@ class _MessagesPageState extends State<MessagesPage> {
     super.initState();
     this.moreaFire = widget.moreaFire;
     _getMessages(this.context);
+    crud0 = CrudMedthods(widget.firestore);
   }
 
   @override
@@ -46,22 +51,7 @@ class _MessagesPageState extends State<MessagesPage> {
         this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
-          drawer: Drawer(
-            child: ListView(
-              children: <Widget>[
-                UserAccountsDrawerHeader(
-                  accountName: Text(anzeigename),
-                  accountEmail: Text(moreaFire.getEmail),
-                  decoration: BoxDecoration(color: MoreaColors.orange),
-                ),
-                ListTile(
-                  title: new Text('Logout'),
-                  trailing: new Icon(Icons.cancel),
-                  onTap: _signedOut,
-                )
-              ],
-            ),
-          ),
+          drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName, moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
           appBar: AppBar(
             title: Text('Nachrichten'),
           ),
@@ -284,22 +274,7 @@ class _MessagesPageState extends State<MessagesPage> {
         appBar: AppBar(
           title: Text('Nachrichten'),
         ),
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: Text(this.anzeigename),
-                accountEmail: Text(moreaFire.getEmail),
-                decoration: new BoxDecoration(color: MoreaColors.orange),
-              ),
-              ListTile(
-                title: new Text('Logout'),
-                trailing: new Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
+        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName, moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
         bottomNavigationBar: BottomAppBar(
           child: Container(
             color: Color.fromRGBO(43, 16, 42, 0.9),

@@ -19,11 +19,13 @@ class ChangeProfile extends StatefulWidget {
   final auth;
   final MoreaFirebase moreaFire;
   final Map<String, Function> navigationMap;
+  final Function updateProfile;
 
   ChangeProfile(
       {@required this.auth,
       @required this.moreaFire,
-      @required this.navigationMap});
+      @required this.navigationMap,
+      @required this.updateProfile});
 
   @override
   _ChangeProfileState createState() => _ChangeProfileState();
@@ -49,19 +51,16 @@ class _ChangeProfileState extends State<ChangeProfile>
     super.initState();
     moreaLoading = MoreaLoading(this);
     this.userInfo = widget.moreaFire.getUserMap;
-    //this._getNachrichtenGruppen();
     this.oldEmail = userInfo['Email'];
     loading = false;
   }
 
   @override
-  void dispose() async {
-    super.dispose();
+  void dispose() {
     password.dispose();
     newPassword = null;
-    await widget.moreaFire.getData(userInfo['UID']);
-    this.userInfo = widget.moreaFire.getUserMap;
     moreaLoading.dispose();
+    super.dispose();
   }
 
   @override
@@ -472,6 +471,7 @@ class _ChangeProfileState extends State<ChangeProfile>
                             _signedOut();
                           });
                         } else {
+                          widget.updateProfile();
                           Navigator.of(context).pop();
                         }
                       } else {
@@ -515,6 +515,8 @@ class _ChangeProfileState extends State<ChangeProfile>
       setState(() {
         loading = false;
       });
+      widget.updateProfile();
+      Navigator.pop(context);
     }
   }
 

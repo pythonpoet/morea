@@ -298,7 +298,6 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
-
     initSubgoup();
   }
 
@@ -308,7 +307,6 @@ class _LoginPageState extends State<LoginPage> {
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
     this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
-    setState(() {});
   }
 
   @override

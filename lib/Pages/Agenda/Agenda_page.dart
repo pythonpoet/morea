@@ -160,24 +160,7 @@ class _AgendaStatePage extends State<AgendaState>
           shape: CircleBorder(side: BorderSide(color: Colors.white)),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: new Text(moreafire.getDisplayName),
-                accountEmail: new Text(moreafire.getEmail),
-                decoration: new BoxDecoration(
-                  color: MoreaColors.orange,
-                ),
-              ),
-              ListTile(
-                title: Text('Logout'),
-                trailing: Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
+        drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail, context, moreafire, crud0, _signedOut),
         bottomNavigationBar: BottomAppBar(
           child: Container(
             color: Color.fromRGBO(43, 16, 42, 0.9),
@@ -293,24 +276,7 @@ class _AgendaStatePage extends State<AgendaState>
           title: new Text('Agenda'),
         ),
         bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: new Text(moreafire.getDisplayName),
-                accountEmail: new Text(moreafire.getEmail),
-                decoration: new BoxDecoration(
-                  color: MoreaColors.orange,
-                ),
-              ),
-              ListTile(
-                title: Text('Logout'),
-                trailing: Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
+        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName, moreafire.getEmail, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getUserMap[userMapgroupID]),
       ));
     }

@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
@@ -18,11 +20,13 @@ class Profile extends StatefulWidget {
   final auth;
   final MoreaFirebase moreaFire;
   final Map<String, Function> navigationMap;
+  final Firestore firestore;
 
   Profile(
       {@required this.auth,
       @required this.moreaFire,
-      @required this.navigationMap});
+      @required this.navigationMap,
+      @required this.firestore});
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -38,6 +42,7 @@ class _ProfileState extends State<Profile> {
   String newPassword;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
   Urllauncher urllauncher = Urllauncher();
+  CrudMedthods crud0;
 
   _ProfileState();
 
@@ -45,6 +50,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     this.userInfo = widget.moreaFire.getUserMap;
+    crud0 = CrudMedthods(widget.firestore);
   }
 
   @override
@@ -53,22 +59,7 @@ class _ProfileState extends State<Profile> {
       this.userInfo['Pfadinamen'] = this.userInfo['Name'];
     }
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text(this.userInfo['Pfadinamen']),
-              accountEmail: Text(this.userInfo['Email']),
-              decoration: new BoxDecoration(color: MoreaColors.orange),
-            ),
-            ListTile(
-              title: new Text('Logout'),
-              trailing: new Icon(Icons.cancel),
-              onTap: _signedOut,
-            )
-          ],
-        ),
-      ),
+      drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName, this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
       floatingActionButtonLocation: _locationFloatingActionButton(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.edit),
@@ -80,6 +71,7 @@ class _ProfileState extends State<Profile> {
             auth: widget.auth,
             moreaFire: widget.moreaFire,
             navigationMap: widget.navigationMap,
+            updateProfile: updateProfile,
           );
         })),
       ),
@@ -218,10 +210,16 @@ class _ProfileState extends State<Profile> {
   void _signedOut() async {
     try {
       await widget.auth.signOut();
+
       widget.navigationMap[signedOut]();
     } catch (e) {
       print(e);
     }
+  }
+
+  void updateProfile() async{
+    await widget.moreaFire.getData(userInfo['UID']);
+    this.userInfo = widget.moreaFire.getUserMap;
   }
 
   FloatingActionButtonLocation _locationFloatingActionButton() {
