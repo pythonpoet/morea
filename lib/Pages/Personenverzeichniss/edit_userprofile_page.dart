@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/Pages/Profil/change_address.dart';
+import 'package:morea/Pages/Profil/change_email.dart';
+import 'package:morea/Pages/Profil/change_name.dart';
+import 'package:morea/Pages/Profil/change_phone_number.dart';
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
@@ -22,12 +27,9 @@ class EditUserProfilePage extends StatefulWidget {
   State<StatefulWidget> createState() => new EditUserPoriflePageState();
 }
 
-class EditUserPoriflePageState extends State<EditUserProfilePage> {
+class EditUserPoriflePageState extends State<EditUserProfilePage> with TickerProviderStateMixin {
   MoreaFirebase moreafire;
   CrudMedthods crud0;
-
-  final formKey = new GlobalKey<FormState>();
-  final resetkey = new GlobalKey<FormState>();
 
   MailChimpAPIManager mailchimpApiManager = MailChimpAPIManager();
 
@@ -35,15 +37,14 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
       _pfadinamen = ' ',
       _vorname,
       _nachname,
-      _alter = "[Datum auswählen]",
-      _selectedstufe = 'Stufe wählen',
-      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
-  String _password,
-      _adresse,
+      _geburtstag,
+      _selectedstufe,
+      _stufe,
+      _pos;
+  String _adresse,
       _ort,
       _plz,
       _handynummer,
-      _passwordneu,
       userId,
       error,
       selectedrolle,
@@ -51,47 +52,36 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
       oldGroup;
   List<Map> _stufenselect = new List();
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
-
-  bool validateAndSave() {
-    final form = formKey.currentState;
-    if (form.validate()) {
-      form.save();
-      return true;
-    } else {
-      return false;
-    }
-  }
+  MoreaLoading moreaLoading;
+  bool loading = true;
 
   void validateAndSubmit() async {
-    if (validateAndSave()) {
-      try {
-        if (_selectedstufe != 'Stufe wählen') {
-          Map<String, dynamic> userdata = mapUserData();
-          await moreafire.updateUserInformation(userdata['UID'], userdata);
-          await moreafire
-              .goToNewGroup(
-                  userdata['UID'],
-                  (userdata[userMapPfadiName] == " ")
-                      ? userdata[userMapVorName]
-                      : userdata[userMapPfadiName],
-                  oldGroup,
-                  userdata[userMapgroupID])
-              .then((onValue) => setState);
-          mailchimpApiManager.updateUserInfo(_email, _vorname, _nachname, _geschlecht, _selectedstufe, moreafire);
-          Navigator.pop(context);
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Bitte eine Stufe wählen!'),
-              );
-            },
-          );
-        }
-      } catch (e) {
-        print('$e');
-      }
+    try {
+      setState(() {
+        loading = true;
+      });
+      Map<String, dynamic> userdata = mapUserData();
+      await moreafire.updateUserInformation(userdata['UID'], userdata);
+      await moreafire
+          .goToNewGroup(
+              userdata['UID'],
+              (userdata[userMapPfadiName] == " ")
+                  ? userdata[userMapVorName]
+                  : userdata[userMapPfadiName],
+              oldGroup,
+              userdata[userMapgroupID])
+          .then((onValue) => setState);
+      mailchimpApiManager.updateUserInfo(
+          _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
+      setState(() {
+        loading = false;
+      });
+      Navigator.pop(context);
+    } catch (e) {
+      print('$e');
+      setState(() {
+        loading = false;
+      });
     }
   }
 
@@ -129,27 +119,35 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
     userInfo[userMapPfadiName] = this._pfadinamen;
     userInfo[userMapVorName] = this._vorname;
     userInfo[userMapNachName] = this._nachname;
-    userInfo[userMapAlter] = this._alter;
-    userInfo[userMapgroupID] = _selectedstufe;
     userInfo[userMapAdresse] = this._adresse;
     userInfo[userMapPLZ] = this._plz;
     userInfo[userMapOrt] = this._ort;
-    userInfo[userMapHandynummer] = this._handynummer;
-    userInfo[userMapPos] = selectedrolle;
     userInfo[userMapEmail] = this._email;
+    userInfo[userMapHandynummer] = this._handynummer;
     userInfo[userMapGeschlecht] = this._geschlecht;
-
+    userInfo[userMapAlter] = this._geburtstag;
+    userInfo[userMapgroupID] = _stufe;
+    userInfo[userMapPos] = _pos;
     return userInfo;
   }
 
   @override
   void initState() {
+    moreaLoading = MoreaLoading(this);
     selectedrolle = widget.profile['Pos'];
     moreafire = widget.moreaFire;
     crud0 = widget.crud0;
     oldGroup = widget.profile[userMapgroupID];
+    initStrings();
     initSubgoup();
+    loading = false;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    moreaLoading.dispose();
+    super.dispose();
   }
 
   initSubgoup() async {
@@ -159,364 +157,377 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> {
     setState(() {});
   }
 
+  void initStrings() {
+    this._vorname = widget.profile['Vorname'];
+    this._nachname = widget.profile['Nachname'];
+    this._pfadinamen = widget.profile['Pfadinamen'];
+    this._adresse = widget.profile['Adresse'];
+    this._plz = widget.profile['PLZ'];
+    this._ort = widget.profile['Ort'];
+    this._email = widget.profile['Email'];
+    this._handynummer = widget.profile['Handynummer'];
+    this._geschlecht = widget.profile['Geschlecht'];
+    this._geburtstag = widget.profile['Geburtstag'];
+    this._stufe = widget.profile['groupID'];
+    this._pos = widget.profile['Pos'];
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    if(loading){
+      return Container(
+        color: Colors.white,
+        child: moreaLoading.loading(),
+      );
+    }
+    else {
+      return new Scaffold(
         appBar: new AppBar(
           title: new Text(widget.profile['Vorname']),
-          backgroundColor: Color(0xff7a62ff),
         ),
-        body: Container(
-            color: Colors.white70,
-            child: new SingleChildScrollView(
-              child: new Form(
-                key: formKey,
+        body: MoreaBackgroundContainer(
+            child: SingleChildScrollView(
+              child: MoreaShadowContainer(
                 child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: buildInputs() + buildSubmitButtons()),
               ),
-            )));
+            )),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.check,
+            color: Colors.white,
+          ),
+          backgroundColor: MoreaColors.violett,
+          onPressed: () => validateAndSubmit(),
+        ),
+      );
+    }
   }
 
   List<Widget> buildInputs() {
     return [
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Icon(Icons.person),
-              flex: 1,
-            ),
-            Expanded(
-              flex: 9,
-              child: Container(
-                alignment: Alignment.center, //
-                decoration: new BoxDecoration(
-                  border: new Border.all(color: Colors.black, width: 2),
-                  borderRadius: new BorderRadius.all(
-                    Radius.circular(4.0),
-                  ),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    new TextFormField(
-                      initialValue: widget.profile['Pfadinamen'],
-                      decoration: new InputDecoration(
-                        border: UnderlineInputBorder(),
-                        filled: true,
-                        labelText: 'Pfadinamen',
-                      ),
-                      onSaved: (value) => _pfadinamen = value,
-                    ),
-                    new TextFormField(
-                      initialValue: widget.profile['Vorname'],
-                      decoration: new InputDecoration(
-                          border: UnderlineInputBorder(),
-                          filled: true,
-                          labelText: 'Vorname'),
-                      validator: (value) => value.isEmpty
-                          ? 'Vornamen darf nicht leer sein'
-                          : null,
-                      keyboardType: TextInputType.text,
-                      onSaved: (value) => _vorname = value,
-                    ),
-                    new TextFormField(
-                      initialValue: widget.profile['Nachname'],
-                      decoration: new InputDecoration(
-                          border: UnderlineInputBorder(),
-                          filled: true,
-                          labelText: 'Nachname'),
-                      validator: (value) => value.isEmpty
-                          ? 'Nachname darf nicht leer sein'
-                          : null,
-                      keyboardType: TextInputType.text,
-                      onSaved: (value) => _nachname = value,
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 12),
-                      width: 1000,
-                      color: Colors.grey[200],
-                      child: new DropdownButton<String>(
-                          items: [
-                            DropdownMenuItem(
-                                value: "Weiblich", child: Text('weiblich')),
-                            DropdownMenuItem(
-                                value: 'Männlich', child: Text('männlich'))
-                          ],
-                          hint: Text(_geschlecht),
-                          onChanged: (newVal) {
-                            _geschlecht = newVal;
-                            this.setState(() {});
-                          }),
-                    ),
-                    Container(
-                      color: Colors.grey[200],
-                      height: 55,
-                      width: 1000,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          new Text(
-                            "   Geburtstag",
-                            style: TextStyle(
-                                color: Colors.grey[600], fontSize: 16),
-                          ),
-                          new FlatButton(
-                            child: Text(_alter,
-                                style: TextStyle(
-                                    color: Colors.grey[500], fontSize: 16)),
-                            onPressed: () async {
-                              await DatePicker.showDatePicker(context,
-                                  showTitleActions: true,
-                                  theme: DatePickerTheme(
-                                      doneStyle: TextStyle(
-                                          color: MoreaColors.violett,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  minTime: DateTime.now()
-                                      .add(new Duration(days: -365 * 25)),
-                                  maxTime: DateTime.now()
-                                      .add(new Duration(days: -365 * 3)),
-                                  onConfirm: (date) {
-                                _alter =
-                                    DateFormat.yMd().format(date).toString();
-                              },
-                                  currentTime: DateTime.now(),
-                                  locale: LocaleType.de);
+      Padding(
+        padding: EdgeInsets.all(20),
+        child: Text(
+          'Profil ändern',
+          style: MoreaTextStyle.title,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Name',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(_pfadinamen == null
+            ? '$_vorname $_nachname'
+            : '$_vorname $_nachname v/o $_pfadinamen'),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ChangeName(_vorname, _nachname, _pfadinamen, changeName))),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Adresse',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text('$_adresse, $_plz $_ort'),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ChangeAddress(_adresse, _plz, _ort, changeAdress))),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'E-Mail-Adresse',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(_email),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ChangeEmail(_email, changeEmail))),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Handynummer',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(_handynummer),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ChangePhoneNumber(_handynummer, changePhoneNumber))),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Geschlecht',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(_geschlecht),
+        onTap: () => _selectGeschlecht(),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Geburtstag',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(_geburtstag),
+        onTap: () async {
+          await DatePicker.showDatePicker(context,
+              showTitleActions: true,
+              theme: DatePickerTheme(
+                  doneStyle: TextStyle(
+                      color: MoreaColors.violett,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+              minTime: DateTime.now().add(new Duration(days: -365 * 100)),
+              maxTime: DateTime.now().add(new Duration(days: -365 * 3)),
+              onConfirm: (date) {
+            _geburtstag = DateFormat('dd.MM.yyy', 'de').format(date).toString();
+          }, currentTime: DateTime.now(), locale: LocaleType.de);
 
-                              setState(() {});
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      color: Colors.grey[800],
-                      height: 0.5,
-                      width: 1000,
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 12),
-                      width: 1000,
-                      color: Colors.grey[200],
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              'Stufe:',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ),
-                          Expanded(
-                              child: Container(
-                            padding: EdgeInsets.only(left: 12),
-                            width: 1000,
-                            color: Colors.grey[200],
-                            child: new DropdownButton<String>(
-                                items: _stufenselect.map((Map group) {
-                                  return new DropdownMenuItem<String>(
-                                    value: group[userMapgroupID],
-                                    child:
-                                        new Text(group[groupMapgroupNickName]),
-                                  );
-                                }).toList(),
-                                hint: Text(_selectedstufe),
-                                onChanged: (newVal) {
-                                  _selectedstufe = newVal;
-                                  this.setState(() {});
-                                }),
-                          ))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 12),
-                      width: 1000,
-                      color: Colors.grey[200],
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              'Rolle:',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ),
-                          Expanded(
-                            child: new DropdownButton<String>(
-                                items: _rollenselect.map((String val) {
-                                  return new DropdownMenuItem<String>(
-                                    value: val,
-                                    child: new Text(val),
-                                  );
-                                }).toList(),
-                                hint: Text(selectedrolle),
-                                onChanged: (newVal) {
-                                  selectedrolle = newVal;
-                                  this.setState(() {});
-                                }),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            )
-          ],
+          setState(() {});
+        },
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
         ),
       ),
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Icon(Icons.home),
-            ),
-            Expanded(
-                flex: 9,
-                child: Container(
-                  alignment: Alignment.center, //
-                  decoration: new BoxDecoration(
-                    border: new Border.all(color: Colors.black, width: 2),
-                    borderRadius: new BorderRadius.all(
-                      Radius.circular(4.0),
-                    ),
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      new TextFormField(
-                        initialValue: widget.profile['Adresse'],
-                        decoration: new InputDecoration(
-                            border: UnderlineInputBorder(),
-                            filled: true,
-                            labelText: 'Adresse'),
-                        keyboardType: TextInputType.text,
-                        onSaved: (value) => _adresse = value,
-                      ),
-                      new Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: new TextFormField(
-                            initialValue: widget.profile['PLZ'],
-                            decoration: new InputDecoration(
-                                border: UnderlineInputBorder(),
-                                filled: true,
-                                labelText: 'PLZ'),
-                            keyboardType: TextInputType.text,
-                            onSaved: (value) => _plz = value,
-                          )),
-                          Expanded(
-                            child: new TextFormField(
-                              initialValue: widget.profile['Ort'],
-                              decoration: new InputDecoration(
-                                  border: UnderlineInputBorder(),
-                                  filled: true,
-                                  labelText: 'Ort'),
-                              keyboardType: TextInputType.text,
-                              onSaved: (value) => _ort = value,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ))
-          ],
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Stufe',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(convMiDatatoWebflow(_stufe)),
+        onTap: () => _selectStufe(),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
         ),
       ),
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Icon(Icons.phone),
-            ),
-            Expanded(
-              flex: 9,
-              child: Container(
-                alignment: Alignment.center, //
-                decoration: new BoxDecoration(
-                  border: new Border.all(color: Colors.black, width: 2),
-                  borderRadius: new BorderRadius.all(
-                    Radius.circular(4.0),
-                  ),
-                ),
-                child: new TextFormField(
-                  initialValue: widget.profile['Handynummer'],
-                  decoration: new InputDecoration(
-                      border: UnderlineInputBorder(),
-                      filled: true,
-                      labelText: 'Handy nummer'),
-                  validator: (value) =>
-                      value.isEmpty ? 'Handynummer darf nicht leer sein' : null,
-                  keyboardType: TextInputType.phone,
-                  onSaved: (value) => _handynummer = value,
-                ),
-              ),
-            )
-          ],
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: MoreaDivider(),
+      ),
+      ListTile(
+        title: Text(
+          'Rolle',
+          style: MoreaTextStyle.lable,
+        ),
+        subtitle: Text(_pos),
+        onTap: () => _selectRolle(),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.black,
         ),
       ),
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Icon(Icons.email),
-            ),
-            Expanded(
-              flex: 9,
-              child: Container(
-                alignment: Alignment.center, //
-                decoration: new BoxDecoration(
-                  border: new Border.all(color: Colors.black, width: 2),
-                  borderRadius: new BorderRadius.all(
-                    Radius.circular(4.0),
-                  ),
-                ),
-                child: new TextFormField(
-                  initialValue: widget.profile['Email'],
-                  decoration:
-                      new InputDecoration(filled: true, labelText: 'Email'),
-                  validator: (value) =>
-                      value.isEmpty ? 'Email darf nicht leer sein' : null,
-                  keyboardType: TextInputType.emailAddress,
-                  onSaved: (value) => _email = value,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-      SizedBox(
-        height: 24,
+      Padding(
+        padding: EdgeInsets.only(bottom: 20),
       )
     ];
   }
 
   List<Widget> buildSubmitButtons() {
     return [
-      new RaisedButton(
-        child: new Text('Ändern', style: new TextStyle(fontSize: 20)),
-        onPressed: validateAndSubmit,
-        shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(30.0)),
-        color: Color(0xff7a62ff),
-        textColor: Colors.white,
-      ),
-      new FlatButton(
-        child: new Text('Person aus Datenbank löschen',
-            style: new TextStyle(fontSize: 20, color: Colors.redAccent)),
-        onPressed: () => {deleteuseraccount()},
+      Center(
+        child: FlatButton(
+          child: new Text('Person aus Datenbank löschen',
+              style: new TextStyle(fontSize: 20, color: Colors.redAccent)),
+          onPressed: () => {deleteuseraccount()},
+        ),
       ),
       SizedBox(
         height: 15,
       )
     ];
+  }
+
+  void changeName(String vorname, String nachname, String pfadiname) {
+    this._vorname = vorname;
+    this._nachname = nachname;
+    this._pfadinamen = pfadiname;
+  }
+
+  void changeAdress(String adresse, String plz, String ort) {
+    this._adresse = adresse;
+    this._plz = plz;
+    this._ort = ort;
+  }
+
+  void changeEmail(String email) {
+    this._email = email;
+  }
+
+  void changePhoneNumber(String handynummer) {
+    this._handynummer = handynummer;
+  }
+
+  void _selectGeschlecht() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Geschlecht ändern'),
+            content: DropdownButton<String>(
+                items: [
+                  DropdownMenuItem(value: "Weiblich", child: Text('weiblich')),
+                  DropdownMenuItem(value: 'Männlich', child: Text('männlich'))
+                ],
+                hint: Text(_geschlecht),
+                onChanged: (newVal) {
+                  _geschlecht = newVal;
+                  this.setState(() {});
+                  Navigator.of(context).pop();
+                }),
+            actions: <Widget>[
+              RaisedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.cancel,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  label: Text(
+                    "Abbrechen",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  color: MoreaColors.violett,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5))))
+            ],
+          );
+        });
+  }
+
+  void _selectStufe() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Stufe ändern'),
+            content: DropdownButton<String>(
+                items: _stufenselect.map((Map group) {
+                  return new DropdownMenuItem<String>(
+                    value: group[userMapgroupID],
+                    child: new Text(group[groupMapgroupNickName]),
+                  );
+                }).toList(),
+                hint: Text(convMiDatatoWebflow(_stufe)),
+                onChanged: (newVal) {
+                  _stufe = newVal;
+                  this.setState(() {});
+                  Navigator.of(context).pop();
+                }),
+            actions: <Widget>[
+              RaisedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.cancel,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  label: Text(
+                    "Abbrechen",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  color: MoreaColors.violett,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5))))
+            ],
+          );
+        });
+  }
+
+  void _selectRolle() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Rolle ändern'),
+            content: DropdownButton<String>(
+                items: _rollenselect.map((String val) {
+                  return new DropdownMenuItem<String>(
+                    value: val,
+                    child: new Text(val),
+                  );
+                }).toList(),
+                hint: Text(_pos),
+                onChanged: (newVal) {
+                  _pos = newVal;
+                  this.setState(() {});
+                  Navigator.of(context).pop();
+                }),
+            actions: <Widget>[
+              RaisedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.cancel,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  label: Text(
+                    "Abbrechen",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  color: MoreaColors.violett,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5))))
+            ],
+          );
+        });
   }
 }

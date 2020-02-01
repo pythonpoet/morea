@@ -31,7 +31,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('E-Mail'),
+        title: Text('E-Mail-Adresse'),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
@@ -54,13 +54,13 @@ class _ChangeEmailState extends State<ChangeEmail> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'E-Mail ändern',
+                      'E-Mail-Adresse ändern',
                       style: MoreaTextStyle.title,
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
-                        'E-Mail',
+                        'E-Mail-Adresse',
                         style: MoreaTextStyle.lable,
                       ),
                     ),

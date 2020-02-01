@@ -4,6 +4,7 @@ import 'package:morea/Pages/Personenverzeichniss/view_userprofile_page.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -42,7 +43,6 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personen'),
-          backgroundColor: Color(0xff7a62ff),
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -66,57 +66,72 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
   }
 
   Widget personen(String groupID) {
-    return Container(
-      child: FutureBuilder(
-          future: widget.crud0.getDocument(pathGroups, groupID),
-          builder: (BuildContext context,
-              AsyncSnapshot<DocumentSnapshot> groupSnap) {
-            if (!groupSnap.hasData) return moreaLoading.loading();
-            List<Map<String, Map<String, dynamic>>> person = new List();
-            if (groupSnap.data.data
-                .containsKey(groupMapPriviledge)) if (groupSnap
-                    .data[groupMapPriviledge].length >
-                0) {
-              Map<String, dynamic>.from(groupSnap.data[groupMapPriviledge])
-                  .forEach((k, v) => {
-                        if (k != 'groupID')
-                          {
-                            person.add({k: Map<String, dynamic>.from(v)})
-                          }
-                      });
-              return Container(
-                  child: ListView.builder(
-                itemCount: person.length,
-                itemBuilder: (context, int index) {
-                  String name, userUID;
-                  person[index].forEach((k, v) {
-                    name = v[groupMapDisplayName];
-                    userUID = k;
-                  });
-                  return ListTile(
-                    title: new Text(name),
-                    onTap: () => navigatetoprofile(
-                        widget.moreaFire.getUserInformation(userUID)),
-                  );
-                },
-              ));
-            }
-            return Center(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  "Niemand ist für diese Stufe Registriert",
-                  style: TextStyle(fontSize: 20),
-                ),
+    return FutureBuilder(
+        future: widget.crud0.getDocument(pathGroups, groupID),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> groupSnap) {
+          if (!groupSnap.hasData) return moreaLoading.loading();
+          List<Map<String, Map<String, dynamic>>> person = new List();
+          if (groupSnap.data.data.containsKey(groupMapPriviledge)) if (groupSnap
+                  .data[groupMapPriviledge].length >
+              0) {
+            Map<String, dynamic>.from(groupSnap.data[groupMapPriviledge])
+                .forEach((k, v) => {
+                      if (k != 'groupID')
+                        {
+                          person.add({k: Map<String, dynamic>.from(v)})
+                        }
+                    });
+            return MoreaBackgroundContainer(
+                child: SingleChildScrollView(
+                  child: MoreaShadowContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(padding: EdgeInsets.all(20), child: Text(convMiDatatoWebflow(groupID), style: MoreaTextStyle.title,),),
+                  ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: person.length,
+                      itemBuilder: (context, int index) {
+                        String name, userUID;
+                        person[index].forEach((k, v) {
+                          name = v[groupMapDisplayName];
+                          userUID = k;
+                        });
+                        return ListTile(
+                          title: new Text(name, style: MoreaTextStyle.lable,),
+                          onTap: () => navigatetoprofile(
+                              widget.moreaFire.getUserInformation(userUID)),
+                          trailing: Icon(Icons.arrow_forward_ios, color: Colors.black,),
+                        );
+                      },
+                      separatorBuilder: (context, int index){
+                        return Padding(padding: EdgeInsets.symmetric(horizontal: 15), child: MoreaDivider());
+                      },
+                  ),
+                  Container(
+                    height: 20,
+                  )
+                ],
               ),
-            );
-          }),
-    );
+            ),
+                ));
+          }
+          return Center(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                "Niemand ist für diese Stufe Registriert",
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          );
+        });
   }
 
   navigatetoprofile(Future<DocumentSnapshot> userdata) {
     Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => new ViewUserProfilePage(
-            userdata, widget.moreaFire, widget.crud0)));
+        builder: (BuildContext context) =>
+            new ViewUserProfilePage(userdata, widget.moreaFire, widget.crud0)));
   }
 }

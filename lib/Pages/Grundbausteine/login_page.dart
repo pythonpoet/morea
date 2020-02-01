@@ -844,7 +844,7 @@ class _LoginPageState extends State<LoginPage> {
                                   await DatePicker.showDatePicker(context,
                                     showTitleActions: true,
                                     theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
-                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
+                                    minTime: DateTime.now().add(new Duration(days: -365*100)),
                                     maxTime: DateTime.now().add(new Duration(days: -365*3)),
                                     onConfirm: (date) {
                                       moreaUser.geburtstag  = DateFormat('dd.MM.yyy', 'de').format(date).toString();
