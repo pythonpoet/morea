@@ -59,7 +59,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   TeleblizFirestore(Firestore firestore, List<String> groupIDs) {
     crud0 = CrudMedthods(firestore);
     _mapHomeFeedController.addStream(this.streamMapHomeFeed(groupIDs));
-    this.streamMapofGroupEvents(groupIDs).first;
+    this.streamMapofGroupEvents(groupIDs);
   }
 
   Stream<Map<String, List<String>>> streamHomeFeed(String groupID) async* {
@@ -116,26 +116,25 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     }
   }
 
-  Stream<String> helper(Map<String, List<String>> listHomeFeed) async* {
+  void helper(Map<String, List<String>> listHomeFeed) async {
     List<Stream<Map<String, Map<String, Map<String, dynamic>>>>> list =
         new List();
     for (MapEntry<String, List<String>> homeFeed in listHomeFeed.entries) {
       list.add(streamMapofGroupEventsHelper(homeFeed).asBroadcastStream());
     }
-    helpertow(StreamGroup.merge(list).asBroadcastStream()).first;
+    helpertow(StreamGroup.merge(list).asBroadcastStream());
   }
 
-  Stream<String> helpertow(
-      Stream<Map<String, Map<String, Map<String, dynamic>>>> stream) async* {
+  void helpertow(
+      Stream<Map<String, Map<String, Map<String, dynamic>>>> stream) async {
     await for (Map<String, Map<String, Map<String, dynamic>>> event in stream) {
       _mapofEventsController.add(event);
     }
   }
 
-  Stream<Map<String, Map<String, Map<String, dynamic>>>> streamMapofGroupEvents(
-      groupIDs) async* {
+  void streamMapofGroupEvents(groupIDs) async {
     await for (dynamic listHomeFeed in getMapHomeFeed) {
-      helper(listHomeFeed).first;
+      helper(listHomeFeed);
     }
   }
 

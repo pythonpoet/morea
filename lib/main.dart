@@ -21,7 +21,6 @@ Future<void> main() async {
   await firestore.settings(timestampsInSnapshotsEnabled: true);
 
   */
-  
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(

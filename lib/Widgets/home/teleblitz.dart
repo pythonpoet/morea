@@ -145,7 +145,6 @@ class Teleblitz {
         if (snap.connectionState == ConnectionState.active) {
           switch (snap.data) {
             case "un-initialized":
-              print(snap.connectionState);
               return Container(
                   padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                   child: Row(
@@ -196,7 +195,6 @@ class Teleblitz {
                   ));
               break;
             case "ChuntNoed":
-              print(snap.connectionState);
               return Container(
                 child: new RaisedButton(
                   child: Container(
@@ -222,7 +220,6 @@ class Teleblitz {
                 ),
               );
             case "Chunt":
-              print(snap.connectionState);
               return Container(
                 child: new RaisedButton(
                   child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
@@ -241,7 +238,6 @@ class Teleblitz {
                 ),
               );
             default:
-              print(snap.connectionState);
               return Text(snap.data);
           }
         } else {
@@ -658,25 +654,30 @@ class Teleblitz {
         returnTelebliz[tlbzMapNoElement] = noElement();
         return returnTelebliz;
       case HomeScreenType.info:
-        snapshot.data[groupID]
-            .forEach((String eventID, Map<String, dynamic> tlbz) {
-          switch (getElementType(tlbz)) {
-            case ElementType.notImplemented:
-              returnTelebliz[eventID] = notImplemented();
-              break;
-            case ElementType.ferien:
-              defineInfo(tlbz, groupID);
-              returnTelebliz[eventID] = ferien();
-              break;
-            case ElementType.keineAktivitaet:
-              defineInfo(tlbz, groupID);
-              returnTelebliz[eventID] = keineAktivitat();
-              break;
-            case ElementType.teleblitz:
-              defineInfo(tlbz, groupID);
-              returnTelebliz[eventID] = teleblitz(groupID, eventID, function);
-          }
-        });
+        if(snapshot.data[groupID].values.contains(null)){
+          returnTelebliz[tlbzMapLoading] = moreaLoading();
+        }
+        else {
+          snapshot.data[groupID]
+                      .forEach((String eventID, Map<String, dynamic> tlbz) {
+                    switch (getElementType(tlbz)) {
+                      case ElementType.notImplemented:
+                        returnTelebliz[eventID] = notImplemented();
+                        break;
+                      case ElementType.ferien:
+                        defineInfo(tlbz, groupID);
+                        returnTelebliz[eventID] = ferien();
+                        break;
+                      case ElementType.keineAktivitaet:
+                        defineInfo(tlbz, groupID);
+                        returnTelebliz[eventID] = keineAktivitat();
+                        break;
+                      case ElementType.teleblitz:
+                        defineInfo(tlbz, groupID);
+                        returnTelebliz[eventID] = teleblitz(groupID, eventID, function);
+                    }
+                  });
+        }
     }
     return returnTelebliz;
   }
