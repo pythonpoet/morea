@@ -316,6 +316,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
                         crud0: crud0,
+                        moreaFire: moreafire,
                       )))),
           new Divider(),
           new ListTile(

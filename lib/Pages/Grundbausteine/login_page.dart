@@ -110,7 +110,8 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       _load = true;
                     });
-                    await datenschutz.moreaDatenschutzerklaerung(context);
+                    CrudMedthods crud = new CrudMedthods(widget.firestore);
+                    await datenschutz.moreaDatenschutzerklaerung(context, (await crud.getDocument(pathConfig, "init")).data["Datenschutz"] );
                     if (datenschutz.akzeptiert) {
                       moreaUser.geschlecht = _geschlecht;
                       moreaUser.pos = "Teilnehmer";
@@ -171,7 +172,8 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       _load = true;
                     });
-                    await datenschutz.moreaDatenschutzerklaerung(context);
+                    CrudMedthods crud = new CrudMedthods(widget.firestore);
+                  await datenschutz.moreaDatenschutzerklaerung(context, (await crud.getDocument(pathConfig, "init")).data["Datenschutz"] );
                     if (datenschutz.akzeptiert) {
                       moreaUser.geschlecht = _geschlecht;
                       moreaUser.pos = _selectedverwandtschaft;
