@@ -54,14 +54,14 @@ abstract class BaseMoreaFirebase {
   Future<String> getWebflowApiKey();
 }
 
-class MoreaFirebase extends BaseMoreaFirebase  {
+class MoreaFirebase extends BaseMoreaFirebase {
   CrudMedthods crud0;
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
   Map<String, dynamic> _userMap, _groupMap;
-  Map<String, int> _groupPrivilege= new Map();
-  Map<String, Map<String, String>>_childMap;
+  Map<String, int> _groupPrivilege = new Map();
+  Map<String, Map<String, String>> _childMap;
 
   Firestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
@@ -99,6 +99,7 @@ class MoreaFirebase extends BaseMoreaFirebase  {
   Map<String, dynamic> get getUserMap => _userMap;
 
   Map<String, Map<String, String>> get getChildMap => moreaUser.childMap;
+
   Map<String, int> get getGroupPrivilege => moreaUser.groupPrivilege;
 
   Future<void> getData(String userID) async {
@@ -110,8 +111,7 @@ class MoreaFirebase extends BaseMoreaFirebase  {
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
     groupIDs.addAll(getSubscribedGroups);
-    if(getGroupID !=null)
-    groupIDs.add(getGroupID);
+    if (getGroupID != null) groupIDs.add(getGroupID);
     tbz = new TeleblizFirestore(firestore, groupIDs);
   }
 
@@ -122,21 +122,22 @@ class MoreaFirebase extends BaseMoreaFirebase  {
   }
 
   //Vorschlag an Maxi
-  Future<void> updateUserInformation(String userUID, Map userInfo){
-    if(userInfo[userMapAccountCreated] is Timestamp)
-      userInfo[userMapAccountCreated] = userInfo[userMapAccountCreated].toString();
-    return callFunction(getcallable("updateUserProfile"),param: userInfo);
+  Future<void> updateUserInformation(String userUID, Map userInfo) {
+    if (userInfo[userMapAccountCreated] is Timestamp)
+      userInfo[userMapAccountCreated] =
+          userInfo[userMapAccountCreated].toString();
+    return callFunction(getcallable("updateUserProfile"), param: userInfo);
   }
 
-  Future<HttpsCallableResult> goToNewGroup(String userID, String displayName, String oldGroup, String newGroup){
+  Future<HttpsCallableResult> goToNewGroup(
+      String userID, String displayName, String oldGroup, String newGroup) {
     return callFunction(getcallable("goToNewGroup"), param: {
       userMapUID: userID,
       "oldGroup": oldGroup,
       "newGroup": newGroup,
-      groupMapDisplayName :displayName
+      groupMapDisplayName: displayName
     });
   }
-  
 
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
     return await crud0.getDocument(pathUser, userUID);
@@ -233,8 +234,11 @@ class MoreaFirebase extends BaseMoreaFirebase  {
   }
 
   Future<void> subscribeToGroup(String groupID) async {
-    Map<String, dynamic> tokendata = {'devtoken': await firebaseMessaging.getToken()};
-    return await crud0.setData('groups/$groupID/Devices', auth0.getUserID, tokendata);
+    Map<String, dynamic> tokendata = {
+      'devtoken': await firebaseMessaging.getToken()
+    };
+    return await crud0.setData(
+        'groups/$groupID/Devices', auth0.getUserID, tokendata);
   }
 
   Stream<QuerySnapshot> getMessages(String groupnr) {
@@ -264,22 +268,23 @@ class MoreaFirebase extends BaseMoreaFirebase  {
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID) {
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
+
   Future<void> uploadDevTocken(String userID) async {
-    await callFunction(getcallable("uploadDevTocken"),param: Map<String,String>.from(
-      {
-        userMapDeviceToken: await firebaseMessaging.getToken(),
-        userMapUID: userID
-      }
-    ));
+    await callFunction(getcallable("uploadDevTocken"),
+        param: Map<String, String>.from({
+          userMapDeviceToken: await firebaseMessaging.getToken(),
+          userMapUID: userID
+        }));
   }
-  Future<void> groupPriviledgeTN(String groupID, String userID, String displayName) async {
-    return callFunction(getcallable("priviledgeTN"),param: Map<String,String>.from(
-      {
-        userMapgroupID: groupID,
-        userMapUID: userID,
-        "DisplayName": displayName
-      }
-    ));
+
+  Future<void> groupPriviledgeTN(
+      String groupID, String userID, String displayName) async {
+    return callFunction(getcallable("priviledgeTN"),
+        param: Map<String, String>.from({
+          userMapgroupID: groupID,
+          userMapUID: userID,
+          "DisplayName": displayName
+        }));
   }
 
   Future<String> getMailChimpApiKey() async {

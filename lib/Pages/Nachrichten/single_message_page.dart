@@ -22,13 +22,22 @@ class SingleMessagePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: MoreaShadowContainer(
             child: Padding(
-              padding: EdgeInsets.only(top: 20, bottom: 40, left: 40, right: 40),
+              padding:
+                  EdgeInsets.only(top: 20, bottom: 40, left: 40, right: 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text('Von: ' + sender, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: Colors.black87),),
+                  Text(
+                    'Von: ' + sender,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.black87),
+                  ),
                   Divider(),
-                  Padding(padding: EdgeInsets.all(10),),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
                   Text(
                     title,
                     textAlign: TextAlign.center,
@@ -42,7 +51,8 @@ class SingleMessagePage extends StatelessWidget {
                   ),
                   Text(
                     body,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
                   ),
                 ],
               ),

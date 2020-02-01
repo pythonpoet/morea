@@ -50,9 +50,9 @@ class MyApp extends StatelessWidget {
       ),
       home: new RootPage(auth: new Auth(), firestore: firestore),
     );
-  
   }
 }
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -71,14 +71,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS != null ) {
+    if (Platform.isIOS != null) {
       return CupertinoTabScaffold(
           tabBar: CupertinoTabBar(items: [
-
             BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.home), title: Text("Home")),
             BottomNavigationBarItem(
@@ -90,20 +87,28 @@ class _MyHomePageState extends State<MyHomePage> {
             switch (index) {
               case 0:
                 return CupertinoPageScaffold(
-                    navigationBar: CupertinoNavigationBar(
-                          middle: Text('Page 2 of tab $index'),
-                        ),
-                        child: Container(color: Colors.blue,),
+                  navigationBar: CupertinoNavigationBar(
+                    middle: Text('Page 2 of tab $index'),
+                  ),
+                  child: Container(
+                    color: Colors.blue,
+                  ),
                 );
                 break;
               case 1:
-                return Container(color: Colors.red,);
+                return Container(
+                  color: Colors.red,
+                );
                 break;
               case 2:
-                return Container(color: Colors.green,);
+                return Container(
+                  color: Colors.green,
+                );
                 break;
               default:
-                return Container(color: Colors.yellow,);
+                return Container(
+                  color: Colors.yellow,
+                );
                 break;
             }
           });

@@ -10,7 +10,7 @@ class WerChunnt {
   final MoreaFirebase moreaFire;
   final String eventID;
 
-  WerChunnt(this.moreaFire, this.eventID){
+  WerChunnt(this.moreaFire, this.eventID) {
     initChunnt();
   }
 

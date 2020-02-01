@@ -3,13 +3,11 @@ import 'package:morea/morealayout.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'change_teleblitz.dart';
 
-class SelectTeleblitzType extends StatelessWidget{
-
+class SelectTeleblitzType extends StatelessWidget {
   SelectTeleblitzType(this.stufe, this.moreaFire);
 
   final String stufe;
   final MoreaFirebase moreaFire;
- 
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +45,8 @@ class SelectTeleblitzType extends StatelessWidget{
                   title: Text('Normal', style: TextStyle(fontSize: 18)),
                   subtitle: Text('Normaler Teleblitz mit Beginn und Schluss'),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => ChangeTeleblitz(
-                            this.stufe,
-                            'normal',
-                            moreaFire
-                          ))),
+                      builder: (BuildContext context) =>
+                          ChangeTeleblitz(this.stufe, 'normal', moreaFire))),
                   trailing: Icon(Icons.arrow_forward_ios),
                   contentPadding: EdgeInsets.only(
                     right: 15,
@@ -70,8 +65,8 @@ class SelectTeleblitzType extends StatelessWidget{
                   subtitle: Text(
                       'Ein Teleblitz mit einem Feld für den Grund des Ausfalls'),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          ChangeTeleblitz(this.stufe, 'keineAktivitaet', moreaFire))),
+                      builder: (BuildContext context) => ChangeTeleblitz(
+                          this.stufe, 'keineAktivitaet', moreaFire))),
                   trailing: Icon(Icons.arrow_forward_ios),
                   contentPadding: EdgeInsets.only(
                     right: 15,

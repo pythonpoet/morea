@@ -36,8 +36,8 @@ class _ChangeEmailState extends State<ChangeEmail> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
-        onPressed: (){
-          if(_validateAndSave()){
+        onPressed: () {
+          if (_validateAndSave()) {
             widget._changeEmail(email.text);
             Navigator.of(context).pop();
           }

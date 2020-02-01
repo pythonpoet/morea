@@ -5,6 +5,7 @@ import 'select_teleblitz_type.dart';
 
 class SelectStufe extends StatelessWidget {
   SelectStufe(this.moreaFire);
+
   final MoreaFirebase moreaFire;
 
   @override
@@ -43,74 +44,91 @@ class SelectStufe extends StatelessWidget {
                   ),
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(thickness: 1, color: Colors.black26,)
-                  ),
+                      child: Divider(
+                        thickness: 1,
+                        color: Colors.black26,
+                      )),
                   ListTile(
                     title: Text(
                       "Biber",
                       style: TextStyle(fontSize: 18),
                     ),
-                    contentPadding: EdgeInsets.only(right: 15, left: 15,),
+                    contentPadding: EdgeInsets.only(
+                      right: 15,
+                      left: 15,
+                    ),
                     trailing: Icon(Icons.arrow_forward_ios),
-                    onTap: (){
+                    onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            SelectTeleblitzType('Biber', moreaFire)
-                      ));
+                          builder: (BuildContext context) =>
+                              SelectTeleblitzType('Biber', moreaFire)));
                     },
                   ),
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(thickness: 1, color: Colors.black26,)
-                  ),
+                      child: Divider(
+                        thickness: 1,
+                        color: Colors.black26,
+                      )),
                   ListTile(
                     title: Text(
                       "Wombat",
                       style: TextStyle(fontSize: 18),
                     ),
-                    contentPadding: EdgeInsets.only(right: 15, left: 15,),
+                    contentPadding: EdgeInsets.only(
+                      right: 15,
+                      left: 15,
+                    ),
                     trailing: Icon(Icons.arrow_forward_ios),
-                    onTap: (){
+                    onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              SelectTeleblitzType('Wombat (Wölfe)', moreaFire), 
+                        builder: (BuildContext context) =>
+                            SelectTeleblitzType('Wombat (Wölfe)', moreaFire),
                       ));
                     },
                   ),
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(thickness: 1, color: Colors.black26,)
-                  ),
+                      child: Divider(
+                        thickness: 1,
+                        color: Colors.black26,
+                      )),
                   ListTile(
                     title: Text(
                       "Nahani",
                       style: TextStyle(fontSize: 18),
                     ),
-                    contentPadding: EdgeInsets.only(right: 15, left: 15,),
+                    contentPadding: EdgeInsets.only(
+                      right: 15,
+                      left: 15,
+                    ),
                     trailing: Icon(Icons.arrow_forward_ios),
-                    onTap: (){
+                    onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              SelectTeleblitzType('Nahani (Meitli)', moreaFire)
-                      ));
+                              SelectTeleblitzType(
+                                  'Nahani (Meitli)', moreaFire)));
                     },
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Divider(thickness: 1, color: Colors.black26,)
-                  ),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(
+                        thickness: 1,
+                        color: Colors.black26,
+                      )),
                   ListTile(
                     title: Text(
                       "Drason",
                       style: TextStyle(fontSize: 18),
                     ),
-                    contentPadding: EdgeInsets.only(right: 15, left: 15, bottom: 15),
+                    contentPadding:
+                        EdgeInsets.only(right: 15, left: 15, bottom: 15),
                     trailing: Icon(Icons.arrow_forward_ios),
-                    onTap: (){
+                    onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              SelectTeleblitzType('Drason (Buebe)', moreaFire)
-                      ));
+                              SelectTeleblitzType(
+                                  'Drason (Buebe)', moreaFire)));
                     },
                   ),
                 ],

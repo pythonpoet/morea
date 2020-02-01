@@ -5,7 +5,6 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class MailChimpAPIManager {
-
   MailChimpAPIManager();
 
   printUserInfo(String email, MoreaFirebase moreafire) async {
@@ -22,10 +21,7 @@ class MailChimpAPIManager {
   updateUserInfo(String email, String vorname, String nachname,
       String geschlecht, String stufe, MoreaFirebase moreafire) async {
     String apiKey = await moreafire.getMailChimpApiKey();
-    String biber = 'Nein',
-        woelfe = 'Nein',
-        meitli = 'Nein',
-        buebe = 'Nein';
+    String biber = 'Nein', woelfe = 'Nein', meitli = 'Nein', buebe = 'Nein';
     if (stufe == midatanamebiber) {
       biber = 'Ja';
     } else if (stufe == midatanamewoelf) {
@@ -52,9 +48,8 @@ class MailChimpAPIManager {
       }
     };
     String bodyStr = jsonEncode(bodyMap);
-    var result = await http.put(urlInfoMailListMembers + hash, headers: {
-      'Authorization': basicAuth
-    }, body: bodyStr);
+    var result = await http.put(urlInfoMailListMembers + hash,
+        headers: {'Authorization': basicAuth}, body: bodyStr);
     var decoded = json.decode(result.body);
     print(decoded);
   }

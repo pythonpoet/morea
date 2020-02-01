@@ -8,6 +8,7 @@ import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
   ProfilePageState({this.profile, this.moreaFire, this.crud0});
+
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
 
@@ -154,9 +155,10 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   @override
   void initState() {
     mergeChildParent = new MergeChildParent(widget.crud0, widget.moreaFire);
-     moreaFire = widget.moreaFire;
-     crud0 = widget.crud0;
-     childParendPend = new ChildParendPend(crud0: widget.crud0, moreaFirebase: widget.moreaFire);
+    moreaFire = widget.moreaFire;
+    crud0 = widget.crud0;
+    childParendPend = new ChildParendPend(
+        crud0: widget.crud0, moreaFirebase: widget.moreaFire);
     if (widget.profile['Pos'] == 'Teilnehmer') {
       reload();
       erziungsberechtigte();

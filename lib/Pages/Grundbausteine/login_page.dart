@@ -111,7 +111,10 @@ class _LoginPageState extends State<LoginPage> {
                       _load = true;
                     });
                     CrudMedthods crud = new CrudMedthods(widget.firestore);
-                    await datenschutz.moreaDatenschutzerklaerung(context, (await crud.getDocument(pathConfig, "init")).data["Datenschutz"] );
+                    await datenschutz.moreaDatenschutzerklaerung(
+                        context,
+                        (await crud.getDocument(pathConfig, "init"))
+                            .data["Datenschutz"]);
                     if (datenschutz.akzeptiert) {
                       moreaUser.geschlecht = _geschlecht;
                       moreaUser.pos = "Teilnehmer";
@@ -173,7 +176,10 @@ class _LoginPageState extends State<LoginPage> {
                       _load = true;
                     });
                     CrudMedthods crud = new CrudMedthods(widget.firestore);
-                  await datenschutz.moreaDatenschutzerklaerung(context, (await crud.getDocument(pathConfig, "init")).data["Datenschutz"] );
+                    await datenschutz.moreaDatenschutzerklaerung(
+                        context,
+                        (await crud.getDocument(pathConfig, "init"))
+                            .data["Datenschutz"]);
                     if (datenschutz.akzeptiert) {
                       moreaUser.geschlecht = _geschlecht;
                       moreaUser.pos = _selectedverwandtschaft;
@@ -840,18 +846,29 @@ class _LoginPageState extends State<LoginPage> {
                                         color: Colors.grey[500], fontSize: 16)),
                                 onPressed: () async {
                                   await DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
-                                    minTime: DateTime.now().add(new Duration(days: -365*100)),
-                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
-                                    onConfirm: (date) {
-                                      moreaUser.geburtstag  = DateFormat('dd.MM.yyy', 'de').format(date).toString();
-                                      _alter = DateFormat('dd.MM.yyy', 'de').format(date).toString();
-                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
-          
-                                  setState(() {
-                                    
-                                  });
+                                      showTitleActions: true,
+                                      theme: DatePickerTheme(
+                                          doneStyle: TextStyle(
+                                              color: MoreaColors.violett,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      minTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 100)),
+                                      maxTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 3)),
+                                      onConfirm: (date) {
+                                    moreaUser.geburtstag =
+                                        DateFormat('dd.MM.yyy', 'de')
+                                            .format(date)
+                                            .toString();
+                                    _alter = DateFormat('dd.MM.yyy', 'de')
+                                        .format(date)
+                                        .toString();
+                                  },
+                                      currentTime: DateTime.now(),
+                                      locale: LocaleType.de);
+
+                                  setState(() {});
                                 },
                               )
                             ],

@@ -62,29 +62,31 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  Stream<List> _getAgenda(groupID)async* {
-    yield* agenda.getTotalAgendaOverview([groupID, ...widget.moreaFire.getSubscribedGroups]);
+  Stream<List> _getAgenda(groupID) async* {
+    yield* agenda.getTotalAgendaOverview(
+        [groupID, ...widget.moreaFire.getSubscribedGroups]);
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
-    if(event.containsKey("DeleteData")){
-    DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
-    DateTime now = DateTime.now();
-    if (_agdatum.difference(now).inDays < 0) {
-      Map fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
-      if(fullevent != null)
-      agenda.deleteAgendaEvent(fullevent);
+    if (event.containsKey("DeleteData")) {
+      DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
+      DateTime now = DateTime.now();
+      if (_agdatum.difference(now).inDays < 0) {
+        Map fullevent =
+            (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+        if (fullevent != null)
+          agenda.deleteAgendaEvent(fullevent);
+        else
+          agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
+      }
+    } else {
+      Map fullevent =
+          (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+      if (fullevent != null)
+        agenda.deleteAgendaEvent(fullevent);
       else
-      agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
+        agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
     }
-    }else{
-      Map fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
-      if(fullevent != null)
-      agenda.deleteAgendaEvent(fullevent);
-      else
-      agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
-    }
-    
   }
 
   bool istLeiter() {
@@ -94,19 +96,20 @@ class _AgendaStatePage extends State<AgendaState>
       return false;
     }
   }
-  bool isEltern(){
-   switch (moreafire.getPos) {
-        case 'Mutter':
-          return true;
-        case 'Vater':
-          return true;
-        case 'Erziehungsberechtigter':
-          return true;
-        case 'Erziehungsberechtigte':
-          return true;
-        default:
-          return false;
-      }
+
+  bool isEltern() {
+    switch (moreafire.getPos) {
+      case 'Mutter':
+        return true;
+      case 'Vater':
+        return true;
+      case 'Erziehungsberechtigter':
+        return true;
+      case 'Erziehungsberechtigte':
+        return true;
+      default:
+        return false;
+    }
   }
 
   routetoAddevent() {
@@ -127,7 +130,7 @@ class _AgendaStatePage extends State<AgendaState>
     moreaLoading = MoreaLoading(this);
     moreafire = widget.moreaFire;
 
-    agenda = new prefix0.Agenda(widget.firestore,widget.moreaFire);
+    agenda = new prefix0.Agenda(widget.firestore, widget.moreaFire);
 
     //_getAgenda("3776");
     quickfix['Stufen'] = stufen;
@@ -160,7 +163,8 @@ class _AgendaStatePage extends State<AgendaState>
           shape: CircleBorder(side: BorderSide(color: Colors.white)),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail, context, moreafire, crud0, _signedOut),
+        drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
+            context, moreafire, crud0, _signedOut),
         bottomNavigationBar: BottomAppBar(
           child: Container(
             color: Color.fromRGBO(43, 16, 42, 0.9),
@@ -276,7 +280,8 @@ class _AgendaStatePage extends State<AgendaState>
           title: new Text('Agenda'),
         ),
         bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
-        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName, moreafire.getEmail, context, moreafire, crud0, _signedOut),
+        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
+            moreafire.getEmail, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getUserMap[userMapgroupID]),
       ));
     }
@@ -287,10 +292,10 @@ class _AgendaStatePage extends State<AgendaState>
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) => new ViewLagerPageState(
-          moreaFire: moreafire, 
-          agenda: agenda,
-          info: info, pos: 
-          moreafire.getUserMap['Pos'])));
+            moreaFire: moreafire,
+            agenda: agenda,
+            info: info,
+            pos: moreafire.getUserMap['Pos'])));
   }
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
@@ -298,14 +303,14 @@ class _AgendaStatePage extends State<AgendaState>
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) => new ViewEventPageState(
-          moreaFire: moreafire, 
-          agenda: agenda,
-          info: info, pos: 
-          moreafire.getUserMap['Pos'],
+              moreaFire: moreafire,
+              agenda: agenda,
+              info: info,
+              pos: moreafire.getUserMap['Pos'],
             )));
   }
 
-  Widget aAgenda(String groupID){
+  Widget aAgenda(String groupID) {
     return StreamBuilder(
         stream: _getAgenda(groupID).asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {

@@ -115,6 +115,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       builder: (BuildContext context) => MessagesPage(
                             moreaFire: moreafire,
                             auth: widget.auth,
+                            firestore: widget.firestore,
                             navigationMap: widget.navigationMap,
                           )));
                 },
@@ -143,6 +144,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           builder: (BuildContext context) => MessagesPage(
                 moreaFire: moreafire,
                 auth: widget.auth,
+                firestore: widget.firestore,
                 navigationMap: widget.navigationMap,
               )));
     }, onLaunch: (Map<String, dynamic> message) async {
@@ -150,6 +152,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (BuildContext context) => MessagesPage(
                 moreaFire: moreafire,
+                firestore: widget.firestore,
                 auth: widget.auth,
                 navigationMap: widget.navigationMap,
               )));

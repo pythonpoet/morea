@@ -654,29 +654,28 @@ class Teleblitz {
         returnTelebliz[tlbzMapNoElement] = noElement();
         return returnTelebliz;
       case HomeScreenType.info:
-        if(snapshot.data[groupID].values.contains(null)){
+        if (snapshot.data[groupID].values.contains(null)) {
           returnTelebliz[tlbzMapLoading] = moreaLoading();
-        }
-        else {
+        } else {
           snapshot.data[groupID]
-                      .forEach((String eventID, Map<String, dynamic> tlbz) {
-                    switch (getElementType(tlbz)) {
-                      case ElementType.notImplemented:
-                        returnTelebliz[eventID] = notImplemented();
-                        break;
-                      case ElementType.ferien:
-                        defineInfo(tlbz, groupID);
-                        returnTelebliz[eventID] = ferien();
-                        break;
-                      case ElementType.keineAktivitaet:
-                        defineInfo(tlbz, groupID);
-                        returnTelebliz[eventID] = keineAktivitat();
-                        break;
-                      case ElementType.teleblitz:
-                        defineInfo(tlbz, groupID);
-                        returnTelebliz[eventID] = teleblitz(groupID, eventID, function);
-                    }
-                  });
+              .forEach((String eventID, Map<String, dynamic> tlbz) {
+            switch (getElementType(tlbz)) {
+              case ElementType.notImplemented:
+                returnTelebliz[eventID] = notImplemented();
+                break;
+              case ElementType.ferien:
+                defineInfo(tlbz, groupID);
+                returnTelebliz[eventID] = ferien();
+                break;
+              case ElementType.keineAktivitaet:
+                defineInfo(tlbz, groupID);
+                returnTelebliz[eventID] = keineAktivitat();
+                break;
+              case ElementType.teleblitz:
+                defineInfo(tlbz, groupID);
+                returnTelebliz[eventID] = teleblitz(groupID, eventID, function);
+            }
+          });
         }
     }
     return returnTelebliz;

@@ -41,7 +41,7 @@ class _ChangeSenderState extends State<ChangeSender> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: MoreaColors.violett,
         child: Icon(Icons.check),
-        onPressed: (){
+        onPressed: () {
           if (saveAndSubmit()) {
             widget.speichern(this.senderController.text);
             Navigator.of(context).pop();

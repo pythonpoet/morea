@@ -59,7 +59,8 @@ class _ProfileState extends State<Profile> {
       this.userInfo['Pfadinamen'] = this.userInfo['Name'];
     }
     return Scaffold(
-      drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName, this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
+      drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName,
+          this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
       floatingActionButtonLocation: _locationFloatingActionButton(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.edit),
@@ -176,7 +177,8 @@ class _ProfileState extends State<Profile> {
                     userInfo['Geschlecht'],
                     style: MoreaTextStyle.normal,
                   ),
-                ),Padding(
+                ),
+                Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Divider(
                       thickness: 1,
@@ -217,7 +219,7 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  void updateProfile() async{
+  void updateProfile() async {
     await widget.moreaFire.getData(userInfo['UID']);
     this.userInfo = widget.moreaFire.getUserMap;
   }

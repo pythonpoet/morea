@@ -4,21 +4,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
-Widget requestPrompttoParent(){
+Widget requestPrompttoParent() {
   return new Column(
     mainAxisAlignment: MainAxisAlignment.center,
     mainAxisSize: MainAxisSize.max,
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      
-      Center(child:Container(
-        padding: EdgeInsets.all(15),
-         child: Text(message, style: new TextStyle(fontSize: 20),)
-      )),
-      
+      Center(
+          child: Container(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                message,
+                style: new TextStyle(fontSize: 20),
+              ))),
     ],
   );
 }
 
-final String message = "Wir können dir noch keine Inhalte anzeigen, da dein Account noch nicht mit deinem Kind verbunden ist. In deinem Profil kannst du deine Kinder verwalten.";
+final String message =
+    "Wir können dir noch keine Inhalte anzeigen, da dein Account noch nicht mit deinem Kind verbunden ist. In deinem Profil kannst du deine Kinder verwalten.";

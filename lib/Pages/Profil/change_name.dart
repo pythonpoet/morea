@@ -42,8 +42,8 @@ class _ChangeNameState extends State<ChangeName> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
-        onPressed: (){
-          if(_validateAndSave()){
+        onPressed: () {
+          if (_validateAndSave()) {
             widget._changeName(vorname.text, nachname.text, pfadiname.text);
             Navigator.of(context).pop();
           }

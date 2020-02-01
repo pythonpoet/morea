@@ -51,218 +51,219 @@ class _MessagesPageState extends State<MessagesPage> {
         this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
-          drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName, moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
-          appBar: AppBar(
-            title: Text('Nachrichten'),
-          ),
-          floatingActionButton: moreaEditActionbutton(this.routeToSendMessage),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          bottomNavigationBar: BottomAppBar(
-            child: Container(
-              color: Color.fromRGBO(43, 16, 42, 0.9),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: FlatButton(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      onPressed: null,
-                      child: Column(
-                        children: <Widget>[
-                          Icon(Icons.message, color: Colors.white),
-                          Text(
-                            'Nachrichten',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.white),
-                          )
-                        ],
-                        mainAxisSize: MainAxisSize.min,
-                      ),
+        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
+            moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
+        appBar: AppBar(
+          title: Text('Nachrichten'),
+        ),
+        floatingActionButton: moreaEditActionbutton(this.routeToSendMessage),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BottomAppBar(
+          child: Container(
+            color: Color.fromRGBO(43, 16, 42, 0.9),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: null,
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.message, color: Colors.white),
+                        Text(
+                          'Nachrichten',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
                     ),
-                    flex: 1,
                   ),
-                  Expanded(
-                    child: FlatButton(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      onPressed: widget.navigationMap[toAgendaPage],
-                      child: Column(
-                        children: <Widget>[
-                          Icon(Icons.event, color: Colors.white),
-                          Text(
-                            'Agenda',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.white),
-                          )
-                        ],
-                        mainAxisSize: MainAxisSize.min,
-                      ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: widget.navigationMap[toAgendaPage],
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.event, color: Colors.white),
+                        Text(
+                          'Agenda',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
                     ),
-                    flex: 1,
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15.0),
-                      child: Text(
-                        'Verfassen',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: Text(
+                      'Verfassen',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Colors.white),
+                      textAlign: TextAlign.center,
                     ),
-                    flex: 1,
                   ),
-                  Expanded(
-                    child: FlatButton(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      onPressed: widget.navigationMap[toHomePage],
-                      child: Column(
-                        children: <Widget>[
-                          Icon(Icons.flash_on, color: Colors.white),
-                          Text(
-                            'Teleblitz',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.white),
-                          )
-                        ],
-                        mainAxisSize: MainAxisSize.min,
-                      ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: widget.navigationMap[toHomePage],
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.flash_on, color: Colors.white),
+                        Text(
+                          'Teleblitz',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
                     ),
-                    flex: 1,
                   ),
-                  Expanded(
-                    child: FlatButton(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      onPressed: widget.navigationMap[toProfilePage],
-                      child: Column(
-                        children: <Widget>[
-                          Icon(Icons.person, color: Colors.white),
-                          Text(
-                            'Profil',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.white),
-                          )
-                        ],
-                        mainAxisSize: MainAxisSize.min,
-                      ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    onPressed: widget.navigationMap[toProfilePage],
+                    child: Column(
+                      children: <Widget>[
+                        Icon(Icons.person, color: Colors.white),
+                        Text(
+                          'Profil',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Colors.white),
+                        )
+                      ],
+                      mainAxisSize: MainAxisSize.min,
                     ),
-                    flex: 1,
                   ),
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                textBaseline: TextBaseline.alphabetic,
-              ),
+                  flex: 1,
+                ),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              textBaseline: TextBaseline.alphabetic,
             ),
-            shape: CircularNotchedRectangle(),
           ),
-          body: StreamBuilder(
-              stream: this.messages,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return MoreaBackgroundContainer(
-                      child: SingleChildScrollView(
-                          child:
-                              MoreaShadowContainer(child: Text('Loading...'))));
-                } else if (!snapshot.hasData) {
-                  return MoreaBackgroundContainer(
+          shape: CircularNotchedRectangle(),
+        ),
+        body: StreamBuilder(
+            stream: this.messages,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
-                      child: MoreaShadowContainer(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  'Nachrichten',
-                                  style: MoreaTextStyle.title,
-                                ),
+                        child:
+                            MoreaShadowContainer(child: Text('Loading...'))));
+              } else if (!snapshot.hasData) {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
                               ),
-                              ListView(
+                            ),
+                            ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text('Keine Nachrichten vorhanden'),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              } else if (snapshot.data.documents.length == 0) {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text('Keine Nachrichten vorhanden'),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return MoreaBackgroundContainer(
+                  child: SingleChildScrollView(
+                    child: MoreaShadowContainer(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
+                              ),
+                            ),
+                            ListView.builder(
+                                itemCount: snapshot.data.documents.length,
                                 shrinkWrap: true,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text('Keine Nachrichten vorhanden'),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
+                                itemBuilder: (context, index) {
+                                  var document = snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                          ],
                         ),
                       ),
                     ),
-                  );
-                } else if (snapshot.data.documents.length == 0) {
-                  return MoreaBackgroundContainer(
-                    child: SingleChildScrollView(
-                      child: MoreaShadowContainer(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  'Nachrichten',
-                                  style: MoreaTextStyle.title,
-                                ),
-                              ),
-                              ListView(
-                                shrinkWrap: true,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text('Keine Nachrichten vorhanden'),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                } else {
-                  return MoreaBackgroundContainer(
-                    child: SingleChildScrollView(
-                      child: MoreaShadowContainer(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  'Nachrichten',
-                                  style: MoreaTextStyle.title,
-                                ),
-                              ),
-                              ListView.builder(
-                                  itemCount: snapshot.data.documents.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    var document = snapshot.data.documents[index];
-                                    return _buildListItem(context, document);
-                                  }),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              }),
+                  ),
+                );
+              }
+            }),
       );
     } else {
       if (moreaFire.getPfandiName == null) {
@@ -274,7 +275,8 @@ class _MessagesPageState extends State<MessagesPage> {
         appBar: AppBar(
           title: Text('Nachrichten'),
         ),
-        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName, moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
+        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
+            moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
         bottomNavigationBar: BottomAppBar(
           child: Container(
             color: Color.fromRGBO(43, 16, 42, 0.9),

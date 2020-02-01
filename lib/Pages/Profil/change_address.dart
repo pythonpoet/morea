@@ -42,9 +42,10 @@ class _ChangeAddressState extends State<ChangeAddress> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
-        onPressed: (){
-          if(_validateAndSave()){
-            widget._changeName(addressController.text, plzController.text, ortController.text);
+        onPressed: () {
+          if (_validateAndSave()) {
+            widget._changeName(
+                addressController.text, plzController.text, ortController.text);
             Navigator.of(context).pop();
           }
         },

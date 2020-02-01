@@ -41,7 +41,7 @@ class _ChangeGrundState extends State<ChangeGrund> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: MoreaColors.violett,
         child: Icon(Icons.check),
-        onPressed: (){
+        onPressed: () {
           if (saveAndSubmit()) {
             widget.speichern(this.grundController.text);
             Navigator.of(context).pop();

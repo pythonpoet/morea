@@ -84,12 +84,18 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                     });
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
-                  child: MoreaShadowContainer(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(20), child: Text(convMiDatatoWebflow(groupID), style: MoreaTextStyle.title,),),
-                  ListView.separated(
+              child: MoreaShadowContainer(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        convMiDatatoWebflow(groupID),
+                        style: MoreaTextStyle.title,
+                      ),
+                    ),
+                    ListView.separated(
                       shrinkWrap: true,
                       itemCount: person.length,
                       itemBuilder: (context, int index) {
@@ -99,23 +105,31 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                           userUID = k;
                         });
                         return ListTile(
-                          title: new Text(name, style: MoreaTextStyle.lable,),
+                          title: new Text(
+                            name,
+                            style: MoreaTextStyle.lable,
+                          ),
                           onTap: () => navigatetoprofile(
                               widget.moreaFire.getUserInformation(userUID)),
-                          trailing: Icon(Icons.arrow_forward_ios, color: Colors.black,),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.black,
+                          ),
                         );
                       },
-                      separatorBuilder: (context, int index){
-                        return Padding(padding: EdgeInsets.symmetric(horizontal: 15), child: MoreaDivider());
+                      separatorBuilder: (context, int index) {
+                        return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: MoreaDivider());
                       },
-                  ),
-                  Container(
-                    height: 20,
-                  )
-                ],
+                    ),
+                    Container(
+                      height: 20,
+                    )
+                  ],
+                ),
               ),
-            ),
-                ));
+            ));
           }
           return Center(
             child: Container(

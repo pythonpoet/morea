@@ -27,7 +27,8 @@ class EditUserProfilePage extends StatefulWidget {
   State<StatefulWidget> createState() => new EditUserPoriflePageState();
 }
 
-class EditUserPoriflePageState extends State<EditUserProfilePage> with TickerProviderStateMixin {
+class EditUserPoriflePageState extends State<EditUserProfilePage>
+    with TickerProviderStateMixin {
   MoreaFirebase moreafire;
   CrudMedthods crud0;
 
@@ -174,27 +175,26 @@ class EditUserPoriflePageState extends State<EditUserProfilePage> with TickerPro
 
   @override
   Widget build(BuildContext context) {
-    if(loading){
+    if (loading) {
       return Container(
         color: Colors.white,
         child: moreaLoading.loading(),
       );
-    }
-    else {
+    } else {
       return new Scaffold(
         appBar: new AppBar(
           title: new Text(widget.profile['Vorname']),
         ),
         body: MoreaBackgroundContainer(
             child: SingleChildScrollView(
-              child: MoreaShadowContainer(
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildInputs() + buildSubmitButtons()),
-              ),
-            )),
+          child: MoreaShadowContainer(
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: buildInputs() + buildSubmitButtons()),
+          ),
+        )),
         floatingActionButton: FloatingActionButton(
           child: Icon(
             Icons.check,

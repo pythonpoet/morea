@@ -61,7 +61,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     moreaLoading.dispose();
     super.dispose();
   }
@@ -71,15 +71,15 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     await this.moreaFire.getData(await auth.currentUser());
     await this.moreaFire.initTeleblitz();
     authStatus = AuthStatus.homePage;
-    setState(() {
-    });return true;
+    setState(() {});
+    return true;
   }
 
   Future authStatusInit() async {
     authStatus = await check4BlockedAuthStatus(
         await auth.currentUser(), widget.firestore);
     if (authStatus == AuthStatus.loading) {
-       initMoreaFire();
+      initMoreaFire();
     }
     setState(() {});
   }
@@ -170,7 +170,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       }
       setState(() {
         authStatus = AuthStatus.homePage;
-
       });
     }
   }
@@ -193,7 +192,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       }
       setState(() {
         authStatus = AuthStatus.agendaPage;
-
       });
     }
   }
@@ -212,6 +210,4 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       authStatus = AuthStatus.notSignedIn;
     });
   }
-
-
 }

@@ -142,8 +142,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                               this.grund, this.setGrund)));
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15, bottom: 15),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, bottom: 15),
                               ),
                             ],
                           ),
@@ -194,8 +194,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 subtitle: Text(endeFerien),
                                 onTap: () => _selectDatumEndeFerien(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                EdgeInsets.only(right: 15, left: 15, bottom: 15),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, bottom: 15),
                               ),
                             ],
                           ),
@@ -230,8 +230,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.all(20),
-                                child:
-                                    Text(this.name, style: MoreaTextStyle.title),
+                                child: Text(this.name,
+                                    style: MoreaTextStyle.title),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -429,8 +429,9 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       '_draft': false,
       '_archived': false
     };
-      teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-      await widget.moreaFire.uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
+    teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
+    await widget.moreaFire
+        .uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
     Navigator.of(context).pop();
   }
 
@@ -494,10 +495,9 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
 }
 
 class TeleblitzManager {
-
   MoreaFirebase moreaFirebase;
 
-  TeleblitzManager(MoreaFirebase moreaFirebase){
+  TeleblitzManager(MoreaFirebase moreaFirebase) {
     this.moreaFirebase = moreaFirebase;
   }
 
@@ -556,8 +556,7 @@ class TeleblitzManager {
     var jsonMap = {"fields": newTeleblitz};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
-    header["Authorization"] =
-        "Bearer $apiKey";
+    header["Authorization"] = "Bearer $apiKey";
     header["accept-version"] = "1.0.0";
     header["Content-Type"] = "application/json";
     http

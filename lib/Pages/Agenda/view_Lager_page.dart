@@ -6,6 +6,7 @@ import 'package:morea/services/morea_firestore.dart';
 
 class ViewLagerPageState extends StatelessWidget {
   ViewLagerPageState({this.info, this.pos, this.moreaFire, this.agenda});
+
   final MoreaFirebase moreaFire;
   final Agenda agenda;
   final Map info;
@@ -13,14 +14,17 @@ class ViewLagerPageState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(info == null)
-    return Card(
-      child: Center(
-        child: Container(
-          padding: EdgeInsets.all(15),
-          child: Text("Dieses Lager ist nicht eingetragen, wende dich an deine Leiter", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
-      ),
-    );
+    if (info == null)
+      return Card(
+        child: Center(
+          child: Container(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                "Dieses Lager ist nicht eingetragen, wende dich an deine Leiter",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              )),
+        ),
+      );
     return Container(
         child: Scaffold(
       appBar: AppBar(

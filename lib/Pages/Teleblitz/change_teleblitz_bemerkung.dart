@@ -41,7 +41,7 @@ class _ChangeBemerkungState extends State<ChangeBemerkung> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: MoreaColors.violett,
         child: Icon(Icons.check),
-        onPressed: (){
+        onPressed: () {
           if (saveAndSubmit()) {
             widget.speichern(this.bemerkungController.text);
             Navigator.of(context).pop();
