@@ -59,9 +59,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
-  Map<String, dynamic> _userMap, _groupMap;
-  Map<String, int> _groupPrivilege = new Map();
-  Map<String, Map<String, String>> _childMap;
+  Map<String, dynamic> _userMap;
 
   Firestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();

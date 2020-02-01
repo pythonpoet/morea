@@ -5,7 +5,6 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
-import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
@@ -41,13 +40,10 @@ class Teleblitz {
       {String name}) {
     _clickController.animateTo(0.0,
         curve: Curves.easeOut, duration: const Duration(milliseconds: 400));
-    String anmeldung;
 
     if (anabmelden == 'Chunt') {
-      anmeldung = 'Du hast dich Angemolden';
       chunnt = true;
     } else {
-      anmeldung = 'Du hast dich Abgemolden';
       chunnt = false;
     }
     if (name == null) {

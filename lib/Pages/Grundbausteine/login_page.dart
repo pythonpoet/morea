@@ -14,7 +14,6 @@ import 'package:morea/services/utilities/dwi_format.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});

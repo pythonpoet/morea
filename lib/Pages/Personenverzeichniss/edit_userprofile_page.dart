@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_address.dart';
@@ -8,12 +7,10 @@ import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
-import 'package:morea/services/auth.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 class EditUserProfilePage extends StatefulWidget {
@@ -39,7 +36,6 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       _vorname,
       _nachname,
       _geburtstag,
-      _selectedstufe,
       _stufe,
       _pos;
   String _adresse,

@@ -6,7 +6,6 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
 

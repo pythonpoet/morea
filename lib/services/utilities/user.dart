@@ -2,7 +2,6 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
-import 'package:morea/services/utilities/MiData.dart';
 
 class User {
   String displayName,

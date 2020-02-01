@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:expandable/expandable.dart';
 
 // generiert mit https://datenschutz-generator.de/
 abstract class BaseDatenschutz {

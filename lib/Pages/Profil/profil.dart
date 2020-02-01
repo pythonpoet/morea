@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
@@ -8,12 +7,6 @@ import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
-
-import 'change_address.dart';
-import 'change_email.dart';
-import 'change_message_groups.dart';
-import 'change_name.dart';
-import 'change_password.dart';
 import 'change_profil.dart';
 
 class Profile extends StatefulWidget {
@@ -37,7 +30,6 @@ class _ProfileState extends State<Profile> {
   List nachrichtenGruppen = [];
   Auth auth0 = Auth();
   TextEditingController password = TextEditingController();
-  final _passwordKey = GlobalKey<FormState>();
   String oldEmail;
   String newPassword;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();

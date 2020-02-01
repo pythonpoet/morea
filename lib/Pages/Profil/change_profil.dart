@@ -11,7 +11,6 @@ import 'package:morea/services/mailchimp_api_manager.dart';
 
 import 'change_address.dart';
 import 'change_email.dart';
-import 'change_message_groups.dart';
 import 'change_name.dart';
 import 'change_password.dart';
 

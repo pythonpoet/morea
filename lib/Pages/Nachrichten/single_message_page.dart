@@ -3,20 +3,15 @@ import 'package:flutter/material.dart';
 import '../../morealayout.dart';
 
 class SingleMessagePage extends StatelessWidget {
-  SingleMessagePage(message) {
-    final data = message.data;
-    this.title = data['title'];
-    this.body = data['body'];
-    this.sender = data['sender'];
-  }
+  SingleMessagePage(this.message);
 
-  String title, body, sender;
+  final message;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(message.data['title']),
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -28,7 +23,7 @@ class SingleMessagePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Text(
-                    'Von: ' + sender,
+                    'Von: ' + message.data['sender'],
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w300,
@@ -39,7 +34,7 @@ class SingleMessagePage extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
-                    title,
+                    message.data['title'],
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 32,
@@ -50,7 +45,7 @@ class SingleMessagePage extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
-                    body,
+                    message.data['body'],
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
                   ),

@@ -8,7 +8,6 @@ import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
 import 'package:morea/Widgets/Action/scan.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
-import 'package:morea/Widgets/standart/dialog.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
