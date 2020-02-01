@@ -98,8 +98,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                           child: FlatButton(
                             child: Text(
                               zeitAntreten + ' Uhr',
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.black87),
+                              style: MoreaTextStyle.textField,
                             ),
                             onPressed: () {
                               _selectTime(context);
@@ -119,7 +118,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                             controller: ortAntretenController,
                             maxLines: 1,
                             keyboardType: TextInputType.text,
-                            style: TextStyle(fontSize: 18),
+                            style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -147,7 +146,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                             maxLines: 10,
                             minLines: 1,
                             keyboardType: TextInputType.text,
-                            style: TextStyle(fontSize: 18),
+                            style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),

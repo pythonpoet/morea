@@ -77,7 +77,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         controller: addressController,
                         maxLines: 1,
                         keyboardType: TextInputType.text,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -104,7 +104,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         controller: plzController,
                         maxLines: 1,
                         keyboardType: TextInputType.number,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -131,7 +131,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         controller: ortController,
                         maxLines: 1,
                         keyboardType: TextInputType.text,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),

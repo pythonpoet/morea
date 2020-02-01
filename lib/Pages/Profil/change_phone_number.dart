@@ -70,7 +70,7 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
                         controller: phoneNumberController,
                         maxLines: 1,
                         keyboardType: TextInputType.phone,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),

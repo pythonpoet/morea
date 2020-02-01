@@ -42,8 +42,8 @@ class SelectTeleblitzType extends StatelessWidget {
                       color: Colors.black26,
                     )),
                 ListTile(
-                  title: Text('Normal', style: TextStyle(fontSize: 18)),
-                  subtitle: Text('Normaler Teleblitz mit Beginn und Schluss'),
+                  title: Text('Normal', style: MoreaTextStyle.lable),
+                  subtitle: Text('Normaler Teleblitz mit Beginn und Schluss', style: MoreaTextStyle.normal,),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) =>
                           ChangeTeleblitz(this.stufe, 'normal', moreaFire))),
@@ -61,9 +61,9 @@ class SelectTeleblitzType extends StatelessWidget {
                     )),
                 ListTile(
                   title:
-                      Text('Ausfall Aktivität', style: TextStyle(fontSize: 18)),
+                      Text('Ausfall Aktivität', style: MoreaTextStyle.lable),
                   subtitle: Text(
-                      'Ein Teleblitz mit einem Feld für den Grund des Ausfalls'),
+                      'Ein Teleblitz mit einem Feld für den Grund des Ausfalls', style: MoreaTextStyle.normal,),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) => ChangeTeleblitz(
                           this.stufe, 'keineAktivitaet', moreaFire))),
@@ -80,9 +80,9 @@ class SelectTeleblitzType extends StatelessWidget {
                       color: Colors.black26,
                     )),
                 ListTile(
-                  title: Text('Ferien', style: TextStyle(fontSize: 18)),
+                  title: Text('Ferien', style: MoreaTextStyle.lable),
                   subtitle: Text(
-                      'Ein Teleblitz mit einem Feld für das Ende der Ferien'),
+                      'Ein Teleblitz mit einem Feld für das Ende der Ferien', style: MoreaTextStyle.normal,),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) =>
                           ChangeTeleblitz(this.stufe, 'ferien', moreaFire))),

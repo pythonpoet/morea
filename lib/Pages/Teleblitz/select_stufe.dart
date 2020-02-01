@@ -51,7 +51,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Biber",
-                      style: TextStyle(fontSize: 18),
+                      style: MoreaTextStyle.normal,
                     ),
                     contentPadding: EdgeInsets.only(
                       right: 15,
@@ -73,7 +73,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Wombat",
-                      style: TextStyle(fontSize: 18),
+                      style: MoreaTextStyle.normal,
                     ),
                     contentPadding: EdgeInsets.only(
                       right: 15,
@@ -96,7 +96,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Nahani",
-                      style: TextStyle(fontSize: 18),
+                      style: MoreaTextStyle.normal,
                     ),
                     contentPadding: EdgeInsets.only(
                       right: 15,
@@ -119,7 +119,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Drason",
-                      style: TextStyle(fontSize: 18),
+                      style: MoreaTextStyle.normal,
                     ),
                     contentPadding:
                         EdgeInsets.only(right: 15, left: 15, bottom: 15),

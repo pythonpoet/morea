@@ -75,7 +75,7 @@ class _ChangeSenderState extends State<ChangeSender> {
                             controller: senderController,
                             maxLines: 1,
                             keyboardType: TextInputType.text,
-                            style: TextStyle(fontSize: 18),
+                            style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),

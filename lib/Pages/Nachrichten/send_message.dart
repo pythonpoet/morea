@@ -5,9 +5,10 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/morealayout.dart';
 
 class SendMessages extends StatefulWidget {
-  SendMessages({this.moreaFire});
+  SendMessages({this.moreaFire, this.auth});
 
   final MoreaFirebase moreaFire;
+  final Auth auth;
 
   @override
   State<StatefulWidget> createState() {
@@ -17,9 +18,7 @@ class SendMessages extends StatefulWidget {
 
 class _SendMessagesState extends State<SendMessages> {
   MoreaFirebase moreaFire;
-  Auth auth = Auth();
   String uid;
-  var userInfo;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   UniqueKey dropdownKey = UniqueKey();
@@ -35,13 +34,16 @@ class _SendMessagesState extends State<SendMessages> {
   bool woelfeCheckBox = false;
   bool meitliCheckBox = false;
   bool buebeCheckBox = false;
-  bool pioCheckBox = false;
 
   @override
   void initState() {
     super.initState();
-    _getUserInformation();
     moreaFire = widget.moreaFire;
+    getUID();
+  }
+
+  void getUID() async{
+    uid = await widget.auth.currentUser();
   }
 
   @override
@@ -73,14 +75,13 @@ class _SendMessagesState extends State<SendMessages> {
           if (biberCheckBox ||
               woelfeCheckBox ||
               meitliCheckBox ||
-              buebeCheckBox ||
-              pioCheckBox) {
+              buebeCheckBox) {
             setState(() {
               if (_formKey.currentState.validate()) {
                 Map<String, dynamic> data = {
                   'body': inhaltController.text,
                   'read': List<String>(),
-                  'sender': userInfo['Pfadinamen'],
+                  'sender': moreaFire.getPfandiName,
                   'snippet': vorschauController.text,
                   'title': titleController.text
                 };
@@ -111,7 +112,7 @@ class _SendMessagesState extends State<SendMessages> {
               children: <Widget>[
                 Text(
                   'Empfänger',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: MoreaTextStyle.lable,
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 15),
@@ -130,7 +131,7 @@ class _SendMessagesState extends State<SendMessages> {
                   },
                   title: Text(
                     'Biber',
-                    style: TextStyle(fontSize: 20),
+                    style: MoreaTextStyle.normal,
                   ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
@@ -148,7 +149,7 @@ class _SendMessagesState extends State<SendMessages> {
                   },
                   title: Text(
                     'Wölfe',
-                    style: TextStyle(fontSize: 20),
+                    style: MoreaTextStyle.normal,
                   ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
@@ -166,7 +167,7 @@ class _SendMessagesState extends State<SendMessages> {
                   },
                   title: Text(
                     'Meitli',
-                    style: TextStyle(fontSize: 20),
+                    style: MoreaTextStyle.normal,
                   ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
@@ -184,39 +185,27 @@ class _SendMessagesState extends State<SendMessages> {
                   },
                   title: Text(
                     'Buebe',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  controlAffinity: ListTileControlAffinity.platform,
-                ),
-                CheckboxListTile(
-                  value: pioCheckBox,
-                  onChanged: (bool val) {
-                    setState(() {
-                      if (val) {
-                        receiver.add('Pios');
-                      } else {
-                        receiver.remove('Pios');
-                      }
-                      pioCheckBox = val;
-                    });
-                  },
-                  title: Text(
-                    'Pios',
-                    style: TextStyle(fontSize: 20),
+                    style: MoreaTextStyle.normal,
                   ),
                   controlAffinity: ListTileControlAffinity.platform,
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 20),
                 ),
+                Text(
+                  'Betreff',
+                  style: MoreaTextStyle.lable,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                ),
                 TextFormField(
                   focusNode: titleFocus,
-                  style: TextStyle(fontSize: 16),
+                  style: MoreaTextStyle.textField,
                   controller: titleController,
                   decoration: InputDecoration(
                     helperText: 'Bspw: Fama',
                     border: OutlineInputBorder(),
-                    labelText: 'Betreff',
                   ),
                   onSaved: (newValue) {
                     setState(() {
@@ -239,7 +228,7 @@ class _SendMessagesState extends State<SendMessages> {
                 ),
                 Text(
                   'Vorschau',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: MoreaTextStyle.lable,
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 15),
@@ -248,7 +237,7 @@ class _SendMessagesState extends State<SendMessages> {
                   keyboardType: TextInputType.text,
                   focusNode: vorschauFocus,
                   controller: vorschauController,
-                  style: TextStyle(fontSize: 20),
+                  style: MoreaTextStyle.normal,
                   minLines: 2,
                   maxLines: 4,
                   decoration: InputDecoration(
@@ -277,7 +266,7 @@ class _SendMessagesState extends State<SendMessages> {
                 ),
                 Text(
                   'Inhalt',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: MoreaTextStyle.lable,
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 15),
@@ -285,7 +274,7 @@ class _SendMessagesState extends State<SendMessages> {
                 TextFormField(
                   focusNode: inhaltFocus,
                   controller: inhaltController,
-                  style: TextStyle(fontSize: 20),
+                  style: MoreaTextStyle.normal,
                   minLines: 5,
                   maxLines: 1000,
                   decoration: InputDecoration(
@@ -312,16 +301,5 @@ class _SendMessagesState extends State<SendMessages> {
             ),
           )),
     );
-  }
-
-  void _getUserInformation() async {
-    //Das funktioniert glaubs nöd / unzueferlässig (weg neue instance vo auth, d registrierig isch uf em e andere instance)
-    //this.uid = await auth.currentUser();
-    this.uid = moreaFire.getUserMap[userMapUID];
-    //Muess userInfo neu aktuallisiert werde? Wenn nöd eifach moreaFire.getUserMap
-    var userInfo = await moreaFire.getUserInformation(this.uid);
-    this.userInfo = userInfo.data;
-    print(uid);
-    print(this.userInfo);
   }
 }

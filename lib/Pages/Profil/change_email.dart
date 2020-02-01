@@ -70,7 +70,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                         controller: email,
                         maxLines: 1,
                         keyboardType: TextInputType.emailAddress,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),

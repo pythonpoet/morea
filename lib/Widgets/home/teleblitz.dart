@@ -434,90 +434,106 @@ class Teleblitz {
           ),
           back: MoreaShadowContainer(
             child: Padding(
-              padding: EdgeInsets.all(15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Flexible(
-                    flex: 1,
-                    fit: FlexFit.tight,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text('Chunnt:'),
-                        StreamBuilder(
-                          stream: werChunnt.stream,
-                          builder: (context,
-                              AsyncSnapshot<List<List<String>>> snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Text('Loading...');
-                            } else if (snapshot.hasError) {
-                              return Text('Error');
-                            } else {
-                              return ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: snapshot.data[0].length,
-                                  itemBuilder: (context, i) {
-                                    return Text(snapshot.data[0][i]);
-                                  });
-                            }
-                          },
-                        )
-                      ],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          'Wer chunnt?',
+                          style: MoreaTextStyle.title,
+                        ),
+                      ),
+                      turnFlipCardTeleblitz(),
+                    ],
                   ),
-                  Flexible(
-                    flex: 1,
-                    fit: FlexFit.tight,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text("Chunnt nöd:"),
-                            turnFlipCardTeleblitz(),
+                            Text('Chunnt:', style: MoreaTextStyle.lable,),
+                            StreamBuilder(
+                              stream: werChunnt.stream,
+                              builder: (context,
+                                  AsyncSnapshot<List<List<String>>> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Text('Loading...');
+                                } else if (snapshot.hasError) {
+                                  return Text('Error');
+                                } else {
+                                  return ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: snapshot.data[0].length,
+                                      itemBuilder: (context, i) {
+                                        return Text(snapshot.data[0][i], style: MoreaTextStyle.normal,);
+                                      });
+                                }
+                              },
+                            )
                           ],
                         ),
-                        StreamBuilder(
-                          stream: moreaFire.streamCollectionWerChunnt(eventID),
-                          builder:
-                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Text('Loading...');
-                            } else if (snapshot.hasError) {
-                              return Text('Error');
-                            } else {
-                              List<DocumentSnapshot> documents =
-                                  snapshot.data.documents;
-                              List<String> chunntNoed = [];
-                              for (DocumentSnapshot document in documents) {
-                                if (document.data['AnmeldeStatus'] ==
-                                    eventMapAnmeldeStatusNegativ) {
-                                  chunntNoed.add(document.data['Name']);
+                      ),
+                      Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text('Chunnt nöd:', style: MoreaTextStyle.lable,),
+                            StreamBuilder(
+                              stream:
+                                  moreaFire.streamCollectionWerChunnt(eventID),
+                              builder: (context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Text('Loading...');
+                                } else if (snapshot.hasError) {
+                                  return Text('Error');
+                                } else {
+                                  List<DocumentSnapshot> documents =
+                                      snapshot.data.documents;
+                                  List<String> chunntNoed = [];
+                                  for (DocumentSnapshot document in documents) {
+                                    if (document.data['AnmeldeStatus'] ==
+                                        eventMapAnmeldeStatusNegativ) {
+                                      chunntNoed.add(document.data['Name']);
+                                    }
+                                  }
+                                  return ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: chunntNoed.length,
+                                      itemBuilder: (context, i) {
+                                        return Text(chunntNoed[i], style: MoreaTextStyle.normal,);
+                                      });
                                 }
-                              }
-                              return ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: chunntNoed.length,
-                                  itemBuilder: (context, i) {
-                                    return Text(chunntNoed[i]);
-                                  });
-                            }
-                          },
-                        )
-                      ],
-                    ),
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20),
+                  )
                 ],
               ),
             ),
@@ -807,7 +823,7 @@ class Info {
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Beginn", style: this._getStyleLeft())),
+                child: Text("Beginn", style: MoreaTextStyle.lable)),
             Expanded(
               child: InkWell(
                 child: Text(
@@ -844,7 +860,7 @@ class Info {
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Schluss", style: this._getStyleLeft())),
+                child: Text("Schluss", style: MoreaTextStyle.lable)),
             Expanded(
                 child: InkWell(
               child: Text(
@@ -884,11 +900,11 @@ class Info {
         children: <Widget>[
           SizedBox(
               width: this._sizeleft,
-              child: Text("Datum", style: this._getStyleLeft())),
+              child: Text("Datum", style: MoreaTextStyle.lable)),
           Expanded(
               child: Text(
             this.datum,
-            style: this._getStyleRight(),
+            style: MoreaTextStyle.normal,
           ))
         ],
       ),
@@ -908,7 +924,7 @@ class Info {
                   children: <Widget>[
                     SizedBox(
                         width: this._sizeleft,
-                        child: Text("Bemerkung:", style: this._getStyleLeft())),
+                        child: Text("Bemerkung:", style: MoreaTextStyle.lable)),
                     /*Expanded(
                   child: Text(
                 this.bemerkung,
@@ -924,7 +940,7 @@ class Info {
                     Expanded(
                         child: Text(
                       this.bemerkung,
-                      style: this._getStyleRight(),
+                      style: MoreaTextStyle.normal,
                     ))
                   ],
                 ),
@@ -954,11 +970,11 @@ class Info {
             children: <Widget>[
               SizedBox(
                   width: this._sizeleft,
-                  child: Text("", style: this._getStyleLeft())),
+                  child: Text("", style: MoreaTextStyle.lable)),
               Expanded(
                   child: Text(
                 this.sender,
-                style: this._getStyleRight(),
+                style: MoreaTextStyle.normal,
               ))
             ],
           ));
@@ -989,7 +1005,7 @@ class Info {
                   children: <Widget>[
                     SizedBox(
                         width: this._sizeleft,
-                        child: Text("Mitnehmen:", style: this._getStyleLeft())),
+                        child: Text("Mitnehmen:", style: MoreaTextStyle.lable)),
                   ],
                 ),
               ),
@@ -1000,7 +1016,7 @@ class Info {
                       child: Html(
                     data: this.mitnehmen,
                     defaultTextStyle:
-                        TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                        MoreaTextStyle.htmlList,
                   ))
                 ],
               ),
@@ -1032,7 +1048,7 @@ class Info {
                 children: <Widget>[
                   SizedBox(
                       width: this._sizeleft,
-                      child: Text("Grund:", style: this._getStyleLeft())),
+                      child: Text("Grund:", style: MoreaTextStyle.lable)),
                 ],
               ),
             ),
@@ -1042,7 +1058,7 @@ class Info {
                 Expanded(
                     child: Text(
                   this.grund,
-                  style: _getStyleRight(),
+                  style: MoreaTextStyle.normal,
                 ))
               ],
             ),
@@ -1062,7 +1078,7 @@ class Info {
                 children: <Widget>[
                   SizedBox(
                       width: this._sizeleft,
-                      child: Text("Grund:", style: this._getStyleLeft())),
+                      child: Text("Grund:", style: MoreaTextStyle.lable)),
                 ],
               ),
             ),
@@ -1072,7 +1088,7 @@ class Info {
                 Expanded(
                     child: Text(
                   "Die Aktivität fällt leider wegen der Schulferien aus.",
-                  style: this._getStyleRight(),
+                  style: MoreaTextStyle.normal,
                 ))
               ],
             ),
@@ -1095,7 +1111,7 @@ class Info {
                 children: <Widget>[
                   SizedBox(
                       width: this._sizeleft,
-                      child: Text("Ende Ferien:", style: this._getStyleLeft())),
+                      child: Text("Ende Ferien:", style: MoreaTextStyle.lable)),
                 ],
               ),
             ),
@@ -1105,25 +1121,11 @@ class Info {
                 Expanded(
                     child: Html(
                   data: formatedEndeFerien,
-                  defaultTextStyle: _getStyleRight(),
+                  defaultTextStyle: MoreaTextStyle.normal,
                 ))
               ],
             ),
           ],
         ));
-  }
-
-  TextStyle _getStyleLeft() {
-    return TextStyle(
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
-    );
-  }
-
-  TextStyle _getStyleRight() {
-    return TextStyle(
-      fontSize: 20,
-      fontWeight: FontWeight.w500,
-    );
   }
 }

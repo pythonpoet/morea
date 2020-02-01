@@ -161,7 +161,7 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
           controller: u,
           maxLines: 1,
           keyboardType: TextInputType.text,
-          style: TextStyle(fontSize: 18),
+          style: MoreaTextStyle.textField,
           cursorColor: MoreaColors.violett,
           decoration: InputDecoration(
             border: OutlineInputBorder(),

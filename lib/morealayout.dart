@@ -109,8 +109,11 @@ class MoreaTextStyle {
             blurRadius: 6),
       ]);
   static TextStyle lable =
-      TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16);
-  static TextStyle normal = TextStyle(color: Colors.black, fontSize: 16);
+      TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20);
+  static TextStyle normal = TextStyle(color: Colors.black, fontSize: 20);
+  static TextStyle htmlList = TextStyle(fontWeight: FontWeight.w500, fontSize: 16);
+  static TextStyle textField = TextStyle(fontSize: 18);
+  static TextStyle sender = TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
 }
 
 class MoreaDivider extends Divider {

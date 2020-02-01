@@ -75,7 +75,7 @@ class _ChangeGrundState extends State<ChangeGrund> {
                             controller: grundController,
                             maxLines: 1,
                             keyboardType: TextInputType.text,
-                            style: TextStyle(fontSize: 18),
+                            style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),

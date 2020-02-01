@@ -24,30 +24,23 @@ class SingleMessagePage extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     'Von: ' + message.data['sender'],
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black87),
+                    style: MoreaTextStyle.sender,
                   ),
-                  Divider(),
+                  MoreaDivider(),
                   Padding(
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
                     message.data['title'],
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 32,
-                        color: MoreaColors.violett,
-                        fontWeight: FontWeight.bold),
+                    style: MoreaTextStyle.title,
                   ),
                   Padding(
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
                     message.data['body'],
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                    style: MoreaTextStyle.normal,
                   ),
                 ],
               ),
