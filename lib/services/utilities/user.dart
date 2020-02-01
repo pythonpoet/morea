@@ -127,6 +127,13 @@ class User {
             Map<String, String>.from(_userMap[userMapKinder]);
         childMap = await createChildMap(kinderMap);
       }
+
+    groupMap = (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
+    if (groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
+      groupPrivilege[groupID] =
+      groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
+    else
+      groupPrivilege[groupID] = 0;
   }
 
   Future getUserData(Map<String, dynamic> userMap) async {
