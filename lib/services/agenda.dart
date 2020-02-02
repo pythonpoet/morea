@@ -43,7 +43,7 @@ class Agenda extends BaseAgenda {
   }
 
   DateTime getDateTime(Map event) {
-    return DateTime.parse(event['Datum']);
+    return DateTime.parse(event['Order']);
   }
 
   Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {

@@ -35,7 +35,8 @@ class EventAddPageState extends State<EventAddPage> {
   MoreaFirebase moreafire;
   int value = 2;
   List<String> mitnehemen = ['Pfadihämpt'];
-  final _addkey = new GlobalKey<FormState>(debugLabel: "_addkey");
+  final _addkeyEvent = new GlobalKey<FormState>(debugLabel: "_addkeyEvent");
+  final _addkeyLager = GlobalKey<FormState>(debugLabel: '_addkeyLager');
   final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
   final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
@@ -53,7 +54,7 @@ class EventAddPageState extends State<EventAddPage> {
       datumvon = 'Datum wählen',
       datumbis = 'Datum wählen',
       lagerort = ' ';
-  int order;
+  String order;
   List<Map<dynamic, dynamic>> subgroups;
 
   Map<String, dynamic> event, lager;
@@ -67,8 +68,8 @@ class EventAddPageState extends State<EventAddPage> {
     'Pios': false,
   };
 
-  _addItem() {
-    if (validateAndSave(_addkey)) {
+  _addItem(GlobalKey<FormState> key) {
+    if (validateAndSave(key)) {
       setState(() {
         value = value + 1;
       });
@@ -110,10 +111,12 @@ class EventAddPageState extends State<EventAddPage> {
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
-        'DeleteDate': datum,
+        'DeleteDate': order,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, event);
+
+      Navigator.of(context).pop();
 
       showDialog(
         context: context,
@@ -165,8 +168,8 @@ class EventAddPageState extends State<EventAddPage> {
     );
     if (picked != null)
       setState(() {
-        datum = DateFormat('yyyy-MM-dd').format(picked);
-        order = int.parse(DateFormat('yyyyMMdd').format(picked));
+        datum = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked);
+        order = DateFormat('yyyyMMdd').format(picked);
       });
   }
 
@@ -181,7 +184,7 @@ class EventAddPageState extends State<EventAddPage> {
     if (picked != null)
       setState(() {
         datumvon = DateFormat('yyyy-MM-dd').format(picked);
-        order = int.parse(DateFormat('yyyyMMdd').format(picked));
+        order = DateFormat('yyyyMMdd').format(picked);
       });
   }
 
@@ -198,22 +201,70 @@ class EventAddPageState extends State<EventAddPage> {
       });
   }
 
-  Future<Null> _selectAnfangszeit(BuildContext context) async {
-    final TimeOfDay picked =
-        await showTimePicker(initialTime: TimeOfDay.now(), context: context);
-    if (picked != null)
+  Future<void> _selectAnfangszeit(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
       setState(() {
-        anfangzeit = picked.hour.toString() + ':' + picked.minute.toString();
+        if (picked.minute.toString().length < 2 &&
+            picked.hour.toString().length >= 2) {
+          this.anfangzeit =
+              picked.hour.toString() + ":0" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length >= 2) {
+          print(true);
+          this.anfangzeit =
+              "0" + picked.hour.toString() + ":" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length < 2) {
+          this.anfangzeit = "0" +
+              picked.hour.toString() +
+              ":" +
+              "0" +
+              picked.minute.toString();
+        } else {
+          print(false);
+          this.anfangzeit =
+              picked.hour.toString() + ":" + picked.minute.toString();
+        }
       });
+    }
+    return null;
   }
 
-  Future<Null> _selectSchlusszeit(BuildContext context) async {
-    final TimeOfDay picked =
-        await showTimePicker(initialTime: TimeOfDay.now(), context: context);
-    if (picked != null)
+  Future<void> _selectSchlusszeit(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
       setState(() {
-        schlusszeit = picked.hour.toString() + ':' + picked.minute.toString();
+        if (picked.minute.toString().length < 2 &&
+            picked.hour.toString().length >= 2) {
+          this.schlusszeit =
+              picked.hour.toString() + ":0" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length >= 2) {
+          print(true);
+          this.schlusszeit =
+              "0" + picked.hour.toString() + ":" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length < 2) {
+          this.schlusszeit = "0" +
+              picked.hour.toString() +
+              ":" +
+              "0" +
+              picked.minute.toString();
+        } else {
+          print(false);
+          this.schlusszeit =
+              picked.hour.toString() + ":" + picked.minute.toString();
+        }
       });
+    }
+    return null;
   }
 
   void lagerdelete() async {
@@ -320,7 +371,6 @@ class EventAddPageState extends State<EventAddPage> {
           child: new Scaffold(
             appBar: new AppBar(
               title: Text('zur Agenda hinzufügen'),
-              backgroundColor: Color(0xff7a62ff),
               bottom: TabBar(
                 tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
               ),
@@ -627,6 +677,7 @@ class EventAddPageState extends State<EventAddPage> {
                               Expanded(
                                 flex: 4,
                                 child: new TextFormField(
+                                  keyboardType: TextInputType.emailAddress,
                                   initialValue: widget.eventinfo['Kontakt']
                                       ['Email'],
                                   decoration: new InputDecoration(
@@ -663,7 +714,7 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                             ),
                             Form(
-                                key: _addkey,
+                                key: _addkeyLager,
                                 child: Container(
                                   child: Row(
                                     children: <Widget>[
@@ -687,7 +738,8 @@ class EventAddPageState extends State<EventAddPage> {
                                           child: new Text('Add',
                                               style:
                                                   new TextStyle(fontSize: 15)),
-                                          onPressed: () => _addItem(),
+                                          onPressed: () =>
+                                              _addItem(_addkeyLager),
                                           shape: new RoundedRectangleBorder(
                                               borderRadius:
                                                   new BorderRadius.circular(
@@ -924,6 +976,7 @@ class EventAddPageState extends State<EventAddPage> {
                                   Expanded(
                                     flex: 4,
                                     child: new TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
                                       initialValue: widget.eventinfo['Kontakt']
                                           ['Email'],
                                       decoration: new InputDecoration(
@@ -960,7 +1013,7 @@ class EventAddPageState extends State<EventAddPage> {
                                   ),
                                 ),
                                 Form(
-                                    key: _addkey,
+                                    key: _addkeyEvent,
                                     child: Container(
                                       child: Row(
                                         children: <Widget>[
@@ -984,7 +1037,8 @@ class EventAddPageState extends State<EventAddPage> {
                                               child: new Text('Add',
                                                   style: new TextStyle(
                                                       fontSize: 15)),
-                                              onPressed: () => _addItem(),
+                                              onPressed: () =>
+                                                  _addItem(_addkeyEvent),
                                               shape: new RoundedRectangleBorder(
                                                   borderRadius:
                                                       new BorderRadius.circular(

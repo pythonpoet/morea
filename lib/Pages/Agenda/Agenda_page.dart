@@ -68,7 +68,7 @@ class _AgendaStatePage extends State<AgendaState>
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
-    if (event.containsKey("DeleteData")) {
+    if (event.containsKey("DeleteDate")) {
       DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
       DateTime now = DateTime.now();
       if (_agdatum.difference(now).inDays < 0) {
@@ -150,10 +150,9 @@ class _AgendaStatePage extends State<AgendaState>
   @override
   Widget build(BuildContext context) {
     if (istLeiter()) {
-      return new Container(
-          child: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Agenda'),
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Agenda'),
         ),
         body: aAgenda(moreafire.getUserMap[userMapgroupID]),
         floatingActionButton: new FloatingActionButton(
@@ -165,125 +164,18 @@ class _AgendaStatePage extends State<AgendaState>
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
             context, moreafire, crud0, _signedOut),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            color: Color.fromRGBO(43, 16, 42, 0.9),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toMessagePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.message, color: Colors.white),
-                        Text(
-                          'Nachrichten',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.event, color: Colors.white),
-                        Text(
-                          'Agenda',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Text(
-                      'Hinzufügen',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toHomePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.flash_on, color: Colors.white),
-                        Text(
-                          'Teleblitz',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toProfilePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.person, color: Colors.white),
-                        Text(
-                          'Profil',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textBaseline: TextBaseline.alphabetic,
-            ),
-          ),
-          shape: CircularNotchedRectangle(),
-        ),
-      ));
+        bottomNavigationBar: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen'),
+      );
     } else {
-      return new Container(
-          child: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Agenda'),
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Agenda'),
         ),
         bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
         drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
             moreafire.getEmail, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getUserMap[userMapgroupID]),
-      ));
+      );
     }
   }
 

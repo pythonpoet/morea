@@ -184,7 +184,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
         if (picked.minute.toString().length < 2 &&
             picked.hour.toString().length >= 2) {
           this.zeitAntreten =
-              picked.hour.toString() + ":" + picked.minute.toString() + "0";
+              picked.hour.toString() + ":0" + picked.minute.toString();
         } else if (picked.hour.toString().length < 2 &&
             picked.minute.toString().length >= 2) {
           this.zeitAntreten =
