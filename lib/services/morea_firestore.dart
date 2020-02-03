@@ -52,6 +52,10 @@ abstract class BaseMoreaFirebase {
   Future<String> getMailChimpApiKey();
 
   Future<String> getWebflowApiKey();
+
+  Future<void> uploadChildUserInformation(Map<String, dynamic> childUserInfo);
+
+  Future<void> priviledgeEltern(String groupID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -295,5 +299,21 @@ class MoreaFirebase extends BaseMoreaFirebase {
     DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
     String result = document.data['webflow'];
     return result;
+  }
+
+  @override
+  Future<HttpsCallableResult> uploadChildUserInformation(
+      Map<String, dynamic> childUserInfo) async {
+    return await callFunction(getcallable("createChildUserMap"),
+        param: childUserInfo);
+  }
+
+  @override
+  Future<void> priviledgeEltern(String groupID) async {
+    return await callFunction(getcallable('priviledgeEltern'), param: {
+      'groupID': groupID,
+      'UID': getUserMap[userMapUID],
+      'DisplayName': this.getVorName
+    });
   }
 }

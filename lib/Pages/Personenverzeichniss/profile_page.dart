@@ -8,10 +8,11 @@ import 'parents.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
-  ProfilePageState({this.profile, this.moreaFire, this.crud0});
+  ProfilePageState({this.profile, this.moreaFire, this.crud0, this.signOut});
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
+  final Function signOut;
 
   var profile;
 
@@ -211,14 +212,14 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? mergeChildParent.parentScannsQrCode(
-                            widget.profile, this.parentaktuallisieren)
+                        ? mergeChildParent.parentScannsQrCode(widget.profile,
+                            this.parentaktuallisieren, context, widget.signOut)
                         : Container(),
                   ),
                   new Align(
                       child: newKidDisplay
                           ? mergeChildParent.registernewChild(widget.profile,
-                              context, this.setProfileState, this.newKidakt)
+                              context, this.setProfileState, this.newKidakt, widget.signOut)
                           : Container())
                 ],
               )));

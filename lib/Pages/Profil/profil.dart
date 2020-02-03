@@ -49,7 +49,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     if (this.userInfo['Pfadinamen'] == null) {
-      this.userInfo['Pfadinamen'] = this.userInfo['Name'];
+      this.userInfo['Pfadinamen'] = '';
     }
     return Scaffold(
       drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName,
@@ -120,11 +120,13 @@ class _ProfileState extends State<Profile> {
                     style: MoreaTextStyle.lable,
                   ),
                   subtitle: Text(
-                    userInfo['Vorname'] +
-                        ' ' +
-                        userInfo['Nachname'] +
-                        ' v/o ' +
-                        userInfo['Pfadinamen'],
+                    userInfo['Pfadinamen'] == ''
+                        ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
+                        : userInfo['Vorname'] +
+                            ' ' +
+                            userInfo['Nachname'] +
+                            ' v/o ' +
+                            userInfo['Pfadinamen'],
                     style: MoreaTextStyle.normal,
                   ),
                 ),
@@ -265,6 +267,7 @@ class _ProfileState extends State<Profile> {
   }
 
   void tutorial() {
-    ShowCaseWidget.of(context).startShowCase([_floatingActionButtonKey, _floatingActionButtonKey2]);
+    ShowCaseWidget.of(context)
+        .startShowCase([_floatingActionButtonKey, _floatingActionButtonKey2]);
   }
 }

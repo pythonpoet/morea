@@ -236,9 +236,6 @@ class _LoginPageState extends State<LoginPage> {
             widget.auth.checkForAuthErrors(context, e), context);
       }
     }
-    setState(() {
-      _load = false;
-    });
   }
 
   void moveToRegister() {
@@ -549,8 +546,54 @@ class _LoginPageState extends State<LoginPage> {
                               hint: Text(_geschlecht),
                               onChanged: (newVal) {
                                 _geschlecht = newVal;
-                                this.setState(() {});
+                                this.setState(() {print(_geschlecht);});
                               }),
+                        ),
+                        Container(
+                          color: Colors.grey[200],
+                          height: 55,
+                          width: 1000,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Text(
+                                "   Geburtstag",
+                                style: TextStyle(
+                                    color: Colors.grey[600], fontSize: 16),
+                              ),
+                              new FlatButton(
+                                child: Text(_alter,
+                                    style: TextStyle(
+                                        color: Colors.grey[500], fontSize: 16)),
+                                onPressed: () async {
+                                  await DatePicker.showDatePicker(context,
+                                      showTitleActions: true,
+                                      theme: DatePickerTheme(
+                                          doneStyle: TextStyle(
+                                              color: MoreaColors.violett,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      minTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 100)),
+                                      maxTime: DateTime.now()
+                                          .add(new Duration(days: -365 * 3)),
+                                      onConfirm: (date) {
+                                        moreaUser.geburtstag =
+                                            DateFormat('dd.MM.yyy', 'de')
+                                                .format(date)
+                                                .toString();
+                                        _alter = DateFormat('dd.MM.yyy', 'de')
+                                            .format(date)
+                                            .toString();
+                                      },
+                                      currentTime: DateTime.now(),
+                                      locale: LocaleType.de);
+
+                                  setState(() {print(moreaUser.geburtstag);});
+                                },
+                              )
+                            ],
+                          ),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 12),

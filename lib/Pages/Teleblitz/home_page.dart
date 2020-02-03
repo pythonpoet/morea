@@ -378,6 +378,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         profile: moreafire.getUserMap,
                         moreaFire: moreafire,
                         crud0: crud0,
+                        signOut: widget.navigationMap[signedOut],
                       )))),
           Divider(),
           new ListTile(
@@ -402,6 +403,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         profile: moreafire.getUserMap,
                         crud0: crud0,
                         moreaFire: moreafire,
+                        signOut: widget.navigationMap[signedOut],
                       )))),
           new Divider(),
           new ListTile(
@@ -475,9 +477,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void tutorialTN() {
-    showDialog(context: context, builder: (context) => AlertDialog(
-      content: Text('Auf diesem Screen kannst du den Teleblitz deines Fähnlis sehen und dich dafür anmelden (ist nur möglich wenn eine Aktivität stattfindet)'),
-    )).then((value) => ShowCaseWidget.of(context).startShowCase([_drawerKey, _bottomAppBarTNKey]));
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text(
+                  'Auf diesem Screen kannst du den Teleblitz deines Fähnlis sehen und dich dafür anmelden (ist nur möglich wenn eine Aktivität stattfindet)'),
+            )).then((value) => ShowCaseWidget.of(context)
+        .startShowCase([_drawerKey, _bottomAppBarTNKey]));
   }
 
   void tutorialEltern() {

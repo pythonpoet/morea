@@ -297,24 +297,56 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       case "Vater":
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       case "Erziehungsberechtigter":
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       case "Erziehungsberechtigte":
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       default:
         throw "UserMap-pos value: $pos is not implemented";

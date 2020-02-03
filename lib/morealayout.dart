@@ -44,7 +44,10 @@ class MoreaShadow {
 }
 
 class MoreaShadowContainer extends Container {
-  MoreaShadowContainer({this.child, this.constraints,});
+  MoreaShadowContainer({
+    this.child,
+    this.constraints,
+  });
 
   @override
   final Decoration decoration = MoreaShadow.teleblitz;
@@ -111,9 +114,11 @@ class MoreaTextStyle {
   static TextStyle lable =
       TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20);
   static TextStyle normal = TextStyle(color: Colors.black, fontSize: 20);
-  static TextStyle htmlList = TextStyle(fontWeight: FontWeight.w500, fontSize: 16);
+  static TextStyle htmlList =
+      TextStyle(fontWeight: FontWeight.w500, fontSize: 16);
   static TextStyle textField = TextStyle(fontSize: 18);
-  static TextStyle sender = TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
+  static TextStyle sender =
+      TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
 }
 
 class MoreaDivider extends Divider {
@@ -349,12 +354,15 @@ Drawer moreaDrawer(
           new ListTile(
               title: new Text('Personen'),
               trailing: new Icon(Icons.people),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState(
-                        moreaFire: moreafire,
-                        crud0: crud0,
-                      )))),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new PersonenVerzeichnisState(
+                            moreaFire: moreafire,
+                            crud0: crud0,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
           new ListTile(
             title: new Text("TN zu Leiter machen"),
             trailing: new Icon(Icons.enhanced_encryption),
@@ -388,12 +396,16 @@ Drawer moreaDrawer(
           ListTile(
               title: new Text('Eltern hinzufügen'),
               trailing: new Icon(Icons.add),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        moreaFire: moreafire,
-                        crud0: crud0,
-                      )))),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) => new ProfilePageState(
+                            profile: moreafire.getUserMap,
+                            moreaFire: moreafire,
+                            crud0: crud0,
+                            signOut: signedOut,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
           Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -418,12 +430,16 @@ Drawer moreaDrawer(
           new ListTile(
               title: new Text('Kinder hinzufügen'),
               trailing: new Icon(Icons.add),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        crud0: crud0,
-                        moreaFire: moreafire,
-                      )))),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) => new ProfilePageState(
+                            profile: moreafire.getUserMap,
+                            crud0: crud0,
+                            moreaFire: moreafire,
+                            signOut: signedOut,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),

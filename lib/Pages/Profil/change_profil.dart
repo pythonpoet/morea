@@ -65,7 +65,7 @@ class _ChangeProfileState extends State<ChangeProfile>
   @override
   Widget build(BuildContext context) {
     if (this.userInfo['Pfadinamen'] == null) {
-      this.userInfo['Pfadinamen'] = this.userInfo['Name'];
+      this.userInfo['Pfadinamen'] = '';
     }
     if (loading) {
       return Container(
@@ -105,11 +105,13 @@ class _ChangeProfileState extends State<ChangeProfile>
                       style: MoreaTextStyle.lable,
                     ),
                     subtitle: Text(
-                      userInfo['Vorname'] +
-                          ' ' +
-                          userInfo['Nachname'] +
-                          ' v/o ' +
-                          userInfo['Pfadinamen'],
+                      userInfo['Pfadinamen'] == ''
+                          ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
+                          : userInfo['Vorname'] +
+                              ' ' +
+                              userInfo['Nachname'] +
+                              ' v/o ' +
+                              userInfo['Pfadinamen'],
                       style: MoreaTextStyle.normal,
                     ),
                     trailing: Icon(
