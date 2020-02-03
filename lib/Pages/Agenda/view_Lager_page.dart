@@ -28,7 +28,7 @@ class ViewLagerPageState extends StatelessWidget {
     return Container(
         child: Scaffold(
       appBar: AppBar(
-        title: Text(info['Lagername'].toString()),
+        title: Text(info['Eventname'].toString()),
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
@@ -73,6 +73,7 @@ class ViewLagerPageState extends StatelessWidget {
               style: MoreaTextStyle.lable,
             ),
             subtitle: ListView(
+              physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: <Widget>[
                 Padding(

@@ -58,7 +58,7 @@ class EventAddPageState extends State<EventAddPage> {
   List<Map<dynamic, dynamic>> subgroups;
 
   Map<String, dynamic> event, lager;
-  Map<String, bool> goupCheckbox = new Map<String, bool>();
+  Map<String, bool> groupCheckbox;
 
   Map<String, bool> stufen = {
     'Biber': false,
@@ -87,16 +87,28 @@ class EventAddPageState extends State<EventAddPage> {
   }
 
   void groupCheckboxinit(List<Map> subgroups) {
-    for (Map groupMap in subgroups) {
-      this.goupCheckbox[groupMap[userMapgroupID]] = false;
+    groupCheckbox = Map<String, bool>();
+    if (widget.eventinfo['eventID'] == null) {
+      for (Map groupMap in subgroups) {
+        this.groupCheckbox[groupMap[userMapgroupID]] = false;
+      }
+    } else {
+      for (Map groupMap in subgroups) {
+        if (widget.eventinfo['groupIDs'].contains(groupMap[userMapgroupID])) {
+          this.groupCheckbox[groupMap[userMapgroupID]] = true;
+        } else {
+          this.groupCheckbox[groupMap[userMapgroupID]] = false;
+        }
+      }
     }
   }
 
   void eventHinzufuegen(_key) {
     if (validateAndSave(_key)) {
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
-
-      this.goupCheckbox.removeWhere((k, v) => v == false);
+      Map<String, bool> finalGroupCheckbox =
+          Map<String, bool>.from(this.groupCheckbox);
+      finalGroupCheckbox.removeWhere((k, v) => v == false);
       event = {
         'Order': order,
         'Lager': false,
@@ -107,7 +119,7 @@ class EventAddPageState extends State<EventAddPage> {
         'Anfangsort': anfangort,
         'Schlusszeit': schlusszeit,
         'Schlussort': schlussort,
-        'groupIDs': this.goupCheckbox.keys.toList(),
+        'groupIDs': finalGroupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
@@ -116,7 +128,7 @@ class EventAddPageState extends State<EventAddPage> {
 
       agenda.uploadtoAgenda(widget.eventinfo, event);
 
-      Navigator.of(context).pop();
+      Navigator.popUntil(context, ModalRoute.withName('/'));
 
       showDialog(
         context: context,
@@ -132,8 +144,9 @@ class EventAddPageState extends State<EventAddPage> {
   void lagerHinzufuegen(_key) {
     if (validateAndSave(_key)) {
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
-
-      this.goupCheckbox.removeWhere((k, v) => v == false);
+      Map<String, bool> finalGroupCheckbox =
+          Map<String, bool>.from(this.groupCheckbox);
+      finalGroupCheckbox.removeWhere((k, v) => v == false);
       lager = {
         'Order': order,
         'Lager': true,
@@ -146,15 +159,15 @@ class EventAddPageState extends State<EventAddPage> {
         'Anfangsort': anfangort,
         'Schlusszeit': schlusszeit,
         'Schlussort': schlussort,
-        'groupIDs': this.goupCheckbox.keys.toList(),
+        'groupIDs': finalGroupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
-        'DeleteDate': datumbis,
+        'DeleteDate': order,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, lager);
-      Navigator.pop(context);
+      Navigator.popUntil(context, ModalRoute.withName('/'));
     }
   }
 
@@ -183,7 +196,7 @@ class EventAddPageState extends State<EventAddPage> {
     );
     if (picked != null)
       setState(() {
-        datumvon = DateFormat('yyyy-MM-dd').format(picked);
+        datumvon = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked);
         order = DateFormat('yyyyMMdd').format(picked);
       });
   }
@@ -197,7 +210,7 @@ class EventAddPageState extends State<EventAddPage> {
         lastDate: now.add(new Duration(days: 9999)));
     if (picked2 != null)
       setState(() {
-        datumbis = DateFormat('yyyy-MM-dd').format(picked2);
+        datumbis = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked2);
       });
   }
 
@@ -385,7 +398,6 @@ class EventAddPageState extends State<EventAddPage> {
         return Scaffold(
           appBar: new AppBar(
             title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
-            backgroundColor: Color(0xff7a62ff),
           ),
           body: LayoutBuilder(
             builder:
@@ -408,8 +420,7 @@ class EventAddPageState extends State<EventAddPage> {
       case AgendaModus.lager:
         return Scaffold(
             appBar: new AppBar(
-              title: new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
-              backgroundColor: Color(0xff7a62ff),
+              title: new Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
             ),
             body: lagerWidget());
         break;
@@ -478,7 +489,7 @@ class EventAddPageState extends State<EventAddPage> {
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
-                                  initialValue: widget.eventinfo['Lagername'],
+                                  initialValue: widget.eventinfo['Eventname'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -601,7 +612,7 @@ class EventAddPageState extends State<EventAddPage> {
                           )),
                       Container(
                           padding: EdgeInsets.all(10),
-                          height: (60 * goupCheckbox.length).toDouble(),
+                          height: (60 * groupCheckbox.length).toDouble(),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -617,11 +628,11 @@ class EventAddPageState extends State<EventAddPage> {
                                         return new CheckboxListTile(
                                           title: new Text(
                                               group[groupMapgroupNickName]),
-                                          value: goupCheckbox[
+                                          value: groupCheckbox[
                                               group[userMapgroupID]],
                                           onChanged: (bool value) {
                                             setState(() {
-                                              goupCheckbox[
+                                              groupCheckbox[
                                                       group[userMapgroupID]] =
                                                   value;
                                             });
@@ -900,7 +911,7 @@ class EventAddPageState extends State<EventAddPage> {
                               )),
                           Container(
                               padding: EdgeInsets.all(10),
-                              height: (60 * goupCheckbox.length).toDouble(),
+                              height: (60 * groupCheckbox.length).toDouble(),
                               child: Row(
                                 children: <Widget>[
                                   Expanded(
@@ -917,11 +928,11 @@ class EventAddPageState extends State<EventAddPage> {
                                             return new CheckboxListTile(
                                               title: new Text(
                                                   group[groupMapgroupNickName]),
-                                              value: goupCheckbox[
+                                              value: groupCheckbox[
                                                   group[userMapgroupID]],
                                               onChanged: (bool value) {
                                                 setState(() {
-                                                  goupCheckbox[group[
+                                                  groupCheckbox[group[
                                                       userMapgroupID]] = value;
                                                 });
                                               },
@@ -1005,6 +1016,8 @@ class EventAddPageState extends State<EventAddPage> {
                                       Expanded(
                                         flex: 7,
                                         child: ListView.builder(
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
                                             itemCount: this.mitnehemen.length,
                                             itemBuilder: (context, index) =>
                                                 this._buildRow(index)),

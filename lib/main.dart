@@ -48,7 +48,10 @@ class MyApp extends StatelessWidget {
             MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
         fontFamily: 'Raleway',
       ),
-      home: new RootPage(auth: new Auth(), firestore: firestore),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => RootPage(auth: Auth(), firestore: firestore,),
+      },
     );
   }
 }

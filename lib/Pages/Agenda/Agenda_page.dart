@@ -114,14 +114,18 @@ class _AgendaStatePage extends State<AgendaState>
 
   routetoAddevent() {
     if (istLeiter()) {
-      Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => EventAddPage(
-                eventinfo: quickfix,
-                agendaModus: AgendaModus.beides,
-                firestore: widget.firestore,
-                moreaFire: moreafire,
-                agenda: agenda,
-              )));
+      Navigator.of(context)
+          .push(new MaterialPageRoute(
+              builder: (BuildContext context) => EventAddPage(
+                    eventinfo: quickfix,
+                    agendaModus: AgendaModus.beides,
+                    firestore: widget.firestore,
+                    moreaFire: moreafire,
+                    agenda: agenda,
+                  )))
+          .then((result) {
+        setState(() {});
+      });
     }
   }
 
@@ -164,7 +168,8 @@ class _AgendaStatePage extends State<AgendaState>
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
             context, moreafire, crud0, _signedOut),
-        bottomNavigationBar: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen'),
+        bottomNavigationBar:
+            moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen'),
       );
     } else {
       return Scaffold(
@@ -182,24 +187,32 @@ class _AgendaStatePage extends State<AgendaState>
   viewLager(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
-    Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => new ViewLagerPageState(
-            moreaFire: moreafire,
-            agenda: agenda,
-            info: info,
-            pos: moreafire.getUserMap['Pos'])));
+    Navigator.of(context)
+        .push(new MaterialPageRoute(
+            builder: (BuildContext context) => new ViewLagerPageState(
+                moreaFire: moreafire,
+                agenda: agenda,
+                info: info,
+                pos: moreafire.getUserMap['Pos'])))
+        .then((result) {
+      setState(() {});
+    });
   }
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
-    Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => new ViewEventPageState(
-              moreaFire: moreafire,
-              agenda: agenda,
-              info: info,
-              pos: moreafire.getUserMap['Pos'],
-            )));
+    Navigator.of(context)
+        .push(new MaterialPageRoute(
+            builder: (BuildContext context) => new ViewEventPageState(
+                  moreaFire: moreafire,
+                  agenda: agenda,
+                  info: info,
+                  pos: moreafire.getUserMap['Pos'],
+                )))
+        .then((result) {
+      setState(() {});
+    });
   }
 
   Widget aAgenda(String groupID) {
@@ -248,6 +261,7 @@ class _AgendaStatePage extends State<AgendaState>
                         child: MoreaDivider(),
                       ),
                       ListView.separated(
+                          physics: NeverScrollableScrollPhysics(),
                           itemCount: slagenda.data.length,
                           shrinkWrap: true,
                           separatorBuilder: (context, int index) {
@@ -263,7 +277,9 @@ class _AgendaStatePage extends State<AgendaState>
 
                             if (_info['Event']) {
                               return ListTile(
+                                  key: ObjectKey(_info),
                                   subtitle: ListView(
+                                    physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     children: <Widget>[
                                       Padding(
@@ -289,11 +305,13 @@ class _AgendaStatePage extends State<AgendaState>
                                   onTap: () => viewEvent(context, _info));
                             } else if (_info['Lager']) {
                               return ListTile(
+                                key: ObjectKey(_info),
                                   title: Text(
                                     _info['Eventname'],
                                     style: MoreaTextStyle.lable,
                                   ),
                                   subtitle: ListView(
+                                    physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     children: <Widget>[
                                       Padding(

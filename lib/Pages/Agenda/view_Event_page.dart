@@ -55,7 +55,6 @@ class ViewEventPageState extends StatelessWidget {
       return Container(
           child: Scaffold(
               appBar: AppBar(
-                backgroundColor: Color(0xff7a62ff),
                 title: Text(info['Eventname'].toString()),
               ),
               body: LayoutBuilder(
@@ -204,6 +203,8 @@ class ViewEventPageState extends StatelessWidget {
                   moreaFire: moreaFire,
                   agenda: agenda,
                 )))
-        .then((onValue) {});
+        .then((onValue) {
+      Navigator.of(context).pop();
+    });
   }
 }

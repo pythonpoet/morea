@@ -58,15 +58,19 @@ class _MessagesPageState extends State<MessagesPage> {
         ),
         floatingActionButton: moreaEditActionbutton(this.routeToSendMessage),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen'),
+        bottomNavigationBar:
+            moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen'),
         body: StreamBuilder(
             stream: this.messages,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
-                        child:
-                            MoreaShadowContainer(child: Text('Loading...', style: MoreaTextStyle.normal,))));
+                        child: MoreaShadowContainer(
+                            child: Text(
+                  'Loading...',
+                  style: MoreaTextStyle.normal,
+                ))));
               } else if (!snapshot.hasData) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -84,10 +88,14 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               children: <Widget>[
                                 ListTile(
-                                  title: Text('Keine Nachrichten vorhanden', style: MoreaTextStyle.normal,),
+                                  title: Text(
+                                    'Keine Nachrichten vorhanden',
+                                    style: MoreaTextStyle.normal,
+                                  ),
                                 )
                               ],
                             ),
@@ -114,10 +122,14 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               children: <Widget>[
                                 ListTile(
-                                  title: Text('Keine Nachrichten vorhanden', style: MoreaTextStyle.normal,),
+                                  title: Text(
+                                    'Keine Nachrichten vorhanden',
+                                    style: MoreaTextStyle.normal,
+                                  ),
                                 )
                               ],
                             ),
@@ -144,6 +156,7 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
                                 itemCount: snapshot.data.documents.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
@@ -194,6 +207,7 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               children: <Widget>[
                                 ListTile(
@@ -224,6 +238,7 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               children: <Widget>[
                                 ListTile(
@@ -256,6 +271,7 @@ class _MessagesPageState extends State<MessagesPage> {
                                   ),
                                 ),
                                 ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemCount: snapshot.data.documents.length,
                                     itemBuilder: (context, index) {
@@ -297,7 +313,8 @@ class _MessagesPageState extends State<MessagesPage> {
   routeToSendMessage() {
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) => SendMessages(
-              moreaFire: moreaFire, auth: widget.auth,
+              moreaFire: moreaFire,
+              auth: widget.auth,
             )));
   }
 
@@ -308,10 +325,8 @@ class _MessagesPageState extends State<MessagesPage> {
           padding: EdgeInsets.only(right: 20, left: 20),
           child: ListTile(
             key: UniqueKey(),
-            title: Text(document['title'],
-                style: MoreaTextStyle.lable),
-            subtitle: Text(document['sender'],
-                style: MoreaTextStyle.sender),
+            title: Text(document['title'], style: MoreaTextStyle.lable),
+            subtitle: Text(document['sender'], style: MoreaTextStyle.sender),
             contentPadding: EdgeInsets.only(),
             leading: CircleAvatar(
               child: Text(document['sender'][0]),
@@ -332,10 +347,12 @@ class _MessagesPageState extends State<MessagesPage> {
         child: ListTile(
           key: UniqueKey(),
           title: Text(
-            document['title'], style: MoreaTextStyle.normal,
+            document['title'],
+            style: MoreaTextStyle.normal,
           ),
           subtitle: Text(
-            document['sender'], style: MoreaTextStyle.sender,
+            document['sender'],
+            style: MoreaTextStyle.sender,
           ),
           contentPadding: EdgeInsets.only(),
           leading: CircleAvatar(

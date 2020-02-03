@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
-import 'package:morea/morea_strings.dart';
 
 class TeleblitzManager {
   String slug;
@@ -21,7 +20,8 @@ class TeleblitzManager {
     var jsonDecode;
     var jsonString;
     String _stufe = filter;
-    jsonString = await http.get(teleblitzapiurl);
+    String webflowApi = await moreafire.getWebflowApiKey();
+    jsonString = await http.get(webflowApi);
     jsonDecode = json.decode(jsonString.body);
     Map infos;
     for (var u in jsonDecode['items']) {
