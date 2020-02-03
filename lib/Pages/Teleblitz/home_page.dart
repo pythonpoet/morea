@@ -475,7 +475,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void tutorialTN() {
-    ShowCaseWidget.of(context).startShowCase([_drawerKey, _bottomAppBarTNKey]);
+    showDialog(context: context, builder: (context) => AlertDialog(
+      content: Text('Auf diesem Screen kannst du den Teleblitz deines Fähnlis sehen und dich dafür anmelden (ist nur möglich wenn eine Aktivität stattfindet)'),
+    )).then((value) => ShowCaseWidget.of(context).startShowCase([_drawerKey, _bottomAppBarTNKey]));
   }
 
   void tutorialEltern() {

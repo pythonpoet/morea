@@ -41,6 +41,7 @@ class _AgendaStatePage extends State<AgendaState>
   GlobalKey _agendaLeiterKey2 = GlobalKey();
   GlobalKey _floatingActionButtonKey = GlobalKey();
   GlobalKey _bottomAppBarLeiterKey = GlobalKey();
+  GlobalKey _bottomAppBarTNKey = GlobalKey();
   Map stufen = {
     'Biber': false,
     'Pios': false,
@@ -176,7 +177,7 @@ class _AgendaStatePage extends State<AgendaState>
               child: Column(
                 children: [
                   Text(
-                    'Hier siehst du alle Events/Lager deiner Stufe',
+                    'Hier siehst du alle Events/Lager deines Fähnlis',
                   ),
                 ],
               ),
@@ -240,8 +241,27 @@ class _AgendaStatePage extends State<AgendaState>
       return Scaffold(
         appBar: AppBar(
           title: Text('Agenda'),
+          actions: tutorialButton(),
         ),
-        bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarTNKey,
+            height: 300,
+            width: 150,
+            disableAnimation: true,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke den Hilfeknopf oben rechts',
+                  ),
+                ],
+              ),
+            ),
+            child: moreaChildBottomAppBar(widget.navigationMap)),
         drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
             moreafire.getEmail, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getUserMap[userMapgroupID]),
@@ -444,5 +464,13 @@ class _AgendaStatePage extends State<AgendaState>
     ]);
   }
 
-  void tutorialTN() {}
+  void tutorialTN() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text('Drücke auf einzelne Events/Lager um mehr Details zu sehen. Drücke auf einzelne Events/Lager um mehr Details zu sehen.'),
+            )).then((onvalue) => ShowCaseWidget.of(context).startShowCase([
+          _bottomAppBarTNKey
+        ]));
+  }
 }

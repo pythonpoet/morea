@@ -138,30 +138,26 @@ class MergeChildParent extends BaseMergeChildParent {
                     );
                 },
               ),
-              Column(
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      height: 80,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: new RaisedButton(
-                      child: new Text('Abbrechen',
-                          style: new TextStyle(fontSize: 20)),
-                      onPressed: () async => {
-                        childaktuallisieren(),
-                        deleteRequest(await qrCodeString)
-                      },
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0)),
-                      color: Color(0xff7a62ff),
-                      textColor: Colors.white,
-                    ),
-                  )
-                ],
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: 80,
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: new RaisedButton(
+                  child: new Text('Abbrechen',
+                      style: new TextStyle(fontSize: 20)),
+                  onPressed: () async => {
+                    childaktuallisieren(),
+                    deleteRequest(await qrCodeString)
+                  },
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                  color: Color(0xff7a62ff),
+                  textColor: Colors.white,
+                ),
               )
             ],
           ),

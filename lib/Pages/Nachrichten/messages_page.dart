@@ -37,6 +37,7 @@ class _MessagesPageState extends State<MessagesPage>
   GlobalKey _messagesKeyLeiter = GlobalKey();
   GlobalKey _floatingActionButtonKey = GlobalKey();
   GlobalKey _bottomAppBarLeiterKey = GlobalKey();
+  GlobalKey _bottomAppBarTNKey = GlobalKey();
   String anzeigename;
   MoreaFirebase moreaFire;
   MoreaLoading moreaLoading;
@@ -235,10 +236,29 @@ class _MessagesPageState extends State<MessagesPage>
       return Scaffold(
         appBar: AppBar(
           title: Text('Nachrichten'),
+          actions: tutorialButton(),
         ),
         drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
             moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
-        bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarTNKey,
+            disableAnimation: true,
+            height: 300,
+            width: 150,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke dort oben rechts den Hilfeknopf',
+                  ),
+                ],
+              ),
+            ),
+            child: moreaChildBottomAppBar(widget.navigationMap)),
         body: StreamBuilder(
             stream: this.messages,
             builder: (context, snapshot) {
@@ -432,30 +452,27 @@ class _MessagesPageState extends State<MessagesPage>
           onPressed: () => tutorialLeiter(),
         ),
       ];
-    } else if (moreaFire.getPos == 'Teilnehmer') {
+    } else {
       return [
         IconButton(
           icon: Icon(Icons.help_outline),
           onPressed: () => tutorialTN(),
         ),
       ];
-    } else {
-      return [
-        IconButton(
-          icon: Icon(Icons.help_outline),
-          onPressed: () => tutorialEltern(),
-        ),
-      ];
     }
   }
 
   void tutorialLeiter() {
-    ShowCaseWidget.of(context)
-        .startShowCase(
+    ShowCaseWidget.of(context).startShowCase(
         [_messagesKeyLeiter, _floatingActionButtonKey, _bottomAppBarLeiterKey]);
   }
 
-  void tutorialTN() {}
-
-  void tutorialEltern() {}
+  void tutorialTN() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text(
+                  'Hier siehst du alle Nachrichten, welche von deinen Leitern an dein Fähnli gesendet wurden'),
+            )).then((onvalue) => ShowCaseWidget.of(context).startShowCase([_bottomAppBarTNKey]));
+  }
 }

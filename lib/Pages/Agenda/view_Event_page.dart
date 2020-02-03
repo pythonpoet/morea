@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -25,51 +26,18 @@ class ViewEventPageState extends StatelessWidget {
               )),
         ),
       );
-    if (istLeiter()) {
-      return Container(
-          child: Scaffold(
-        appBar: AppBar(
-          title: Text(info['Eventname'].toString()),
-        ),
-        body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-            return MoreaBackgroundContainer(
-              child: SingleChildScrollView(
-                  child: MoreaShadowContainer(
-                child: viewEvent(),
-              )),
-            );
-          },
-        ),
-        floatingActionButton: Opacity(
-          opacity: istLeiter() ? 1.0 : 0.0,
-          child: new FloatingActionButton(
-            elevation: 0.0,
-            child: new Icon(Icons.edit),
-            backgroundColor: Color(0xff7a62ff),
-            onPressed: () => routeToLagerbearb(context),
-          ),
-        ),
-      ));
-    } else {
-      return Container(
-          child: Scaffold(
-              appBar: AppBar(
-                title: Text(info['Eventname'].toString()),
-              ),
-              body: LayoutBuilder(
-                builder:
-                    (BuildContext context, BoxConstraints viewportConstraints) {
-                  return SingleChildScrollView(
-                      child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: viewportConstraints.maxHeight,
-                    ),
-                    child: viewEvent(),
-                  ));
-                },
-              )));
-    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(info['Eventname'].toString()),
+      ),
+      body: MoreaBackgroundContainer(
+        child: SingleChildScrollView(
+            child: MoreaShadowContainer(
+          child: viewEvent(),
+        )),
+      ),
+      floatingActionButton: floatingActionButton(context),
+    );
   }
 
   Widget viewEvent() {
@@ -77,14 +45,20 @@ class ViewEventPageState extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.all(20),
-          child: Text(
+          padding: EdgeInsets.only(top: 20),
+        ),
+        ListTile(
+          title: Text(
             info['Eventname'],
             style: MoreaTextStyle.title,
           ),
+          trailing: Text(
+            'Event',
+            style: MoreaTextStyle.sender,
+          ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
+          padding: EdgeInsets.only(right: 15, left: 15, top: 20),
           child: MoreaDivider(),
         ),
         ListTile(
@@ -206,5 +180,13 @@ class ViewEventPageState extends StatelessWidget {
         .then((onValue) {
       Navigator.of(context).pop();
     });
+  }
+
+  FloatingActionButton floatingActionButton(context) {
+    if (istLeiter()) {
+      return moreaEditActionbutton(route: () => routeToLagerbearb(context));
+    } else {
+      return null;
+    }
   }
 }
