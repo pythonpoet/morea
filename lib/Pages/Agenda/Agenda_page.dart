@@ -5,6 +5,7 @@ import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../../morealayout.dart';
 import 'Agenda_Eventadd_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +37,10 @@ class _AgendaStatePage extends State<AgendaState>
   prefix0.Agenda agenda;
   String pos = 'Teilnehmer';
   Stream<List> sLagenda;
+  GlobalKey _agendaLeiterKey = GlobalKey();
+  GlobalKey _agendaLeiterKey2 = GlobalKey();
+  GlobalKey _floatingActionButtonKey = GlobalKey();
+  GlobalKey _bottomAppBarLeiterKey = GlobalKey();
   Map stufen = {
     'Biber': false,
     'Pios': false,
@@ -157,19 +162,79 @@ class _AgendaStatePage extends State<AgendaState>
       return Scaffold(
         appBar: AppBar(
           title: Text('Agenda'),
+          actions: tutorialButton(),
         ),
-        body: aAgenda(moreafire.getUserMap[userMapgroupID]),
-        floatingActionButton: new FloatingActionButton(
-          child: Icon(Icons.add),
-          backgroundColor: Color(0xff7a62ff),
-          onPressed: () => routetoAddevent(),
-          shape: CircleBorder(side: BorderSide(color: Colors.white)),
+        body: Showcase.withWidget(
+            key: _agendaLeiterKey,
+            height: 300,
+            width: 150,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Hier siehst du alle Events/Lager deiner Stufe',
+                  ),
+                ],
+              ),
+            ),
+            disableAnimation: true,
+            child: Showcase.withWidget(
+                disableAnimation: true,
+                key: _agendaLeiterKey2,
+                height: 300,
+                width: 150,
+                container: Container(
+                  padding: EdgeInsets.all(5),
+                  constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Drücke auf einzelne Events/Lager um mehr Details zu sehen',
+                      ),
+                    ],
+                  ),
+                ),
+                child: aAgenda(moreafire.getUserMap[userMapgroupID]))),
+        floatingActionButton: Showcase(
+          key: _floatingActionButtonKey,
+          disableAnimation: true,
+          description: 'Hier kannst du Events/Lager hinzufügen',
+          child: new FloatingActionButton(
+            child: Icon(Icons.add),
+            backgroundColor: Color(0xff7a62ff),
+            onPressed: () => routetoAddevent(),
+            shape: CircleBorder(side: BorderSide(color: Colors.white)),
+          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
             context, moreafire, crud0, _signedOut),
-        bottomNavigationBar:
-            moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen'),
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarLeiterKey,
+            height: 300,
+            width: 150,
+            disableAnimation: true,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke den Hilfeknopf oben rechts',
+                  ),
+                ],
+              ),
+            ),
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen')),
       );
     } else {
       return Scaffold(
@@ -305,7 +370,7 @@ class _AgendaStatePage extends State<AgendaState>
                                   onTap: () => viewEvent(context, _info));
                             } else if (_info['Lager']) {
                               return ListTile(
-                                key: ObjectKey(_info),
+                                  key: ObjectKey(_info),
                                   title: Text(
                                     _info['Eventname'],
                                     style: MoreaTextStyle.lable,
@@ -351,4 +416,33 @@ class _AgendaStatePage extends State<AgendaState>
     await widget.auth.signOut();
     widget.navigationMap[signedOut]();
   }
+
+  List<Widget> tutorialButton() {
+    if (istLeiter()) {
+      return [
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () => tutorialLeiter(),
+        )
+      ];
+    } else {
+      return [
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () => tutorialTN(),
+        )
+      ];
+    }
+  }
+
+  void tutorialLeiter() {
+    ShowCaseWidget.of(context).startShowCase([
+      _agendaLeiterKey,
+      _agendaLeiterKey2,
+      _floatingActionButtonKey,
+      _bottomAppBarLeiterKey
+    ]);
+  }
+
+  void tutorialTN() {}
 }

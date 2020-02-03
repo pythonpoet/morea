@@ -44,7 +44,7 @@ class MoreaShadow {
 }
 
 class MoreaShadowContainer extends Container {
-  MoreaShadowContainer({this.child, this.constraints});
+  MoreaShadowContainer({this.child, this.constraints,});
 
   @override
   final Decoration decoration = MoreaShadow.teleblitz;

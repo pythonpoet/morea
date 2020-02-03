@@ -13,6 +13,7 @@ import 'package:morea/services/auth.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({this.auth, this.firestore});
@@ -97,11 +98,15 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         break;
 
       case AuthStatus.homePage:
-        return new HomePage(
-          auth: auth,
-          firestore: widget.firestore,
-          navigationMap: navigationMap,
-          moreafire: moreaFire,
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (context) => HomePage(
+              auth: auth,
+              firestore: widget.firestore,
+              navigationMap: navigationMap,
+              moreafire: moreaFire,
+            ),
+          ),
         );
         break;
       case AuthStatus.blockedByAppVersion:
@@ -113,29 +118,41 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         break;
 
       case AuthStatus.messagePage:
-        return MessagesPage(
-          auth: auth,
-          moreaFire: moreaFire,
-          navigationMap: this.navigationMap,
-          firestore: widget.firestore,
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (context) => MessagesPage(
+              auth: auth,
+              moreaFire: moreaFire,
+              navigationMap: this.navigationMap,
+              firestore: widget.firestore,
+            ),
+          ),
         );
         break;
 
       case AuthStatus.agendaPage:
-        return AgendaState(
-          auth: auth,
-          navigationMap: navigationMap,
-          moreaFire: moreaFire,
-          firestore: widget.firestore,
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (context) => AgendaState(
+              auth: auth,
+              navigationMap: navigationMap,
+              moreaFire: moreaFire,
+              firestore: widget.firestore,
+            ),
+          ),
         );
         break;
 
       case AuthStatus.profilePage:
-        return Profile(
-          auth: auth,
-          moreaFire: moreaFire,
-          navigationMap: navigationMap,
-          firestore: widget.firestore,
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (context) => Profile(
+              auth: auth,
+              moreaFire: moreaFire,
+              navigationMap: navigationMap,
+              firestore: widget.firestore,
+            ),
+          ),
         );
         break;
       case AuthStatus.loading:
