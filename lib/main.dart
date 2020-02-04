@@ -8,34 +8,12 @@ import 'package:morea/services/auth.dart';
 import 'morealayout.dart';
 
 Future<void> main() async {
-  /*final FirebaseApp app = await FirebaseApp.configure(
-    name: 'Pfadi Morea',
-    options: const FirebaseOptions(
-      googleAppID: '1:20884476221:android:da0ee1d9ef987290793554',
-      //gcmSenderID: '1015173140187',
-      apiKey: 'AIzaSyBhmTHDLaRcXPGCuPXrHmG4nvks4_NezT0',
-      projectID: 'dev-pfadi-morea',
-    ),
-  );
-  final Firestore firestore = Firestore(app: app);
-  await firestore.settings(timestampsInSnapshotsEnabled: true);
-
-  */
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    MaterialApp(
-        title: 'Morea App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            fontFamily: 'Raleway',
-            primarySwatch: MaterialColor(
-                MoreaColors.appBarInt, MoreaColors.violettMaterialColor)),
-        home: MyApp()),
-  );
+    MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  //MyApp({this.firestore});
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +94,6 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           });
     }
-    //Android Scafold
     else {
       return Scaffold(
         appBar: AppBar(
