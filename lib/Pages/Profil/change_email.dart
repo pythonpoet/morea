@@ -31,13 +31,13 @@ class _ChangeEmailState extends State<ChangeEmail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('E-Mail'),
+        title: Text('E-Mail-Adresse'),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
-        onPressed: (){
-          if(_validateAndSave()){
+        onPressed: () {
+          if (_validateAndSave()) {
             widget._changeEmail(email.text);
             Navigator.of(context).pop();
           }
@@ -54,13 +54,13 @@ class _ChangeEmailState extends State<ChangeEmail> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'E-Mail ändern',
+                      'E-Mail-Adresse ändern',
                       style: MoreaTextStyle.title,
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
-                        'E-Mail',
+                        'E-Mail-Adresse',
                         style: MoreaTextStyle.lable,
                       ),
                     ),
@@ -70,7 +70,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                         controller: email,
                         maxLines: 1,
                         keyboardType: TextInputType.emailAddress,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),

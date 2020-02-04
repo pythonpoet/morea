@@ -9,7 +9,13 @@ import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 
 class EventAddPage extends StatefulWidget {
-  EventAddPage({this.eventinfo, this.agendaModus, this.firestore, this.agenda, this.moreaFire});
+  EventAddPage(
+      {this.eventinfo,
+      this.agendaModus,
+      this.firestore,
+      this.agenda,
+      this.moreaFire});
+
   final MoreaFirebase moreaFire;
   final Map eventinfo;
   final AgendaModus agendaModus;
@@ -29,7 +35,8 @@ class EventAddPageState extends State<EventAddPage> {
   MoreaFirebase moreafire;
   int value = 2;
   List<String> mitnehemen = ['Pfadihämpt'];
-  final _addkey = new GlobalKey<FormState>(debugLabel: "_addkey");
+  final _addkeyEvent = new GlobalKey<FormState>(debugLabel: "_addkeyEvent");
+  final _addkeyLager = GlobalKey<FormState>(debugLabel: '_addkeyLager');
   final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
   final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
@@ -47,11 +54,11 @@ class EventAddPageState extends State<EventAddPage> {
       datumvon = 'Datum wählen',
       datumbis = 'Datum wählen',
       lagerort = ' ';
-  int order;
+  String order;
   List<Map<dynamic, dynamic>> subgroups;
 
   Map<String, dynamic> event, lager;
-  Map<String, bool> goupCheckbox = new Map<String, bool>();
+  Map<String, bool> groupCheckbox;
 
   Map<String, bool> stufen = {
     'Biber': false,
@@ -61,8 +68,8 @@ class EventAddPageState extends State<EventAddPage> {
     'Pios': false,
   };
 
-  _addItem() {
-    if (validateAndSave(_addkey)) {
+  _addItem(GlobalKey<FormState> key) {
+    if (validateAndSave(key)) {
       setState(() {
         value = value + 1;
       });
@@ -80,16 +87,28 @@ class EventAddPageState extends State<EventAddPage> {
   }
 
   void groupCheckboxinit(List<Map> subgroups) {
-    for (Map groupMap in subgroups) {
-      this.goupCheckbox[groupMap[userMapgroupID]] = false;
+    groupCheckbox = Map<String, bool>();
+    if (widget.eventinfo['eventID'] == null) {
+      for (Map groupMap in subgroups) {
+        this.groupCheckbox[groupMap[userMapgroupID]] = false;
+      }
+    } else {
+      for (Map groupMap in subgroups) {
+        if (widget.eventinfo['groupIDs'].contains(groupMap[userMapgroupID])) {
+          this.groupCheckbox[groupMap[userMapgroupID]] = true;
+        } else {
+          this.groupCheckbox[groupMap[userMapgroupID]] = false;
+        }
+      }
     }
   }
 
   void eventHinzufuegen(_key) {
     if (validateAndSave(_key)) {
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
-
-      this.goupCheckbox.removeWhere((k, v) => v == false);
+      Map<String, bool> finalGroupCheckbox =
+          Map<String, bool>.from(this.groupCheckbox);
+      finalGroupCheckbox.removeWhere((k, v) => v == false);
       event = {
         'Order': order,
         'Lager': false,
@@ -100,28 +119,34 @@ class EventAddPageState extends State<EventAddPage> {
         'Anfangsort': anfangort,
         'Schlusszeit': schlusszeit,
         'Schlussort': schlussort,
-        'groupIDs': this.goupCheckbox.keys.toList(),
+        'groupIDs': finalGroupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
-        'DeleteDate': datum,
+        'DeleteDate': order,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, event);
 
+      Navigator.popUntil(context, ModalRoute.withName('/'));
+
       showDialog(
-          context: context,
-          child: new AlertDialog(
-            title: new Text("Event wurde hinzugefügt"),
-          ));
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Event wurde hinzugefügt'),
+          );
+        },
+      );
     }
   }
 
   void lagerHinzufuegen(_key) {
     if (validateAndSave(_key)) {
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
-
-      this.goupCheckbox.removeWhere((k, v) => v == false);
+      Map<String, bool> finalGroupCheckbox =
+          Map<String, bool>.from(this.groupCheckbox);
+      finalGroupCheckbox.removeWhere((k, v) => v == false);
       lager = {
         'Order': order,
         'Lager': true,
@@ -134,15 +159,15 @@ class EventAddPageState extends State<EventAddPage> {
         'Anfangsort': anfangort,
         'Schlusszeit': schlusszeit,
         'Schlussort': schlussort,
-        'groupIDs': this.goupCheckbox.keys.toList(),
+        'groupIDs': finalGroupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
         'Mitnehmen': mitnehemen,
-        'DeleteDate': datumbis,
+        'DeleteDate': order,
       };
 
       agenda.uploadtoAgenda(widget.eventinfo, lager);
-      Navigator.pop(context);
+      Navigator.popUntil(context, ModalRoute.withName('/'));
     }
   }
 
@@ -156,8 +181,8 @@ class EventAddPageState extends State<EventAddPage> {
     );
     if (picked != null)
       setState(() {
-        datum = DateFormat('yyyy-MM-dd').format(picked);
-        order = int.parse(DateFormat('yyyyMMdd').format(picked));
+        datum = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked);
+        order = DateFormat('yyyyMMdd').format(picked);
       });
   }
 
@@ -171,8 +196,8 @@ class EventAddPageState extends State<EventAddPage> {
     );
     if (picked != null)
       setState(() {
-        datumvon = DateFormat('yyyy-MM-dd').format(picked);
-        order = int.parse(DateFormat('yyyyMMdd').format(picked));
+        datumvon = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked);
+        order = DateFormat('yyyyMMdd').format(picked);
       });
   }
 
@@ -185,26 +210,74 @@ class EventAddPageState extends State<EventAddPage> {
         lastDate: now.add(new Duration(days: 9999)));
     if (picked2 != null)
       setState(() {
-        datumbis = DateFormat('yyyy-MM-dd').format(picked2);
+        datumbis = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked2);
       });
   }
 
-  Future<Null> _selectAnfangszeit(BuildContext context) async {
-    final TimeOfDay picked =
-        await showTimePicker(initialTime: TimeOfDay.now(), context: context);
-    if (picked != null)
+  Future<void> _selectAnfangszeit(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
       setState(() {
-        anfangzeit = picked.hour.toString() + ':' + picked.minute.toString();
+        if (picked.minute.toString().length < 2 &&
+            picked.hour.toString().length >= 2) {
+          this.anfangzeit =
+              picked.hour.toString() + ":0" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length >= 2) {
+          print(true);
+          this.anfangzeit =
+              "0" + picked.hour.toString() + ":" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length < 2) {
+          this.anfangzeit = "0" +
+              picked.hour.toString() +
+              ":" +
+              "0" +
+              picked.minute.toString();
+        } else {
+          print(false);
+          this.anfangzeit =
+              picked.hour.toString() + ":" + picked.minute.toString();
+        }
       });
+    }
+    return null;
   }
 
-  Future<Null> _selectSchlusszeit(BuildContext context) async {
-    final TimeOfDay picked =
-        await showTimePicker(initialTime: TimeOfDay.now(), context: context);
-    if (picked != null)
+  Future<void> _selectSchlusszeit(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
       setState(() {
-        schlusszeit = picked.hour.toString() + ':' + picked.minute.toString();
+        if (picked.minute.toString().length < 2 &&
+            picked.hour.toString().length >= 2) {
+          this.schlusszeit =
+              picked.hour.toString() + ":0" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length >= 2) {
+          print(true);
+          this.schlusszeit =
+              "0" + picked.hour.toString() + ":" + picked.minute.toString();
+        } else if (picked.hour.toString().length < 2 &&
+            picked.minute.toString().length < 2) {
+          this.schlusszeit = "0" +
+              picked.hour.toString() +
+              ":" +
+              "0" +
+              picked.minute.toString();
+        } else {
+          print(false);
+          this.schlusszeit =
+              picked.hour.toString() + ":" + picked.minute.toString();
+        }
       });
+    }
+    return null;
   }
 
   void lagerdelete() async {
@@ -283,8 +356,8 @@ class EventAddPageState extends State<EventAddPage> {
 
     anfangzeit = widget.eventinfo['Anfangszeit'];
     schlusszeit = widget.eventinfo['Schlusszeit'];
-    if(widget.eventinfo.containsKey("Stufen"))
-    stufen = Map<String,bool>.from(widget.eventinfo['Stufen']);
+    if (widget.eventinfo.containsKey("Stufen"))
+      stufen = Map<String, bool>.from(widget.eventinfo['Stufen']);
     mitnehemen = List<String>.from(widget.eventinfo['Mitnehmen']);
     order = widget.eventinfo['Order'];
     moreafire = widget.moreaFire;
@@ -297,59 +370,62 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    if(subgroups==null)
-      return Card(child: Container(padding: EdgeInsets.all(100),child: simpleMoreaLoadingIndicator(),),);
+    if (subgroups == null)
+      return Card(
+        child: Container(
+          padding: EdgeInsets.all(100),
+          child: simpleMoreaLoadingIndicator(),
+        ),
+      );
     switch (widget.agendaModus) {
       case AgendaModus.beides:
         return DefaultTabController(
-                length: 2,
-                child: new Scaffold(
-                  appBar: new AppBar(
-                    title: Text('zur Agenda hinzufügen'),
-                    backgroundColor: Color(0xff7a62ff),
-                    bottom: TabBar(
-                      tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
-                    ),
-                  ),
-                  body: TabBarView(
-                    children: <Widget>[eventWidget(), lagerWidget()],
-                  ),
-                ),
-              );
+          length: 2,
+          child: new Scaffold(
+            appBar: new AppBar(
+              title: Text('zur Agenda hinzufügen'),
+              bottom: TabBar(
+                tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
+              ),
+            ),
+            body: TabBarView(
+              children: <Widget>[eventWidget(), lagerWidget()],
+            ),
+          ),
+        );
         break;
       case AgendaModus.event:
         return Scaffold(
-                appBar: new AppBar(
-                  title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
-                  backgroundColor: Color(0xff7a62ff),
-                ),
-                body: LayoutBuilder(
-                  builder: (BuildContext context,
-                      BoxConstraints viewportConstraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: viewportConstraints.maxHeight,
-                          ),
-                          child: SingleChildScrollView(
-                              child: Column(
-                            children: <Widget>[eventWidget()],
-                          ))),
-                    );
-                  },
-                ),
+          appBar: new AppBar(
+            title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
+          ),
+          body: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: viewportConstraints.maxHeight,
+                    ),
+                    child: SingleChildScrollView(
+                        child: Column(
+                      children: <Widget>[eventWidget()],
+                    ))),
               );
+            },
+          ),
+        );
 
         break;
       case AgendaModus.lager:
         return Scaffold(
-                appBar: new AppBar(
-                  title:
-                      new Text(widget.eventinfo['Lagername'] + ' bearbeiten'),
-                  backgroundColor: Color(0xff7a62ff),
-                ),
-                body: lagerWidget());
+            appBar: new AppBar(
+              title: new Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
+            ),
+            body: lagerWidget());
         break;
+      default:
+        return null;
     }
   }
 
@@ -413,7 +489,7 @@ class EventAddPageState extends State<EventAddPage> {
                               Expanded(
                                 flex: 7,
                                 child: new TextFormField(
-                                  initialValue: widget.eventinfo['Lagername'],
+                                  initialValue: widget.eventinfo['Eventname'],
                                   decoration: new InputDecoration(
                                     border: OutlineInputBorder(),
                                     filled: false,
@@ -536,7 +612,7 @@ class EventAddPageState extends State<EventAddPage> {
                           )),
                       Container(
                           padding: EdgeInsets.all(10),
-                          height: (60 * goupCheckbox.length).toDouble(),
+                          height: (60 * groupCheckbox.length).toDouble(),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -549,15 +625,14 @@ class EventAddPageState extends State<EventAddPage> {
                                       physics: NeverScrollableScrollPhysics(),
                                       children: subgroups
                                           .map((Map<dynamic, dynamic> group) {
-                                       
                                         return new CheckboxListTile(
                                           title: new Text(
                                               group[groupMapgroupNickName]),
-                                          value: goupCheckbox[
+                                          value: groupCheckbox[
                                               group[userMapgroupID]],
                                           onChanged: (bool value) {
                                             setState(() {
-                                              goupCheckbox[
+                                              groupCheckbox[
                                                       group[userMapgroupID]] =
                                                   value;
                                             });
@@ -613,6 +688,7 @@ class EventAddPageState extends State<EventAddPage> {
                               Expanded(
                                 flex: 4,
                                 child: new TextFormField(
+                                  keyboardType: TextInputType.emailAddress,
                                   initialValue: widget.eventinfo['Kontakt']
                                       ['Email'],
                                   decoration: new InputDecoration(
@@ -649,7 +725,7 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                             ),
                             Form(
-                                key: _addkey,
+                                key: _addkeyLager,
                                 child: Container(
                                   child: Row(
                                     children: <Widget>[
@@ -673,7 +749,8 @@ class EventAddPageState extends State<EventAddPage> {
                                           child: new Text('Add',
                                               style:
                                                   new TextStyle(fontSize: 15)),
-                                          onPressed: () => _addItem(),
+                                          onPressed: () =>
+                                              _addItem(_addkeyLager),
                                           shape: new RoundedRectangleBorder(
                                               borderRadius:
                                                   new BorderRadius.circular(
@@ -834,7 +911,7 @@ class EventAddPageState extends State<EventAddPage> {
                               )),
                           Container(
                               padding: EdgeInsets.all(10),
-                              height: (60 * goupCheckbox.length).toDouble(),
+                              height: (60 * groupCheckbox.length).toDouble(),
                               child: Row(
                                 children: <Widget>[
                                   Expanded(
@@ -848,15 +925,14 @@ class EventAddPageState extends State<EventAddPage> {
                                               NeverScrollableScrollPhysics(),
                                           children: subgroups.map(
                                               (Map<dynamic, dynamic> group) {
-                                            print("group: " + group.toString());
                                             return new CheckboxListTile(
                                               title: new Text(
                                                   group[groupMapgroupNickName]),
-                                              value: goupCheckbox[
+                                              value: groupCheckbox[
                                                   group[userMapgroupID]],
                                               onChanged: (bool value) {
                                                 setState(() {
-                                                  goupCheckbox[group[
+                                                  groupCheckbox[group[
                                                       userMapgroupID]] = value;
                                                 });
                                               },
@@ -911,6 +987,7 @@ class EventAddPageState extends State<EventAddPage> {
                                   Expanded(
                                     flex: 4,
                                     child: new TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
                                       initialValue: widget.eventinfo['Kontakt']
                                           ['Email'],
                                       decoration: new InputDecoration(
@@ -939,6 +1016,8 @@ class EventAddPageState extends State<EventAddPage> {
                                       Expanded(
                                         flex: 7,
                                         child: ListView.builder(
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
                                             itemCount: this.mitnehemen.length,
                                             itemBuilder: (context, index) =>
                                                 this._buildRow(index)),
@@ -947,7 +1026,7 @@ class EventAddPageState extends State<EventAddPage> {
                                   ),
                                 ),
                                 Form(
-                                    key: _addkey,
+                                    key: _addkeyEvent,
                                     child: Container(
                                       child: Row(
                                         children: <Widget>[
@@ -971,7 +1050,8 @@ class EventAddPageState extends State<EventAddPage> {
                                               child: new Text('Add',
                                                   style: new TextStyle(
                                                       fontSize: 15)),
-                                              onPressed: () => _addItem(),
+                                              onPressed: () =>
+                                                  _addItem(_addkeyEvent),
                                               shape: new RoundedRectangleBorder(
                                                   borderRadius:
                                                       new BorderRadius.circular(

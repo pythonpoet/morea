@@ -1,11 +1,13 @@
 import 'dart:io' show Platform;
+
 enum PlatformType { isAndroid, isIOS }
-abstract class BaseDWICore{
+
+abstract class BaseDWICore {
   PlatformType getDevicePlatform();
 }
 
-class DWICore extends BaseDWICore{
-  PlatformType getDevicePlatform(){
+class DWICore extends BaseDWICore {
+  PlatformType getDevicePlatform() {
     String os = Platform.operatingSystem;
     switch (os) {
       case 'android':

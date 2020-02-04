@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
-
 abstract class BaseCrudMethods {
   Future<QuerySnapshot> getCollection(String path);
 
@@ -18,9 +17,8 @@ abstract class BaseCrudMethods {
 
   Future<bool> waitOnDocumentChanged(String path, String document);
 
-  Future<void> setData(
-      String path, String document, Map<String, dynamic> data);
-      
+  Future<void> setData(String path, String document, Map<String, dynamic> data);
+
   Future<void> runTransaction(
       String path, String document, Map<String, dynamic> data);
 
@@ -36,11 +34,9 @@ class CrudMedthods implements BaseCrudMethods {
   DWIFormat dwiformat = new DWIFormat();
   Firestore db;
 
-  CrudMedthods(Firestore firestore){
+  CrudMedthods(Firestore firestore) {
     this.db = firestore;
-    
   }
- 
 
   Future<QuerySnapshot> getCollection(String path) async {
     path = dwiformat.pathstring(path);
@@ -75,7 +71,8 @@ class CrudMedthods implements BaseCrudMethods {
     controller.add(false);
     Firestore.instance.collection(path).snapshots().listen((onData) {
       onData.documentChanges.forEach((change) async {
-        if ((change.oldIndex == change.newIndex)&&(change.document.documentID == document)) {
+        if ((change.oldIndex == change.newIndex) &&
+            (change.document.documentID == document)) {
           controller.add(true);
         }
       });
@@ -84,9 +81,10 @@ class CrudMedthods implements BaseCrudMethods {
     controller.close();
     return true;
   }
+
   Future<void> setData(
       String path, String document, Map<String, dynamic> data) async {
-        print("set doc: $path/$document");
+    print("set doc: $path/$document");
     path = dwiformat.pathstring(path);
     await Firestore.instance
         .collection(path)
@@ -98,30 +96,26 @@ class CrudMedthods implements BaseCrudMethods {
     });
   }
 
-
   Future<void> runTransaction(
       String path, String document, Map<String, dynamic> data) async {
-      DocumentReference docRef = db.collection(path).document(document);
+    DocumentReference docRef = db.collection(path).document(document);
 
-      try{
-          TransactionHandler transactionHandler =  (Transaction tran)async {
-          await tran.get(docRef).then((DocumentSnapshot snap)async {
-              if (snap.exists) {  
-                await tran.update(docRef, data);
-              }else{
-                await tran.set(docRef, data);
-              }
-            }).catchError((err)=>{
-             throw err
-            });
-        };
+    try {
+      TransactionHandler transactionHandler = (Transaction tran) async {
+        await tran.get(docRef).then((DocumentSnapshot snap) async {
+          if (snap.exists) {
+            await tran.update(docRef, data);
+          } else {
+            await tran.set(docRef, data);
+          }
+        }).catchError((err) => {throw err});
+      };
       return await db.runTransaction(transactionHandler);
-      }catch(e){
-        print(e);
-      }
-    
+    } catch (e) {
+      print(e);
     }
-    
+  }
+
   Future deletedocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);

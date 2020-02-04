@@ -2,17 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
@@ -30,31 +32,24 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
-  
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
- 
+  User moreaUser;
+  Register register;
+  CrudMedthods crud0;
 
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String _email,
-      _pfadinamen = ' ',
-      _vorname,
-      _nachname,
-      _alter ="[Datum auswählen]",
+  String _alter = "[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
-      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen';
-  String _password,
-      _adresse,
-      _ort,
-      _plz,
-      _handynummer,
-      _passwordneu,
-      userId,
-      error;
+      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen',
+      _password,
+      _passwordneu;
+  String error;
+  String _geschlecht = 'Bitte wählen';
   FormType _formType = FormType.login;
   List<Map> _stufenselect = new List();
   List<String> _verwandtschaft = [
@@ -69,15 +64,8 @@ class _LoginPageState extends State<LoginPage> {
   Color left = Colors.black;
   Color right = Colors.white;
 
-  //Für Eltern Stufenauswahl
-  bool biberCheckbox = false;
-  bool woelfeCheckbox = false;
-  bool meitliCheckbox = false;
-  bool buebeCheckbox = false;
-  bool pioCheckbox = false;
-
-  
-
+  //Mailchimp
+  MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -90,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   updatedevtoken() async {
-    moreafire.uploadDevTocken(userId);
+    moreafire.uploadDevTocken(moreaUser.userID);
   }
 
   void validateAndSubmit() async {
@@ -101,10 +89,11 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            userId = await widget.auth.signInWithEmailAndPassword(_email, _password);
-            print('Sign in: $userId');
-            if (userId != null) {
-              moreafire.uploadDevTocken(userId);
+            moreaUser.userID = await widget.auth
+                .signInWithEmailAndPassword(moreaUser.email, _password);
+            print('Sign in: ${moreaUser.userID}');
+            if (moreaUser.userID != null) {
+              moreafire.uploadDevTocken(moreaUser.userID);
               setState(() {
                 _load = false;
               });
@@ -116,113 +105,69 @@ class _LoginPageState extends State<LoginPage> {
             }
             break;
           case FormType.register:
-            if (_password.length >= 6) {
-              if (_password == _passwordneu) {
-                if (_selectedstufe != 'Stufe wählen') {
-                  setState(() {
-                    _load = true;
-                  });
-                  await datenschutz.moreaDatenschutzerklaerung(context);
-                  if (datenschutz.akzeptiert) {
-                    userId = await widget.auth.createUserWithEmailAndPassword(
-                        _email, _password);
-                    print('Registered user: $userId');
-                    if (userId != null) {
-                      //Creates userMap
-                      moreafire.createUserInformation(await mapUserData());
-                      //writes Devicetoken to collection of groupID
-                      moreafire.subscribeToGroup(convWebflowtoMiData(_selectedstufe));
-                      //uploads devtoken to userMap
-                      moreafire.uploadDevTocken(userId);
-                      //Writes tn rights to groupMap
-                      moreafire.groupPriviledgeTN(_selectedstufe ,userId, (_pfadinamen == ' '? _vorname: _pfadinamen));
-                      //sends user to rootpage
-                      widget.onSignedIn();
-                    }
-                  } else {
-                    setState(() {
-                      _load = false;
-                    });
-                    return null;
-                  }
+            var regDat = await register.validateTeilnehmer(context);
+            if(!(regDat is User))
+              return
+              moreaUser = regDat;
+              setState(() {
+                _load = true;
+              });
+              CrudMedthods crud = new CrudMedthods(widget.firestore);
+              await datenschutz.moreaDatenschutzerklaerung(
+                  context,
+                  (await crud.getDocument(pathConfig, "init"))
+                      .data["Datenschutz"]);
+                if (datenschutz.akzeptiert) {
+                  moreaUser.pos = "Teilnehmer";
+                  await moreaUser.createMoreaUser(
+                      widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                  await mailChimpAPIManager.updateUserInfo(
+                      moreaUser.email,
+                      moreaUser.vorName,
+                      moreaUser.nachName,
+                      _geschlecht,
+                      moreaUser.groupID,
+                      moreafire);
                 } else {
-                  showDialog(
-                      context: context,
-                      child: new AlertDialog(
-                        title: new Text("Bitte eine Stufe wählen!"),
-                      ));
+                  setState(() {
+                    _load = false;
+                  });
+                  return null;
                 }
-              } else {
-                showDialog(
-                    context: context,
-                    child: new AlertDialog(
-                      title: new Text("Passwörter sind nicht identisch"),
-                    ));
-              }
-            } else {
-              showDialog(
-                  context: context,
-                  child: new AlertDialog(
-                    title: new Text(
-                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
-                  ));
-            }
+                 
             break;
           case FormType.registereltern:
-            if (_password.length >= 6) {
-              if (_password == _passwordneu) {
-                if (_selectedverwandtschaft != "Verwandtschaftsgrad wählen") {
-                    setState(() {
-                      _load = true;
-                    });
-                    await datenschutz.moreaDatenschutzerklaerung(context);
+            var regDat = await register.validateParent(context);
+            if(!(regDat is User))
+              return
+              moreaUser = regDat;
+              setState(() {
+                _load = true;
+              });
+                    CrudMedthods crud = new CrudMedthods(widget.firestore);
+                    await datenschutz.moreaDatenschutzerklaerung(
+                        context,
+                        (await crud.getDocument(pathConfig, "init"))
+                            .data["Datenschutz"]);
                     if (datenschutz.akzeptiert) {
-                      userId = await widget.auth
-                          .createUserWithEmailAndPassword(_email, _password);
-                      print('Registered user: $userId');
-                      if (userId != null) {
-                        moreafire.createUserInformation(await mapUserData());
-                        moreafire.uploadDevTocken(userId);
-                        setState(() {
-                          _load = false;
-                        });
-                        widget.onSignedIn();
-                      }
+                      await moreaUser.createMoreaUser(
+                          widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                      await mailChimpAPIManager.updateUserInfo(
+                          moreaUser.email,
+                          moreaUser.vorName,
+                          moreaUser.nachName,
+                          _geschlecht,
+                          moreaUser.groupID,
+                          moreafire);
                     }
-                 
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Verwandtschaftsgrad wählen"),
-                        );
-                      });
-                }
-              } else {
-                showDialog(
-                    context: context,
-                    child: new AlertDialog(
-                      title: new Text("Passwörter sind nicht identisch"),
-                    ));
-              }
-            } else {
-              showDialog(
-                  context: context,
-                  child: new AlertDialog(
-                    title: new Text(
-                        "Passwort muss aus mindistens 6 Zeichen bestehen"),
-                  ));
-            }
+                  
             break;
         }
       } catch (e) {
-         widget.auth.displayAuthError(widget.auth.checkForAuthErrors(context, e), context);
+        widget.auth.displayAuthError(
+            widget.auth.checkForAuthErrors(context, e), context);
       }
     }
-    setState(() {
-      _load = false;
-    });
   }
 
   void moveToRegister() {
@@ -253,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: 'z.B. maxi@stinkt.undso',
                 ),
                 onChanged: (String value) {
-                  this._email = value;
+                  this.moreaUser.email = value;
                 },
               ),
             )
@@ -273,63 +218,13 @@ class _LoginPageState extends State<LoginPage> {
                     context: context,
                     child: new AlertDialog(
                       title: new Text(
-                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $_email erhalten'),
+                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $moreaUser.email erhalten'),
                     ));
-                widget.auth.sendPasswordResetEmail(_email);
+                widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
         ],
       ),
     );
-  }
-
-  Future<Map> mapUserData() async {
-    var token = await firebaseMessaging.getToken();
-    List devtoken = [token];
-    switch (_formType) {
-      case FormType.register:
-        Map<String, dynamic> userInfo = {
-          userMapPfadiName: this._pfadinamen,
-          userMapVorName: this._vorname,
-          userMapNachName: this._nachname,
-          userMapAlter: this._alter,
-          userMapAccountCreated : DateTime.now(),
-          userMapgroupID: _selectedstufe,
-  
-          userMapAdresse: this._adresse,
-          userMapPLZ: this._plz,
-          userMapOrt: this._ort,
-          userMapHandynummer: this._handynummer,
-          userMapPos: 'Teilnehmer',
-          userMapUID: this.userId,
-          userMapEmail: this._email,
-          userMapDeviceToken: devtoken
-        };
-        return userInfo;
-        break;
-      case FormType.registereltern:
-        Map<String, dynamic> userInfo = {
-          userMapPfadiName: " ",
-          userMapVorName: this._vorname,
-          userMapNachName: this._nachname,
-          userMapgroupID: '',
-          userMapAccountCreated : DateTime.now(),
-          userMapAdresse: this._adresse,
-          userMapPLZ: this._plz,
-          userMapOrt: this._ort,
-          userMapHandynummer: this._handynummer,
-          userMapPos: this._selectedverwandtschaft,
-          userMapUID: this.userId,
-          userMapEmail: this._email,
-          userMapDeviceToken: devtoken
-        };
-        return userInfo;
-        break;
-      case FormType.login:
-        return null;
-        break;
-      default:
-        return null;
-    }
   }
 
   @override
@@ -337,16 +232,21 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
-    
     initSubgoup();
   }
+
   initSubgoup() async {
-    CrudMedthods crud0 = new CrudMedthods(widget.firestore);
+    crud0 = new CrudMedthods(widget.firestore);
+    moreaUser = new User(crud0);
+    register = new Register(moreaUser: moreaUser);
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
-    this._stufenselect =
-        new List<Map>.from(data[groupMapSubgroup]);
-    setState(() {});
+    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
+  }
+  letsSetState(){
+    setState(() {
+      
+    });
   }
 
   @override
@@ -362,9 +262,9 @@ class _LoginPageState extends State<LoginPage> {
         : new Container();
 
     return new Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-      ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+        ),
         body: Stack(
           children: <Widget>[
             Container(
@@ -454,7 +354,7 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) =>
                       value.isEmpty ? 'Email darf nicht leer sein' : null,
                   keyboardType: TextInputType.emailAddress,
-                  onSaved: (value) => _email = value,
+                  onSaved: (value) => moreaUser.email = value,
                 ),
                 new TextFormField(
                   decoration: new InputDecoration(
@@ -503,7 +403,7 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 child: Column(
                   children: <Widget>[
-                    buildRegisterTeilnehmer(context),
+                    register.registerTeilnehmerWidget(context, letsSetState, crud0.getDocument(pathGroups, "1165")),
                     Column(children: buildSubmitButtons())
                   ],
                 ),
@@ -511,7 +411,7 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 child: Column(
                   children: <Widget>[
-                    buildRegisterEltern(context),
+                    register.registerParentWidget(context, letsSetState),
                     Column(children: buildSubmitButtons())
                   ],
                 ),
@@ -523,548 +423,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Widget buildRegisterEltern(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Icon(Icons.person),
-                  flex: 1,
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Vorname'),
-                          validator: (value) => value.isEmpty
-                              ? 'Vornamen darf nicht leer sein'
-                              : null,
-                          keyboardType: TextInputType.text,
-                          onSaved: (value) => _vorname = value,
-                        ),
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Nachname'),
-                          validator: (value) => value.isEmpty
-                              ? 'Nachname darf nicht leer sein'
-                              : null,
-                          keyboardType: TextInputType.text,
-                          onSaved: (value) => _nachname = value,
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(left: 12),
-                          width: 1000,
-                          color: Colors.grey[200],
-                          child: new DropdownButton<String>(
-                              items: _verwandtschaft.map((String val) {
-                                return new DropdownMenuItem<String>(
-                                  value: val,
-                                  child: new Text(val),
-                                );
-                              }).toList(),
-                              hint: Text(_selectedverwandtschaft),
-                              onChanged: (newVal) {
-                                _selectedverwandtschaft = newVal;
-                                this.setState(() {});
-                              }),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.home),
-                ),
-                Expanded(
-                    flex: 9,
-                    child: Container(
-                      alignment: Alignment.center, //
-                      decoration: new BoxDecoration(
-                        border: new Border.all(color: Colors.black, width: 2),
-                        borderRadius: new BorderRadius.all(
-                          Radius.circular(4.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          new TextFormField(
-                            decoration: new InputDecoration(
-                                border: UnderlineInputBorder(),
-                                filled: true,
-                                labelText: 'Adresse'),
-                            keyboardType: TextInputType.text,
-                            onSaved: (value) => _adresse = value,
-                          ),
-                          new Row(
-                            children: <Widget>[
-                              Expanded(
-                                  child: new TextFormField(
-                                decoration: new InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    filled: true,
-                                    labelText: 'PLZ'),
-                                keyboardType: TextInputType.number,
-                                onSaved: (value) => _plz = value,
-                              )),
-                              Expanded(
-                                child: new TextFormField(
-                                  decoration: new InputDecoration(
-                                      border: UnderlineInputBorder(),
-                                      filled: true,
-                                      labelText: 'Ort'),
-                                  keyboardType: TextInputType.text,
-                                  onSaved: (value) => _ort = value,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ))
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.phone),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: new TextFormField(
-                      decoration: new InputDecoration(
-                          border: UnderlineInputBorder(),
-                          filled: true,
-                          labelText: 'Handy nummer'),
-                      validator: (value) => value.isEmpty
-                          ? 'Handynummer darf nicht leer sein'
-                          : null,
-                      keyboardType: TextInputType.phone,
-                      onSaved: (value) => _handynummer = value,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.email),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: new TextFormField(
-                      decoration:
-                          new InputDecoration(filled: true, labelText: 'Email'),
-                      validator: (value) =>
-                          value.isEmpty ? 'Email darf nicht leer sein' : null,
-                      keyboardType: TextInputType.emailAddress,
-                      onSaved: (value) => _email = value,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.vpn_key),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Password'),
-                          validator: (value) => value.isEmpty
-                              ? 'Passwort darf nicht leer sein'
-                              : null,
-                          obscureText: true,
-                          onSaved: (value) => _password = value,
-                        ),
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Password erneut eingeben'),
-                          validator: (value) => value.isEmpty
-                              ? 'Passwort darf nicht leer sein'
-                              : null,
-                          obscureText: true,
-                          onSaved: (value) => _passwordneu = value,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 24,
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget buildRegisterTeilnehmer(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Icon(Icons.person),
-                  flex: 1,
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                            border: UnderlineInputBorder(),
-                            filled: true,
-                            labelText: 'Pfadinamen',
-                          ),
-                          onSaved: (value) => _pfadinamen = value,
-                        ),
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Vorname'),
-                          validator: (value) => value.isEmpty
-                              ? 'Vornamen darf nicht leer sein'
-                              : null,
-                          keyboardType: TextInputType.text,
-                          onSaved: (value) => _vorname = value,
-                        ),
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Nachname'),
-                          validator: (value) => value.isEmpty
-                              ? 'Nachname darf nicht leer sein'
-                              : null,
-                          keyboardType: TextInputType.text,
-                          onSaved: (value) => _nachname = value,
-                        ),
-                        Container(
-                          color: Colors.grey[200],
-                          height: 55,
-                          width: 1000,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              new Text("   Geburtstag", style:  TextStyle(color: Colors.grey[600], fontSize: 16), ),
-                              new FlatButton(
-                                child: Text(_alter, style:  TextStyle(color: Colors.grey[500], fontSize: 16)),
-                                onPressed: () async {
-                                 
-                                  await DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    theme: DatePickerTheme(doneStyle: TextStyle(color: MoreaColors.violett, fontSize: 16, fontWeight: FontWeight.bold) ),
-                                    minTime: DateTime.now().add(new Duration(days: -365*25)),
-                                    maxTime: DateTime.now().add(new Duration(days: -365*3)),
-                                    onConfirm: (date) {
-                                      _alter  = DateFormat.yMd().format(date).toString();
-                                    }, currentTime: DateTime.now(), locale: LocaleType.de);
-          
-                                  setState(() {
-                                    
-                                  });
-                                },
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
-                          color: Colors.grey[800],
-                          height: 0.5,
-                          width: 1000,
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(left: 12),
-                          width: 1000,
-                          color: Colors.grey[200],
-                          child: new DropdownButton<String>(
-                              items: _stufenselect.map((Map group) {
-                                return new DropdownMenuItem<String>(
-                                  value: group[userMapgroupID],
-                                  child: new Text(group[groupMapgroupNickName]),
-                                );
-                              }).toList(),
-                              hint: Text(_selectedstufe),
-                              onChanged: (newVal) {
-                                _selectedstufe = newVal;
-                                this.setState(() {});
-                              }),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.home),
-                ),
-                Expanded(
-                    flex: 9,
-                    child: Container(
-                      alignment: Alignment.center, //
-                      decoration: new BoxDecoration(
-                        border: new Border.all(color: Colors.black, width: 2),
-                        borderRadius: new BorderRadius.all(
-                          Radius.circular(4.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          new TextFormField(
-                            decoration: new InputDecoration(
-                                border: UnderlineInputBorder(),
-                                filled: true,
-                                labelText: 'Adresse'),
-                            keyboardType: TextInputType.text,
-                            onSaved: (value) => _adresse = value,
-                          ),
-                          new Row(
-                            children: <Widget>[
-                              Expanded(
-                                  child: new TextFormField(
-                                decoration: new InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    filled: true,
-                                    labelText: 'PLZ'),
-                                keyboardType: TextInputType.number,
-                                onSaved: (value) => _plz = value,
-                              )),
-                              Expanded(
-                                child: new TextFormField(
-                                  decoration: new InputDecoration(
-                                      border: UnderlineInputBorder(),
-                                      filled: true,
-                                      labelText: 'Ort'),
-                                  keyboardType: TextInputType.text,
-                                  onSaved: (value) => _ort = value,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ))
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.phone),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: new TextFormField(
-                      decoration: new InputDecoration(
-                          border: UnderlineInputBorder(),
-                          filled: true,
-                          labelText: 'Handy nummer'),
-                      validator: (value) => value.isEmpty
-                          ? 'Handynummer darf nicht leer sein'
-                          : null,
-                      keyboardType: TextInputType.phone,
-                      onSaved: (value) => _handynummer = value,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.email),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: new TextFormField(
-                      decoration:
-                          new InputDecoration(filled: true, labelText: 'Email'),
-                      validator: (value) =>
-                          value.isEmpty ? 'Email darf nicht leer sein' : null,
-                      keyboardType: TextInputType.emailAddress,
-                      onSaved: (value) => _email = value,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Icon(Icons.vpn_key),
-                ),
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    alignment: Alignment.center, //
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2),
-                      borderRadius: new BorderRadius.all(
-                        Radius.circular(4.0),
-                      ),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Password'),
-                          validator: (value) => value.isEmpty
-                              ? 'Passwort darf nicht leer sein'
-                              : null,
-                          obscureText: true,
-                          onSaved: (value) => _password = value,
-                        ),
-                        new TextFormField(
-                          decoration: new InputDecoration(
-                              border: UnderlineInputBorder(),
-                              filled: true,
-                              labelText: 'Password erneut eingeben'),
-                          validator: (value) => value.isEmpty
-                              ? 'Passwort darf nicht leer sein'
-                              : null,
-                          obscureText: true,
-                          onSaved: (value) => _passwordneu = value,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 24,
-          )
-        ],
-      ),
-    );
-  }
-
+  
   List<Widget> buildSubmitButtons() {
     if (_formType == FormType.login) {
       return [

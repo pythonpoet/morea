@@ -7,17 +7,28 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
-abstract class BaseAgenda{
+abstract class BaseAgenda {
   Stream<List<dynamic>> getAgendaOverview(String groupID);
+
   Future<DocumentSnapshot> getAgendaTitle(String eventID);
+
   Future<void> deleteAgendaEvent(Map<String, dynamic> event);
+
   Future<void> deleteAgendaOverviewTitle(String groupID, String eventID);
-  Future<void> uploadtoAgenda(Map<String, dynamic> dataold, Map<String, dynamic> data);
-  Future<void> updateAgendaTitles(String groupID, Map<String, dynamic> agendaTitle);
+
+  Future<void> uploadtoAgenda(
+      Map<String, dynamic> dataold, Map<String, dynamic> data);
+
+  Future<void> updateAgendaTitles(
+      String groupID, Map<String, dynamic> agendaTitle);
+
   Future<String> createEventID();
-  List<String> check4EventgroupIDsChanged(Map<String, dynamic> eventOld, Map<String, dynamic> eventNew);
+
+  List<String> check4EventgroupIDsChanged(
+      Map<String, dynamic> eventOld, Map<String, dynamic> eventNew);
 }
-class Agenda extends BaseAgenda{
+
+class Agenda extends BaseAgenda {
   CrudMedthods crud0;
   DWIFormat dwiFormat = new DWIFormat();
   Firestore db;
@@ -25,35 +36,36 @@ class Agenda extends BaseAgenda{
   List<Map> events = new List();
   StreamController<List<Map>> eventStream = new BehaviorSubject();
 
-  Agenda(Firestore firestore, MoreaFirebase moreaFire){
-   this.crud0 = new CrudMedthods(firestore);
-   this.db = firestore;
-   this.moreaFire = moreaFire;
-  }
-  DateTime getDateTime(Map event){
-    return DateTime.parse(event['Datum']);
+  Agenda(Firestore firestore, MoreaFirebase moreaFire) {
+    this.crud0 = new CrudMedthods(firestore);
+    this.db = firestore;
+    this.moreaFire = moreaFire;
   }
 
-  Stream<List<Map<dynamic,dynamic>>> getAgendaOverview(String groupID)async* {
-    await for(DocumentSnapshot groupMap in crud0.streamDocument(pathGroups, groupID)){
-      if(groupMap.data.containsKey('AgendaTitles'))
-      yield List<Map>.from(groupMap.data["AgendaTitles"]);
+  DateTime getDateTime(Map event) {
+    return DateTime.parse(event['DeleteDate']);
+  }
+
+  Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {
+    await for (DocumentSnapshot groupMap
+        in crud0.streamDocument(pathGroups, groupID)) {
+      if (groupMap.data.containsKey('AgendaTitles'))
+        yield List<Map>.from(groupMap.data["AgendaTitles"]);
     }
   }
-  Stream<bool> addToList(String groupID)async*{
-    await for(List<Map<dynamic,dynamic>> groupEvents in this.getAgendaOverview(groupID)){
-      if(groupEvents != null)
-      if(events.length>0)
-        for(Map groupEvent in groupEvents){
-          int i= 0;
-          events.forEach((event){
-            if(event["eventID"] == groupEvent["eventID"])
-              i++;
+
+  Stream<bool> addToList(String groupID) async* {
+    await for (List<Map<dynamic, dynamic>> groupEvents
+        in this.getAgendaOverview(groupID)) {
+      if (groupEvents != null) if (events.length > 0)
+        for (Map groupEvent in groupEvents) {
+          int i = 0;
+          events.forEach((event) {
+            if (event["eventID"] == groupEvent["eventID"]) i++;
           });
-          if(i == 0)
-            events.add(groupEvent);
+          if (i == 0) events.add(groupEvent);
         }
-        else
+      else
         events.addAll(groupEvents);
       /*
       for(Map event in events){
@@ -65,134 +77,146 @@ class Agenda extends BaseAgenda{
         );
           
       }*/
-      events.sort((a, b)=> getDateTime(a).compareTo(getDateTime(b)));
+      events.sort((a, b) => getDateTime(a).compareTo(getDateTime(b)));
       eventStream.add(events);
       yield true;
     }
   }
-  Stream<List<Map>> getTotalAgendaOverview(List<String> groupIDs)async*{
-    for(String groupID in groupIDs){
-      print("Loop of: $groupID");
-      addToList(groupID).firstWhere((bool test) => test==true);
+
+  Stream<List<Map>> getTotalAgendaOverview(List<String> groupIDs) async* {
+    for (String groupID in groupIDs) {
+      addToList(groupID).firstWhere((bool test) => test == true);
     }
-    print("loop terminated");
     yield* eventStream.stream;
   }
- Future<DocumentSnapshot> getAgendaTitle(String eventID)async{
-   return await crud0.getDocument(pathEvents, eventID);
+
+  Future<DocumentSnapshot> getAgendaTitle(String eventID) async {
+    return await crud0.getDocument(pathEvents, eventID);
   }
-  Future<void> deleteAgendaEvent(Map<String, dynamic> event)async{
+
+  Future<void> deleteAgendaEvent(Map<String, dynamic> event) async {
     List<String> groupIDs = new List<String>.from(event["groupIDs"]);
     String eventID = event["eventID"];
-    if(groupIDs.isNotEmpty)
-    for(String groupID in groupIDs){
-    this.deleteAgendaOverviewTitle(groupID, eventID);
-    }
-    
+    if (groupIDs.isNotEmpty)
+      for (String groupID in groupIDs) {
+        this.deleteAgendaOverviewTitle(groupID, eventID);
+      }
+
     return await crud0.deletedocument(pathEvents, eventID);
   }
-  Future<void> deleteAgendaOverviewTitle(String groupID, String eventID)async{
+
+  Future<void> deleteAgendaOverviewTitle(String groupID, String eventID) async {
     DocumentReference docRef = db.collection(pathGroups).document(groupID);
     List<dynamic> agendaOverview;
-     
-    try{
-          TransactionHandler transactionHandler =  (Transaction tran)async {
-          await tran.get(docRef).then((DocumentSnapshot snap)async {
-              if (snap.exists) {
-                Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
-                  if(test.containsKey("AgendaTitles")){
-                    agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
-                    agendaOverview.removeWhere((element) => element[groupMapEventID] == eventID);                      
-                    }
-                  }
-                 await tran.update(docRef, Map<String, dynamic>.from({"AgendaTitles": agendaOverview}));
-      
-            }).catchError((err)=>{
-              print(err)
-            });
-        };
+
+    try {
+      TransactionHandler transactionHandler = (Transaction tran) async {
+        await tran.get(docRef).then((DocumentSnapshot snap) async {
+          if (snap.exists) {
+            Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
+            if (test.containsKey("AgendaTitles")) {
+              agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
+              agendaOverview.removeWhere(
+                  (element) => element[groupMapEventID] == eventID);
+            }
+          }
+          await tran.update(docRef,
+              Map<String, dynamic>.from({"AgendaTitles": agendaOverview}));
+        }).catchError((err) => {print(err)});
+      };
       return await db.runTransaction(transactionHandler);
-      }catch(e){
-        print(e);
-      }
+    } catch (e) {
+      print('Error in deleteAgendaOverview');
+      print(e);
+    }
   }
-  Map<String, dynamic> createEventTitle(Map<String, dynamic> event){
+
+  Map<String, dynamic> createEventTitle(Map<String, dynamic> event) {
     return Map<String, dynamic>.from({
-      "Datum" : event["Datum"],
+      "Datum": event["Datum"],
       "eventID": event["eventID"],
-      "Lager" : event["Lager"],
-      "Event" : event["Event"],
+      "Lager": event["Lager"],
+      "Event": event["Event"],
       "Eventname": event["Eventname"],
       "DeleteDate": event["DeleteDate"]
     });
   }
 
-  Future<void> uploadtoAgenda(Map<String, dynamic> eventOld, Map<String, dynamic> data) async {
+  Future<void> uploadtoAgenda(
+      Map<String, dynamic> eventOld, Map<String, dynamic> data) async {
     String eventID;
-    if(!eventOld.containsKey("eventID"))
-     eventID = await createEventID();
-    else{
+    if (!eventOld.containsKey("eventID"))
+      eventID = await createEventID();
+    else {
       eventID = eventOld["eventID"];
-      for(String groupID in eventOld['groupIDs']){
-      await this.deleteAgendaOverviewTitle(groupID, eventID);
+      for (String groupID in eventOld['groupIDs']) {
+        await this.deleteAgendaOverviewTitle(groupID, eventID);
+      }
     }
-    }
-     
+
+    print(eventID);
+
     data["eventID"] = eventID;
-    
+
     List<String> groupIDs = data["groupIDs"];
-    
-    for(String groupID in groupIDs){
+
+    for (String groupID in groupIDs) {
       this.updateAgendaTitles(groupID, this.createEventTitle(data));
-    }    return await crud0.runTransaction(pathEvents, eventID , data);
+    }
+    return await crud0.runTransaction(pathEvents, eventID, data);
   }
-  Future<String> createEventID()async{
+
+  Future<String> createEventID() async {
     return await moreaFire.createEventID();
   }
-  Future<void> updateAgendaTitles(String groupID, Map<String, dynamic> agendaTitle)async{
+
+  Future<void> updateAgendaTitles(
+      String groupID, Map<String, dynamic> agendaTitle) async {
     DocumentReference docRef = db.collection(pathGroups).document(groupID);
     List<dynamic> agendaOverview = new List();
-   
+
     //DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
-    
-    try{
-          TransactionHandler transactionHandler =  (Transaction tran)async {
-          await tran.get(docRef).then((DocumentSnapshot snap)async {
-              if (snap.exists) {
-                Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
-                  if(test.containsKey("AgendaTitles")){
-                    agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
-                    if(agendaOverview.length>=0){
-                      agendaOverview.add(agendaTitle);
-                      agendaOverview.sort((a,b)=> getDateTime(a).compareTo(getDateTime(b)));
-                      
-                    }else{
-                       agendaOverview[0] = agendaTitle;
-                    }
-                  }else{
-                    agendaOverview.add(agendaTitle);
-                  }
-                 await tran.update(docRef, Map<String, dynamic>.from({"AgendaTitles": agendaOverview}));
+
+    try {
+      TransactionHandler transactionHandler = (Transaction tran) async {
+        await tran.get(docRef).then((DocumentSnapshot snap) async {
+          if (snap.exists) {
+            Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
+            if (test.containsKey("AgendaTitles")) {
+              agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
+              if (agendaOverview.length >= 1) {
+                agendaOverview.add(agendaTitle);
+                agendaOverview
+                    .sort((a, b) => getDateTime(a).compareTo(getDateTime(b)));
+              } else {
+                agendaOverview.add(agendaTitle);
               }
-            }).catchError((err)=>{
-              print(err)
-            });
-        };
+            } else {
+              agendaOverview.add(agendaTitle);
+            }
+            await tran.update(docRef,
+                Map<String, dynamic>.from({"AgendaTitles": agendaOverview}));
+          }
+        }).catchError((err) => {print(err)});
+      };
       return await db.runTransaction(transactionHandler);
-      }catch(e){
-        print(e);
-      }
+    } catch (e) {
+      print('Error in updateAgendaTitles');
+      print(e);
+    }
   }
-  List<String> check4EventgroupIDsChanged(Map<String, dynamic> eventOld, Map<String, dynamic> eventNew){
+
+  List<String> check4EventgroupIDsChanged(
+      Map<String, dynamic> eventOld, Map<String, dynamic> eventNew) {
     List<String> oldGroupIDs = new List<String>();
     List<String> newGroupIDs = new List<String>();
-    if(eventOld.containsKey("groupIDs"))
+    if (eventOld.containsKey("groupIDs"))
       oldGroupIDs.addAll(List<String>.from(eventOld['groupIDs']));
-    if(eventNew.containsKey('groupIDs'))
+    if (eventNew.containsKey('groupIDs'))
       newGroupIDs.addAll(List<String>.from(eventNew['groupIDs']));
-    if(oldGroupIDs.length>0)
-    oldGroupIDs.removeWhere((element) => newGroupIDs.contains(element));
-    
+    if (oldGroupIDs.length > 0)
+      oldGroupIDs.removeWhere((element) => newGroupIDs.contains(element));
+
     return oldGroupIDs;
   }
 }

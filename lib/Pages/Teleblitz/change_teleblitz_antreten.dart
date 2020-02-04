@@ -25,9 +25,9 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
   @override
   void initState() {
     super.initState();
-    var splitAntreten = widget.antreten.split(',');
-    this.ortAntreten = splitAntreten[0];
-    this.zeitAntreten = splitAntreten[1].split(' ')[1];
+    var splitAntreten = widget.antreten.split(', ');
+    this.ortAntreten = splitAntreten[1];
+    this.zeitAntreten = splitAntreten[0].split(' ')[0];
     this.mapAntreten = widget.mapAntreten;
     ortAntretenController.text = ortAntreten;
     mapAntretenController.text = mapAntreten;
@@ -98,8 +98,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                           child: FlatButton(
                             child: Text(
                               zeitAntreten + ' Uhr',
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.black87),
+                              style: MoreaTextStyle.textField,
                             ),
                             onPressed: () {
                               _selectTime(context);
@@ -119,7 +118,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                             controller: ortAntretenController,
                             maxLines: 1,
                             keyboardType: TextInputType.text,
-                            style: TextStyle(fontSize: 18),
+                            style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -147,7 +146,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                             maxLines: 10,
                             minLines: 1,
                             keyboardType: TextInputType.text,
-                            style: TextStyle(fontSize: 18),
+                            style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -185,7 +184,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
         if (picked.minute.toString().length < 2 &&
             picked.hour.toString().length >= 2) {
           this.zeitAntreten =
-              picked.hour.toString() + ":" + picked.minute.toString() + "0";
+              picked.hour.toString() + ":0" + picked.minute.toString();
         } else if (picked.hour.toString().length < 2 &&
             picked.minute.toString().length >= 2) {
           this.zeitAntreten =

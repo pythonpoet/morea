@@ -5,25 +5,27 @@ import 'package:morea/Pages/About/about.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
+import 'package:morea/Widgets/Action/scan.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
-import 'package:morea/Widgets/home/eltern.dart';
-import 'package:morea/Widgets/home/elternpend.dart';
-import 'package:morea/Widgets/home/leiter.dart';
-import 'package:morea/Widgets/home/teilnehmer.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/MiData.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'select_stufe.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
+import 'package:morea/Widgets/home/elternpend.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.firestore, this.navigationMap});
+  HomePage({this.auth, this.firestore, this.navigationMap, this.moreafire});
 
   final BaseAuth auth;
   final Firestore firestore;
   final Map<String, Function> navigationMap;
+  final MoreaFirebase moreafire;
 
   @override
   State<StatefulWidget> createState() => HomePageState();
@@ -39,6 +41,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Teleblitz teleblitz;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   MoreaLoading moreaLoading;
+  GlobalKey _changeTeleblitzKey = GlobalKey();
+  GlobalKey _bottomAppBarLeiterKey = GlobalKey();
+  GlobalKey _drawerKey = GlobalKey();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  GlobalKey _bottomAppBarTNKey = GlobalKey();
 
   //final formKey = new GlobalKey<FormState>();
 
@@ -49,48 +56,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool chunnt = false;
   var messagingGroups;
 
-  void submit(String anabmelden, String groupnr, String eventID, String uid, {String name}) {
-    String anmeldung;
-
-    anmeldeDaten = {
-      'Anmeldename': moreafire.getDisplayName,
-      'Anmeldung': anabmelden
-    };
-
-    if (anabmelden == 'Chunt') {
-      anmeldung = 'Du hast dich Angemolden';
-      chunnt = true;
-    } else {
-      anmeldung = 'Du hast dich Abgemolden';
-      chunnt = false;
-    }
-    crud0
-        .waitOnDocumentChanged("$pathEvents/$eventID/Anmeldungen", uid)
-        .then((onValue) {
-      if (onValue)
-        showDialog(
-            context: context,
-            builder: (context) => new AlertDialog(
-                  title: new Text("Teleblitz"),
-                  content: new Text(anmeldung),
-                ));
-    });
-    if(name == null){
-      name = moreafire.getDisplayName;
-    }
-    if (_formType != FormType.eltern) {
-      moreafire.childAnmelden(eventID, widget.auth.getUserID,
-          widget.auth.getUserID, anabmelden, name);
-    } else {
-      moreafire.parentAnmeldet(eventID, widget.auth.getUserID,
-          widget.auth.getUserID, anabmelden, name);
-    }
-  }
-
-  
   void getuserinfo() async {
-    await moreafire.getData(widget.auth.getUserID);
-    await moreafire.initTeleblitz();
     forminit();
     teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
@@ -135,7 +101,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    moreafire = new MoreaFirebase(widget.firestore);
+    moreafire = widget.moreafire;
     crud0 = new CrudMedthods(widget.firestore);
     moreaLoading = new MoreaLoading(this);
     firebaseMessaging.configure(
@@ -154,6 +120,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       builder: (BuildContext context) => MessagesPage(
                             moreaFire: moreafire,
                             auth: widget.auth,
+                            firestore: widget.firestore,
                             navigationMap: widget.navigationMap,
                           )));
                 },
@@ -182,6 +149,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           builder: (BuildContext context) => MessagesPage(
                 moreaFire: moreafire,
                 auth: widget.auth,
+                firestore: widget.firestore,
                 navigationMap: widget.navigationMap,
               )));
     }, onLaunch: (Map<String, dynamic> message) async {
@@ -189,6 +157,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       Navigator.of(context).push(new MaterialPageRoute(
           builder: (BuildContext context) => MessagesPage(
                 moreaFire: moreafire,
+                firestore: widget.firestore,
                 auth: widget.auth,
                 navigationMap: widget.navigationMap,
               )));
@@ -199,7 +168,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     moreaLoading.dispose();
-    //teleblitz.dispose();
     super.dispose();
   }
 
@@ -209,68 +177,144 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget teleblitzwidget() {
-    switch (_formType) {
-      case FormType.loading:
-        return Scaffold(
-            appBar: AppBar(
-              title: Text('Teleblitz'),
-            ),
-            drawer: new Drawer(
-              child: new ListView(children: navigation()),
-            ),
-            body: moreaLoading.loading());
-      case FormType.leiter:
-        return leiterView(
-            stream: moreafire.tbz.getMapofEvents,
-            groupID: moreafire.getGroupID,
-            subscribedGroups: moreafire.getSubscribedGroups,
-            navigation: navigation,
-            teleblitzAnzeigen: teleblitz.anzeigen,
-            route: routeEditTelebliz,
-            navigationMap: widget.navigationMap,
-            moreaLoading: moreaLoading.loading());
+    if (_formType == FormType.loading)
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Teleblitz'),
+          ),
+          drawer: new Drawer(
+            child: new ListView(children: navigation()),
+          ),
+          body: moreaLoading.loading());
+    if ((moreafire.getSubscribedGroups.length > 0) ||
+        (moreafire.getGroupID != null)) {
+      List<Widget> anzeige = new List();
+      if (moreafire.getGroupID != null)
+        anzeige.add(teleblitz.displayContent(
+            moreaLoading.loading, moreafire.getGroupID));
+      moreafire.getSubscribedGroups.forEach((groupID) {
+        anzeige.add(teleblitz.displayContent(moreaLoading.loading, groupID));
+      });
 
-        break;
-      case FormType.teilnehmer:
-        return teilnehmerView(
-            stream: moreafire.tbz.getMapofEvents,
-            groupID: moreafire.getGroupID,
-            navigation: navigation,
-            teleblitzAnzeigen: teleblitz.anzeigen,
-            anmeldebutton: this.childAnmeldeButton,
-            navigationMap: widget.navigationMap,
-            moreaLoading: moreaLoading.loading());
-        break;
-      case FormType.eltern:
-        if (moreafire.getSubscribedGroups.length > 0)
-          return elternView(
-              stream: moreafire.tbz.getMapofEvents,
-              subscribedGroups: moreafire.getSubscribedGroups,
-              navigation: navigation,
-              teleblitzAnzeigen: teleblitz.anzeigen,
-              anmeldebutton: parentAnmeldeButton,
-              navigationMap: widget.navigationMap,
-              moreaLoading: moreaLoading.loading());
-        else
-          return Scaffold(
-              appBar: AppBar(
-                title: Text('Teleblitz'),
+      return DefaultTabController(
+        length: moreafire.getSubscribedGroups.length +
+            ((moreafire.getGroupID != null) ? 1 : 0),
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: new AppBar(
+            title: new Text('Teleblitz'),
+            bottom: TabBar(
+                tabs: getTabList(((moreafire.getGroupID == null)
+                    ? moreafire.getSubscribedGroups
+                    : [
+                        moreafire.getGroupID,
+                        ...moreafire.getSubscribedGroups
+                      ]))),
+            actions: tutorialButton(),
+            leading: Showcase.withWidget(
+              key: _drawerKey,
+              disableAnimation: true,
+              height: 300,
+              width: 150,
+              container: Container(
+                padding: EdgeInsets.all(5),
+                constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white),
+                child: Column(
+                  children: [
+                    Text(
+                      tutorialDrawer(),
+                    ),
+                  ],
+                ),
               ),
-              drawer: new Drawer(
-                child: new ListView(children: navigation()),
+              child: IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () => _scaffoldKey.currentState.openDrawer(),
               ),
-              body: requestPrompttoParent());
-        break;
-        default:
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Teleblitz'),
             ),
-            drawer: new Drawer(
-              child: new ListView(children: navigation()),
-            ),
-            body: moreaLoading.loading());
+          ),
+          drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
+              moreafire.getEmail, context, moreafire, crud0, _signedOut),
+          body: TabBarView(children: anzeige),
+          floatingActionButton: (moreafire.getPos == "Leiter")
+              ? Showcase(
+                  key: _changeTeleblitzKey,
+                  disableAnimation: true,
+                  description: 'Hier kannst du den Teleblitz ändern',
+                  child: moreaEditActionbutton(
+                    route: routeEditTelebliz,
+                  ))
+              : SizedBox(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar: (moreafire.getPos == "Leiter")
+              ? Showcase.withWidget(
+                  key: _bottomAppBarLeiterKey,
+                  disableAnimation: true,
+                  height: 500,
+                  width: 150,
+                  container: Container(
+                    padding: EdgeInsets.all(5),
+                    constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.white),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Hier kannst du zu den verschiedenen Screens wechseln. Wechsle zum nächsten Screen und drücke dort den Hilfeknopf oben rechts.',
+                        ),
+                      ],
+                    ),
+                  ),
+                  child:
+                      moreaLeiterBottomAppBar(widget.navigationMap, "Ändern"))
+              : Showcase.withWidget(
+                  key: _bottomAppBarTNKey,
+                  height: 300,
+                  width: 150,
+                  disableAnimation: true,
+                  container: Container(
+                    padding: EdgeInsets.all(5),
+                    constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.white),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Hier kannst du zu den verschiedenen Screens wechseln. Wechsle zum nächsten Screen und drücke dort den Hilfeknopf oben rechts.',
+                        ),
+                      ],
+                    ),
+                  ),
+                  child: moreaChildBottomAppBar(
+                    widget.navigationMap,
+                  )),
+        ),
+      );
+    } else
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Teleblitz'),
+          ),
+          drawer: new Drawer(
+            child: new ListView(children: navigation()),
+          ),
+          body: requestPrompttoParent());
+  }
+
+  List<Widget> getTabList(List<String> subscribedGroups) {
+    List<Widget> tabList = new List();
+    for (String groupID in subscribedGroups) {
+      tabList.add(new Tab(
+        text: convMiDatatoWebflow(groupID),
+      ));
     }
+    return tabList;
   }
 
   List<Widget> navigation() {
@@ -295,7 +339,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState()))),
+                      new PersonenVerzeichnisState(
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                      )))),
+          new ListTile(
+            title: new Text("TN zu Leiter machen"),
+            trailing: new Icon(Icons.enhanced_encryption),
+            onTap: () => makeLeiterWidget(context,
+                moreafire.getUserMap[userMapUID], moreafire.getGroupID),
+          ),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),
@@ -322,10 +375,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               trailing: new Icon(Icons.add),
               onTap: () => Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) => new ProfilePageState(
-                    profile: moreafire.getUserMap,
-                    moreaFire: moreafire,
-                    crud0: crud0,
-                  )))),
+                        profile: moreafire.getUserMap,
+                        moreaFire: moreafire,
+                        crud0: crud0,
+                        signOut: widget.navigationMap[signedOut],
+                      )))),
           Divider(),
           new ListTile(
             title: new Text('Logout'),
@@ -348,6 +402,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   builder: (BuildContext context) => new ProfilePageState(
                         profile: moreafire.getUserMap,
                         crud0: crud0,
+                        moreaFire: moreafire,
+                        signOut: widget.navigationMap[signedOut],
                       )))),
           new Divider(),
           new ListTile(
@@ -363,75 +419,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           )
         ];
         break;
-        default:
-          return [
-            ListTile(
-              leading: Text('Loading...'),
-            )
-          ];
+      default:
+        return [
+          ListTile(
+            leading: Text('Loading...'),
+          )
+        ];
     }
-  }
-
-  Widget parentAnmeldeButton(String groupID, String eventID) {
-    List<Widget> anmeldebuttons = new List();
-    moreafire.getChildMap[groupID].forEach((String vorname, uid) {
-      anmeldebuttons.add(anmeldebutton(
-          groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden",
-          name: vorname));
-    });
-    return Column(children: anmeldebuttons);
-  }
-
-  Widget childAnmeldeButton(String groupID, String eventID) {
-    return anmeldebutton(moreafire.getGroupID, eventID, widget.auth.getUserID,
-        'Chume', 'Chume nöd');
-  }
-
-  Widget anmeldebutton(
-      String groupID, String eventID, String uid, String anmelden, abmelden,
-      {String name}) {
-    return Container(
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-                child: Container(
-              child: new RaisedButton(
-                child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
-                onPressed: () {
-                  if (name == null) {
-                    submit(eventMapAnmeldeStatusNegativ, moreafire.getGroupID, eventID, uid);
-                  } else {
-                    submit(eventMapAnmeldeStatusNegativ, moreafire.getGroupID, eventID, uid,
-                        name: name);
-                  }
-                },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-              ),
-            )),
-            Expanded(
-              child: Container(
-                child: new RaisedButton(
-                  child: new Text(anmelden, style: new TextStyle(fontSize: 20)),
-                  onPressed: () {
-                    if (name == null) {
-                      submit(eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid);
-                    } else {
-                      submit(eventMapAnmeldeStatusPositiv, moreafire.getGroupID, eventID, uid,
-                          name: name);
-                    }
-                  },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
-                  textColor: Colors.white,
-                ),
-              ),
-            )
-          ],
-        ));
   }
 
   void routeEditTelebliz() {
@@ -441,5 +435,77 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         .then((onValue) {
       setState(() {});
     });
+  }
+
+  List<Widget> tutorialButton() {
+    switch (_formType) {
+      case FormType.leiter:
+        return [
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () => tutorialLeiter(),
+          )
+        ];
+        break;
+      case FormType.teilnehmer:
+        return [
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () => tutorialTN(),
+          )
+        ];
+        break;
+      case FormType.eltern:
+        return [
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () => tutorialEltern(),
+          )
+        ];
+        break;
+      case FormType.loading:
+        return [];
+        break;
+      default:
+        return [];
+    }
+  }
+
+  void tutorialLeiter() {
+    ShowCaseWidget.of(context).startShowCase(
+        [_changeTeleblitzKey, _drawerKey, _bottomAppBarLeiterKey]);
+  }
+
+  void tutorialTN() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text(
+                  'Auf diesem Screen kannst du den Teleblitz deines Fähnlis sehen und dich dafür anmelden (ist nur möglich wenn eine Aktivität stattfindet)'),
+            )).then((value) => ShowCaseWidget.of(context)
+        .startShowCase([_drawerKey, _bottomAppBarTNKey]));
+  }
+
+  void tutorialEltern() {
+    ShowCaseWidget.of(context).startShowCase([_drawerKey, _bottomAppBarTNKey]);
+  }
+
+  String tutorialDrawer() {
+    switch (_formType) {
+      case FormType.leiter:
+        return 'Hier kannst du als Leiter das Profil deiner TNs ändern, TNs zu Leitern machen und dich ausloggen.';
+        break;
+      case FormType.teilnehmer:
+        return 'Hier kannst du das Konto deiner Eltern verlinken, damit sie dich für Aktivitäten anmelden können, und dich ausloggen.';
+        break;
+      case FormType.eltern:
+        return 'Hier kannst du das Konto deiner Kinder verlinken, damit du sie für Aktivitäten anmelden kannst, und dich ausloggen.';
+        break;
+      case FormType.loading:
+        return 'Loading';
+        break;
+      default:
+        return 'Loading';
+    }
   }
 }

@@ -36,8 +36,8 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
-        onPressed: (){
-          if(_validateAndSave()){
+        onPressed: () {
+          if (_validateAndSave()) {
             widget._changePhoneNumber(phoneNumberController.text);
             Navigator.of(context).pop();
           }
@@ -70,7 +70,7 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
                         controller: phoneNumberController,
                         maxLines: 1,
                         keyboardType: TextInputType.phone,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),

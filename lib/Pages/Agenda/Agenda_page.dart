@@ -5,6 +5,7 @@ import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../../morealayout.dart';
 import 'Agenda_Eventadd_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +37,11 @@ class _AgendaStatePage extends State<AgendaState>
   prefix0.Agenda agenda;
   String pos = 'Teilnehmer';
   Stream<List> sLagenda;
+  GlobalKey _agendaLeiterKey = GlobalKey();
+  GlobalKey _agendaLeiterKey2 = GlobalKey();
+  GlobalKey _floatingActionButtonKey = GlobalKey();
+  GlobalKey _bottomAppBarLeiterKey = GlobalKey();
+  GlobalKey _bottomAppBarTNKey = GlobalKey();
   Map stufen = {
     'Biber': false,
     'Pios': false,
@@ -62,36 +68,31 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  Stream<List> _getAgenda(groupID)async* {
-    yield* agenda.getTotalAgendaOverview([groupID, ...widget.moreaFire.getSubscribedGroups]);
+  Stream<List> _getAgenda(groupID) async* {
+    yield* agenda.getTotalAgendaOverview(
+        [groupID, ...widget.moreaFire.getSubscribedGroups]);
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
-    if(event.containsKey("DeleteDate")){
+    if (event.containsKey("DeleteDate")) {
       DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
       DateTime now = DateTime.now();
-
       if (_agdatum.difference(now).inDays < 0) {
-        Map fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
-        if(fullevent != null)
-        agenda.deleteAgendaEvent(fullevent);
+        Map fullevent =
+            (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+        if (fullevent != null)
+          agenda.deleteAgendaEvent(fullevent);
         else
-        agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
+          agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
       }
-    }else{
-      Map fullevent;
-      try{
-         fullevent = (await agenda.getAgendaTitle(event[groupMapEventID])).data;
-      }catch(e){
-        throw e;
-         
-      }
-        if(fullevent != null)
+    } else {
+      Map fullevent =
+          (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+      if (fullevent != null)
         agenda.deleteAgendaEvent(fullevent);
-        else
+      else
         agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
     }
-    
   }
 
   bool istLeiter() {
@@ -101,31 +102,36 @@ class _AgendaStatePage extends State<AgendaState>
       return false;
     }
   }
-  bool isEltern(){
-   switch (moreafire.getPos) {
-        case 'Mutter':
-          return true;
-        case 'Vater':
-          return true;
-        case 'Erziehungsberechtigter':
-          return true;
-        case 'Erziehungsberechtigte':
-          return true;
-        default:
-          return false;
-      }
+
+  bool isEltern() {
+    switch (moreafire.getPos) {
+      case 'Mutter':
+        return true;
+      case 'Vater':
+        return true;
+      case 'Erziehungsberechtigter':
+        return true;
+      case 'Erziehungsberechtigte':
+        return true;
+      default:
+        return false;
+    }
   }
 
   routetoAddevent() {
     if (istLeiter()) {
-      Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => EventAddPage(
-                eventinfo: quickfix,
-                agendaModus: AgendaModus.beides,
-                firestore: widget.firestore,
-                moreaFire: moreafire,
-                agenda: agenda,
-              )));
+      Navigator.of(context)
+          .push(new MaterialPageRoute(
+              builder: (BuildContext context) => EventAddPage(
+                    eventinfo: quickfix,
+                    agendaModus: AgendaModus.beides,
+                    firestore: widget.firestore,
+                    moreaFire: moreafire,
+                    agenda: agenda,
+                  )))
+          .then((result) {
+        setState(() {});
+      });
     }
   }
 
@@ -134,7 +140,7 @@ class _AgendaStatePage extends State<AgendaState>
     moreaLoading = MoreaLoading(this);
     moreafire = widget.moreaFire;
 
-    agenda = new prefix0.Agenda(widget.firestore,widget.moreaFire);
+    agenda = new prefix0.Agenda(widget.firestore, widget.moreaFire);
 
     //_getAgenda("3776");
     quickfix['Stufen'] = stufen;
@@ -154,199 +160,147 @@ class _AgendaStatePage extends State<AgendaState>
   @override
   Widget build(BuildContext context) {
     if (istLeiter()) {
-      return new Container(
-          child: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Agenda'),
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Agenda'),
+          actions: tutorialButton(),
         ),
-        body: aAgenda(moreafire.getUserMap[userMapgroupID]),
-        floatingActionButton: new FloatingActionButton(
-          child: Icon(Icons.add),
-          backgroundColor: Color(0xff7a62ff),
-          onPressed: () => routetoAddevent(),
-          shape: CircleBorder(side: BorderSide(color: Colors.white)),
+        body: Showcase.withWidget(
+            key: _agendaLeiterKey,
+            height: 300,
+            width: 150,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Hier siehst du alle Events/Lager deines Fähnlis',
+                  ),
+                ],
+              ),
+            ),
+            disableAnimation: true,
+            child: Showcase.withWidget(
+                disableAnimation: true,
+                key: _agendaLeiterKey2,
+                height: 300,
+                width: 150,
+                container: Container(
+                  padding: EdgeInsets.all(5),
+                  constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Drücke auf einzelne Events/Lager um mehr Details zu sehen',
+                      ),
+                    ],
+                  ),
+                ),
+                child: aAgenda(moreafire.getUserMap[userMapgroupID]))),
+        floatingActionButton: Showcase(
+          key: _floatingActionButtonKey,
+          disableAnimation: true,
+          description: 'Hier kannst du Events/Lager hinzufügen',
+          child: new FloatingActionButton(
+            child: Icon(Icons.add),
+            backgroundColor: Color(0xff7a62ff),
+            onPressed: () => routetoAddevent(),
+            shape: CircleBorder(side: BorderSide(color: Colors.white)),
+          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: new Text(moreafire.getDisplayName),
-                accountEmail: new Text(moreafire.getEmail),
-                decoration: new BoxDecoration(
-                  color: MoreaColors.orange,
-                ),
+        drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
+            context, moreafire, crud0, _signedOut),
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarLeiterKey,
+            height: 300,
+            width: 150,
+            disableAnimation: true,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke den Hilfeknopf oben rechts',
+                  ),
+                ],
               ),
-              ListTile(
-                title: Text('Logout'),
-                trailing: Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            color: Color.fromRGBO(43, 16, 42, 0.9),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toMessagePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.message, color: Colors.white),
-                        Text(
-                          'Nachrichten',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.event, color: Colors.white),
-                        Text(
-                          'Agenda',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Text(
-                      'Hinzufügen',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toHomePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.flash_on, color: Colors.white),
-                        Text(
-                          'Teleblitz',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toProfilePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.person, color: Colors.white),
-                        Text(
-                          'Profil',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textBaseline: TextBaseline.alphabetic,
             ),
-          ),
-          shape: CircularNotchedRectangle(),
-        ),
-      ));
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen')),
+      );
     } else {
-      return new Container(
-          child: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Agenda'),
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Agenda'),
+          actions: tutorialButton(),
         ),
-        bottomNavigationBar: moreaChildBottomAppBar(widget.navigationMap),
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: new Text(moreafire.getDisplayName),
-                accountEmail: new Text(moreafire.getEmail),
-                decoration: new BoxDecoration(
-                  color: MoreaColors.orange,
-                ),
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarTNKey,
+            height: 300,
+            width: 150,
+            disableAnimation: true,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke den Hilfeknopf oben rechts',
+                  ),
+                ],
               ),
-              ListTile(
-                title: Text('Logout'),
-                trailing: Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
+            ),
+            child: moreaChildBottomAppBar(widget.navigationMap)),
+        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
+            moreafire.getEmail, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getUserMap[userMapgroupID]),
-      ));
+      );
     }
   }
 
   viewLager(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
-    Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => new ViewLagerPageState(
-          moreaFire: moreafire, 
-          agenda: agenda,
-          info: info, pos: 
-          moreafire.getUserMap['Pos'])));
+    Navigator.of(context)
+        .push(new MaterialPageRoute(
+            builder: (BuildContext context) => new ViewLagerPageState(
+                moreaFire: moreafire,
+                agenda: agenda,
+                info: info,
+                pos: moreafire.getUserMap['Pos'])))
+        .then((result) {
+      setState(() {});
+    });
   }
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
         (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
-    Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => new ViewEventPageState(
-          moreaFire: moreafire, 
-          agenda: agenda,
-          info: info, pos: 
-          moreafire.getUserMap['Pos'],
-            )));
+    Navigator.of(context)
+        .push(new MaterialPageRoute(
+            builder: (BuildContext context) => new ViewEventPageState(
+                  moreaFire: moreafire,
+                  agenda: agenda,
+                  info: info,
+                  pos: moreafire.getUserMap['Pos'],
+                )))
+        .then((result) {
+      setState(() {});
+    });
   }
 
-  Widget aAgenda(String groupID){
+  Widget aAgenda(String groupID) {
     return StreamBuilder(
         stream: _getAgenda(groupID).asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
@@ -392,6 +346,7 @@ class _AgendaStatePage extends State<AgendaState>
                         child: MoreaDivider(),
                       ),
                       ListView.separated(
+                          physics: NeverScrollableScrollPhysics(),
                           itemCount: slagenda.data.length,
                           shrinkWrap: true,
                           separatorBuilder: (context, int index) {
@@ -407,7 +362,9 @@ class _AgendaStatePage extends State<AgendaState>
 
                             if (_info['Event']) {
                               return ListTile(
+                                  key: ObjectKey(_info),
                                   subtitle: ListView(
+                                    physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     children: <Widget>[
                                       Padding(
@@ -433,11 +390,13 @@ class _AgendaStatePage extends State<AgendaState>
                                   onTap: () => viewEvent(context, _info));
                             } else if (_info['Lager']) {
                               return ListTile(
+                                  key: ObjectKey(_info),
                                   title: Text(
                                     _info['Eventname'],
                                     style: MoreaTextStyle.lable,
                                   ),
                                   subtitle: ListView(
+                                    physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     children: <Widget>[
                                       Padding(
@@ -476,5 +435,42 @@ class _AgendaStatePage extends State<AgendaState>
   void _signedOut() async {
     await widget.auth.signOut();
     widget.navigationMap[signedOut]();
+  }
+
+  List<Widget> tutorialButton() {
+    if (istLeiter()) {
+      return [
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () => tutorialLeiter(),
+        )
+      ];
+    } else {
+      return [
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () => tutorialTN(),
+        )
+      ];
+    }
+  }
+
+  void tutorialLeiter() {
+    ShowCaseWidget.of(context).startShowCase([
+      _agendaLeiterKey,
+      _agendaLeiterKey2,
+      _floatingActionButtonKey,
+      _bottomAppBarLeiterKey
+    ]);
+  }
+
+  void tutorialTN() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text('Drücke auf einzelne Events/Lager um mehr Details zu sehen. Drücke auf einzelne Events/Lager um mehr Details zu sehen.'),
+            )).then((onvalue) => ShowCaseWidget.of(context).startShowCase([
+          _bottomAppBarTNKey
+        ]));
   }
 }

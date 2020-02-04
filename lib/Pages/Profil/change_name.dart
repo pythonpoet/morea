@@ -42,8 +42,8 @@ class _ChangeNameState extends State<ChangeName> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
         backgroundColor: MoreaColors.violett,
-        onPressed: (){
-          if(_validateAndSave()){
+        onPressed: () {
+          if (_validateAndSave()) {
             widget._changeName(vorname.text, nachname.text, pfadiname.text);
             Navigator.of(context).pop();
           }
@@ -76,7 +76,7 @@ class _ChangeNameState extends State<ChangeName> {
                         controller: vorname,
                         maxLines: 1,
                         keyboardType: TextInputType.text,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -103,7 +103,7 @@ class _ChangeNameState extends State<ChangeName> {
                         controller: nachname,
                         maxLines: 1,
                         keyboardType: TextInputType.text,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -130,7 +130,7 @@ class _ChangeNameState extends State<ChangeName> {
                         controller: pfadiname,
                         maxLines: 1,
                         keyboardType: TextInputType.text,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),

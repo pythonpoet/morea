@@ -1,8 +1,10 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:morea/services/utilities/user.dart';
 import 'auth.dart';
 import 'crud.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -46,6 +48,14 @@ abstract class BaseMoreaFirebase {
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
 
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
+
+  Future<String> getMailChimpApiKey();
+
+  Future<String> getWebflowApiKey();
+
+  Future<void> uploadChildUserInformation(Map<String, dynamic> childUserInfo);
+
+  Future<void> priviledgeEltern(String groupID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -53,110 +63,57 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Auth auth0 = new Auth();
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
-  Map<String, dynamic> _userMap, _groupMap;
-  Map<String, int> _groupPrivilege= new Map();
-  Map<String, Map<String, String>>_childMap;
-  String _displayName,
-      _pfadiName,
-      _groupID,
-      _vorName,
-      _nachName,
-      _pos,
-      //_homeFeedMainEventID,
-      _email;
-  Map<String, dynamic> _messagingGroups;
-  List<String> _subscribedGroups = new List<String>();
+  Map<String, dynamic> _userMap;
+
   Firestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  User moreaUser;
 
   MoreaFirebase(Firestore firestore, {List groupIDs}) {
     this.firestore = firestore;
     crud0 = new CrudMedthods(firestore);
+    moreaUser = new User(crud0);
     if (groupIDs != null) tbz = new TeleblizFirestore(firestore, groupIDs);
   }
 
-  String get getDisplayName => _displayName;
+  String get getDisplayName => moreaUser.displayName;
 
-  String get getPfandiName => _pfadiName;
+  String get getPfandiName => moreaUser.pfadiName;
 
-  String get getGroupID => _groupID;
+  String get getGroupID => moreaUser.groupID;
 
-  String get getVorName => _vorName;
+  String get getVorName => moreaUser.vorName;
 
-  String get getNachName => _nachName;
+  String get getNachName => moreaUser.nachName;
 
-  String get getPos => _pos;
+  String get getPos => moreaUser.pos;
 
-  String get getEmail => _email;
+  String get getEmail => moreaUser.email;
+
+  String get getGeschlecht => moreaUser.geschlecht;
 
   //String get getHomeFeedMainEventID => _homeFeedMainEventID;
 
-  List<String> get getSubscribedGroups => _subscribedGroups;
+  List<String> get getSubscribedGroups => moreaUser.subscribedGroups;
 
-  Map<String, dynamic> get getGroupMap => _groupMap;
+  Map<String, dynamic> get getGroupMap => moreaUser.groupMap;
 
   Map<String, dynamic> get getUserMap => _userMap;
 
-  Map<String, Map<String, String>> get getChildMap => _childMap;
-  Map<String, int> get getGroupPrivilege => _groupPrivilege;
+  Map<String, Map<String, String>> get getChildMap => moreaUser.childMap;
+
+  Map<String, int> get getGroupPrivilege => moreaUser.groupPrivilege;
 
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
         (await crud0.getDocument(pathUser, userID)).data);
-    //init userMap
-    _pfadiName = _userMap[userMapPfadiName];
-    _groupID = _userMap[userMapgroupID];
-    _vorName = _userMap[userMapVorName];
-    _nachName = _userMap[userMapNachName];
-    _pos = _userMap[userMapPos];
-    _email = _userMap[userMapEmail];
-    _subscribedGroups =
-        List<String>.from(_userMap[userMapSubscribedGroups] ?? []);
-    if (_pfadiName == '')
-      _displayName = _vorName;
-    else
-      _displayName = _pfadiName;
-    if ((_pos == userMapLeiter) || (_pos == userMapTeilnehmer)) {
-      
-      _groupMap =
-          (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-      _groupPrivilege[_groupID] = _groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
-
-     
-    } else {
-      if (_userMap.containsKey(userMapKinder)) {
-        Map<String, String> kinderMap =
-            Map<String, String>.from(_userMap[userMapKinder]);
-        _childMap = await createChildMap(kinderMap);
-      }
-    }
+    await moreaUser.getUserData(_userMap);
   }
 
-  Future<Map<String, Map<String, String>>> createChildMap(
-      Map<String, String> childs) async {
-    Map<String, Map<String, String>> childMap = new Map();
-    for (String vorname in childs.keys) {
-      Map<String, dynamic> childUserDat =
-          (await crud0.getDocument(pathUser, childs[vorname])).data;
-      if (childMap.containsKey(childUserDat[userMapgroupID]))
-        childMap[childUserDat[userMapgroupID]][vorname] = childs[vorname];
-      else
-        childMap[childUserDat[userMapgroupID]] = {vorname: childs[vorname]};
-      if (!_subscribedGroups.contains(childUserDat[userMapgroupID]))
-        _subscribedGroups.add(childUserDat[userMapgroupID]);
-    }
-    parentGroupPrivilege(childMap);
-    return childMap;
-  }
-  //TODO GroupPrivilege aus groupMap nehmen
-parentGroupPrivilege(Map<String, Map<String, String>> childMap){
-  for (String groupID in childMap.keys)
-    _groupPrivilege[groupID] = 2;
-}
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
-    groupIDs.addAll(_subscribedGroups);
-    groupIDs.add(_groupID);
+    groupIDs.addAll(getSubscribedGroups);
+    if (getGroupID != null) groupIDs.add(getGroupID);
     tbz = new TeleblizFirestore(firestore, groupIDs);
   }
 
@@ -166,14 +123,22 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
     return null;
   }
 
-  Future<void> updateUserInformation(
-    String userUID,
-    Map userInfo,
-  ) async {
-    userUID = dwiformat.simplestring(userUID);
-    Map<String, dynamic> request = {"type": "updateUserInformation", "content": userInfo};
-    await crud0.setData(pathRequest, userUID, request);
-    return null;
+  //Vorschlag an Maxi
+  Future<void> updateUserInformation(String userUID, Map userInfo) {
+    if (userInfo[userMapAccountCreated] is Timestamp)
+      userInfo[userMapAccountCreated] =
+          userInfo[userMapAccountCreated].toString();
+    return callFunction(getcallable("updateUserProfile"), param: userInfo);
+  }
+
+  Future<HttpsCallableResult> goToNewGroup(
+      String userID, String displayName, String oldGroup, String newGroup) {
+    return callFunction(getcallable("goToNewGroup"), param: {
+      userMapUID: userID,
+      "oldGroup": oldGroup,
+      "newGroup": newGroup,
+      groupMapDisplayName: displayName
+    });
   }
 
   Future<DocumentSnapshot> getUserInformation(String userUID) async {
@@ -207,7 +172,7 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
       String anmeldeUID, String anmeldeStatus, String name) async {
     crud0.runTransaction(
         "$pathEvents/$eventID/Anmeldungen",
-        anmeldeUID,
+        childUID,
         Map<String, dynamic>.from({
           "AnmeldeStatus": anmeldeStatus,
           eventMapAnmeldeUID: anmeldeUID,
@@ -271,8 +236,11 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
   }
 
   Future<void> subscribeToGroup(String groupID) async {
-    Map<String, dynamic> tokendata = {'devtoken': await firebaseMessaging.getToken()};
-    return await crud0.setData('groups/$groupID/Devices', auth0.getUserID, tokendata);
+    Map<String, dynamic> tokendata = {
+      'devtoken': await firebaseMessaging.getToken()
+    };
+    return await crud0.setData(
+        'groups/$groupID/Devices', auth0.getUserID, tokendata);
   }
 
   Stream<QuerySnapshot> getMessages(String groupnr) {
@@ -302,21 +270,50 @@ parentGroupPrivilege(Map<String, Map<String, String>> childMap){
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID) {
     return crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
   }
+
   Future<void> uploadDevTocken(String userID) async {
-    await callFunction(getcallable("uploadDevTocken"),param: Map<String,String>.from(
-      {
-        userMapDeviceToken: await firebaseMessaging.getToken(),
-        userMapUID: userID
-      }
-    ));
+    await callFunction(getcallable("uploadDevTocken"),
+        param: Map<String, String>.from({
+          userMapDeviceToken: await firebaseMessaging.getToken(),
+          userMapUID: userID
+        }));
   }
-  Future<void> groupPriviledgeTN(String groupID, String userID, String displayName) async {
-    return callFunction(getcallable("priviledgeTN"),param: Map<String,String>.from(
-      {
-        userMapgroupID: groupID,
-        userMapUID: userID,
-        "displayName": displayName
-      }
-    ));
+
+  Future<void> groupPriviledgeTN(
+      String groupID, String userID, String displayName) async {
+    return callFunction(getcallable("priviledgeTN"),
+        param: Map<String, String>.from({
+          userMapgroupID: groupID,
+          userMapUID: userID,
+          "DisplayName": displayName
+        }));
+  }
+
+  Future<String> getMailChimpApiKey() async {
+    DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
+    String result = document.data['mailchimp'];
+    return result;
+  }
+
+  Future<String> getWebflowApiKey() async {
+    DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
+    String result = document.data['webflow'];
+    return result;
+  }
+
+  @override
+  Future<HttpsCallableResult> uploadChildUserInformation(
+      Map<String, dynamic> childUserInfo) async {
+    return await callFunction(getcallable("createChildUserMap"),
+        param: childUserInfo);
+  }
+
+  @override
+  Future<void> priviledgeEltern(String groupID) async {
+    return await callFunction(getcallable('priviledgeEltern'), param: {
+      'groupID': groupID,
+      'UID': getUserMap[userMapUID],
+      'DisplayName': this.getVorName
+    });
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:morea/morealayout.dart';
 
-Widget moreaEditActionbutton(Function route) {
+Widget moreaEditActionbutton({@required Function route, Key key}) {
   return new FloatingActionButton(
+    key: key == null ? null : key,
     elevation: 1.0,
     child: new Icon(Icons.edit),
     backgroundColor: MoreaColors.violett,

@@ -10,7 +10,7 @@ class WerChunnt {
   final MoreaFirebase moreaFire;
   final String eventID;
 
-  WerChunnt(this.moreaFire, this.eventID){
+  WerChunnt(this.moreaFire, this.eventID) {
     initChunnt();
   }
 
@@ -19,7 +19,7 @@ class WerChunnt {
     this._controller.close();
   }
 
-  Stream<List<List<String>>> get stream => _controller.stream.asBroadcastStream();
+  Stream<List<List<String>>> get stream => _controller.stream;
 
   void initChunnt() {
     moreaFire.streamCollectionWerChunnt(eventID).listen((data) {
@@ -28,14 +28,12 @@ class WerChunnt {
       List<DocumentSnapshot> documents = data.documents;
       for (DocumentSnapshot document in documents) {
         if (document.data['AnmeldeStatus'] == eventMapAnmeldeStatusPositiv) {
-          print(document.data);
           chunnt.add(document.data['Name']);
         } else {
-          print(document.data);
           chunntNoed.add(document.data['Name']);
         }
       }
-      _controller.sink.add([chunnt, chunntNoed]);
+      _controller.add([chunnt, chunntNoed]);
     });
   }
 }

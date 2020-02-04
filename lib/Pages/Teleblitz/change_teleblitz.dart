@@ -50,13 +50,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   bool draft = false;
   var oldTeleblitz;
 
-  TeleblitzManager teleblitzManager = TeleblitzManager();
+  TeleblitzManager teleblitzManager;
 
   @override
   void initState() {
     super.initState();
     this.stufe = widget.stufe;
     this.moreaFire = widget.moreaFire;
+    this.teleblitzManager = TeleblitzManager(this.moreaFire);
     this.oldTeleblitz = downloadTeleblitz();
     if (widget.formType == "keineAktivitaet") {
       this.formType = FormType.keineAktivitaet;
@@ -116,8 +117,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Datum',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(datum),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(datum, style: MoreaTextStyle.normal,),
                                 onTap: () => _selectDatum(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding:
@@ -132,8 +133,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Grund des Ausfalls',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(this.grund),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(this.grund, style: MoreaTextStyle.normal,),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -141,8 +142,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                               this.grund, this.setGrund)));
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, bottom: 15),
                               ),
                             ],
                           ),
@@ -189,12 +190,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Ende Ferien',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(endeFerien),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(endeFerien, style: MoreaTextStyle.normal,),
                                 onTap: () => _selectDatumEndeFerien(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                EdgeInsets.only(right: 15, left: 15),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, bottom: 15),
                               ),
                             ],
                           ),
@@ -229,8 +230,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.all(20),
-                                child:
-                                    Text(this.name, style: MoreaTextStyle.title),
+                                child: Text(this.name,
+                                    style: MoreaTextStyle.title),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -241,8 +242,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Datum',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(datum),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(datum, style: MoreaTextStyle.normal,),
                                 onTap: () => _selectDatum(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding:
@@ -257,8 +258,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Beginn',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(antreten),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(antreten, style: MoreaTextStyle.normal,),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -280,8 +281,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Schluss',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(abtreten),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(abtreten, style: MoreaTextStyle.normal,),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -301,12 +302,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Mitnehmen',
-                                    style: TextStyle(fontSize: 18)),
+                                    style: MoreaTextStyle.lable),
                                 subtitle: ListView.builder(
                                   itemCount: mitnehmen.length,
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
-                                    return Text(mitnehmen[index]);
+                                    return Text(mitnehmen[index], style: MoreaTextStyle.normal,);
                                   },
                                 ),
                                 onTap: () {
@@ -328,8 +329,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Bemerkung',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(bemerkung),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(bemerkung, style: MoreaTextStyle.normal,),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -349,8 +350,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   )),
                               ListTile(
                                 title: Text('Sender',
-                                    style: TextStyle(fontSize: 18)),
-                                subtitle: Text(sender),
+                                    style: MoreaTextStyle.lable),
+                                subtitle: Text(sender, style: MoreaTextStyle.normal,),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -428,9 +429,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
       '_draft': false,
       '_archived': false
     };
-      teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-      await widget.moreaFire.uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
-    Navigator.of(context).pop();
+    teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
+    await widget.moreaFire
+        .uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
+    Navigator.of(context).popUntil(ModalRoute.withName('/'));
   }
 
   Future<Null> _selectDatum(BuildContext context) async {
@@ -493,13 +495,18 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
 }
 
 class TeleblitzManager {
-  TeleblitzManager();
+  MoreaFirebase moreaFirebase;
+
+  TeleblitzManager(MoreaFirebase moreaFirebase) {
+    this.moreaFirebase = moreaFirebase;
+  }
 
   Future<Map> downloadTeleblitz(String stufe) async {
+    String apiKey = await moreaFirebase.getWebflowApiKey();
     var jsonDecode;
     var jsonString;
     jsonString = await http.get(
-        "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de");
+        "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=$apiKey");
     jsonDecode = json.decode(jsonString.body);
     Map infos;
     for (var u in jsonDecode['items']) {
@@ -535,7 +542,8 @@ class TeleblitzManager {
     return newMitnehmen;
   }
 
-  void uploadTeleblitz(Map newTeleblitz, String id) {
+  void uploadTeleblitz(Map newTeleblitz, String id) async {
+    String apiKey = await moreaFirebase.getWebflowApiKey();
     String formatedMitnehmen = '<ul>';
     for (String u in newTeleblitz['mitnehmen-test']) {
       formatedMitnehmen = formatedMitnehmen + '<li>' + u + '</li>';
@@ -548,8 +556,7 @@ class TeleblitzManager {
     var jsonMap = {"fields": newTeleblitz};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
-    header["Authorization"] =
-        "Bearer d9097840d357b02bd934ba7d9c52c595e6940273e940816a35062fe99e69a2de";
+    header["Authorization"] = "Bearer $apiKey";
     header["accept-version"] = "1.0.0";
     header["Content-Type"] = "application/json";
     http

@@ -1,19 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/Pages/Nachrichten/send_message.dart';
 import 'package:morea/morealayout.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
   MessagesPage(
       {@required this.auth,
       @required this.moreaFire,
-      @required this.navigationMap});
+      @required this.navigationMap,
+      @required this.firestore});
 
+  final Firestore firestore;
   final MoreaFirebase moreaFire;
   final Auth auth;
   final Map navigationMap;
@@ -22,19 +27,34 @@ class MessagesPage extends StatefulWidget {
   State<StatefulWidget> createState() => _MessagesPageState();
 }
 
-class _MessagesPageState extends State<MessagesPage> {
+class _MessagesPageState extends State<MessagesPage>
+    with TickerProviderStateMixin {
+  CrudMedthods crud0;
   var messages;
   var date;
   var uid;
   var stufe;
+  GlobalKey _messagesKeyLeiter = GlobalKey();
+  GlobalKey _floatingActionButtonKey = GlobalKey();
+  GlobalKey _bottomAppBarLeiterKey = GlobalKey();
+  GlobalKey _bottomAppBarTNKey = GlobalKey();
   String anzeigename;
   MoreaFirebase moreaFire;
+  MoreaLoading moreaLoading;
 
   @override
   void initState() {
     super.initState();
     this.moreaFire = widget.moreaFire;
     _getMessages(this.context);
+    crud0 = CrudMedthods(widget.firestore);
+    moreaLoading = MoreaLoading(this);
+  }
+
+  @override
+  void dispose() {
+    moreaLoading.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,233 +66,166 @@ class _MessagesPageState extends State<MessagesPage> {
         this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: Text(anzeigename),
-                accountEmail: Text(moreaFire.getEmail),
-                decoration: BoxDecoration(color: MoreaColors.orange),
-              ),
-              ListTile(
-                title: new Text('Logout'),
-                trailing: new Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
+        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
+            moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
         appBar: AppBar(
           title: Text('Nachrichten'),
+          actions: tutorialButton(),
         ),
-        floatingActionButton: moreaEditActionbutton(this.routeToSendMessage),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            color: Color.fromRGBO(43, 16, 42, 0.9),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.message, color: Colors.white),
-                        Text(
-                          'Nachrichten',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
+        floatingActionButton: Showcase.withWidget(
+            key: _floatingActionButtonKey,
+            disableAnimation: true,
+            width: 150,
+            height: 300,
+            shapeBorder: CircleBorder(),
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Hier kannst du Nachrichten verschicken. Nur Leiter haben diese Option in der App.',
                   ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toAgendaPage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.event, color: Colors.white),
-                        Text(
-                          'Agenda',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Text(
-                      'Verfassen',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toHomePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.flash_on, color: Colors.white),
-                        Text(
-                          'Teleblitz',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toProfilePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.person, color: Colors.white),
-                        Text(
-                          'Profil',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textBaseline: TextBaseline.alphabetic,
+                ],
+              ),
             ),
-          ),
-          shape: CircularNotchedRectangle(),
-        ),
-        body: StreamBuilder(
-            stream: this.messages,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return MoreaBackgroundContainer(
+            child: moreaEditActionbutton(route: this.routeToSendMessage)),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarLeiterKey,
+            disableAnimation: true,
+            height: 300,
+            width: 150,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke dort oben rechts den Hilfeknopf',
+                  ),
+                ],
+              ),
+            ),
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen')),
+        body: Showcase(
+          disableAnimation: true,
+          key: _messagesKeyLeiter,
+          description: 'Hier siehst du alle deine Nachrichten',
+          child: StreamBuilder(
+              stream: this.messages,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return MoreaBackgroundContainer(
+                      child: SingleChildScrollView(
+                          child: MoreaShadowContainer(
+                              child: moreaLoading.loading())));
+                } else if (!snapshot.hasData) {
+                  return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
-                        child:
-                            MoreaShadowContainer(child: Text('Loading...'))));
-              } else if (!snapshot.hasData) {
-                return MoreaBackgroundContainer(
-                  child: SingleChildScrollView(
-                    child: MoreaShadowContainer(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Text(
-                                'Nachrichten',
-                                style: MoreaTextStyle.title,
+                      child: MoreaShadowContainer(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Text(
+                                  'Nachrichten',
+                                  style: MoreaTextStyle.title,
+                                ),
                               ),
-                            ),
-                            ListView(
-                              shrinkWrap: true,
-                              children: <Widget>[
-                                ListTile(
-                                  title: Text('Keine Nachrichten vorhanden'),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              } else if (snapshot.data.documents.length == 0) {
-                return MoreaBackgroundContainer(
-                  child: SingleChildScrollView(
-                    child: MoreaShadowContainer(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Text(
-                                'Nachrichten',
-                                style: MoreaTextStyle.title,
-                              ),
-                            ),
-                            ListView(
-                              shrinkWrap: true,
-                              children: <Widget>[
-                                ListTile(
-                                  title: Text('Keine Nachrichten vorhanden'),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              } else {
-                return MoreaBackgroundContainer(
-                  child: SingleChildScrollView(
-                    child: MoreaShadowContainer(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Text(
-                                'Nachrichten',
-                                style: MoreaTextStyle.title,
-                              ),
-                            ),
-                            ListView.builder(
-                                itemCount: snapshot.data.documents.length,
+                              ListView(
+                                physics: NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  var document = snapshot.data.documents[index];
-                                  return _buildListItem(context, document);
-                                }),
-                          ],
+                                children: <Widget>[
+                                  ListTile(
+                                    title: Text(
+                                      'Keine Nachrichten vorhanden',
+                                      style: MoreaTextStyle.normal,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }
-            }),
+                  );
+                } else if (snapshot.data.documents.length == 0) {
+                  return MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                      child: MoreaShadowContainer(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Text(
+                                  'Nachrichten',
+                                  style: MoreaTextStyle.title,
+                                ),
+                              ),
+                              ListView(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                children: <Widget>[
+                                  ListTile(
+                                    title: Text(
+                                      'Keine Nachrichten vorhanden',
+                                      style: MoreaTextStyle.normal,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                      child: MoreaShadowContainer(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Text(
+                                  'Nachrichten',
+                                  style: MoreaTextStyle.title,
+                                ),
+                              ),
+                              ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: snapshot.data.documents.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    var document =
+                                        snapshot.data.documents[index];
+                                    return _buildListItem(context, document);
+                                  }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              }),
+        ),
       );
     } else {
       if (moreaFire.getPfandiName == null) {
@@ -283,116 +236,29 @@ class _MessagesPageState extends State<MessagesPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text('Nachrichten'),
+          actions: tutorialButton(),
         ),
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: Text(this.anzeigename),
-                accountEmail: Text(moreaFire.getEmail),
-                decoration: new BoxDecoration(color: MoreaColors.orange),
+        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
+            moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
+        bottomNavigationBar: Showcase.withWidget(
+            key: _bottomAppBarTNKey,
+            disableAnimation: true,
+            height: 300,
+            width: 150,
+            container: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), color: Colors.white),
+              child: Column(
+                children: [
+                  Text(
+                    'Geh zum nächsten Screen und drücke dort oben rechts den Hilfeknopf',
+                  ),
+                ],
               ),
-              ListTile(
-                title: new Text('Logout'),
-                trailing: new Icon(Icons.cancel),
-                onTap: _signedOut,
-              )
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            color: Color.fromRGBO(43, 16, 42, 0.9),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: null,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.message, color: Colors.white),
-                        Text(
-                          'Nachrichten',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toAgendaPage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.event, color: Colors.white),
-                        Text(
-                          'Agenda',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toHomePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.flash_on, color: Colors.white),
-                        Text(
-                          'Teleblitz',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    onPressed: widget.navigationMap[toProfilePage],
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.person, color: Colors.white),
-                        Text(
-                          'Profil',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: Colors.white),
-                        )
-                      ],
-                      mainAxisSize: MainAxisSize.min,
-                    ),
-                  ),
-                  flex: 1,
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              textBaseline: TextBaseline.alphabetic,
             ),
-          ),
-          shape: CircularNotchedRectangle(),
-        ),
+            child: moreaChildBottomAppBar(widget.navigationMap)),
         body: StreamBuilder(
             stream: this.messages,
             builder: (context, snapshot) {
@@ -415,6 +281,7 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               children: <Widget>[
                                 ListTile(
@@ -445,6 +312,7 @@ class _MessagesPageState extends State<MessagesPage> {
                               ),
                             ),
                             ListView(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               children: <Widget>[
                                 ListTile(
@@ -467,6 +335,7 @@ class _MessagesPageState extends State<MessagesPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Padding(
                                   padding: EdgeInsets.only(top: 10),
@@ -476,6 +345,7 @@ class _MessagesPageState extends State<MessagesPage> {
                                   ),
                                 ),
                                 ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemCount: snapshot.data.documents.length,
                                     itemBuilder: (context, index) {
@@ -518,6 +388,7 @@ class _MessagesPageState extends State<MessagesPage> {
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) => SendMessages(
               moreaFire: moreaFire,
+              auth: widget.auth,
             )));
   }
 
@@ -528,11 +399,8 @@ class _MessagesPageState extends State<MessagesPage> {
           padding: EdgeInsets.only(right: 20, left: 20),
           child: ListTile(
             key: UniqueKey(),
-            title: Text(document['title'],
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(document['sender'],
-                style: TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold)),
+            title: Text(document['title'], style: MoreaTextStyle.lable),
+            subtitle: Text(document['sender'], style: MoreaTextStyle.sender),
             contentPadding: EdgeInsets.only(),
             leading: CircleAvatar(
               child: Text(document['sender'][0]),
@@ -547,31 +415,6 @@ class _MessagesPageState extends State<MessagesPage> {
               }));
             },
           ));
-//    } else if (!(document['read'][this.uid])) {
-//      return Container(
-//        padding: EdgeInsets.symmetric(horizontal: 20),
-//        child: ListTile(
-//          key: UniqueKey(),
-//          title: Text(document['title'],
-//              style: TextStyle(fontWeight: FontWeight.bold)),
-//          subtitle: Text(document['sender'],
-//              style:
-//                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-//          contentPadding: EdgeInsets.only(),
-//          leading: CircleAvatar(
-//            child: Text(document['sender'][0]),
-//          ),
-//          trailing: Icon(Icons.arrow_forward_ios),
-//          onTap: () async {
-//            await moreaFire.setMessageRead(
-//                this.uid, document.documentID, this.stufe);
-//            Navigator.of(context)
-//                .push(MaterialPageRoute(builder: (BuildContext context) {
-//              return SingleMessagePage(message);
-//            }));
-//          },
-//        ),
-//      );
     } else {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -579,9 +422,11 @@ class _MessagesPageState extends State<MessagesPage> {
           key: UniqueKey(),
           title: Text(
             document['title'],
+            style: MoreaTextStyle.normal,
           ),
           subtitle: Text(
             document['sender'],
+            style: MoreaTextStyle.sender,
           ),
           contentPadding: EdgeInsets.only(),
           leading: CircleAvatar(
@@ -597,5 +442,37 @@ class _MessagesPageState extends State<MessagesPage> {
         ),
       );
     }
+  }
+
+  List<Widget> tutorialButton() {
+    if (moreaFire.getPos == 'Leiter') {
+      return [
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () => tutorialLeiter(),
+        ),
+      ];
+    } else {
+      return [
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () => tutorialTN(),
+        ),
+      ];
+    }
+  }
+
+  void tutorialLeiter() {
+    ShowCaseWidget.of(context).startShowCase(
+        [_messagesKeyLeiter, _floatingActionButtonKey, _bottomAppBarLeiterKey]);
+  }
+
+  void tutorialTN() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text(
+                  'Hier siehst du alle Nachrichten, welche von deinen Leitern an dein Fähnli gesendet wurden'),
+            )).then((onvalue) => ShowCaseWidget.of(context).startShowCase([_bottomAppBarTNKey]));
   }
 }

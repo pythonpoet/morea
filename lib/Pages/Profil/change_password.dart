@@ -72,7 +72,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         obscureText: true,
                         maxLines: 1,
                         keyboardType: TextInputType.visiblePassword,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -93,7 +93,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         obscureText: true,
                         maxLines: 1,
                         keyboardType: TextInputType.visiblePassword,
-                        style: TextStyle(fontSize: 18),
+                        style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -102,7 +102,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                           if (value.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else if (value != passwordController.text) {
-                            print('error');
                             return 'Die Passwörter stimmen nicht überein';
                           } else {
                             return null;

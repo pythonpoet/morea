@@ -13,9 +13,11 @@ class TabIndicationPainter extends CustomPainter {
 
   TabIndicationPainter(
       {this.dxTarget = 125.0,
-        this.dxEntry = 25.0,
-        this.radius = 21.0,
-        this.dy = 25.0, this.pageController}) : super(repaint: pageController) {
+      this.dxEntry = 25.0,
+      this.radius = 21.0,
+      this.dy = 25.0,
+      this.pageController})
+      : super(repaint: pageController) {
     painter = new Paint()
       ..color = Color(0xFFFFFFFF)
       ..style = PaintingStyle.fill;
@@ -23,14 +25,14 @@ class TabIndicationPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-
     final pos = pageController.position;
-    double fullExtent = (pos.maxScrollExtent - pos.minScrollExtent + pos.viewportDimension);
+    double fullExtent =
+        (pos.maxScrollExtent - pos.minScrollExtent + pos.viewportDimension);
 
     double pageOffset = pos.extentBefore / fullExtent;
 
     bool left2right = dxEntry < dxTarget;
-    Offset entry = new Offset(left2right ? dxEntry: dxTarget, dy);
+    Offset entry = new Offset(left2right ? dxEntry : dxTarget, dy);
     Offset target = new Offset(left2right ? dxTarget : dxEntry, dy);
 
     Path path = new Path();
