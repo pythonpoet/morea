@@ -148,28 +148,45 @@ class Teleblitz {
                     children: <Widget>[
                       Expanded(
                           child: Container(
-                        child: new RaisedButton(
-                          child: new Text(abmelden,
-                              style: new TextStyle(fontSize: 20)),
-                          onPressed: () {
-                            if (name == null) {
-                              submit(eventMapAnmeldeStatusNegativ, groupID,
-                                  eventID, uid);
-                            } else {
-                              submit(eventMapAnmeldeStatusNegativ, groupID,
-                                  eventID, uid,
+                            child: new RaisedButton(
+                              elevation: 0,
+                              padding: EdgeInsets.all(0),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                                constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
+                                child: Center(
+                                  child: new Text(
+                                    abmelden, 
+                                    style: MoreaTextStyle.button))),
+                              onPressed: () {
+                                if (name == null) {
+                                  submit(
+                                    eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
+                                } else {
+                                  submit(
+                                    eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
                                   name: name);
-                            }
-                          },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                        ),
-                      )),
+                    }
+                  },
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                ),
+              )),
                       Expanded(
                         child: Container(
                           child: new RaisedButton(
-                            child: new Text(anmelden,
-                                style: new TextStyle(fontSize: 20)),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                              constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: [MoreaColors.orange, MoreaColors.violett],),
+                                borderRadius: BorderRadius.circular(30)
+                              ),
+                              child: Center(
+                                child: new Text(anmelden,
+                                    style: MoreaTextStyle.button),
+                              ),
+                            ),
                             onPressed: () {
                               if (name == null) {
                                 submit(eventMapAnmeldeStatusPositiv, groupID,
@@ -182,7 +199,8 @@ class Teleblitz {
                             },
                             shape: new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(30.0)),
-                            color: Color(0xff7a62ff),
+                            color: Colors.transparent,
+                            padding: EdgeInsets.all(0),
                             textColor: Colors.white,
                           ),
                         ),
@@ -193,11 +211,19 @@ class Teleblitz {
             case "ChuntNoed":
               return Container(
                 child: new RaisedButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  color: Colors.transparent,
+                  padding: EdgeInsets.all(0),
                   child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                    constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [MoreaColors.orange, MoreaColors.violett],),
+                      borderRadius: BorderRadius.circular(30)
+                    ),
                     child: Center(
                         child: new Text(anmelden,
-                            style: new TextStyle(fontSize: 20))),
-                    width: 120,
+                            style: MoreaTextStyle.button)),
                   ),
                   onPressed: () {
                     if (name == null) {
@@ -209,16 +235,15 @@ class Teleblitz {
                           name: name);
                     }
                   },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
                   textColor: Colors.white,
                 ),
               );
             case "Chunt":
               return Container(
                 child: new RaisedButton(
-                  child: new Text(abmelden, style: new TextStyle(fontSize: 20)),
+                  elevation: 0,
+                  padding: EdgeInsets.all(0),
+                  child: Container(padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),constraints: BoxConstraints(minWidth: 170, maxWidth: 170),child: Center(child: new Text(abmelden, style: MoreaTextStyle.button))),
                   onPressed: () {
                     if (name == null) {
                       submit(

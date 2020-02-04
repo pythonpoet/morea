@@ -52,6 +52,7 @@ class _ProfileState extends State<Profile> {
       this.userInfo['Pfadinamen'] = '';
     }
     return Scaffold(
+      backgroundColor: MoreaColors.bottomAppBar,
       drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName,
           this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
       floatingActionButtonLocation: _locationFloatingActionButton(),

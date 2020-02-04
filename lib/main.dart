@@ -44,13 +44,14 @@ class MyApp extends StatelessWidget {
       title: 'Pfadi Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
+        backgroundColor: Colors.white,
         primarySwatch: MaterialColor(
             MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
         fontFamily: 'Raleway',
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => RootPage(auth: Auth(), firestore: firestore,),
+        '/': (context) => Container(decoration: BoxDecoration(gradient: LinearGradient(colors: [MoreaColors.orange, Colors.white], begin: Alignment.topCenter, end: Alignment.bottomCenter)), child: RootPage(auth: Auth(), firestore: firestore,)),
       },
     );
   }
