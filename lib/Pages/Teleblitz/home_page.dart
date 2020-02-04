@@ -1,11 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/About/about.dart';
 import 'package:morea/Pages/Nachrichten/messages_page.dart';
-import 'package:morea/Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
-import 'package:morea/Pages/Personenverzeichniss/profile_page.dart';
-import 'package:morea/Widgets/Action/scan.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
@@ -200,6 +196,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         length: moreafire.getSubscribedGroups.length +
             ((moreafire.getGroupID != null) ? 1 : 0),
         child: Scaffold(
+          backgroundColor: MoreaColors.bottomAppBar,
           key: _scaffoldKey,
           appBar: new AppBar(
             title: new Text('Teleblitz'),
@@ -318,114 +315,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   List<Widget> navigation() {
-    switch (_formType) {
-      case FormType.loading:
-        return [
-          ListTile(
-            leading: Text('Loading...'),
-          )
-        ];
-      case FormType.leiter:
-        return [
-          new UserAccountsDrawerHeader(
-            accountName: new Text(moreafire.getDisplayName),
-            accountEmail: new Text(widget.auth.getUserEmail),
-            decoration: new BoxDecoration(
-              color: MoreaColors.orange,
-            ),
-          ),
-          new ListTile(
-              title: new Text('Personen'),
-              trailing: new Icon(Icons.people),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState(
-                        moreaFire: moreafire,
-                        crud0: crud0,
-                      )))),
-          new ListTile(
-            title: new Text("TN zu Leiter machen"),
-            trailing: new Icon(Icons.enhanced_encryption),
-            onTap: () => makeLeiterWidget(context,
-                moreafire.getUserMap[userMapUID], moreafire.getGroupID),
-          ),
-          new Divider(),
-          new ListTile(
-              title: new Text("Über dieses App"),
-              trailing: new Icon(Icons.info),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new AboutThisApp()))),
-          new Divider(),
-          new ListTile(
-            title: new Text('Logout'),
-            trailing: new Icon(Icons.cancel),
-            onTap: _signedOut,
-          )
-        ];
-        break;
-      case FormType.teilnehmer:
-        return [
-          new UserAccountsDrawerHeader(
-            accountName: new Text(moreafire.getDisplayName),
-            accountEmail: new Text(widget.auth.getUserEmail),
-            decoration: new BoxDecoration(color: MoreaColors.orange),
-          ),
-          ListTile(
-              title: new Text('Eltern hinzufügen'),
-              trailing: new Icon(Icons.add),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        moreaFire: moreafire,
-                        crud0: crud0,
-                        signOut: widget.navigationMap[signedOut],
-                      )))),
-          Divider(),
-          new ListTile(
-            title: new Text('Logout'),
-            trailing: new Icon(Icons.cancel),
-            onTap: _signedOut,
-          )
-        ];
-        break;
-      case FormType.eltern:
-        return [
-          new UserAccountsDrawerHeader(
-            accountName: Text(moreafire.getDisplayName),
-            accountEmail: Text(widget.auth.getUserEmail),
-            decoration: new BoxDecoration(color: MoreaColors.orange),
-          ),
-          new ListTile(
-              title: new Text('Kinder hinzufügen'),
-              trailing: new Icon(Icons.add),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        crud0: crud0,
-                        moreaFire: moreafire,
-                        signOut: widget.navigationMap[signedOut],
-                      )))),
-          new Divider(),
-          new ListTile(
-              title: new Text("Über dieses App"),
-              trailing: new Icon(Icons.info),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new AboutThisApp()))),
-          new Divider(),
-          new ListTile(
-            title: new Text('Logout'),
-            trailing: new Icon(Icons.cancel),
-            onTap: _signedOut,
-          )
-        ];
-        break;
-      default:
-        return [
-          ListTile(
-            leading: Text('Loading...'),
-          )
-        ];
-    }
+    return [
+      ListTile(
+        leading: Text('Loading...'),
+      )
+    ];
   }
 
   void routeEditTelebliz() {

@@ -161,6 +161,7 @@ class _AgendaStatePage extends State<AgendaState>
   Widget build(BuildContext context) {
     if (istLeiter()) {
       return Scaffold(
+        backgroundColor: MoreaColors.bottomAppBar,
         appBar: AppBar(
           title: Text('Agenda'),
           actions: tutorialButton(),
@@ -239,6 +240,7 @@ class _AgendaStatePage extends State<AgendaState>
       );
     } else {
       return Scaffold(
+        backgroundColor: MoreaColors.bottomAppBar,
         appBar: AppBar(
           title: Text('Agenda'),
           actions: tutorialButton(),

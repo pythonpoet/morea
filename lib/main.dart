@@ -7,52 +7,36 @@ import 'package:morea/Pages/Grundbausteine/root_page.dart';
 import 'package:morea/services/auth.dart';
 import 'morealayout.dart';
 
-void main() {
-   WidgetsFlutterBinding.ensureInitialized();
-  /*final FirebaseApp app = await FirebaseApp.configure(
-    name: 'Pfadi Morea',
-    options: const FirebaseOptions(
-      googleAppID: '1:20884476221:android:da0ee1d9ef987290793554',
-      //gcmSenderID: '1015173140187',
-      apiKey: 'AIzaSyBhmTHDLaRcXPGCuPXrHmG4nvks4_NezT0',
-      projectID: 'dev-pfadi-morea',
-    ),
-  );
-  final Firestore firestore = Firestore(app: app);
-  await firestore.settings(timestampsInSnapshotsEnabled: true);
-
-  */
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MaterialApp(
-        title: 'Pfadi Morea',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            fontFamily: 'Raleway',
-            primarySwatch: MaterialColor(
-                MoreaColors.appBarInt, MoreaColors.violettMaterialColor)),
-        home: MyApp()),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  //MyApp({this.firestore});
-
-   final Firestore firestore = new Firestore();
-
+  final Firestore firestore = new Firestore();
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Pfadi Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
+        backgroundColor: Colors.white,
         primarySwatch: MaterialColor(
             MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
         fontFamily: 'Raleway',
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => RootPage(auth: Auth(), firestore: firestore,),
+        '/': (context) => Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [MoreaColors.orange, MoreaColors.bottomAppBar],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter)),
+            child: RootPage(
+              auth: Auth(),
+              firestore: firestore,
+            )),
       },
     );
   }
@@ -117,9 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 break;
             }
           });
-    }
-    //Android Scafold
-    else {
+    } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
