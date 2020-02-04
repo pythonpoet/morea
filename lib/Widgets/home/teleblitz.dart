@@ -223,10 +223,8 @@ class Teleblitz {
                     padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
                     constraints: BoxConstraints(maxWidth: 170, minWidth: 170),
                     decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          MoreaColors.orange,
-                          MoreaColors.violett
-                        ]),
+                        gradient: LinearGradient(
+                            colors: [MoreaColors.orange, MoreaColors.violett]),
                         borderRadius: BorderRadius.circular(30)),
                     child: Center(
                         child:
@@ -523,12 +521,19 @@ class Teleblitz {
                                 } else {
                                   return ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: snapshot.data[0].length,
+                                      itemCount: snapshot.data[0].length + 1,
                                       itemBuilder: (context, i) {
-                                        return Text(
-                                          snapshot.data[0][i],
-                                          style: MoreaTextStyle.normal,
-                                        );
+                                        if (i < snapshot.data[0].length) {
+                                          return Text(
+                                            snapshot.data[0][i],
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        } else {
+                                          return Text(
+                                            'Total: ' + snapshot.data[0].length.toString(),
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        }
                                       });
                                 }
                               },
@@ -570,12 +575,19 @@ class Teleblitz {
                                   }
                                   return ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: chunntNoed.length,
+                                      itemCount: chunntNoed.length + 1,
                                       itemBuilder: (context, i) {
-                                        return Text(
-                                          chunntNoed[i],
-                                          style: MoreaTextStyle.normal,
-                                        );
+                                        if (i < chunntNoed.length) {
+                                          return Text(
+                                            chunntNoed[i],
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        } else {
+                                          return Text(
+                                            'Total: ' + chunntNoed.length.toString(),
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        }
                                       });
                                 }
                               },
