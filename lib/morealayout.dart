@@ -408,6 +408,12 @@ Drawer moreaDrawer(
                       moreafire.getData(moreafire.getUserMap[userMapUID]))),
           Divider(),
           new ListTile(
+              title: new Text("Über dieses App"),
+              trailing: new Icon(Icons.info),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AboutThisApp()))),
+          new Divider(),
+          new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
             onTap: signedOut,
