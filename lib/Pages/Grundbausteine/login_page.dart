@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
       _password,
       _passwordneu;
   String error;
-  String _geschlecht = 'Bitte wählen';
+  String _geschlecht = 'Bitte Geschlecht wählen';
   FormType _formType = FormType.login;
   List<Map> _stufenselect = new List();
   List<String> _verwandtschaft = [
