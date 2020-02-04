@@ -49,7 +49,7 @@ dev_dependencies:
         sdk: flutter
 
 flutter_icons:
-    android: true
+    android: false
     ios: true
     image_path: "assets/icon/icon.png"
 

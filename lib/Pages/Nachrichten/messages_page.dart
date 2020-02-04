@@ -66,6 +66,7 @@ class _MessagesPageState extends State<MessagesPage>
         this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
+        backgroundColor: MoreaColors.bottomAppBar,
         drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
             moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
         appBar: AppBar(
@@ -234,6 +235,7 @@ class _MessagesPageState extends State<MessagesPage>
         this.anzeigename = moreaFire.getPfandiName;
       }
       return Scaffold(
+        backgroundColor: MoreaColors.bottomAppBar,
         appBar: AppBar(
           title: Text('Nachrichten'),
           actions: tutorialButton(),

@@ -14,7 +14,7 @@ class MoreaColors {
   static int violettInt = 0xff7a62ff;
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;
-  static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 0.9);
+  static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 1);
 
   //306bac 3626A7
   static Map<int, Color> violettMaterialColor = {
@@ -119,6 +119,8 @@ class MoreaTextStyle {
   static TextStyle textField = TextStyle(fontSize: 18);
   static TextStyle sender =
       TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
+  static TextStyle button =
+      TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
 }
 
 class MoreaDivider extends Divider {
@@ -128,8 +130,9 @@ class MoreaDivider extends Divider {
 
 BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
   return BottomAppBar(
+    color: MoreaColors.bottomAppBar,
+    elevation: 0,
     child: Container(
-      color: Color.fromRGBO(43, 16, 42, 0.9),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -224,8 +227,9 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
 
 BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
   return BottomAppBar(
+    elevation: 0,
+    color: MoreaColors.bottomAppBar,
     child: Container(
-      color: Color.fromRGBO(43, 16, 42, 0.9),
       child: Row(
         children: <Widget>[
           Expanded(

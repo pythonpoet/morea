@@ -9,12 +9,10 @@ import 'morealayout.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     Firestore firestore = new Firestore();
@@ -22,13 +20,23 @@ class MyApp extends StatelessWidget {
       title: 'Pfadi Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
+        backgroundColor: Colors.white,
         primarySwatch: MaterialColor(
             MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
         fontFamily: 'Raleway',
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => RootPage(auth: Auth(), firestore: firestore,),
+        '/': (context) => Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [MoreaColors.orange, MoreaColors.bottomAppBar],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter)),
+            child: RootPage(
+              auth: Auth(),
+              firestore: firestore,
+            )),
       },
     );
   }
@@ -93,8 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 break;
             }
           });
-    }
-    else {
+    } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

@@ -196,6 +196,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         length: moreafire.getSubscribedGroups.length +
             ((moreafire.getGroupID != null) ? 1 : 0),
         child: Scaffold(
+          backgroundColor: MoreaColors.bottomAppBar,
           key: _scaffoldKey,
           appBar: new AppBar(
             title: new Text('Teleblitz'),
