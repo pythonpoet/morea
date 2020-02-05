@@ -6,7 +6,7 @@ class BlockedByDevToken extends StatelessWidget {
     return Center(
         child: Container(
       padding: EdgeInsets.all(15),
-      child: new Text("Dieses Gerät wurde gespärrt.",
+      child: new Text("Dieses Gerät wurde gesperrt.",
           style: new TextStyle(fontSize: 20)),
     ));
   }
