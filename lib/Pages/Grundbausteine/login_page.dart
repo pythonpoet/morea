@@ -164,6 +164,9 @@ class _LoginPageState extends State<LoginPage> {
             break;
         }
       } catch (e) {
+        setState(() {
+                _load = false;
+              });
         widget.auth.displayAuthError(
             widget.auth.checkForAuthErrors(context, e), context);
       }

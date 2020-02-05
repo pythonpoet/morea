@@ -304,10 +304,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -318,10 +315,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+        
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -332,10 +326,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+    
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -346,10 +337,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+        
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else

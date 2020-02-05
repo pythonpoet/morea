@@ -227,6 +227,7 @@ class _ChangeProfileState extends State<ChangeProfile>
                         thickness: 1,
                         color: Colors.black26,
                       )),
+                  userInfo.containsKey("Geburtstag")? Column(children:[
                   ListTile(
                     title: Text(
                       'Geburtstag',
@@ -241,13 +242,15 @@ class _ChangeProfileState extends State<ChangeProfile>
                       color: Colors.black,
                     ),
                     onTap: () => _changeGeburtstag(),
-                  ),
-                  Padding(
+                  ),Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: Divider(
                         thickness: 1,
                         color: Colors.black26,
-                      )),
+                      )),])
+                  :
+                  Container(),
+                  
                   ListTile(
                     title: Text(
                       'Passwort',

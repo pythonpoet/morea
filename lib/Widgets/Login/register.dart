@@ -26,7 +26,7 @@ class Register implements BaseRegister {
       _passwordneu,
       userId,
       error,
-      _geschlecht = 'Bitte wählen';
+      _geschlecht = 'Geschlecht wählen';
   List<Map> _stufenselect = new List();
     List<String> _verwandtschaft = [
     'Mutter',
@@ -127,8 +127,6 @@ class Register implements BaseRegister {
             registerVorName(),
             registerNachName(),
             registerGeschlecht(setState),
-            //TODO Braucht es wirklich Geburtstag der Eltern?
-            registerGeburtsTag(context, setState),
             registerVerwandtschaft(setState)
           ]),
           registerSection(icon: Icon(Icons.home), widgets: [
@@ -282,21 +280,28 @@ class Register implements BaseRegister {
           new Container(
             padding: EdgeInsets.only(left: 12),
             width: 1000,
+            height: 55,
             color: Colors.grey[200],
-            child: new DropdownButton<String>(
-              underline: SizedBox(),
-                items: [
-                  DropdownMenuItem(
-                      value: "Weiblich", child: Text('weiblich')),
-                  DropdownMenuItem(
-                      value: 'Männlich', child: Text('männlich'))
+            child: Center(
+              child: Row(
+                children: <Widget>[
+                  new DropdownButton<String>(
+                    underline: SizedBox(),
+                      items: [
+                        DropdownMenuItem(
+                            value: "Weiblich", child: Text('weiblich')),
+                        DropdownMenuItem(
+                            value: 'Männlich', child: Text('männlich'))
+                      ],
+                      hint: Text(_geschlecht),
+                      onChanged: (newVal) {
+                        moreaUser.geschlecht = newVal;
+                        _geschlecht = newVal;
+                        setState();
+                      }),
                 ],
-                hint: Text(_geschlecht),
-                onChanged: (newVal) {
-                  moreaUser.geschlecht = newVal;
-                  _geschlecht = newVal;
-                  setState();
-                }),
+              ),
+            ),
           ),
         ],
       );
@@ -361,21 +366,28 @@ class Register implements BaseRegister {
           Container(
             padding: EdgeInsets.only(left: 12),
             width: 1000,
+            height: 55,
             color: Colors.grey[200],
-            child: new DropdownButton<String>(
-              underline: SizedBox(),
-                items: _stufenselect.map((Map group) {
-                  return new DropdownMenuItem<String>(
-                    value: group[userMapgroupID],
-                    child: new Text(group[groupMapgroupNickName]),
-                  );
-                }).toList(),
-                hint: Text(_selectedstufe),
-                onChanged: (newVal) {
-                  _selectedstufe = convMiDatatoWebflow(newVal);
-                  moreaUser.groupID = newVal;
-                  setState();
-                }),
+            child: Center(
+              child: Row(
+                children: <Widget>[
+                  new DropdownButton<String>(
+                    underline: SizedBox(),
+                      items: _stufenselect.map((Map group) {
+                        return new DropdownMenuItem<String>(
+                          value: group[userMapgroupID],
+                          child: new Text(group[groupMapgroupNickName]),
+                        );
+                      }).toList(),
+                      hint: Text(_selectedstufe),
+                      onChanged: (newVal) {
+                        _selectedstufe = convMiDatatoWebflow(newVal);
+                        moreaUser.groupID = newVal;
+                        setState();
+                      }),
+                ],
+              ),
+            ),
           )
         ]
       );
@@ -387,21 +399,28 @@ class Register implements BaseRegister {
           Container(
                   padding: EdgeInsets.only(left: 12),
                   width: 1000,
+                  height: 55,
                   color: Colors.grey[200],
-                  child: new DropdownButton<String>(
-                    underline: SizedBox(),
-                      items: _verwandtschaft.map((String val) {
-                        return new DropdownMenuItem<String>(
-                          value: val,
-                          child: new Text(val),
-                        );
-                      }).toList(),
-                      hint: Text(_selectedverwandtschaft),
-                      onChanged: (newVal) {
-                        _selectedverwandtschaft = newVal;
-                        moreaUser.pos = newVal;
-                        setState();
-                      }),
+                  child: Center(
+                    child: Row(
+                      children: <Widget>[
+                        new DropdownButton<String>(
+                          underline: SizedBox(),
+                            items: _verwandtschaft.map((String val) {
+                              return new DropdownMenuItem<String>(
+                                value: val,
+                                child: new Text(val),
+                              );
+                            }).toList(),
+                            hint: Text(_selectedverwandtschaft),
+                            onChanged: (newVal) {
+                              _selectedverwandtschaft = newVal;
+                              moreaUser.pos = newVal;
+                              setState();
+                            }),
+                      ],
+                    ),
+                  ),
                 ),
         ],
       );
