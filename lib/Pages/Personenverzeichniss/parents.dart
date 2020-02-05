@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -14,6 +16,7 @@ import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'package:random_string/random_string.dart';
+import 'package:rxdart/rxdart.dart';
 
 abstract class BaseMergeChildParent {
   Widget childShowQrCode(Map userMap, BuildContext context,
@@ -32,6 +35,7 @@ class MergeChildParent extends BaseMergeChildParent {
   Register register;
   bool parentReaderror = false, allowScanner = true;
   final formKey = new GlobalKey<FormState>();
+  StreamController<bool> streamRegisterStatus = new BehaviorSubject();
 
   String userId, error;
 
@@ -163,10 +167,9 @@ class MergeChildParent extends BaseMergeChildParent {
             context: context,
             builder: (context) => AlertDialog(
                 content: Text(
-                    'Die App muss neu gestartet werden nachdem sie ein neues Kind verknüpft haben. Sie werden darum nun ausgeloggt.')))
+                    'Dein Kind wurde hinzugefügt')))
         .then((onvalue) {
-      Navigator.of(context).popUntil(ModalRoute.withName('/'));
-      signOut();
+      RestartWidget.restartApp(context);
     });
   }
 
@@ -245,24 +248,94 @@ class MergeChildParent extends BaseMergeChildParent {
               child:
                   new Text('Registrieren', style: new TextStyle(fontSize: 20)),
               onPressed: () => {
-                registerChild(parentData, context, newKidakt).then((res) {
-                  if(res)
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            content: Text(
-                                'Dein Kind wurde erfolgreich hinzugefügt. Das App wird nun neu gestartet'),
-                          )).then((onval) {
-                    RestartWidget.restartApp(context);
-                  });
-                  else
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
+               registerChild(parentData, context, newKidakt).then((onValue){
+                 streamRegisterStatus.add(onValue);
+               }),
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context)  {
+                    return StreamBuilder(
+                      stream: streamRegisterStatus.stream,
+                      builder: (BuildContext context, AsyncSnapshot snap){
+                        if(!snap.hasData)
+                          return Container(
+                             padding: EdgeInsets.only(left: 40, bottom:80, right: 40, top: 80),
+                              child: Card(
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 20, bottom:40, right: 20, top: 40),
+                                  child: Column(
+                                    children:[
+                                      Expanded(
+                                        child: Text("Dein Kind wird hinzugefügt", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                        flex: 1,),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Center(
+                                          child: Container(
+                                              child: Center(child: simpleMoreaLoadingIndicator()),
+                                              height: 100,
+                                              width: 140,
+                                            ),
+                                        ),
+                                      )
+                                    ]
+                                  ),
+                                )
+                              ),
+                                height: 100,
+                                width: 140,
+                              );
+                        else if(snap.data){
+                          return Container(
+                             padding: EdgeInsets.only(left: 40, bottom:80, right: 40, top: 80),
+                              child: Card(
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 20, bottom:40, right: 20, top: 40),
+                                  child: Column(
+                                    children:[
+                                      Expanded(
+                                        child: Text("Dein Kind wurde hinzugefügt", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                        flex: 1,),
+                                      Expanded(
+                                        flex: 9,
+                                        child: Center(
+                                          child:  Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.check_circle, size: 60, color: Colors.green),
+                                                    Text(" Fertig",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+                                                  ]
+                                                ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex:1,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: <Widget>[
+                                            RaisedButton(
+                                              child: Text("Ok"),
+                                              onPressed: () => RestartWidget.restartApp(context),
+                                              color: MoreaColors.violett                                              
+                                            )
+                                          ],
+                                          )
+                                      )
+                                    ]
+                                  ),
+                                )
+                              ),
+                                height: 100,
+                                width: 140,
+                              );
+                          }
+                        else return AlertDialog(
                             content: Text(
                                 'Etwas hat nicht funktioniert. Bitte versuche es erneut.'),
-                          )); 
-                })
+                          ); 
+                      }
+                    );}),
               },
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),
