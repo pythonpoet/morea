@@ -432,7 +432,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
     await widget.moreaFire
         .uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
-    Navigator.of(context).pop();
+    Navigator.of(context).popUntil(ModalRoute.withName('/'));
   }
 
   Future<Null> _selectDatum(BuildContext context) async {

@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'parents.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
-  ProfilePageState({this.profile, this.moreaFire, this.crud0});
+  ProfilePageState({this.profile, this.moreaFire, this.crud0, this.signOut});
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
+  final Function signOut;
 
   var profile;
 
@@ -52,8 +54,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> erziungsberechtigte() async {
-    if ((widget.profile['Eltern-pending'] != null) &&
-        (widget.profile['Eltern-pending'].length != 0)) {
+    if ((widget.profile['Eltern'] != null) &&
+        (widget.profile['Eltern'].length != 0)) {
       await getElternMap();
       hatEltern = true;
       setState(() {});
@@ -115,7 +117,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getElternMap() async {
-    List elternUID = List.from(widget.profile['Eltern-pending'].values);
+    List elternUID = List.from(widget.profile['Eltern'].values);
     for (int i = 0; i < elternUID.length; i++) {
       var elternData = await moreaFire.getUserInformation(elternUID[i]);
       if (i == 0) {
@@ -178,19 +180,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
               ),
               body: Stack(
                 children: <Widget>[
-                  LayoutBuilder(
-                    builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                          child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: viewportConstraints.maxHeight,
-                        ),
-                        child: viewChildprofile(context),
-                      ));
-                    },
+                  MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                        child: MoreaShadowContainer(
+                      child: viewChildprofile(context),
+                    )),
                   ),
-                  new Align(
+                  Align(
                     child: display
                         ? mergeChildParent.childShowQrCode(
                             widget.profile,
@@ -209,28 +205,21 @@ class ProfilePageStatePage extends State<ProfilePageState> {
               ),
               body: Stack(
                 children: <Widget>[
-                  LayoutBuilder(
-                    builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                          child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: viewportConstraints.maxHeight,
-                        ),
-                        child: viewParentprofile(context),
-                      ));
-                    },
+                  MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                        child: MoreaShadowContainer(
+                            child: viewParentprofile(context))),
                   ),
                   new Align(
                     child: display
-                        ? mergeChildParent.parentScannsQrCode(
-                            widget.profile, this.parentaktuallisieren)
+                        ? mergeChildParent.parentScannsQrCode(widget.profile,
+                            this.parentaktuallisieren, context, widget.signOut)
                         : Container(),
                   ),
                   new Align(
                       child: newKidDisplay
                           ? mergeChildParent.registernewChild(widget.profile,
-                              context, this.setProfileState, this.newKidakt)
+                              context, this.setProfileState, this.newKidakt, widget.signOut)
                           : Container())
                 ],
               )));
@@ -241,23 +230,34 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     return Container(
       padding: EdgeInsets.all(15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              'Eltern',
+              style: MoreaTextStyle.title,
+            ),
+          ),
           hatEltern ? elternAnzeigen() : Container(),
           SizedBox(
             height: 10,
           ),
-          Container(
-            child: RaisedButton(
-              child: Text(
-                'Mit Eltern Koppeln',
-                style: TextStyle(fontSize: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                child: Text(
+                  'Mit Eltern Koppeln',
+                  style: TextStyle(fontSize: 20),
+                ),
+                onPressed: () => {childaktuallisieren()},
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                color: Color(0xff7a62ff),
+                textColor: Colors.white,
               ),
-              onPressed: () => {childaktuallisieren()},
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
-            ),
+            ],
           ),
           SizedBox(
             height: 24,
@@ -271,13 +271,21 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     return Container(
       padding: EdgeInsets.all(15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              'Kinder',
+              style: MoreaTextStyle.title,
+            ),
+          ),
           hatKinder ? kinderAnzeigen() : Container(),
           SizedBox(
             height: 10,
           ),
-          Container(
-              child: Column(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
                 child: Text(
@@ -290,6 +298,11 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 color: Color(0xff7a62ff),
                 textColor: Colors.white,
               ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
               RaisedButton(
                 child: Text(
                   'Neues Kind registrieren',
@@ -302,9 +315,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 textColor: Colors.white,
               ),
             ],
-          )),
-          SizedBox(
-            height: 24,
           ),
         ],
       ),
@@ -313,112 +323,52 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   Widget elternAnzeigen() {
     if (elternMapList[0] != 'Liam Bebecho') {
-      return Column(
-        children: <Widget>[
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            height: 130 * (elternMapList.length).toDouble(),
-            alignment: Alignment.center, //
-            decoration: new BoxDecoration(
-              border: new Border.all(color: Colors.black, width: 2),
-              borderRadius: new BorderRadius.all(
-                Radius.circular(4.0),
+      return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: elternMapList.length,
+          itemBuilder: (context, int index) {
+            Map<String, dynamic> elternMap =
+                Map<String, dynamic>.from(elternMapList[index]);
+            return Container(
+              decoration: BoxDecoration(
+                  border: Border.all(width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ListTile(
+                    title: Text(
+                      '${elternMap['Pos']}:',
+                      style: MoreaTextStyle.lable,
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      'Name',
+                      style: MoreaTextStyle.lable,
+                    ),
+                    subtitle: Text(
+                      '${elternMap["Vorname"]} ${elternMap["Nachname"]}',
+                      style: MoreaTextStyle.normal,
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      'E-Mail-Adresse',
+                      style: MoreaTextStyle.lable,
+                    ),
+                    subtitle: Text(
+                      elternMap['Email'],
+                      style: MoreaTextStyle.normal,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            child: Container(
-                padding: EdgeInsets.all(5),
-                child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: elternMapList.length,
-                    itemExtent: 130,
-                    itemBuilder: (context, int index) {
-                      Map<String, dynamic> elternMap =
-                          Map<String, dynamic>.from(elternMapList[index]);
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text('${elternMap['Pos']}:',
-                                style: TextStyle(fontSize: 20)),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Vorname:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  elternMap['Vorname'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Nachname:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  elternMap['Nachname'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Email:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  elternMap['Email'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Telefon:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  elternMap['Handynummer'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    })),
-          )
-        ],
-      );
+            );
+          });
     } else {
       return Container();
     }
@@ -426,112 +376,46 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   Widget kinderAnzeigen() {
     if (kinderMapList[0] != 'Walter') {
-      return Column(
-        children: <Widget>[
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            height: 130 * (kinderMapList.length).toDouble(),
-            alignment: Alignment.center, //
-            decoration: new BoxDecoration(
-              border: new Border.all(color: Colors.black, width: 2),
-              borderRadius: new BorderRadius.all(
-                Radius.circular(4.0),
+      return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: kinderMapList.length,
+          itemBuilder: (context, int index) {
+            Map<String, dynamic> kinderMap =
+                Map<String, dynamic>.from(kinderMapList[index]);
+            return Container(
+              decoration: BoxDecoration(
+                  border: Border.all(width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ListTile(
+                    title: Text(
+                      'Name',
+                      style: MoreaTextStyle.lable,
+                    ),
+                    subtitle: Text(
+                      '${kinderMap["Vorname"]} ${kinderMap["Nachname"]}',
+                      style: MoreaTextStyle.normal,
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      'E-Mail-Adresse',
+                      style: MoreaTextStyle.lable,
+                    ),
+                    subtitle: Text(
+                      kinderMap['Email'],
+                      style: MoreaTextStyle.normal,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            child: Container(
-                padding: EdgeInsets.all(5),
-                child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: kinderMapList.length,
-                    itemExtent: 130,
-                    itemBuilder: (context, int index) {
-                      Map<String, dynamic> kinderMap =
-                          Map<String, dynamic>.from(kinderMapList[index]);
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text('${kinderMap['Pos']}:',
-                                style: TextStyle(fontSize: 20)),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Vorname:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  kinderMap['Vorname'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Nachname:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  kinderMap['Nachname'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Email:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  kinderMap['Email'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                    child: Container(
-                                  child: Text(
-                                    'Telefon:',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                )),
-                                Expanded(
-                                    child: Container(
-                                        child: Text(
-                                  kinderMap['Handynummer'],
-                                  style: TextStyle(fontSize: 20),
-                                )))
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    })),
-          )
-        ],
-      );
+            );
+          });
     } else {
       return Container();
     }

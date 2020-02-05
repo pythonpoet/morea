@@ -27,6 +27,7 @@ final String pathConfig = "config";
 final String pathAnmeldungen = "Anmeldungen";
 final String pathRequest = "request";
 final String pathInit = "init";
+final String pathChildren = "children";
 
 //Maps
 final String mapTimestamp = "Timestamp";

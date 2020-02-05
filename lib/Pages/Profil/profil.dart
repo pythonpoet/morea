@@ -6,7 +6,7 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
-import 'package:morea/services/utilities/url_launcher.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'change_profil.dart';
 
 class Profile extends StatefulWidget {
@@ -33,8 +33,9 @@ class _ProfileState extends State<Profile> {
   String oldEmail;
   String newPassword;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
-  Urllauncher urllauncher = Urllauncher();
   CrudMedthods crud0;
+  GlobalKey _floatingActionButtonKey = GlobalKey();
+  GlobalKey _floatingActionButtonKey2 = GlobalKey();
 
   _ProfileState();
 
@@ -48,25 +49,52 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     if (this.userInfo['Pfadinamen'] == null) {
-      this.userInfo['Pfadinamen'] = this.userInfo['Name'];
+      this.userInfo['Pfadinamen'] = '';
     }
     return Scaffold(
+      backgroundColor: MoreaColors.bottomAppBar,
       drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName,
           this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
       floatingActionButtonLocation: _locationFloatingActionButton(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.edit),
-        backgroundColor: MoreaColors.violett,
-        shape: CircleBorder(side: BorderSide(color: Colors.white)),
-        onPressed: () =>
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return ChangeProfile(
-            auth: widget.auth,
-            moreaFire: widget.moreaFire,
-            navigationMap: widget.navigationMap,
-            updateProfile: updateProfile,
-          );
-        })),
+      floatingActionButton: Showcase(
+        key: _floatingActionButtonKey,
+        shapeBorder: CircleBorder(),
+        description: 'Hier kannst du dein Profil ändern',
+        disableAnimation: true,
+        child: Showcase.withWidget(
+          key: _floatingActionButtonKey2,
+          disableAnimation: true,
+          shapeBorder: CircleBorder(),
+          height: 300,
+          width: 150,
+          container: Container(
+            padding: EdgeInsets.all(5),
+            constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5), color: Colors.white),
+            child: Column(
+              children: [
+                Text(
+                  'Anpassung an deinem Profil hier, ändern auch dein Profil für den E-Mail-Verteiler',
+                ),
+              ],
+            ),
+          ),
+          child: FloatingActionButton(
+            child: Icon(Icons.edit),
+            backgroundColor: MoreaColors.violett,
+            shape: CircleBorder(side: BorderSide(color: Colors.white)),
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) {
+              return ChangeProfile(
+                auth: widget.auth,
+                moreaFire: widget.moreaFire,
+                navigationMap: widget.navigationMap,
+                updateProfile: updateProfile,
+              );
+            })),
+          ),
+        ),
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -93,11 +121,13 @@ class _ProfileState extends State<Profile> {
                     style: MoreaTextStyle.lable,
                   ),
                   subtitle: Text(
-                    userInfo['Vorname'] +
-                        ' ' +
-                        userInfo['Nachname'] +
-                        ' v/o ' +
-                        userInfo['Pfadinamen'],
+                    userInfo['Pfadinamen'] == ''
+                        ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
+                        : userInfo['Vorname'] +
+                            ' ' +
+                            userInfo['Nachname'] +
+                            ' v/o ' +
+                            userInfo['Pfadinamen'],
                     style: MoreaTextStyle.normal,
                   ),
                 ),
@@ -128,15 +158,15 @@ class _ProfileState extends State<Profile> {
                       color: Colors.black26,
                     )),
                 ListTile(
-                    title: Text(
-                      'E-Mail-Adresse',
-                      style: MoreaTextStyle.lable,
-                    ),
-                    subtitle: Text(
-                      userInfo['Email'],
-                      style: MoreaTextStyle.normal,
-                    ),
-                    onTap: () => urllauncher.openMail(userInfo['Email'])),
+                  title: Text(
+                    'E-Mail-Adresse',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: Text(
+                    userInfo['Email'],
+                    style: MoreaTextStyle.normal,
+                  ),
+                ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Divider(
@@ -152,7 +182,6 @@ class _ProfileState extends State<Profile> {
                     userInfo['Handynummer'],
                     style: MoreaTextStyle.normal,
                   ),
-                  onTap: () => urllauncher.openPhone(userInfo['Handynummer']),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -196,6 +225,12 @@ class _ProfileState extends State<Profile> {
       ),
       appBar: AppBar(
         title: Text('Profil'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () => tutorial(),
+          )
+        ],
       ),
       bottomNavigationBar: _bottomAppBarBuilder(),
     );
@@ -230,5 +265,10 @@ class _ProfileState extends State<Profile> {
     } else {
       return moreaChildBottomAppBar(widget.navigationMap);
     }
+  }
+
+  void tutorial() {
+    ShowCaseWidget.of(context)
+        .startShowCase([_floatingActionButtonKey, _floatingActionButtonKey2]);
   }
 }

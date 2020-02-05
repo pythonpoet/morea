@@ -23,6 +23,7 @@ class ChildParendPend extends BaseChildParendPend {
             param: Map.from({
               userMapPos: userMap[userMapPos],
               userMapUID: userMap[userMapUID],
+              userMapgroupID: userMap[userMapgroupID],
               mapTimestamp: DateTime.now().toIso8601String()
             })))
         .data;

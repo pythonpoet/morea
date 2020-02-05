@@ -14,7 +14,7 @@ class MoreaColors {
   static int violettInt = 0xff7a62ff;
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;
-  static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 0.9);
+  static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 1);
 
   //306bac 3626A7
   static Map<int, Color> violettMaterialColor = {
@@ -44,7 +44,10 @@ class MoreaShadow {
 }
 
 class MoreaShadowContainer extends Container {
-  MoreaShadowContainer({this.child, this.constraints});
+  MoreaShadowContainer({
+    this.child,
+    this.constraints,
+  });
 
   @override
   final Decoration decoration = MoreaShadow.teleblitz;
@@ -111,9 +114,13 @@ class MoreaTextStyle {
   static TextStyle lable =
       TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20);
   static TextStyle normal = TextStyle(color: Colors.black, fontSize: 20);
-  static TextStyle htmlList = TextStyle(fontWeight: FontWeight.w500, fontSize: 16);
+  static TextStyle htmlList =
+      TextStyle(fontWeight: FontWeight.w500, fontSize: 16);
   static TextStyle textField = TextStyle(fontSize: 18);
-  static TextStyle sender = TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
+  static TextStyle sender =
+      TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
+  static TextStyle button =
+      TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
 }
 
 class MoreaDivider extends Divider {
@@ -123,8 +130,9 @@ class MoreaDivider extends Divider {
 
 BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
   return BottomAppBar(
+    color: MoreaColors.bottomAppBar,
+    elevation: 0,
     child: Container(
-      color: Color.fromRGBO(43, 16, 42, 0.9),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -219,8 +227,9 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
 
 BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
   return BottomAppBar(
+    elevation: 0,
+    color: MoreaColors.bottomAppBar,
     child: Container(
-      color: Color.fromRGBO(43, 16, 42, 0.9),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -349,12 +358,15 @@ Drawer moreaDrawer(
           new ListTile(
               title: new Text('Personen'),
               trailing: new Icon(Icons.people),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new PersonenVerzeichnisState(
-                        moreaFire: moreafire,
-                        crud0: crud0,
-                      )))),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new PersonenVerzeichnisState(
+                            moreaFire: moreafire,
+                            crud0: crud0,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
           new ListTile(
             title: new Text("TN zu Leiter machen"),
             trailing: new Icon(Icons.enhanced_encryption),
@@ -388,13 +400,23 @@ Drawer moreaDrawer(
           ListTile(
               title: new Text('Eltern hinzufügen'),
               trailing: new Icon(Icons.add),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        moreaFire: moreafire,
-                        crud0: crud0,
-                      )))),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) => new ProfilePageState(
+                            profile: moreafire.getUserMap,
+                            moreaFire: moreafire,
+                            crud0: crud0,
+                            signOut: signedOut,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
           Divider(),
+          new ListTile(
+              title: new Text("Über dieses App"),
+              trailing: new Icon(Icons.info),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new AboutThisApp()))),
+          new Divider(),
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
@@ -418,12 +440,16 @@ Drawer moreaDrawer(
           new ListTile(
               title: new Text('Kinder hinzufügen'),
               trailing: new Icon(Icons.add),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new ProfilePageState(
-                        profile: moreafire.getUserMap,
-                        crud0: crud0,
-                        moreaFire: moreafire,
-                      )))),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) => new ProfilePageState(
+                            profile: moreafire.getUserMap,
+                            crud0: crud0,
+                            moreaFire: moreafire,
+                            signOut: signedOut,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),

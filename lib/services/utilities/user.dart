@@ -286,6 +286,11 @@ class User {
         else
           throw "$userMapGeschlecht has to be non-null";
 
+        if(groupID != null)
+          userMap[userMapgroupID] = groupID;
+        else
+          throw "$userMapgroupID has to be non-null";
+
         if (pfadiName != null) userMap[userMapPfadiName] = pfadiName;
         //Pfadiname can be empty
 
@@ -297,24 +302,56 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       case "Vater":
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       case "Erziehungsberechtigter":
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       case "Erziehungsberechtigte":
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
+        if (geburtstag != null)
+          userMap[userMapGeburtstag] = geburtstag.toString();
+        else
+          throw "$userMapGeburtstag has to be non-null";
+        if (geschlecht != null)
+          userMap[userMapGeschlecht] = geschlecht;
+        else
+          throw "$userMapGeschlecht has to be non-null";
         break;
       default:
         throw "UserMap-pos value: $pos is not implemented";
@@ -325,7 +362,7 @@ class User {
   }
 
   Future<dynamic> createMoreaUser(
-      Auth auth, _password, MoreaFirebase moreafire, onSignedIn) async {
+      Auth auth, String _password, MoreaFirebase moreafire, onSignedIn) async {
     try {
       userID = await auth.createUserWithEmailAndPassword(email, _password);
       print('Registered user: $userID');

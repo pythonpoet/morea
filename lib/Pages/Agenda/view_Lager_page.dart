@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -25,31 +26,18 @@ class ViewLagerPageState extends StatelessWidget {
               )),
         ),
       );
-    return Container(
-        child: Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text(info['Lagername'].toString()),
+        title: Text(info['Eventname'].toString()),
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return MoreaBackgroundContainer(
-            child: SingleChildScrollView(
-                child: MoreaShadowContainer(
-              child: viewLager(),
-            )),
-          );
-        },
+      body: MoreaBackgroundContainer(
+        child: SingleChildScrollView(
+            child: MoreaShadowContainer(
+          child: viewLager(),
+        )),
       ),
-      floatingActionButton: Opacity(
-        opacity: istLeiter() ? 1.0 : 0.0,
-        child: new FloatingActionButton(
-          elevation: 0.0,
-          child: new Icon(Icons.edit),
-          backgroundColor: Color(0xff7a62ff),
-          onPressed: () => routeToLagerbearb(context),
-        ),
-      ),
-    ));
+      floatingActionButton: floatingActionButton(context),
+    );
   }
 
   Widget viewLager() {
@@ -57,14 +45,17 @@ class ViewLagerPageState extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Text(
+          padding: EdgeInsets.only(top: 20),
+        ),
+        ListTile(
+          title: Text(
             info['Eventname'],
             style: MoreaTextStyle.title,
           ),
+          trailing: Text('Lager', style: MoreaTextStyle.sender,),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
+          padding: EdgeInsets.only(right: 15, left: 15, top: 20),
           child: MoreaDivider(),
         ),
         ListTile(
@@ -73,6 +64,7 @@ class ViewLagerPageState extends StatelessWidget {
               style: MoreaTextStyle.lable,
             ),
             subtitle: ListView(
+              physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: <Widget>[
                 Padding(
@@ -211,5 +203,13 @@ class ViewLagerPageState extends StatelessWidget {
                   moreaFire: moreaFire,
                 )))
         .then((onValue) {});
+  }
+
+  FloatingActionButton floatingActionButton(BuildContext context) {
+    if (istLeiter()) {
+      return moreaEditActionbutton(route: () => routeToLagerbearb(context));
+    } else {
+      return null;
+    }
   }
 }

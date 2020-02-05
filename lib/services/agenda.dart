@@ -43,7 +43,7 @@ class Agenda extends BaseAgenda {
   }
 
   DateTime getDateTime(Map event) {
-    return DateTime.parse(event['Order']);
+    return DateTime.parse(event['DeleteDate']);
   }
 
   Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {
@@ -126,6 +126,7 @@ class Agenda extends BaseAgenda {
       };
       return await db.runTransaction(transactionHandler);
     } catch (e) {
+      print('Error in deleteAgendaOverview');
       print(e);
     }
   }
@@ -152,6 +153,8 @@ class Agenda extends BaseAgenda {
         await this.deleteAgendaOverviewTitle(groupID, eventID);
       }
     }
+
+    print(eventID);
 
     data["eventID"] = eventID;
 
@@ -181,12 +184,12 @@ class Agenda extends BaseAgenda {
             Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
             if (test.containsKey("AgendaTitles")) {
               agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
-              if (agendaOverview.length >= 0) {
+              if (agendaOverview.length >= 1) {
                 agendaOverview.add(agendaTitle);
                 agendaOverview
                     .sort((a, b) => getDateTime(a).compareTo(getDateTime(b)));
               } else {
-                agendaOverview[0] = agendaTitle;
+                agendaOverview.add(agendaTitle);
               }
             } else {
               agendaOverview.add(agendaTitle);
@@ -198,6 +201,7 @@ class Agenda extends BaseAgenda {
       };
       return await db.runTransaction(transactionHandler);
     } catch (e) {
+      print('Error in updateAgendaTitles');
       print(e);
     }
   }

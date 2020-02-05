@@ -33,6 +33,7 @@ dependencies:
     rxdart: ^0.22.4
     flutter_datetime_picker: ^1.2.8
     flip_card: ^0.4.4
+    showcaseview: ^0.1.5
 
 
     shared_preferences: any
@@ -48,8 +49,8 @@ dev_dependencies:
         sdk: flutter
 
 flutter_icons:
-    android: true
-    ios: true
+    android: false
+    ios: false
     image_path: "assets/icon/icon.png"
 
 

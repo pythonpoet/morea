@@ -337,18 +337,23 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: MoreaDivider(),
       ),
-      ListTile(
-        title: Text(
-          'Stufe',
-          style: MoreaTextStyle.lable,
-        ),
-        subtitle: Text(convMiDatatoWebflow(_stufe)),
-        onTap: () => _selectStufe(),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          color: Colors.black,
-        ),
-      ),
+      (_pos == "Mutter" ||
+              _pos == 'Vater' ||
+              _pos == 'Erziehungsberechtigter' ||
+              _pos == 'Erziehungsberechtigte')
+          ? Container()
+          : ListTile(
+              title: Text(
+                'Stufe',
+                style: MoreaTextStyle.lable,
+              ),
+              subtitle: Text(convMiDatatoWebflow(_stufe)),
+              onTap: () => _selectStufe(),
+              trailing: Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.black,
+              ),
+            ),
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: MoreaDivider(),
