@@ -156,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                           moreaUser.email,
                           moreaUser.vorName,
                           moreaUser.nachName,
-                          _geschlecht,
+                          moreaUser.geschlecht,
                           moreaUser.groupID,
                           moreafire);
                     }
@@ -238,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
   initSubgoup() async {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
-    register = new Register(moreaUser: moreaUser);
+    register = new Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;
     this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
@@ -403,7 +403,7 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 child: Column(
                   children: <Widget>[
-                    register.registerTeilnehmerWidget(context, letsSetState, crud0.getDocument(pathGroups, "1165")),
+                    register.registerTeilnehmerWidget(context, letsSetState),
                     Column(children: buildSubmitButtons())
                   ],
                 ),

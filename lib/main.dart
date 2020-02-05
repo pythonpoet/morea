@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Grundbausteine/login_page.dart';
 import 'package:morea/Pages/Grundbausteine/root_page.dart';
+import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/services/auth.dart';
 import 'morealayout.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(RestartWidget(child: MyApp(),));
 }
 
 class MyApp extends StatelessWidget {

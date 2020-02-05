@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
@@ -242,7 +244,7 @@ class User {
     if (email != null)
       userMap[userMapEmail] = email;
     else
-      throw "$userMapEmail has to be non-null";
+      log("$userMapEmail has to be non-null");
 
     if (vorName != null)
       userMap[userMapVorName] = vorName;
@@ -257,7 +259,7 @@ class User {
     if (userID != null)
       userMap[userMapUID] = userID;
     else
-      throw "$userMapUID has to be non-null";
+      log("$userMapUID has to be non-null");
 
     if (ort != null)
       userMap[userMapOrt] = ort;
