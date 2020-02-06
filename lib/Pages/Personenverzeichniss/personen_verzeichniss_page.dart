@@ -94,6 +94,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                       ),
                     ),
                     ListView.separated(
+                      physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: person.length,
                       itemBuilder: (context, int index) {
