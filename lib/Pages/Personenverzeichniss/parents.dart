@@ -389,6 +389,11 @@ class MergeChildParent extends BaseMergeChildParent {
           } else {
             userInfo[userMapKinder][moreaUser.vorName] = childUID;
           }
+          if (userInfo[userMapSubscribedGroups] == null){
+            userInfo[userMapSubscribedGroups] = <String>[moreaUser.groupID];
+          } else {
+            userInfo[userMapSubscribedGroups].add(moreaUser.groupID);
+          }
           moreafire.updateUserInformation(
               moreafire.getUserMap[userMapUID], userInfo);
           moreafire.groupPriviledgeTN(moreaUser.groupID, childUID, moreaUser.vorName);
