@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Grundbausteine/blockedByAppVersion_page.dart';

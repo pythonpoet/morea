@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/restartWidget.dart';
@@ -11,11 +9,9 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
 import 'package:morea/services/utilities/user.dart';
-import 'package:random_string/random_string.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class BaseMergeChildParent {
@@ -380,6 +376,9 @@ class MergeChildParent extends BaseMergeChildParent {
           moreaUser.adresse = parentData[userMapAdresse];
           moreaUser.plz = parentData[userMapPLZ];
           moreaUser.ort = parentData[userMapOrt];
+          moreaUser.elternMap = <String, dynamic>{
+            moreafire.getVorName: moreafire.getUserMap[userMapUID],
+          };
           moreaUser.pos = "Teilnehmer";
           HttpsCallableResult results =
           await moreafire.uploadChildUserInformation(moreaUser.generateAndValitateUserMap());

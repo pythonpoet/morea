@@ -23,7 +23,7 @@ class User {
   List<String> subscribedGroups = new List<String>();
   Map<String, int> groupPrivilege = new Map();
   Map<String, Map<String, String>> childMap;
-  Map<String, dynamic> _userMap, groupMap;
+  Map<String, dynamic> _userMap, groupMap, elternMap;
   CrudMedthods crud0;
 
   User(this.crud0);
@@ -297,6 +297,8 @@ class User {
         //Pfadiname can be empty
 
         if (handynummer != null) userMap[userMapHandynummer] = handynummer;
+
+        if(elternMap != null) userMap[userMapEltern] = elternMap;
         //Handynummer can be empty
         break;
       case "Mutter":

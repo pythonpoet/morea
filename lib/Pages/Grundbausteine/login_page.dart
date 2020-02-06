@@ -1,20 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:intl/intl.dart';
 import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/morea_strings.dart';
-import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
@@ -43,21 +39,10 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String _alter = "[Datum auswählen]",
-      _selectedstufe = 'Stufe wählen',
-      _selectedverwandtschaft = 'Verwandtschaftsgrad wählen',
-      _password,
-      _passwordneu;
+  String _password;
   String error;
-  String _geschlecht = 'Bitte wählen';
   FormType _formType = FormType.login;
   List<Map> _stufenselect = new List();
-  List<String> _verwandtschaft = [
-    'Mutter',
-    'Vater',
-    'Erziehungsberechtigter',
-    'Erziehungsberechtigte'
-  ];
   bool _load = false;
 
   PageController pageController;
@@ -125,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                       moreaUser.email,
                       moreaUser.vorName,
                       moreaUser.nachName,
-                      _geschlecht,
+                      moreaUser.geschlecht,
                       moreaUser.groupID,
                       moreafire);
                 } else {
@@ -169,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
               });
         widget.auth.displayAuthError(
             widget.auth.checkForAuthErrors(context, e), context);
+        print(e);
       }
     }
   }

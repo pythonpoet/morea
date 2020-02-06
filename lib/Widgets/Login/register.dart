@@ -11,19 +11,10 @@ abstract class BaseRegister {}
 
 class Register implements BaseRegister {
   String get getPassword => _password;
-  String _email,
-      _pfadinamen = ' ',
-      _vorname,
-      _nachname,
-      _alter = "[Datum auswählen]",
+  String _alter = "[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen',
-      _password,
-      _adresse,
-      _ort,
-      _plz,
-      _handynummer,
-      _passwordneu,
+      _password,_passwordneu,
       userId,
       error,
       _geschlecht = 'Geschlecht wählen';
@@ -296,7 +287,11 @@ class Register implements BaseRegister {
                       hint: Text(_geschlecht),
                       onChanged: (newVal) {
                         moreaUser.geschlecht = newVal;
-                        _geschlecht = newVal;
+                        if(newVal == 'Weiblich'){
+                          _geschlecht = 'weiblich';
+                        } else {
+                          _geschlecht = 'männlich';
+                        }
                         setState();
                       }),
                 ],
