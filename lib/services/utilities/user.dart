@@ -88,8 +88,13 @@ class User {
     //SubscribedGroups can be empty (Because Children are asigned to a single group by default).
 
     if (_userMap.containsKey(userMapPfadiName)) {
-      pfadiName = _userMap[userMapPfadiName];
-      displayName = pfadiName;
+      if (_userMap[userMapPfadiName] != '' &&
+          _userMap[userMapPfadiName] != null) {
+        pfadiName = _userMap[userMapPfadiName];
+        displayName = pfadiName;
+      } else {
+        displayName = vorName;
+      }
     } else {
       displayName = vorName;
     }

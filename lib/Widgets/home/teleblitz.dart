@@ -120,16 +120,51 @@ class Teleblitz {
   Widget parentAnmeldeButton(String groupID, String eventID) {
     List<Widget> anmeldebuttons = new List();
     moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
-      anmeldebuttons.add(anmeldebutton(
-          groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden",
-          name: vorname));
+      anmeldebuttons.add(
+          anmeldebutton(groupID, eventID, uid, "ja", "nein", name: vorname));
     });
     return Column(children: anmeldebuttons);
   }
 
   Widget childAnmeldeButton(String groupID, String eventID) {
     return anmeldebutton(moreaFire.getGroupID, eventID,
-        moreaFire.getUserMap[userMapUID], 'Chume', 'Chume nöd');
+        moreaFire.getUserMap[userMapUID], 'Chume', 'Chume nöd',);
+  }
+
+  Widget parentListTitle(){
+    return Container(
+        padding: EdgeInsets.only(top: 30, bottom: 20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+                width: 120,
+                child: Text("", style: MoreaTextStyle.lable)),
+            Expanded(
+                child: Text(
+                  'Bist du dabei?',
+                  style: MoreaTextStyle.lable,
+                ))
+          ],
+        ));
+  }
+
+  Widget childListTitle(String displayname){
+    return Container(
+        padding: EdgeInsets.only(top: 30, bottom: 20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+                width: 120,
+                child: Text("", style: MoreaTextStyle.lable)),
+            Expanded(
+                child: Text(
+                  '$displayname, bist du dabei?',
+                  style: MoreaTextStyle.lable,
+                ))
+          ],
+        ));
   }
 
   Widget anmeldebutton(
@@ -147,18 +182,23 @@ class Teleblitz {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Expanded(
-                          child: Container(
+                        child: Text(
+                          name == null ? '' : name,
+                          style: MoreaTextStyle.lable,
+                        ),
+                      ),
+                      Flexible(
                         child: RaisedButton(
                           elevation: 0,
                           padding: EdgeInsets.all(0),
                           child: Container(
-                              alignment: Alignment.center,
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 15),
+                                  horizontal: 0, vertical: 15),
                               constraints:
-                                  BoxConstraints(minWidth: 170, maxWidth: 170),
-                              child:
-                                  Text(abmelden, style: MoreaTextStyle.button)),
+                              BoxConstraints(minWidth: 170, maxWidth: 170),
+                              child: Center(
+                                  child: new Text(abmelden,
+                                      style: MoreaTextStyle.button))),
                           onPressed: () {
                             if (name == null) {
                               submit(eventMapAnmeldeStatusNegativ, groupID,
@@ -169,45 +209,44 @@ class Teleblitz {
                                   name: name);
                             }
                           },
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0)),
                         ),
-                      )),
-                      Expanded(
-                        child: Container(
-                          child: new RaisedButton(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 15),
-                              constraints:
-                                  BoxConstraints(minWidth: 170, maxWidth: 170),
-                              decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      MoreaColors.orange,
-                                      MoreaColors.violett
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: new Text(anmelden,
-                                  style: MoreaTextStyle.button),
-                            ),
-                            onPressed: () {
-                              if (name == null) {
-                                submit(eventMapAnmeldeStatusPositiv, groupID,
-                                    eventID, uid);
-                              } else {
-                                submit(eventMapAnmeldeStatusPositiv, groupID,
-                                    eventID, uid,
-                                    name: name);
-                              }
-                            },
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(30.0)),
-                            color: Colors.transparent,
-                            padding: EdgeInsets.all(0),
-                            textColor: Colors.white,
+                      ),
+                      Padding(padding: EdgeInsets.only(right: 5),),
+                      Flexible(
+                        child: RaisedButton(
+                          padding: EdgeInsets.all(0),
+                          child: Container(
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                            constraints:
+                            BoxConstraints(maxWidth: 170, minWidth: 170),
+                            decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: [
+                                  MoreaColors.orange,
+                                  MoreaColors.violett
+                                ]),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Center(
+                                child: new Text(anmelden,
+                                    style: MoreaTextStyle.button)),
+                            width: 120,
                           ),
+                          onPressed: () {
+                            if (name == null) {
+                              submit(eventMapAnmeldeStatusPositiv, groupID,
+                                  eventID, uid);
+                            } else {
+                              submit(eventMapAnmeldeStatusPositiv, groupID,
+                                  eventID, uid,
+                                  name: name);
+                            }
+                          },
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0)),
+                          color: Colors.transparent,
+                          textColor: Colors.white,
                         ),
                       )
                     ],
@@ -215,60 +254,99 @@ class Teleblitz {
               break;
             case "ChuntNoed":
               return Container(
-                child: new RaisedButton(
-                  padding: EdgeInsets.all(0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-                    constraints: BoxConstraints(maxWidth: 170, minWidth: 170),
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [MoreaColors.orange, MoreaColors.violett]),
-                        borderRadius: BorderRadius.circular(30)),
-                    child: Center(
-                        child:
-                            new Text(anmelden, style: MoreaTextStyle.button)),
-                    width: 120,
-                  ),
-                  onPressed: () {
-                    if (name == null) {
-                      submit(
-                          eventMapAnmeldeStatusPositiv, groupID, eventID, uid);
-                    } else {
-                      submit(
-                          eventMapAnmeldeStatusPositiv, groupID, eventID, uid,
-                          name: name);
-                    }
-                  },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Colors.transparent,
-                  textColor: Colors.white,
+                padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        name == null ? '' : name,
+                        style: MoreaTextStyle.lable,
+                      ),
+                    ),
+                    Flexible(
+                      child: Container(),
+                    ),
+                    Padding(padding: EdgeInsets.only(right: 5),),
+                    Flexible(
+                      child: new RaisedButton(
+                        padding: EdgeInsets.all(0),
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                          constraints:
+                              BoxConstraints(maxWidth: 170, minWidth: 170),
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: [
+                                MoreaColors.orange,
+                                MoreaColors.violett
+                              ]),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Center(
+                              child: new Text(anmelden,
+                                  style: MoreaTextStyle.button)),
+                          width: 120,
+                        ),
+                        onPressed: () {
+                          if (name == null) {
+                            submit(eventMapAnmeldeStatusPositiv, groupID,
+                                eventID, uid);
+                          } else {
+                            submit(eventMapAnmeldeStatusPositiv, groupID,
+                                eventID, uid,
+                                name: name);
+                          }
+                        },
+                        shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0)),
+                        color: Colors.transparent,
+                        textColor: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               );
             case "Chunt":
               return Container(
-                child: new RaisedButton(
-                  elevation: 0,
-                  padding: EdgeInsets.all(0),
-                  child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-                      constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
-                      child: Center(
-                          child: new Text(abmelden,
-                              style: MoreaTextStyle.button))),
-                  onPressed: () {
-                    if (name == null) {
-                      submit(
-                          eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
-                    } else {
-                      submit(
-                          eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
-                          name: name);
-                    }
-                  },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
+                padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        name == null ? '' : name,
+                        style: MoreaTextStyle.lable,
+                      ),
+                    ),
+                    Flexible(
+                      child: new RaisedButton(
+                        elevation: 0,
+                        padding: EdgeInsets.all(0),
+                        child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 15),
+                            constraints:
+                                BoxConstraints(minWidth: 170, maxWidth: 170),
+                            child: Center(
+                                child: new Text(abmelden,
+                                    style: MoreaTextStyle.button))),
+                        onPressed: () {
+                          if (name == null) {
+                            submit(eventMapAnmeldeStatusNegativ, groupID,
+                                eventID, uid);
+                          } else {
+                            submit(eventMapAnmeldeStatusNegativ, groupID,
+                                eventID, uid,
+                                name: name);
+                          }
+                        },
+                        shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0)),
+                      ),
+                    ),
+                    Padding(padding: EdgeInsets.only(right: 5),),
+                    Flexible(
+                      child: Container(),
+                    ),
+                  ],
                 ),
               );
             default:
@@ -415,6 +493,7 @@ class Teleblitz {
                 info.getMitnehmen(),
                 info.getBemerkung(),
                 info.getSender(),
+                childListTitle(moreaFire.getDisplayName),
                 childAnmeldeButton(groupID, eventID),
                 parentShare(groupID),
               ],
@@ -435,6 +514,7 @@ class Teleblitz {
                 info.getMitnehmen(),
                 info.getBemerkung(),
                 info.getSender(),
+                parentListTitle(),
                 parentAnmeldeButton(groupID, eventID),
                 parentShare(groupID)
               ],
