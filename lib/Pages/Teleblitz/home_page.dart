@@ -59,12 +59,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _signedOut() async {
-    try {
       await widget.auth.signOut();
       widget.navigationMap[signedOut]();
-    } catch (e) {
-      print(e);
-    }
   }
 
   void forminit() {

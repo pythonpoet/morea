@@ -169,19 +169,21 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
                   child: moreaLoading.loading(),
                 ),
                 Expanded(
-                  flex: 1,
-                  child: FlatButton(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.cancel, color: Colors.grey,),
-                      Text(" Logout", style: TextStyle(fontSize: 20, color: Colors.grey))
-                    ],
-                  ),
-                  onPressed: () => signedOut(),
-                )
-                )
-                
-                
+                    flex: 1,
+                    child: FlatButton(
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.cancel,
+                            color: Colors.grey,
+                          ),
+                          Text(" Logout",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.grey))
+                        ],
+                      ),
+                      onPressed: () => signedOut(),
+                    ))
               ],
             ));
         break;
@@ -208,9 +210,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       if (dispose != null) {
         dispose();
       }
-      setState(() {
-        authStatus = AuthStatus.homePage;
-      });
+      try {
+        setState(() {
+          authStatus = AuthStatus.homePage;
+        });
+      } catch (e) {
+        print(e);
+      }
     }
   }
 

@@ -386,7 +386,10 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: signedOut,
+            onTap: (){
+              Navigator.of(context).pop();
+              signedOut();
+            },
           )
         ],
       ),
@@ -423,7 +426,10 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: signedOut,
+            onTap: (){
+              Navigator.of(context).pop();
+              signedOut();
+            },
           )
         ],
       ),
@@ -463,7 +469,10 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: signedOut,
+            onTap: (){
+              Navigator.of(context).pop();
+              signedOut();
+            },
           )
         ],
       ),
