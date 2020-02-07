@@ -129,7 +129,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getElternMap() async {
-    List elternUID = List.from(widget.profile['Eltern'].values);
+    List elternUID = List.from(widget.profile['Eltern'].keys);
     for (int i = 0; i < elternUID.length; i++) {
       var elternData = await moreaFire.getUserInformation(elternUID[i]);
       if (i == 0) {
@@ -142,7 +142,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getKindernMap() async {
-    List kinderUID = List.from(widget.profile['Kinder'].values);
+    List kinderUID = List.from(widget.profile['Kinder'].keys);
     for (int i = 0; i < kinderUID.length; i++) {
       var kinderData = await moreaFire.getUserInformation(kinderUID[i]);
       if (i == 0) {

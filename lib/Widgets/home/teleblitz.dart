@@ -119,7 +119,7 @@ class Teleblitz {
 
   Widget parentAnmeldeButton(String groupID, String eventID) {
     List<Widget> anmeldebuttons = new List();
-    moreaFire.getChildMap[groupID].forEach((String vorname, uid) {
+    moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
       anmeldebuttons.add(anmeldebutton(
           groupID, eventID, uid, "$vorname anmelden", "$vorname abmelden",
           name: vorname));
@@ -152,13 +152,13 @@ class Teleblitz {
                           elevation: 0,
                           padding: EdgeInsets.all(0),
                           child: Container(
+                              alignment: Alignment.center,
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 0, vertical: 15),
+                                  horizontal: 30, vertical: 15),
                               constraints:
                                   BoxConstraints(minWidth: 170, maxWidth: 170),
-                              child: Center(
-                                  child: Text(abmelden,
-                                      style: MoreaTextStyle.button))),
+                              child:
+                                  Text(abmelden, style: MoreaTextStyle.button)),
                           onPressed: () {
                             if (name == null) {
                               submit(eventMapAnmeldeStatusNegativ, groupID,
@@ -178,7 +178,7 @@ class Teleblitz {
                           child: new RaisedButton(
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 0, vertical: 15),
+                                  horizontal: 30, vertical: 15),
                               constraints:
                                   BoxConstraints(minWidth: 170, maxWidth: 170),
                               decoration: BoxDecoration(
@@ -189,10 +189,8 @@ class Teleblitz {
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(30)),
-                              child: Center(
-                                child: new Text(anmelden,
-                                    style: MoreaTextStyle.button),
-                              ),
+                              child: new Text(anmelden,
+                                  style: MoreaTextStyle.button),
                             ),
                             onPressed: () {
                               if (name == null) {
@@ -286,7 +284,7 @@ class Teleblitz {
   Widget parentAnmeldeIndicator(String groupID, String eventID,
       Stream<String> Function(String userID, String eventID) function) {
     List<Widget> anmeldebuttons = new List();
-    moreaFire.getChildMap[groupID].forEach((String vorname, uid) {
+    moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
       anmeldeStreamController[uid] = new BehaviorSubject();
       anmeldeStreamController[uid].addStream(function(uid, eventID));
       anmeldebuttons.add(anmeldeIndicator(
@@ -530,7 +528,9 @@ class Teleblitz {
                                           );
                                         } else {
                                           return Text(
-                                            'Total: ' + snapshot.data[0].length.toString(),
+                                            'Total: ' +
+                                                snapshot.data[0].length
+                                                    .toString(),
                                             style: MoreaTextStyle.normal,
                                           );
                                         }
@@ -584,7 +584,8 @@ class Teleblitz {
                                           );
                                         } else {
                                           return Text(
-                                            'Total: ' + chunntNoed.length.toString(),
+                                            'Total: ' +
+                                                chunntNoed.length.toString(),
                                             style: MoreaTextStyle.normal,
                                           );
                                         }

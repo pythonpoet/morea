@@ -377,7 +377,8 @@ class MergeChildParent extends BaseMergeChildParent {
                                 actions: <Widget>[
                                   RaisedButton(
                                     child: Text('Ok'),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                   )
                                 ],
                               );
@@ -533,7 +534,8 @@ class MergeChildParent extends BaseMergeChildParent {
                                 actions: <Widget>[
                                   RaisedButton(
                                     child: Text('Ok'),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                   )
                                 ],
                               );
@@ -573,7 +575,8 @@ class MergeChildParent extends BaseMergeChildParent {
 
   Future<bool> registerChild(Map<String, dynamic> parentData,
       BuildContext context, Function newKidakt) async {
-    if (!validateAndSave(context)) return false;
+    if (!validateAndSave(context))
+      return false;
     else {
       var userDoc = await register.validateParentRegistersChild(context);
       if (!(userDoc is User))
@@ -584,7 +587,7 @@ class MergeChildParent extends BaseMergeChildParent {
         moreaUser.plz = parentData[userMapPLZ];
         moreaUser.ort = parentData[userMapOrt];
         moreaUser.elternMap = <String, dynamic>{
-          moreafire.getVorName: moreafire.getUserMap[userMapUID],
+          moreafire.getUserMap[userMapUID]: moreafire.getVorName,
         };
         moreaUser.pos = "Teilnehmer";
         HttpsCallableResult results = await moreafire
@@ -592,9 +595,9 @@ class MergeChildParent extends BaseMergeChildParent {
         String childUID = results.data;
         Map<String, dynamic> userInfo = Map.of(moreafire.getUserMap);
         if (userInfo[userMapKinder] == null) {
-          userInfo[userMapKinder] = {moreaUser.vorName: childUID};
+          userInfo[userMapKinder] = {childUID: moreaUser.vorName};
         } else {
-          userInfo[userMapKinder][moreaUser.vorName] = childUID;
+          userInfo[userMapKinder][childUID] = moreaUser.vorName;
         }
         await moreafire.updateUserInformation(
             moreafire.getUserMap[userMapUID], userInfo);
@@ -626,8 +629,8 @@ class MergeChildParent extends BaseMergeChildParent {
         String newChildUID = await moreafire.upgradeChild(
             childToUpgradeMap, oldChildUID, register.getPassword);
         Map<String, dynamic> userInfo = Map.of(moreafire.getUserMap);
-        userInfo[userMapKinder][childToUpgradeMap[userMapVorName]] =
-            newChildUID;
+        userInfo[userMapKinder][newChildUID] =
+            childToUpgradeMap[userMapVorName];
         await moreafire.updateUserInformation(
             moreafire.getUserMap[userMapUID], userInfo);
         return true;

@@ -344,8 +344,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
     Map<String, dynamic> payload = {
       'UID': uid,
       'content': childMap,
-      'elternList': childMap[userMapEltern].values.toList(),
+      'elternList': childMap[userMapEltern].keys.toList(),
       'vorname': childMap[userMapVorName],
+      'oldChildUID': oldChildUID,
     };
     await callFunction(getcallable('upgradeChildMap'), param: payload);
 
