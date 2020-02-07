@@ -165,8 +165,13 @@ class User {
     //geschlecht can be null (Becase we don't have to know the sex of a parent)
 
     if (_userMap.containsKey(userMapPfadiName)) {
-      pfadiName = _userMap[userMapPfadiName];
-      displayName = pfadiName;
+      if (_userMap[userMapPfadiName] != '' &&
+          _userMap[userMapPfadiName] != null) {
+        pfadiName = _userMap[userMapPfadiName];
+        displayName = pfadiName;
+      } else {
+        displayName = vorName;
+      }
     } else {
       displayName = vorName;
     }
