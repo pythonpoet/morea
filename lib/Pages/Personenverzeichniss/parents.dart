@@ -35,7 +35,6 @@ class MergeChildParent extends BaseMergeChildParent {
 
   String userId, error;
 
-
   BuildContext showDialogcontext;
 
   MergeChildParent(CrudMedthods crudMedthods, MoreaFirebase moreaFirebase) {
@@ -45,7 +44,9 @@ class MergeChildParent extends BaseMergeChildParent {
     this.childParendPend =
         new ChildParendPend(crud0: crud0, moreaFirebase: moreafire);
     moreaUser = User(crud0);
-    register = Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+    register = Register(
+        moreaUser: moreaUser,
+        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
   }
 
   Widget registernewChild(Map<String, dynamic> parentData, BuildContext context,
@@ -71,6 +72,36 @@ class MergeChildParent extends BaseMergeChildParent {
                       key: formKey,
                       child: buildRegisterTeilnehmer(context, parentData,
                           setProfileState, newKidakt, signOut)),
+                ),
+              ],
+            ),
+          ),
+        ));
+  }
+
+  Widget upgradeChild(BuildContext context, Function upgradeKid,
+      Map<String, dynamic> childToUpgradeMap, Function signOut) {
+    return Container(
+        color: Colors.black.withOpacity(0.7),
+        padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
+        child: new Card(
+          child: new Container(
+            padding: EdgeInsets.all(20),
+            child: new Column(
+              children: <Widget>[
+                Flexible(
+                  flex: 1,
+                  child: Text(
+                    'Account erstellen',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                ),
+                Flexible(
+                  flex: 7,
+                  child: new Form(
+                      key: formKey,
+                      child: buildUpgradeKid(
+                          context, upgradeKid, childToUpgradeMap, signOut)),
                 ),
               ],
             ),
@@ -161,9 +192,8 @@ class MergeChildParent extends BaseMergeChildParent {
     }
     showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-                content: Text(
-                    'Dein Kind wurde hinzugefügt')))
+            builder: (context) =>
+                AlertDialog(content: Text('Dein Kind wurde hinzugefügt')))
         .then((onvalue) {
       RestartWidget.restartApp(context);
     });
@@ -239,99 +269,120 @@ class MergeChildParent extends BaseMergeChildParent {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-           register.parentRegisterNewChild(setProfileState),
+            register.parentRegisterNewChild(setProfileState),
             new RaisedButton(
               child:
                   new Text('Registrieren', style: new TextStyle(fontSize: 20)),
               onPressed: () => {
-               registerChild(parentData, context, newKidakt).then((onValue){
-                 streamRegisterStatus.add(onValue);
-               }),
+                registerChild(parentData, context, newKidakt).then((onValue) {
+                  streamRegisterStatus.add(onValue);
+                }),
                 showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context)  {
-                    return StreamBuilder(
-                      stream: streamRegisterStatus.stream,
-                      builder: (BuildContext context, AsyncSnapshot snap){
-                        if(!snap.hasData)
-                          return Container(
-                             padding: EdgeInsets.only(left: 40, bottom:80, right: 40, top: 80),
-                              child: Card(
-                                child: Container(
-                                  padding: EdgeInsets.only(left: 20, bottom:40, right: 20, top: 40),
-                                  child: Column(
-                                    children:[
-                                      Expanded(
-                                        child: Text("Dein Kind wird hinzugefügt", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                        flex: 1,),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Center(
-                                          child: Container(
-                                              child: Center(child: simpleMoreaLoadingIndicator()),
-                                              height: 100,
-                                              width: 140,
-                                            ),
-                                        ),
-                                      )
-                                    ]
-                                  ),
-                                )
-                              ),
-                                height: 100,
-                                width: 140,
-                              );
-                        else if(snap.data){
-                          return Container(
-                             padding: EdgeInsets.only(left: 40, bottom:80, right: 40, top: 80),
-                              child: Card(
-                                child: Container(
-                                  padding: EdgeInsets.only(left: 20, bottom:40, right: 20, top: 40),
-                                  child: Column(
-                                    children:[
-                                      Expanded(
-                                        child: Text("Dein Kind wurde hinzugefügt", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                        flex: 1,),
-                                      Expanded(
-                                        flex: 9,
-                                        child: Center(
-                                          child:  Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(Icons.check_circle, size: 60, color: Colors.green),
-                                                    Text(" Fertig",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
-                                                  ]
-                                                ),
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return StreamBuilder(
+                          stream: streamRegisterStatus.stream,
+                          builder: (BuildContext context, AsyncSnapshot snap) {
+                            if (!snap.hasData)
+                              return Container(
+                                padding: EdgeInsets.only(
+                                    left: 40, bottom: 80, right: 40, top: 80),
+                                child: Card(
+                                    child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: 20, bottom: 40, right: 20, top: 40),
+                                  child: Column(children: [
+                                    Expanded(
+                                      child: Text("Dein Kind wird hinzugefügt",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
+                                      flex: 1,
+                                    ),
+                                    Expanded(
+                                      flex: 9,
+                                      child: Center(
+                                        child: Container(
+                                          child: Center(
+                                              child:
+                                                  simpleMoreaLoadingIndicator()),
+                                          height: 100,
+                                          width: 140,
                                         ),
                                       ),
-                                      Expanded(
-                                        flex:1,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: <Widget>[
-                                            RaisedButton(
-                                              child: Text("Ok"),
-                                              onPressed: () => RestartWidget.restartApp(context),
-                                              color: MoreaColors.violett                                              
-                                            )
-                                          ],
-                                          )
-                                      )
-                                    ]
-                                  ),
-                                )
-                              ),
+                                    )
+                                  ]),
+                                )),
                                 height: 100,
                                 width: 140,
                               );
-                          }
-                        else return AlertDialog(
-                            content: Text(
-                                'Etwas hat nicht funktioniert. Bitte versuche es erneut.'),
-                          ); 
-                      }
-                    );}),
+                            else if (snap.data) {
+                              return Container(
+                                padding: EdgeInsets.only(
+                                    left: 40, bottom: 80, right: 40, top: 80),
+                                child: Card(
+                                    child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: 20, bottom: 40, right: 20, top: 40),
+                                  child: Column(children: [
+                                    Expanded(
+                                      child: Text("Dein Kind wurde hinzugefügt",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
+                                      flex: 1,
+                                    ),
+                                    Expanded(
+                                      flex: 9,
+                                      child: Center(
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.check_circle,
+                                                  size: 60,
+                                                  color: Colors.green),
+                                              Text(" Fertig",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold))
+                                            ]),
+                                      ),
+                                    ),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: <Widget>[
+                                            RaisedButton(
+                                                child: Text("Ok"),
+                                                onPressed: () =>
+                                                    RestartWidget.restartApp(
+                                                        context),
+                                                color: MoreaColors.violett)
+                                          ],
+                                        ))
+                                  ]),
+                                )),
+                                height: 100,
+                                width: 140,
+                              );
+                            } else
+                              return AlertDialog(
+                                content: Text(
+                                    'Etwas hat nicht funktioniert. Bitte versuche es erneut.'),
+                                actions: <Widget>[
+                                  RaisedButton(
+                                    child: Text('Ok'),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  )
+                                ],
+                              );
+                          });
+                    }),
               },
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),
@@ -342,6 +393,162 @@ class MergeChildParent extends BaseMergeChildParent {
               child: new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
               onPressed: () async => {
                 newKidakt(),
+              },
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+              color: Color(0xff7a62ff),
+              textColor: Colors.white,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildUpgradeKid(BuildContext context, Function upgradeKid,
+      Map<String, dynamic> childToUpgradeMap, Function signOut) {
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            register.parentUpgradeChild(),
+            new RaisedButton(
+              child: new Text('Upgraden', style: new TextStyle(fontSize: 20)),
+              onPressed: () => {
+                upgradeKidExecution(context, upgradeKid, childToUpgradeMap)
+                    .then((onValue) {
+                  streamRegisterStatus.add(onValue);
+                }),
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return StreamBuilder(
+                          stream: streamRegisterStatus.stream,
+                          builder: (BuildContext context, AsyncSnapshot snap) {
+                            if (!snap.hasData)
+                              return Container(
+                                padding: EdgeInsets.only(
+                                    left: 40, bottom: 80, right: 40, top: 80),
+                                child: Card(
+                                    child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: 20, bottom: 40, right: 20, top: 40),
+                                  child: Column(children: [
+                                    Expanded(
+                                      child: Text("Dein Kind wird hinzugefügt",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
+                                      flex: 1,
+                                    ),
+                                    Expanded(
+                                      flex: 9,
+                                      child: Center(
+                                        child: Container(
+                                          child: Center(
+                                              child:
+                                                  simpleMoreaLoadingIndicator()),
+                                          height: 100,
+                                          width: 140,
+                                        ),
+                                      ),
+                                    )
+                                  ]),
+                                )),
+                                height: 100,
+                                width: 140,
+                              );
+                            else if (snap.data) {
+                              return Container(
+                                padding: EdgeInsets.only(
+                                    left: 40, bottom: 80, right: 40, top: 80),
+                                child: Card(
+                                    child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: 20, bottom: 40, right: 20, top: 40),
+                                  child: Column(children: [
+                                    Expanded(
+                                      child: Text(
+                                          "Dein Kind wurde hinzugefügt.",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
+                                      flex: 1,
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                          "Du musst dich nun wieder einloggen.",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
+                                      flex: 1,
+                                    ),
+                                    Expanded(
+                                      flex: 9,
+                                      child: Center(
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.check_circle,
+                                                  size: 60,
+                                                  color: Colors.green),
+                                              Text(" Fertig",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold))
+                                            ]),
+                                      ),
+                                    ),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: <Widget>[
+                                            RaisedButton(
+                                                child: Text("Ok"),
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .popUntil(
+                                                          ModalRoute.withName(
+                                                              '/'));
+                                                  signOut();
+                                                },
+                                                color: MoreaColors.violett)
+                                          ],
+                                        ))
+                                  ]),
+                                )),
+                                height: 100,
+                                width: 140,
+                              );
+                            } else
+                              return AlertDialog(
+                                content: Text(
+                                    'Etwas hat nicht funktioniert. Bitte versuche es erneut.'),
+                                actions: <Widget>[
+                                  RaisedButton(
+                                    child: Text('Ok'),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  )
+                                ],
+                              );
+                          });
+                    }),
+              },
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
+              color: Color(0xff7a62ff),
+              textColor: Colors.white,
+            ),
+            RaisedButton(
+              child: new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
+              onPressed: () async => {
+                upgradeKid(Map<String, dynamic>()),
               },
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),
@@ -366,34 +573,65 @@ class MergeChildParent extends BaseMergeChildParent {
 
   Future<bool> registerChild(Map<String, dynamic> parentData,
       BuildContext context, Function newKidakt) async {
-        if(!validateAndSave(context))
-          return false;
-        var userDoc = await register.validateParentRegistersChild(context);
-        if(!(userDoc is User))
-          return false;
-        else{
-          //assume adress form Parent to child
-          moreaUser.adresse = parentData[userMapAdresse];
-          moreaUser.plz = parentData[userMapPLZ];
-          moreaUser.ort = parentData[userMapOrt];
-          moreaUser.elternMap = <String, dynamic>{
-            moreafire.getVorName: moreafire.getUserMap[userMapUID],
-          };
-          moreaUser.pos = "Teilnehmer";
-          HttpsCallableResult results =
-          await moreafire.uploadChildUserInformation(moreaUser.generateAndValitateUserMap());
-          String childUID = results.data;
-          Map<String, dynamic> userInfo = Map.of(moreafire.getUserMap);
-          if (userInfo[userMapKinder] == null) {
-            userInfo[userMapKinder] = {moreaUser.vorName: childUID};
-          } else {
-            userInfo[userMapKinder][moreaUser.vorName] = childUID;
-          }
-          moreafire.updateUserInformation(
-              moreafire.getUserMap[userMapUID], userInfo);
-          moreafire.groupPriviledgeTN(moreaUser.groupID, childUID, moreaUser.vorName);
- 
-          return true;
+    if (!validateAndSave(context)) return false;
+    else {
+      var userDoc = await register.validateParentRegistersChild(context);
+      if (!(userDoc is User))
+        return false;
+      else {
+        //assume adress form Parent to child
+        moreaUser.adresse = parentData[userMapAdresse];
+        moreaUser.plz = parentData[userMapPLZ];
+        moreaUser.ort = parentData[userMapOrt];
+        moreaUser.elternMap = <String, dynamic>{
+          moreafire.getVorName: moreafire.getUserMap[userMapUID],
+        };
+        moreaUser.pos = "Teilnehmer";
+        HttpsCallableResult results = await moreafire
+            .uploadChildUserInformation(moreaUser.generateAndValitateUserMap());
+        String childUID = results.data;
+        Map<String, dynamic> userInfo = Map.of(moreafire.getUserMap);
+        if (userInfo[userMapKinder] == null) {
+          userInfo[userMapKinder] = {moreaUser.vorName: childUID};
+        } else {
+          userInfo[userMapKinder][moreaUser.vorName] = childUID;
         }
+        await moreafire.updateUserInformation(
+            moreafire.getUserMap[userMapUID], userInfo);
+        if (moreaUser.pfadiName == null || moreaUser.pfadiName == '') {
+          moreaUser.displayName = moreaUser.vorName;
+        } else {
+          moreaUser.displayName = moreaUser.pfadiName;
+        }
+        await moreafire.groupPriviledgeTN(
+            moreaUser.groupID, childUID, moreaUser.displayName);
+
+        return true;
+      }
+    }
+  }
+
+  Future<bool> upgradeKidExecution(BuildContext context, Function upgradeKid,
+      Map<String, dynamic> childToUpgradeMap) async {
+    if (!validateAndSave(context)) {
+      return false;
+    } else {
+      var userDoc = await register.validateUpgradeChild(context);
+      if (!(userDoc is User))
+        return false;
+      else {
+        childToUpgradeMap[userMapEmail] = moreaUser.email;
+        childToUpgradeMap[userMapHandynummer] = moreaUser.handynummer;
+        String oldChildUID = childToUpgradeMap[userMapChildUID];
+        String newChildUID = await moreafire.upgradeChild(
+            childToUpgradeMap, oldChildUID, register.getPassword);
+        Map<String, dynamic> userInfo = Map.of(moreafire.getUserMap);
+        userInfo[userMapKinder][childToUpgradeMap[userMapVorName]] =
+            newChildUID;
+        await moreafire.updateUserInformation(
+            moreafire.getUserMap[userMapUID], userInfo);
+        return true;
+      }
+    }
   }
 }

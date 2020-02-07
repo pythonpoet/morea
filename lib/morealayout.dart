@@ -121,6 +121,8 @@ class MoreaTextStyle {
       TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
   static TextStyle button =
       TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
+
+  static TextStyle warningTitle = TextStyle(fontSize: 34, fontWeight: FontWeight.w700, color: Colors.red);
 }
 
 class MoreaDivider extends Divider {

@@ -7,6 +7,7 @@ import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
@@ -102,8 +103,15 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 'Löschen',
                 style: TextStyle(color: Colors.redAccent),
               ),
-              onPressed: () {
-                crud0.deletedocument('user', widget.profile['UID']);
+              onPressed: () async {
+                print(widget.profile);
+                for(var elternUID in widget.profile[userMapEltern].values.toList()){
+                  var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
+                  elternMap[userMapKinder].remove(widget.profile[userMapVorName]);
+                  print(elternMap);
+                  await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
+                }
+                await callFunction(getcallable('deleteUserMap'), param: {'UID': widget.profile['UID'], 'groupID': widget.profile[userMapgroupID],});
                 Navigator.pop(context);
               })
         ],

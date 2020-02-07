@@ -49,6 +49,7 @@ class Agenda extends BaseAgenda {
   Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {
     await for (DocumentSnapshot groupMap
         in crud0.streamDocument(pathGroups, groupID)) {
+      if(groupMap.data['AgendaTitles'].isNotEmpty)
       if (groupMap.data.containsKey('AgendaTitles'))
         yield List<Map>.from(groupMap.data["AgendaTitles"]);
     }

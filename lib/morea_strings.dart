@@ -56,6 +56,7 @@ final String userMapDeviceToken = "devtoken";
 final String userMapGeburtstag = "Geburtstag";
 final String userMapAccountEdit = "edit";
 final String userMapGeschlecht = 'Geschlecht';
+final String userMapChildUID = 'childUID';
 
 //groupMap
 final String groupMapEventID = "eventID";

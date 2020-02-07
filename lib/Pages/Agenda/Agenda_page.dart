@@ -69,8 +69,13 @@ class _AgendaStatePage extends State<AgendaState>
   MoreaLoading moreaLoading;
 
   Stream<List> _getAgenda(groupID) async* {
-    yield* agenda.getTotalAgendaOverview(
-        [groupID, ...widget.moreaFire.getSubscribedGroups]);
+    List groupIDs = [];
+    print(groupID);
+    if(groupID != null)
+      groupIDs.add(groupID);
+    groupIDs.addAll(widget.moreaFire.getSubscribedGroups);
+    print(groupIDs);
+    yield* agenda.getTotalAgendaOverview(groupIDs);
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
@@ -139,7 +144,7 @@ class _AgendaStatePage extends State<AgendaState>
   void initState() {
     moreaLoading = MoreaLoading(this);
     moreafire = widget.moreaFire;
-
+    crud0 = CrudMedthods(widget.firestore);
     agenda = new prefix0.Agenda(widget.firestore, widget.moreaFire);
 
     //_getAgenda("3776");

@@ -41,6 +41,9 @@ abstract class BaseAuth {
   Future<bool> reauthenticate(String email, String password);
 
   Future<void> changeEmail(String email);
+
+  Future<void> createUserWithEmailAndPasswordForChild(
+      String email, String passowrd);
 }
 
 class Auth implements BaseAuth {
@@ -61,6 +64,11 @@ class Auth implements BaseAuth {
     }))
         .user;
     return _user.uid;
+  }
+
+  Future<String> createUserWithEmailAndPasswordForChild(String email, String password) async {
+    FirebaseUser childUser = (await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password)).user;
+    return childUser.uid;
   }
 
   Future<String> createUserWithEmailAndPassword(
