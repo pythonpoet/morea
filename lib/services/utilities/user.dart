@@ -366,7 +366,7 @@ class User {
           moreafire.subscribeToGroup(groupID);
           //Writes tn rights to groupMap
           await moreafire.groupPriviledgeTN(
-              groupID, userID, (pfadiName == ' ' ? vorName : pfadiName));
+              groupID, userID, (pfadiName == '' ? vorName : pfadiName));
         }
 
         //uploads devtoken to userMap
