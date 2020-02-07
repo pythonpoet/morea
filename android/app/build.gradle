@@ -24,9 +24,12 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-def keystorePropertiesFile = rootProject.file("key.properties")
+
 def keystoreproperties = new Properties()
-keystoreproperties.load(new FileInputStream(keystorePropertiesFile))
+def keystorePropertiesFile = rootProject.file("key.properties")
+if(keystorePropertiesFile.exists()){
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     compileSdkVersion 28
@@ -52,7 +55,7 @@ android {
         release{
             keyAlias keystoreproperties['keyAlias']
             keyPassword keystoreproperties['keyPassword']
-            storeFile file(keystoreproperties['storeFile'])
+            storeFile keystoreProperties['storeFile'] ? file(keystoreproperties['storeFile']) : null
             storePassword keystoreproperties['storePassword']
         }
     }
