@@ -626,13 +626,8 @@ class MergeChildParent extends BaseMergeChildParent {
         childToUpgradeMap[userMapEmail] = moreaUser.email;
         childToUpgradeMap[userMapHandynummer] = moreaUser.handynummer;
         String oldChildUID = childToUpgradeMap[userMapChildUID];
-        String newChildUID = await moreafire.upgradeChild(
+        await moreafire.upgradeChild(
             childToUpgradeMap, oldChildUID, register.getPassword);
-        Map<String, dynamic> userInfo = Map.of(moreafire.getUserMap);
-        userInfo[userMapKinder][newChildUID] =
-            childToUpgradeMap[userMapVorName];
-        await moreafire.updateUserInformation(
-            moreafire.getUserMap[userMapUID], userInfo);
         return true;
       }
     }
