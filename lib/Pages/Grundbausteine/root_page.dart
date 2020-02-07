@@ -227,9 +227,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   void agendaPage({dispose}) {
     if (!(authStatus == AuthStatus.agendaPage)) {
-      if (dispose != null) {
-        dispose();
-      }
       setState(() {
         authStatus = AuthStatus.agendaPage;
       });

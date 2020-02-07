@@ -68,14 +68,12 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  Stream<List> _getAgenda(groupID) async* {
-    List groupIDs = [];
-    print(groupID);
+  void _getAgenda(groupID) {
+    List<String> groupIDs = [];
     if(groupID != null)
       groupIDs.add(groupID);
     groupIDs.addAll(widget.moreaFire.getSubscribedGroups);
-    print(groupIDs);
-    yield* agenda.getTotalAgendaOverview(groupIDs);
+    agenda.getTotalAgendaOverview(groupIDs);
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
@@ -152,6 +150,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
+    _getAgenda(moreafire.getUserMap[userMapgroupID]);
 
     super.initState();
   }
@@ -309,9 +308,10 @@ class _AgendaStatePage extends State<AgendaState>
 
   Widget aAgenda(String groupID) {
     return StreamBuilder(
-        stream: _getAgenda(groupID).asBroadcastStream(),
+        stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
+            print(slagenda.connectionState);
             return moreaLoading.loading();
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(

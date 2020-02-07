@@ -36,6 +36,8 @@ class Agenda extends BaseAgenda {
   List<Map> events = new List();
   StreamController<List<Map>> eventStream = new BehaviorSubject();
 
+  Stream<List<Map<dynamic, dynamic>>> get eventstream => eventStream.stream;
+
   Agenda(Firestore firestore, MoreaFirebase moreaFire) {
     this.crud0 = new CrudMedthods(firestore);
     this.db = firestore;
@@ -47,17 +49,26 @@ class Agenda extends BaseAgenda {
   }
 
   Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {
+    print('Getting stream for group: ' + groupID);
     await for (DocumentSnapshot groupMap
         in crud0.streamDocument(pathGroups, groupID)) {
-      if(groupMap.data['AgendaTitles'].isNotEmpty)
-      if (groupMap.data.containsKey('AgendaTitles'))
-        yield List<Map>.from(groupMap.data["AgendaTitles"]);
+      if (groupMap.data.containsKey('AgendaTitles')) {
+        if (groupMap.data['AgendaTitles'].isNotEmpty) {
+          yield List<Map>.from(groupMap.data["AgendaTitles"]);
+        } else {
+          yield [];
+        }
+      } else {
+        yield [];
+      }
     }
   }
 
   Stream<bool> addToList(String groupID) async* {
     await for (List<Map<dynamic, dynamic>> groupEvents
         in this.getAgendaOverview(groupID)) {
+      print(groupEvents);
+
       if (groupEvents != null) if (events.length > 0)
         for (Map groupEvent in groupEvents) {
           int i = 0;
@@ -84,11 +95,10 @@ class Agenda extends BaseAgenda {
     }
   }
 
-  Stream<List<Map>> getTotalAgendaOverview(List<String> groupIDs) async* {
+  void getTotalAgendaOverview(List<String> groupIDs) {
     for (String groupID in groupIDs) {
       addToList(groupID).firstWhere((bool test) => test == true);
     }
-    yield* eventStream.stream;
   }
 
   Future<DocumentSnapshot> getAgendaTitle(String eventID) async {
