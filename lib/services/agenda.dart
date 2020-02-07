@@ -49,7 +49,6 @@ class Agenda extends BaseAgenda {
   }
 
   Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {
-    print('Getting stream for group: ' + groupID);
     await for (DocumentSnapshot groupMap
         in crud0.streamDocument(pathGroups, groupID)) {
       if (groupMap.data.containsKey('AgendaTitles')) {
@@ -67,18 +66,18 @@ class Agenda extends BaseAgenda {
   Stream<bool> addToList(String groupID) async* {
     await for (List<Map<dynamic, dynamic>> groupEvents
         in this.getAgendaOverview(groupID)) {
-      print(groupEvents);
-
-      if (groupEvents != null) if (events.length > 0)
+      if (groupEvents != null) if (events.length >= 0)
         for (Map groupEvent in groupEvents) {
+          groupEvent['groupID'] = groupID;
           int i = 0;
           events.forEach((event) {
             if (event["eventID"] == groupEvent["eventID"]) i++;
           });
           if (i == 0) events.add(groupEvent);
         }
-      else
+      else {
         events.addAll(groupEvents);
+      }
       /*
       for(Map event in events){
         List someList = new List();
@@ -96,6 +95,8 @@ class Agenda extends BaseAgenda {
   }
 
   void getTotalAgendaOverview(List<String> groupIDs) {
+    //eliminates duplicates of groupIDs
+    groupIDs.toSet().toList();
     for (String groupID in groupIDs) {
       addToList(groupID).firstWhere((bool test) => test == true);
     }

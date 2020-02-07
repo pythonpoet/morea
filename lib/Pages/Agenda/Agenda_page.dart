@@ -4,6 +4,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../morealayout.dart';
@@ -311,7 +312,6 @@ class _AgendaStatePage extends State<AgendaState>
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
-            print(slagenda.connectionState);
             return moreaLoading.loading();
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(
@@ -394,6 +394,7 @@ class _AgendaStatePage extends State<AgendaState>
                                     _info['Eventname'].toString(),
                                     style: MoreaTextStyle.lable,
                                   ),
+                                  trailing: _info['groupID'] == null ? Text('Error') : Text(convMiDatatoWebflow(_info['groupID']), style: MoreaTextStyle.sender,),
                                   onTap: () => viewEvent(context, _info));
                             } else if (_info['Lager']) {
                               return ListTile(
@@ -422,6 +423,7 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
+                                  trailing: _info['groupID'] == null ? Text('Error') : Text(convMiDatatoWebflow(_info['groupID']), style: MoreaTextStyle.sender,),
                                   onTap: () => viewLager(context, _info));
                             } else {
                               return SizedBox();
