@@ -401,7 +401,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                       '${kinderMap["Vorname"]} ${kinderMap["Nachname"]}',
                       style: MoreaTextStyle.normal,
                     ),
-                  ),
+                  ),kinderMap.containsKey("Email")?
                   ListTile(
                     title: Text(
                       'E-Mail-Adresse',
@@ -411,7 +411,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                       kinderMap['Email'],
                       style: MoreaTextStyle.normal,
                     ),
-                  ),
+                  ):
+                  Container(),
                 ],
               ),
             );

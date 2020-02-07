@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
@@ -21,7 +23,7 @@ class User {
   List<String> subscribedGroups = new List<String>();
   Map<String, int> groupPrivilege = new Map();
   Map<String, Map<String, String>> childMap;
-  Map<String, dynamic> _userMap, groupMap;
+  Map<String, dynamic> _userMap, groupMap, elternMap;
   CrudMedthods crud0;
 
   User(this.crud0);
@@ -242,7 +244,7 @@ class User {
     if (email != null)
       userMap[userMapEmail] = email;
     else
-      throw "$userMapEmail has to be non-null";
+      log("$userMapEmail has to be non-null");
 
     if (vorName != null)
       userMap[userMapVorName] = vorName;
@@ -257,7 +259,7 @@ class User {
     if (userID != null)
       userMap[userMapUID] = userID;
     else
-      throw "$userMapUID has to be non-null";
+      log("$userMapUID has to be non-null");
 
     if (ort != null)
       userMap[userMapOrt] = ort;
@@ -286,10 +288,17 @@ class User {
         else
           throw "$userMapGeschlecht has to be non-null";
 
+        if(groupID != null)
+          userMap[userMapgroupID] = groupID;
+        else
+          throw "$userMapgroupID has to be non-null";
+
         if (pfadiName != null) userMap[userMapPfadiName] = pfadiName;
         //Pfadiname can be empty
 
         if (handynummer != null) userMap[userMapHandynummer] = handynummer;
+
+        if(elternMap != null) userMap[userMapEltern] = elternMap;
         //Handynummer can be empty
         break;
       case "Mutter":
@@ -297,10 +306,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -311,10 +317,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+        
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -325,10 +328,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+    
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -339,10 +339,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        if (geburtstag != null)
-          userMap[userMapGeburtstag] = geburtstag.toString();
-        else
-          throw "$userMapGeburtstag has to be non-null";
+        
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -357,7 +354,7 @@ class User {
   }
 
   Future<dynamic> createMoreaUser(
-      Auth auth, _password, MoreaFirebase moreafire, onSignedIn) async {
+      Auth auth, String _password, MoreaFirebase moreafire, onSignedIn) async {
     try {
       userID = await auth.createUserWithEmailAndPassword(email, _password);
       print('Registered user: $userID');

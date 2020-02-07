@@ -160,7 +160,30 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             appBar: AppBar(
               title: Text('Teleblitz'),
             ),
-            body: moreaLoading.loading());
+            body: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: moreaLoading.loading(),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: FlatButton(
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.cancel, color: Colors.grey,),
+                      Text(" Logout", style: TextStyle(fontSize: 20, color: Colors.grey))
+                    ],
+                  ),
+                  onPressed: () => signedOut(),
+                )
+                )
+                
+                
+              ],
+            ));
         break;
       default:
         return Container(

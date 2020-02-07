@@ -205,16 +205,19 @@ class _ProfileState extends State<Profile> {
                       thickness: 1,
                       color: Colors.black26,
                     )),
-                ListTile(
-                  title: Text(
-                    'Geburtstag',
-                    style: MoreaTextStyle.lable,
-                  ),
-                  subtitle: Text(
-                    userInfo['Geburtstag'],
-                    style: MoreaTextStyle.normal,
-                  ),
-                ),
+                    userInfo.containsKey("Geburtstag")?
+                        ListTile(
+                          title: Text(
+                            'Geburtstag',
+                            style: MoreaTextStyle.lable,
+                          ),
+                          subtitle: Text(
+                            userInfo['Geburtstag'],
+                            style: MoreaTextStyle.normal,
+                          ),
+                        )
+                      :
+                      Container(),
                 Padding(
                   padding: EdgeInsets.only(bottom: 10),
                 ),

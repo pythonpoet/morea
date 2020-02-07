@@ -4,42 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/Pages/Grundbausteine/login_page.dart';
 import 'package:morea/Pages/Grundbausteine/root_page.dart';
+import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/services/auth.dart';
 import 'morealayout.dart';
 
 Future<void> main() async {
-  /*final FirebaseApp app = await FirebaseApp.configure(
-    name: 'Pfadi Morea',
-    options: const FirebaseOptions(
-      googleAppID: '1:20884476221:android:da0ee1d9ef987290793554',
-      //gcmSenderID: '1015173140187',
-      apiKey: 'AIzaSyBhmTHDLaRcXPGCuPXrHmG4nvks4_NezT0',
-      projectID: 'dev-pfadi-morea',
-    ),
-  );
-  final Firestore firestore = Firestore(app: app);
-  await firestore.settings(timestampsInSnapshotsEnabled: true);
-
-  */
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MaterialApp(
-        title: 'Morea App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            fontFamily: 'Raleway',
-            primarySwatch: MaterialColor(
-                MoreaColors.appBarInt, MoreaColors.violettMaterialColor)),
-        home: MyApp()),
-  );
+  runApp(RestartWidget(child: MyApp(),));
 }
 
 class MyApp extends StatelessWidget {
-  //MyApp({this.firestore});
-
+  final Firestore firestore = new Firestore();
   @override
   Widget build(BuildContext context) {
-    Firestore firestore = new Firestore();
     return new MaterialApp(
       title: 'Pfadi Morea',
       debugShowCheckedModeBanner: false,
@@ -51,7 +28,16 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => Container(decoration: BoxDecoration(gradient: LinearGradient(colors: [MoreaColors.orange, Colors.white], begin: Alignment.topCenter, end: Alignment.bottomCenter)), child: RootPage(auth: Auth(), firestore: firestore,)),
+        '/': (context) => Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [MoreaColors.orange, MoreaColors.bottomAppBar],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter)),
+            child: RootPage(
+              auth: Auth(),
+              firestore: firestore,
+            )),
       },
     );
   }
@@ -116,9 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 break;
             }
           });
-    }
-    //Android Scafold
-    else {
+    } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

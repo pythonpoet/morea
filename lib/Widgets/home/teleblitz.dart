@@ -148,40 +148,47 @@ class Teleblitz {
                     children: <Widget>[
                       Expanded(
                           child: Container(
-                            child: new RaisedButton(
-                              elevation: 0,
-                              padding: EdgeInsets.all(0),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-                                constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
-                                child: Center(
-                                  child: new Text(
-                                    abmelden, 
-                                    style: MoreaTextStyle.button))),
-                              onPressed: () {
-                                if (name == null) {
-                                  submit(
-                                    eventMapAnmeldeStatusNegativ, groupID, eventID, uid);
-                                } else {
-                                  submit(
-                                    eventMapAnmeldeStatusNegativ, groupID, eventID, uid,
+                        child: RaisedButton(
+                          elevation: 0,
+                          padding: EdgeInsets.all(0),
+                          child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 0, vertical: 15),
+                              constraints:
+                                  BoxConstraints(minWidth: 170, maxWidth: 170),
+                              child: Center(
+                                  child: Text(abmelden,
+                                      style: MoreaTextStyle.button))),
+                          onPressed: () {
+                            if (name == null) {
+                              submit(eventMapAnmeldeStatusNegativ, groupID,
+                                  eventID, uid);
+                            } else {
+                              submit(eventMapAnmeldeStatusNegativ, groupID,
+                                  eventID, uid,
                                   name: name);
-                    }
-                  },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                ),
-              )),
+                            }
+                          },
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0)),
+                        ),
+                      )),
                       Expanded(
                         child: Container(
                           child: new RaisedButton(
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-                              constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 0, vertical: 15),
+                              constraints:
+                                  BoxConstraints(minWidth: 170, maxWidth: 170),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [MoreaColors.orange, MoreaColors.violett],),
-                                borderRadius: BorderRadius.circular(30)
-                              ),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      MoreaColors.orange,
+                                      MoreaColors.violett
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(30)),
                               child: Center(
                                 child: new Text(anmelden,
                                     style: MoreaTextStyle.button),
@@ -211,19 +218,18 @@ class Teleblitz {
             case "ChuntNoed":
               return Container(
                 child: new RaisedButton(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  color: Colors.transparent,
                   padding: EdgeInsets.all(0),
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-                    constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
+                    constraints: BoxConstraints(maxWidth: 170, minWidth: 170),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [MoreaColors.orange, MoreaColors.violett],),
-                      borderRadius: BorderRadius.circular(30)
-                    ),
+                        gradient: LinearGradient(
+                            colors: [MoreaColors.orange, MoreaColors.violett]),
+                        borderRadius: BorderRadius.circular(30)),
                     child: Center(
-                        child: new Text(anmelden,
-                            style: MoreaTextStyle.button)),
+                        child:
+                            new Text(anmelden, style: MoreaTextStyle.button)),
+                    width: 120,
                   ),
                   onPressed: () {
                     if (name == null) {
@@ -235,6 +241,9 @@ class Teleblitz {
                           name: name);
                     }
                   },
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                  color: Colors.transparent,
                   textColor: Colors.white,
                 ),
               );
@@ -243,7 +252,13 @@ class Teleblitz {
                 child: new RaisedButton(
                   elevation: 0,
                   padding: EdgeInsets.all(0),
-                  child: Container(padding: EdgeInsets.symmetric(horizontal: 0, vertical: 15),constraints: BoxConstraints(minWidth: 170, maxWidth: 170),child: Center(child: new Text(abmelden, style: MoreaTextStyle.button))),
+                  child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                      constraints: BoxConstraints(minWidth: 170, maxWidth: 170),
+                      child: Center(
+                          child: new Text(abmelden,
+                              style: MoreaTextStyle.button))),
                   onPressed: () {
                     if (name == null) {
                       submit(
@@ -490,7 +505,10 @@ class Teleblitz {
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text('Chunnt:', style: MoreaTextStyle.lable,),
+                            Text(
+                              'Chunnt:',
+                              style: MoreaTextStyle.lable,
+                            ),
                             StreamBuilder(
                               stream: werChunnt.stream,
                               builder: (context,
@@ -503,9 +521,19 @@ class Teleblitz {
                                 } else {
                                   return ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: snapshot.data[0].length,
+                                      itemCount: snapshot.data[0].length + 1,
                                       itemBuilder: (context, i) {
-                                        return Text(snapshot.data[0][i], style: MoreaTextStyle.normal,);
+                                        if (i < snapshot.data[0].length) {
+                                          return Text(
+                                            snapshot.data[0][i],
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        } else {
+                                          return Text(
+                                            'Total: ' + snapshot.data[0].length.toString(),
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        }
                                       });
                                 }
                               },
@@ -521,7 +549,10 @@ class Teleblitz {
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text('Chunnt nöd:', style: MoreaTextStyle.lable,),
+                            Text(
+                              'Chunnt nöd:',
+                              style: MoreaTextStyle.lable,
+                            ),
                             StreamBuilder(
                               stream:
                                   moreaFire.streamCollectionWerChunnt(eventID),
@@ -544,9 +575,19 @@ class Teleblitz {
                                   }
                                   return ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: chunntNoed.length,
+                                      itemCount: chunntNoed.length + 1,
                                       itemBuilder: (context, i) {
-                                        return Text(chunntNoed[i], style: MoreaTextStyle.normal,);
+                                        if (i < chunntNoed.length) {
+                                          return Text(
+                                            chunntNoed[i],
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        } else {
+                                          return Text(
+                                            'Total: ' + chunntNoed.length.toString(),
+                                            style: MoreaTextStyle.normal,
+                                          );
+                                        }
                                       });
                                 }
                               },
@@ -1040,8 +1081,7 @@ class Info {
                   Expanded(
                       child: Html(
                     data: this.mitnehmen,
-                    defaultTextStyle:
-                        MoreaTextStyle.htmlList,
+                    defaultTextStyle: MoreaTextStyle.htmlList,
                   ))
                 ],
               ),

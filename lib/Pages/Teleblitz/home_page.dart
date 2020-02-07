@@ -300,9 +300,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           appBar: AppBar(
             title: Text('Teleblitz'),
           ),
-          drawer: new Drawer(
-            child: new ListView(children: navigation()),
-          ),
+          drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
+              moreafire.getEmail, context, moreafire, crud0, _signedOut),
           body: requestPrompttoParent());
   }
 

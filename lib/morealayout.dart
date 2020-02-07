@@ -227,8 +227,8 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
 
 BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
   return BottomAppBar(
-    color: Colors.transparent,
     elevation: 0,
+    color: MoreaColors.bottomAppBar,
     child: Container(
       child: Row(
         children: <Widget>[

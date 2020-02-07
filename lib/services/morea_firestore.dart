@@ -118,9 +118,19 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> createUserInformation(Map userInfo) async {
-    String userUID = await auth0.currentUser();
-    await crud0.setData(pathUser, userUID, userInfo);
-    return null;
+    try{
+
+      String userUID = await auth0.currentUser();
+      Map<String, dynamic> payload = {
+        'UID': userUID,
+        'content': userInfo
+      };
+      await callFunction(getcallable('createUserMap'), param: payload);
+      return null;
+    } catch(e){
+      print(e);
+      return null;
+    }
   }
 
   //Vorschlag an Maxi
