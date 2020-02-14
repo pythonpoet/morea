@@ -27,10 +27,10 @@ class _ChangeAddressState extends State<ChangeAddress> {
 
   @override
   void dispose() {
-    super.dispose();
     addressController.dispose();
     plzController.dispose();
     ortController.dispose();
+    super.dispose();
   }
 
   @override

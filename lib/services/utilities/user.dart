@@ -373,14 +373,13 @@ class User {
         await moreafire.createUserInformation(generateAndValitateUserMap());
         //writes Devicetoken to collection of groupID
         if (groupID != null) {
-          moreafire.subscribeToGroup(groupID);
           //Writes tn rights to groupMap
           await moreafire.groupPriviledgeTN(
               groupID, userID, (pfadiName == '' ? vorName : pfadiName));
         }
 
         //uploads devtoken to userMap
-        moreafire.uploadDevTocken(userID);
+        await moreafire.uploadDevTocken(userID);
 
         //sends user to rootpage
         onSignedIn();

@@ -239,14 +239,8 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  void _signedOut() async {
-    try {
-      await widget.auth.signOut();
-
-      widget.navigationMap[signedOut]();
-    } catch (e) {
-      print(e);
-    }
+  void _signedOut() {
+    widget.navigationMap[signedOut]();
   }
 
   void updateProfile() async {

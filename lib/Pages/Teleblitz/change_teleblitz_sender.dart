@@ -28,8 +28,8 @@ class _ChangeSenderState extends State<ChangeSender> {
 
   @override
   void dispose() {
-    super.dispose();
     senderController.dispose();
+    super.dispose();
   }
 
   @override

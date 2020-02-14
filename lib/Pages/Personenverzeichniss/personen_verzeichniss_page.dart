@@ -24,8 +24,8 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
 
   @override
   void initState() {
-    moreaLoading = new MoreaLoading(this);
     super.initState();
+    moreaLoading = new MoreaLoading(this);
   }
 
   @override

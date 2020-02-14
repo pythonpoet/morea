@@ -22,7 +22,7 @@ class _SendMessagesState extends State<SendMessages> {
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   UniqueKey dropdownKey = UniqueKey();
-  List<String> receiver = <String>[];
+  List<String> receivers = <String>[];
   TextEditingController titleController = TextEditingController();
   FocusNode titleFocus = FocusNode();
   TextEditingController inhaltController = TextEditingController();
@@ -79,16 +79,19 @@ class _SendMessagesState extends State<SendMessages> {
             setState(() {
               if (_formKey.currentState.validate()) {
                 Map<String, dynamic> data = {
-                  'body': inhaltController.text,
-                  'read': List<String>(),
-                  'sender': moreaFire.getPfandiName,
+                  'message': {
+                    'title': titleController.text,
+                    'body': inhaltController.text,
+                    'sender': moreaFire.getPfandiName,
+                    'read': List<String>(),
+                    'receivers': receivers,
+                  },
+                  'receivers': receivers,
                   'snippet': vorschauController.text,
                   'title': titleController.text
                 };
-                for (String i in receiver) {
-                  moreaFire.uploadMessage(i, data);
-                }
-                print('Successful');
+                moreaFire.uploadMessage(data);
+                print('Successful: $data');
                 Navigator.of(context).pop();
               }
             });
@@ -122,9 +125,9 @@ class _SendMessagesState extends State<SendMessages> {
                   onChanged: (bool val) {
                     setState(() {
                       if (val) {
-                        receiver.add(midatanamebiber);
+                        receivers.add(midatanamebiber);
                       } else {
-                        receiver.remove(midatanamebiber);
+                        receivers.remove(midatanamebiber);
                       }
                       biberCheckBox = val;
                     });
@@ -140,9 +143,9 @@ class _SendMessagesState extends State<SendMessages> {
                   onChanged: (bool val) {
                     setState(() {
                       if (val) {
-                        receiver.add(midatanamewoelf);
+                        receivers.add(midatanamewoelf);
                       } else {
-                        receiver.remove(midatanamewoelf);
+                        receivers.remove(midatanamewoelf);
                       }
                       woelfeCheckBox = val;
                     });
@@ -158,9 +161,9 @@ class _SendMessagesState extends State<SendMessages> {
                   onChanged: (bool val) {
                     setState(() {
                       if (val) {
-                        receiver.add(midatanamemeitli);
+                        receivers.add(midatanamemeitli);
                       } else {
-                        receiver.remove(midatanamemeitli);
+                        receivers.remove(midatanamemeitli);
                       }
                       meitliCheckBox = val;
                     });
@@ -176,9 +179,9 @@ class _SendMessagesState extends State<SendMessages> {
                   onChanged: (bool val) {
                     setState(() {
                       if (val) {
-                        receiver.add(midatanamebuebe);
+                        receivers.add(midatanamebuebe);
                       } else {
-                        receiver.remove(midatanamebuebe);
+                        receivers.remove(midatanamebuebe);
                       }
                       buebeCheckBox = val;
                     });

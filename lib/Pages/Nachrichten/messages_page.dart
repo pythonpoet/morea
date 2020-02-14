@@ -5,9 +5,11 @@ import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/messages_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/Pages/Nachrichten/send_message.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'single_message_page.dart';
 
@@ -30,7 +32,6 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage>
     with TickerProviderStateMixin {
   CrudMedthods crud0;
-  var messages;
   var date;
   var uid;
   var stufe;
@@ -41,19 +42,25 @@ class _MessagesPageState extends State<MessagesPage>
   String anzeigename;
   MoreaFirebase moreaFire;
   MoreaLoading moreaLoading;
+  MessagesManager messagesManager;
 
   @override
   void initState() {
     super.initState();
-    this.moreaFire = widget.moreaFire;
-    _getMessages(this.context);
-    crud0 = CrudMedthods(widget.firestore);
     moreaLoading = MoreaLoading(this);
+    this.moreaFire = widget.moreaFire;
+    crud0 = CrudMedthods(widget.firestore);
+    messagesManager = MessagesManager(crud0);
+    List<String> groups = [];
+    groups.add(moreaFire.getGroupID);
+    groups.addAll(moreaFire.getSubscribedGroups);
+    messagesManager.getMessages(groups);
   }
 
   @override
   void dispose() {
     moreaLoading.dispose();
+    messagesManager.dispose();
     super.dispose();
   }
 
@@ -118,13 +125,11 @@ class _MessagesPageState extends State<MessagesPage>
           key: _messagesKeyLeiter,
           description: 'Hier siehst du alle deine Nachrichten',
           child: StreamBuilder(
-              stream: this.messages,
+              stream: messagesManager.stream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return MoreaBackgroundContainer(
-                      child: SingleChildScrollView(
-                          child: MoreaShadowContainer(
-                              child: moreaLoading.loading())));
+                      child: moreaLoading.loading());
                 } else if (!snapshot.hasData) {
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
@@ -262,10 +267,12 @@ class _MessagesPageState extends State<MessagesPage>
             ),
             child: moreaChildBottomAppBar(widget.navigationMap)),
         body: StreamBuilder(
-            stream: this.messages,
+            stream: messagesManager.stream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Text('Loading...');
+                return MoreaBackgroundContainer(
+                  child: moreaLoading.loading(),
+                );
               } else if (!snapshot.hasData) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -369,21 +376,8 @@ class _MessagesPageState extends State<MessagesPage>
     }
   }
 
-  void _signedOut() async {
-    try {
-      await widget.auth.signOut();
-      widget.navigationMap[signedOut]();
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  _getMessages(BuildContext context) async {
-    this.uid = widget.auth.getUserID;
-    this.stufe = moreaFire.getGroupID;
-    setState(() {
-      this.messages = moreaFire.getMessages(this.stufe);
-    });
+  void _signedOut() {
+    widget.navigationMap[signedOut]();
   }
 
   routeToSendMessage() {
@@ -402,7 +396,14 @@ class _MessagesPageState extends State<MessagesPage>
           child: ListTile(
             key: UniqueKey(),
             title: Text(document['title'], style: MoreaTextStyle.lable),
-            subtitle: Text(document['sender'], style: MoreaTextStyle.sender),
+            subtitle: Column(
+              children: <Widget>[
+                Text('von: ${document['sender']}',
+                    style: MoreaTextStyle.sender),
+                Text(
+                    'für: ${document['receivers'].forEach((groupID) => convMiDatatoWebflow(groupID)).toString()}'),
+              ],
+            ),
             contentPadding: EdgeInsets.only(),
             leading: CircleAvatar(
               child: Text(document['sender'][0]),
@@ -475,6 +476,7 @@ class _MessagesPageState extends State<MessagesPage>
         builder: (context) => AlertDialog(
               content: Text(
                   'Hier siehst du alle Nachrichten, welche von deinen Leitern an dein Fähnli gesendet wurden'),
-            )).then((onvalue) => ShowCaseWidget.of(context).startShowCase([_bottomAppBarTNKey]));
+            )).then((onvalue) =>
+        ShowCaseWidget.of(context).startShowCase([_bottomAppBarTNKey]));
   }
 }

@@ -35,9 +35,9 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
 
   @override
   void dispose() {
-    super.dispose();
     ortAntretenController.dispose();
     mapAntretenController.dispose();
+    super.dispose();
   }
 
   @override

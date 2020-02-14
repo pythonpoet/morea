@@ -34,6 +34,7 @@ dependencies:
     flutter_datetime_picker: ^1.2.8
     flip_card: ^0.4.4
     showcaseview: ^0.1.5
+    device_info: ^0.4.1+4
 
 
     shared_preferences: any
@@ -49,9 +50,9 @@ dev_dependencies:
         sdk: flutter
 
 flutter_icons:
-    android: true
+    android: false
     ios: true
-    image_path: "assets/icon/icon.png"
+    image_path: "assets/icon/morea_transparent.png"
     adaptive_icon_background: "#ffffff"
 
 

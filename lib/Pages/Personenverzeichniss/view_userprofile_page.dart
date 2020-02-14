@@ -29,8 +29,8 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
 
   @override
   void initState() {
-    moreaLoading = MoreaLoading(this);
     super.initState();
+    moreaLoading = MoreaLoading(this);
   }
 
   @override

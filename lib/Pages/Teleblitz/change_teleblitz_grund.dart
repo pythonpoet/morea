@@ -28,8 +28,8 @@ class _ChangeGrundState extends State<ChangeGrund> {
 
   @override
   void dispose() {
-    super.dispose();
     grundController.dispose();
+    super.dispose();
   }
 
   @override

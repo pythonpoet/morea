@@ -71,8 +71,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   void _getAgenda(groupID) {
     List<String> groupIDs = [];
-    if(groupID != null)
-      groupIDs.add(groupID);
+    if (groupID != null) groupIDs.add(groupID);
     groupIDs.addAll(widget.moreaFire.getSubscribedGroups);
     agenda.getTotalAgendaOverview(groupIDs);
   }
@@ -141,6 +140,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   @override
   void initState() {
+    super.initState();
     moreaLoading = MoreaLoading(this);
     moreafire = widget.moreaFire;
     crud0 = CrudMedthods(widget.firestore);
@@ -152,8 +152,6 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
     _getAgenda(moreafire.getUserMap[userMapgroupID]);
-
-    super.initState();
   }
 
   @override
@@ -312,7 +310,8 @@ class _AgendaStatePage extends State<AgendaState>
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
-            return moreaLoading.loading();
+            return MoreaBackgroundContainer(
+                child: moreaLoading.loading());
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(
               child: MoreaShadowContainer(
@@ -394,7 +393,12 @@ class _AgendaStatePage extends State<AgendaState>
                                     _info['Eventname'].toString(),
                                     style: MoreaTextStyle.lable,
                                   ),
-                                  trailing: _info['groupID'] == null ? Text('Error') : Text(convMiDatatoWebflow(_info['groupID']), style: MoreaTextStyle.sender,),
+                                  trailing: _info['groupID'] == null
+                                      ? Text('Error')
+                                      : Text(
+                                          convMiDatatoWebflow(_info['groupID']),
+                                          style: MoreaTextStyle.sender,
+                                        ),
                                   onTap: () => viewEvent(context, _info));
                             } else if (_info['Lager']) {
                               return ListTile(
@@ -423,7 +427,12 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
-                                  trailing: _info['groupID'] == null ? Text('Error') : Text(convMiDatatoWebflow(_info['groupID']), style: MoreaTextStyle.sender,),
+                                  trailing: _info['groupID'] == null
+                                      ? Text('Error')
+                                      : Text(
+                                          convMiDatatoWebflow(_info['groupID']),
+                                          style: MoreaTextStyle.sender,
+                                        ),
                                   onTap: () => viewLager(context, _info));
                             } else {
                               return SizedBox();
@@ -441,8 +450,7 @@ class _AgendaStatePage extends State<AgendaState>
         });
   }
 
-  void _signedOut() async {
-    await widget.auth.signOut();
+  void _signedOut() {
     widget.navigationMap[signedOut]();
   }
 
@@ -477,9 +485,9 @@ class _AgendaStatePage extends State<AgendaState>
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              content: Text('Drücke auf einzelne Events/Lager um mehr Details zu sehen. Drücke auf einzelne Events/Lager um mehr Details zu sehen.'),
-            )).then((onvalue) => ShowCaseWidget.of(context).startShowCase([
-          _bottomAppBarTNKey
-        ]));
+              content: Text(
+                  'Drücke auf einzelne Events/Lager um mehr Details zu sehen. Drücke auf einzelne Events/Lager um mehr Details zu sehen.'),
+            )).then((onvalue) =>
+        ShowCaseWidget.of(context).startShowCase([_bottomAppBarTNKey]));
   }
 }

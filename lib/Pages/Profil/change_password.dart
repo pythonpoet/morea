@@ -16,15 +16,10 @@ class _ChangePasswordState extends State<ChangePassword> {
   final _formKey = GlobalKey<FormState>();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
-    super.dispose();
     passwordController.dispose();
     verifyPasswordController.dispose();
+    super.dispose();
   }
 
   @override

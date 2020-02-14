@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:morea/Pages/Grundbausteine/login_page.dart';
 import 'package:morea/Pages/Grundbausteine/root_page.dart';
 import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/services/auth.dart';
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS != null) {
+    if (Platform.isIOS) {
       return CupertinoTabScaffold(
           tabBar: CupertinoTabBar(items: [
             BottomNavigationBarItem(

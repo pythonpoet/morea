@@ -27,10 +27,10 @@ class _ChangeNameState extends State<ChangeName> {
 
   @override
   void dispose() {
-    super.dispose();
     vorname.dispose();
     nachname.dispose();
     pfadiname.dispose();
+    super.dispose();
   }
 
   @override

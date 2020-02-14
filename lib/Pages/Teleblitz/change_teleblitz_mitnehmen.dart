@@ -30,6 +30,14 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
   }
 
   @override
+  void dispose() {
+    for(TextEditingController controller in mitnehmenController){
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

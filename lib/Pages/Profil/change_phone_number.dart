@@ -23,8 +23,8 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
 
   @override
   void dispose() {
-    super.dispose();
     phoneNumberController.dispose();
+    super.dispose();
   }
 
   @override

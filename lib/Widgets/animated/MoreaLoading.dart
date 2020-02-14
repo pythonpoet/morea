@@ -83,3 +83,61 @@ class MoreaLoading {
     _loadingController.dispose();
   }
 }
+
+class MoreaLoadingWidget extends StatefulWidget {
+  final Function signOut;
+
+  MoreaLoadingWidget(this.signOut);
+
+  @override
+  _MoreaLoadingWidgetState createState() => _MoreaLoadingWidgetState();
+}
+
+class _MoreaLoadingWidgetState extends State<MoreaLoadingWidget>
+    with TickerProviderStateMixin {
+  MoreaLoading moreaLoading;
+
+  @override
+  void initState() {
+    super.initState();
+    moreaLoading = MoreaLoading(this);
+  }
+
+  @override
+  void dispose() {
+    moreaLoading.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            flex: 5,
+            child: moreaLoading.loading(),
+          ),
+          Expanded(
+              flex: 1,
+              child: FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.cancel,
+                      color: Colors.grey,
+                    ),
+                    Text(" Logout",
+                        style: TextStyle(fontSize: 20, color: Colors.grey))
+                  ],
+                ),
+                onPressed: () => widget.signOut(),
+              ))
+        ],
+      ),
+    );
+  }
+}
