@@ -109,12 +109,6 @@ class _ProfileState extends State<Profile> {
                     style: MoreaTextStyle.title,
                   ),
                 ),
-                Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.black26,
-                    )),
                 ListTile(
                   title: Text(
                     'Name',
@@ -142,13 +136,18 @@ class _ProfileState extends State<Profile> {
                     'Adresse',
                     style: MoreaTextStyle.lable,
                   ),
-                  subtitle: Text(
-                    userInfo['Adresse'] +
-                        ', ' +
-                        userInfo['PLZ'] +
-                        ' ' +
-                        userInfo['Ort'],
-                    style: MoreaTextStyle.normal,
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        userInfo['Adresse'] + ', ',
+                        style: MoreaTextStyle.normal,
+                      ),
+                      Text(
+                        userInfo['PLZ'] + ' ' + userInfo['Ort'],
+                        style: MoreaTextStyle.normal,
+                      )
+                    ],
                   ),
                 ),
                 Padding(
@@ -205,19 +204,18 @@ class _ProfileState extends State<Profile> {
                       thickness: 1,
                       color: Colors.black26,
                     )),
-                    userInfo.containsKey("Geburtstag")?
-                        ListTile(
-                          title: Text(
-                            'Geburtstag',
-                            style: MoreaTextStyle.lable,
-                          ),
-                          subtitle: Text(
-                            userInfo['Geburtstag'],
-                            style: MoreaTextStyle.normal,
-                          ),
-                        )
-                      :
-                      Container(),
+                userInfo.containsKey("Geburtstag")
+                    ? ListTile(
+                        title: Text(
+                          'Geburtstag',
+                          style: MoreaTextStyle.lable,
+                        ),
+                        subtitle: Text(
+                          userInfo['Geburtstag'],
+                          style: MoreaTextStyle.normal,
+                        ),
+                      )
+                    : Container(),
                 Padding(
                   padding: EdgeInsets.only(bottom: 10),
                 ),

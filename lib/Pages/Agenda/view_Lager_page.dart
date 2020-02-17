@@ -44,19 +44,13 @@ class ViewLagerPageState extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(top: 20),
-        ),
         ListTile(
           title: Text(
             info['Eventname'],
             style: MoreaTextStyle.title,
           ),
           trailing: Text('Lager', style: MoreaTextStyle.sender,),
-        ),
-        Padding(
-          padding: EdgeInsets.only(right: 15, left: 15, top: 20),
-          child: MoreaDivider(),
+          contentPadding: EdgeInsets.all(20),
         ),
         ListTile(
             title: Text(
@@ -134,7 +128,6 @@ class ViewLagerPageState extends StatelessWidget {
             'Beschreibung',
             style: MoreaTextStyle.lable,
           ),
-          contentPadding: EdgeInsets.all(15),
           subtitle: Text(
             info['Beschreibung'],
             style: MoreaTextStyle.normal,
@@ -149,7 +142,6 @@ class ViewLagerPageState extends StatelessWidget {
             'Mitnehmen',
             style: MoreaTextStyle.lable,
           ),
-          contentPadding: EdgeInsets.all(15),
           subtitle: ListView.builder(
               itemCount: info['Mitnehmen'].length,
               shrinkWrap: true,
@@ -158,7 +150,7 @@ class ViewLagerPageState extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
-                    info['Mitnehmen'][index],
+                    '- ' + info['Mitnehmen'][index],
                     style: MoreaTextStyle.normal,
                   ),
                 );

@@ -346,11 +346,6 @@ class _AgendaStatePage extends State<AgendaState>
                           style: MoreaTextStyle.title,
                         ),
                       ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                        child: MoreaDivider(),
-                      ),
                       ListView.separated(
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: slagenda.data.length,

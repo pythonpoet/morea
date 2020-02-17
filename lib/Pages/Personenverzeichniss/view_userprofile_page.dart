@@ -88,10 +88,6 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             style: MoreaTextStyle.title,
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: MoreaDivider(),
-        ),
         ListTile(
           title: Text(
             'Name',
@@ -191,8 +187,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: MoreaDivider(),
+          padding: EdgeInsets.only(top: 20),
         ),
       ],
     );

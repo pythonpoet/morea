@@ -134,32 +134,29 @@ class _MessagesPageState extends State<MessagesPage>
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                       child: MoreaShadowContainer(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  'Nachrichten',
-                                  style: MoreaTextStyle.title,
-                                ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
                               ),
-                              ListView(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                children: <Widget>[
-                                  ListTile(
-                                    title: Text(
-                                      'Keine Nachrichten vorhanden',
-                                      style: MoreaTextStyle.normal,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
+                            ),
+                            ListView(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text(
+                                    'Keine Nachrichten vorhanden',
+                                    style: MoreaTextStyle.normal,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -174,7 +171,7 @@ class _MessagesPageState extends State<MessagesPage>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
+                                padding: const EdgeInsets.all(20),
                                 child: Text(
                                   'Nachrichten',
                                   style: MoreaTextStyle.title,
@@ -202,29 +199,33 @@ class _MessagesPageState extends State<MessagesPage>
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                       child: MoreaShadowContainer(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  'Nachrichten',
-                                  style: MoreaTextStyle.title,
-                                ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Text(
+                                'Nachrichten',
+                                style: MoreaTextStyle.title,
                               ),
-                              ListView.builder(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: snapshot.data.documents.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    var document =
-                                        snapshot.data.documents[index];
-                                    return _buildListItem(context, document);
-                                  }),
-                            ],
-                          ),
+                            ),
+                            ListView.separated(
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: snapshot.data.documents.length,
+                                shrinkWrap: true,
+                                separatorBuilder: (context, index){
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                    child: MoreaDivider(),
+                                  );
+                                },
+                                itemBuilder: (context, index) {
+                                  var document =
+                                      snapshot.data.documents[index];
+                                  return _buildListItem(context, document);
+                                }),
+                            Padding(padding: EdgeInsets.only(top: 20),)
+                          ],
                         ),
                       ),
                     ),
@@ -277,29 +278,26 @@ class _MessagesPageState extends State<MessagesPage>
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
                     child: MoreaShadowContainer(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Text(
-                                'Nachrichten',
-                                style: MoreaTextStyle.title,
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Text(
+                              'Nachrichten',
+                              style: MoreaTextStyle.title,
                             ),
-                            ListView(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              children: <Widget>[
-                                ListTile(
-                                  title: Text('Keine Nachrichten vorhanden'),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                          ListView(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            children: <Widget>[
+                              ListTile(
+                                title: Text('Keine Nachrichten vorhanden'),
+                              )
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -308,29 +306,26 @@ class _MessagesPageState extends State<MessagesPage>
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
                     child: MoreaShadowContainer(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Text(
-                                'Nachrichten',
-                                style: MoreaTextStyle.title,
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Text(
+                              'Nachrichten',
+                              style: MoreaTextStyle.title,
                             ),
-                            ListView(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              children: <Widget>[
-                                ListTile(
-                                  title: Text('Keine Nachrichten vorhanden'),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                          ListView(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            children: <Widget>[
+                              ListTile(
+                                title: Text('Keine Nachrichten vorhanden'),
+                              )
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -341,29 +336,35 @@ class _MessagesPageState extends State<MessagesPage>
                     return MoreaBackgroundContainer(
                       child: SingleChildScrollView(
                         child: MoreaShadowContainer(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: Text(
-                                    'Nachrichten',
-                                    style: MoreaTextStyle.title,
-                                  ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Text(
+                                  'Nachrichten',
+                                  style: MoreaTextStyle.title,
                                 ),
-                                ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: snapshot.data.documents.length,
-                                    itemBuilder: (context, index) {
-                                      var document =
-                                          snapshot.data.documents[index];
-                                      return _buildListItem(context, document);
-                                    }),
-                              ],
-                            ),
+                              ),
+                              ListView.separated(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  separatorBuilder: (context, index){
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      child: MoreaDivider(),
+                                    );
+                                  },
+                                  itemCount: snapshot.data.documents.length,
+                                  itemBuilder: (context, index) {
+                                    var document =
+                                        snapshot.data.documents[index];
+                                    return _buildListItem(context, document);
+                                  }),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20),
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -433,9 +434,14 @@ class _MessagesPageState extends State<MessagesPage>
             document['title'],
             style: MoreaTextStyle.normal,
           ),
-          subtitle: Text(
-            document['sender'],
-            style: MoreaTextStyle.sender,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('von: ${document['sender']}',
+                  style: MoreaTextStyle.sender),
+              Text(
+                'für: $receiversString', style: MoreaTextStyle.sender,),
+            ],
           ),
           contentPadding: EdgeInsets.only(),
           leading: CircleAvatar(

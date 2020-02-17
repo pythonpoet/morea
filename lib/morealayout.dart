@@ -47,7 +47,6 @@ class MoreaShadow {
 class MoreaShadowContainer extends Container {
   MoreaShadowContainer({
     this.child,
-    this.constraints,
   });
 
   @override
@@ -56,7 +55,7 @@ class MoreaShadowContainer extends Container {
       EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 40);
   final Widget child;
   final Color color = Color.fromRGBO(255, 255, 255, 0.8);
-  final BoxConstraints constraints;
+  final BoxConstraints constraints = BoxConstraints(maxWidth: 450);
 }
 
 class MoreaBackgroundContainer extends Container {

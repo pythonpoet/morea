@@ -11,24 +11,12 @@ class SelectStufe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Stufe wählen"),
-      ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return Container(
-            decoration: BoxDecoration(
-              color: MoreaColors.orange,
-              image: DecorationImage(
-                  image: AssetImage('assets/images/background.png'),
-                  alignment: Alignment.bottomCenter),
-            ),
-            alignment: Alignment.topCenter,
-            child: Container(
-              decoration: MoreaShadow.teleblitz,
-              margin: EdgeInsets.all(20),
-              constraints:
-                  BoxConstraints(minWidth: viewportConstraints.maxWidth),
+        appBar: AppBar(
+          title: Text("Stufe wählen"),
+        ),
+        body: MoreaBackgroundContainer(
+          child: SingleChildScrollView(
+            child: MoreaShadowContainer(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -42,16 +30,10 @@ class SelectStufe extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(
-                        thickness: 1,
-                        color: Colors.black26,
-                      )),
                   ListTile(
                     title: Text(
                       "Biber",
-                      style: MoreaTextStyle.normal,
+                      style: MoreaTextStyle.lable,
                     ),
                     contentPadding: EdgeInsets.only(
                       right: 15,
@@ -73,7 +55,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Wombat",
-                      style: MoreaTextStyle.normal,
+                      style: MoreaTextStyle.lable,
                     ),
                     contentPadding: EdgeInsets.only(
                       right: 15,
@@ -96,7 +78,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Nahani",
-                      style: MoreaTextStyle.normal,
+                      style: MoreaTextStyle.lable,
                     ),
                     contentPadding: EdgeInsets.only(
                       right: 15,
@@ -119,7 +101,7 @@ class SelectStufe extends StatelessWidget {
                   ListTile(
                     title: Text(
                       "Drason",
-                      style: MoreaTextStyle.normal,
+                      style: MoreaTextStyle.lable,
                     ),
                     contentPadding:
                         EdgeInsets.only(right: 15, left: 15, bottom: 15),
@@ -134,9 +116,7 @@ class SelectStufe extends StatelessWidget {
                 ],
               ),
             ),
-          );
-        },
-      ),
-    );
+          ),
+        ));
   }
 }
