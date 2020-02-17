@@ -41,7 +41,6 @@ class _LoginPageState extends State<LoginPage> {
   String _password;
   String error;
   FormType _formType = FormType.login;
-  List<Map> _stufenselect = new List();
   bool _load = false;
 
   PageController pageController;
@@ -69,18 +68,24 @@ class _LoginPageState extends State<LoginPage> {
     if (validateAndSave()) {
       try {
         switch (_formType) {
+          //Login
           case FormType.login:
+          //Sets Login indicator
             setState(() {
               _load = true;
             });
+            //login firebase user
             moreaUser.userID = await widget.auth
                 .signInWithEmailAndPassword(moreaUser.email, _password);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
+              //upload deviceToken
               moreafire.uploadDevTocken(moreaUser.userID);
+              //reset loading indicator
               setState(() {
                 _load = false;
               });
+              //navigate to homeScreen
               widget.onSignedIn();
             } else {
               setState(() {
@@ -89,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
             }
             break;
           case FormType.register:
+            //Check if userMap is right
             var regDat = await register.validateTeilnehmer(context);
             if(!(regDat is User))
               return
@@ -97,14 +103,17 @@ class _LoginPageState extends State<LoginPage> {
                 _load = true;
               });
               CrudMedthods crud = new CrudMedthods(widget.firestore);
+              //prompt user with Datenschutzerklärung
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
                       .data["Datenschutz"]);
                 if (datenschutz.akzeptiert) {
                   moreaUser.pos = "Teilnehmer";
+                  //Create User
                   await moreaUser.createMoreaUser(
                       widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                  //Add to mailChimpAPIManager
                   await mailChimpAPIManager.updateUserInfo(
                       moreaUser.email,
                       moreaUser.vorName,
@@ -227,9 +236,6 @@ class _LoginPageState extends State<LoginPage> {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
     register = new Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
-    Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, "1165")).data;
-    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
   }
 
   @override
@@ -269,9 +275,9 @@ class _LoginPageState extends State<LoginPage> {
                       key: formKey,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height >= 1100.0
+                        height: _formType != FormType.login?   MediaQuery.of(context).size.height >= 1100.0
                             ? MediaQuery.of(context).size.height
-                            : 1100.0,
+                            : 1100.0 : MediaQuery.of(context).size.height -100,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buildInputs(),
