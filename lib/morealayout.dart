@@ -68,7 +68,8 @@ class MoreaBackgroundContainer extends Container {
     color: MoreaColors.orange,
     image: DecorationImage(
         image: AssetImage('assets/images/background.png'),
-        alignment: Alignment.bottomCenter),
+        alignment: Alignment.bottomCenter,
+        fit: BoxFit.fitWidth),
   );
   final Widget child;
   final Alignment alignment = Alignment.topCenter;
