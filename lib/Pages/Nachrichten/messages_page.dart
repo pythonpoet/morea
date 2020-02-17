@@ -390,6 +390,11 @@ class _MessagesPageState extends State<MessagesPage>
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var message = document;
+    List<String> receivers = [];
+    for(String receiver in document['receivers']){
+      receivers.add(convMiDatatoWebflow(receiver));
+    }
+    String receiversString = receivers.join(',');
     if (!(document['read'].contains(this.uid))) {
       return Container(
           padding: EdgeInsets.only(right: 20, left: 20),
@@ -397,11 +402,12 @@ class _MessagesPageState extends State<MessagesPage>
             key: UniqueKey(),
             title: Text(document['title'], style: MoreaTextStyle.lable),
             subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text('von: ${document['sender']}',
                     style: MoreaTextStyle.sender),
                 Text(
-                    'für: ${document['receivers'].forEach((groupID) => convMiDatatoWebflow(groupID)).toString()}'),
+                    'für: $receiversString', style: MoreaTextStyle.sender,),
               ],
             ),
             contentPadding: EdgeInsets.only(),
