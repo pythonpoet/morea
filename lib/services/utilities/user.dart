@@ -88,8 +88,13 @@ class User {
     //SubscribedGroups can be empty (Because Children are asigned to a single group by default).
 
     if (_userMap.containsKey(userMapPfadiName)) {
-      pfadiName = _userMap[userMapPfadiName];
-      displayName = pfadiName;
+      if (_userMap[userMapPfadiName] != '' &&
+          _userMap[userMapPfadiName] != null) {
+        pfadiName = _userMap[userMapPfadiName];
+        displayName = pfadiName;
+      } else {
+        displayName = vorName;
+      }
     } else {
       displayName = vorName;
     }
@@ -160,8 +165,13 @@ class User {
     //geschlecht can be null (Becase we don't have to know the sex of a parent)
 
     if (_userMap.containsKey(userMapPfadiName)) {
-      pfadiName = _userMap[userMapPfadiName];
-      displayName = pfadiName;
+      if (_userMap[userMapPfadiName] != '' &&
+          _userMap[userMapPfadiName] != null) {
+        pfadiName = _userMap[userMapPfadiName];
+        displayName = pfadiName;
+      } else {
+        displayName = vorName;
+      }
     } else {
       displayName = vorName;
     }
@@ -216,13 +226,13 @@ class User {
   Future<Map<String, Map<String, String>>> createChildMap(
       Map<String, String> childs) async {
     Map<String, Map<String, String>> childMap = new Map();
-    for (String vorname in childs.keys) {
+    for (String childUID in childs.keys) {
       Map<String, dynamic> childUserDat =
-          (await crud0.getDocument(pathUser, childs[vorname])).data;
+          (await crud0.getDocument(pathUser, childUID)).data;
       if (childMap.containsKey(childUserDat[userMapgroupID]))
-        childMap[childUserDat[userMapgroupID]][vorname] = childs[vorname];
+        childMap[childUserDat[userMapgroupID]][childUID] = childs[childUID];
       else
-        childMap[childUserDat[userMapgroupID]] = {vorname: childs[vorname]};
+        childMap[childUserDat[userMapgroupID]] = {childUID: childs[childUID]};
       if (!subscribedGroups.contains(childUserDat[userMapgroupID]))
         subscribedGroups.add(childUserDat[userMapgroupID]);
     }
@@ -288,7 +298,7 @@ class User {
         else
           throw "$userMapGeschlecht has to be non-null";
 
-        if(groupID != null)
+        if (groupID != null)
           userMap[userMapgroupID] = groupID;
         else
           throw "$userMapgroupID has to be non-null";
@@ -298,7 +308,7 @@ class User {
 
         if (handynummer != null) userMap[userMapHandynummer] = handynummer;
 
-        if(elternMap != null) userMap[userMapEltern] = elternMap;
+        if (elternMap != null) userMap[userMapEltern] = elternMap;
         //Handynummer can be empty
         break;
       case "Mutter":
@@ -317,7 +327,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        
+
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -328,7 +338,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-    
+
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -339,7 +349,7 @@ class User {
           userMap[userMapHandynummer] = handynummer;
         else
           throw "$userMapHandynummer has to be non-null";
-        
+
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
@@ -366,7 +376,7 @@ class User {
           moreafire.subscribeToGroup(groupID);
           //Writes tn rights to groupMap
           await moreafire.groupPriviledgeTN(
-              groupID, userID, (pfadiName == ' ' ? vorName : pfadiName));
+              groupID, userID, (pfadiName == '' ? vorName : pfadiName));
         }
 
         //uploads devtoken to userMap

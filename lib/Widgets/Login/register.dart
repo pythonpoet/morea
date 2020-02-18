@@ -109,6 +109,22 @@ class Register implements BaseRegister {
           ));
     else return moreaUser;
   }
+
+  dynamic validateUpgradeChild(BuildContext context)async{
+    if (_password.length < 6)
+      return await showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
+          ));
+    else if(_password != _passwordneu)
+      return  await showDialog(
+          context: context,
+          child: new AlertDialog(
+            title: new Text("Passwörter sind nicht identisch"),
+          ));
+    else return moreaUser;
+  }
   Widget registerParentWidget(BuildContext context, Function setState){
         return Container(
       child: Column(
@@ -197,6 +213,23 @@ class Register implements BaseRegister {
         },
       );
     }
+
+    Widget parentUpgradeChild(){
+     return Container(
+       child: Column(
+         mainAxisSize: MainAxisSize.min,
+         children: <Widget>[
+           registerSection(icon: Icon(Icons.person), widgets: [registerHandyNummer()]),
+           registerSection(icon: Icon(Icons.email), widgets: [registerEmail()]),
+           registerSection(icon: Icon(Icons.vpn_key), widgets: [registerPassword(), registerPasswordNew()]),
+           SizedBox(
+             height: 24,
+           )
+         ],
+       ),
+     );
+    }
+
     Widget registerSection({
       @required Icon icon,
       @required List<Widget> widgets
@@ -233,7 +266,7 @@ class Register implements BaseRegister {
         decoration: new InputDecoration(
           border: UnderlineInputBorder(),
           filled: true,
-          labelText: 'Pfadinamen',
+          labelText: 'Pfadiname',
         ),
         onSaved: (value) => moreaUser.pfadiName = value,
       );

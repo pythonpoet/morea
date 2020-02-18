@@ -35,6 +35,6 @@ String convMiDatatoWebflow(String groupID) {
     case '4013':
       return 'Drason (Buebe)';
     default:
-      throw "convMiDatatoWebflow Error";
+      throw "convMiDatatoWebflow Error groupID given was: " + groupID.toString();
   }
 }

@@ -15,7 +15,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:icon="@mipmap/ic_morea_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="Dev Pfadi Morea"
         android:roundIcon="@mipmap/ic_morea_launcher_round">
         <meta-data

@@ -56,6 +56,9 @@ abstract class BaseMoreaFirebase {
   Future<void> uploadChildUserInformation(Map<String, dynamic> childUserInfo);
 
   Future<void> priviledgeEltern(String groupID);
+
+  Future<void> upgradeChild(
+      Map<String, dynamic> childMap, String oldUID, String password);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -118,16 +121,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> createUserInformation(Map userInfo) async {
-    try{
-
+    try {
       String userUID = await auth0.currentUser();
-      Map<String, dynamic> payload = {
-        'UID': userUID,
-        'content': userInfo
-      };
+      Map<String, dynamic> payload = {'UID': userUID, 'content': userInfo};
       await callFunction(getcallable('createUserMap'), param: payload);
       return null;
-    } catch(e){
+    } catch (e) {
       print(e);
       return null;
     }
@@ -246,6 +245,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> subscribeToGroup(String groupID) async {
+     await firebaseMessaging.requestNotificationPermissions();
+      firebaseMessaging.configure();
     Map<String, dynamic> tokendata = {
       'devtoken': await firebaseMessaging.getToken()
     };
@@ -282,6 +283,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uploadDevTocken(String userID) async {
+     await firebaseMessaging.requestNotificationPermissions();
+      firebaseMessaging.configure();
     await callFunction(getcallable("uploadDevTocken"),
         param: Map<String, String>.from({
           userMapDeviceToken: await firebaseMessaging.getToken(),
@@ -325,5 +328,45 @@ class MoreaFirebase extends BaseMoreaFirebase {
       'UID': getUserMap[userMapUID],
       'DisplayName': this.getVorName
     });
+  }
+
+  @override
+  Future<String> upgradeChild(Map<String, dynamic> childMap, String oldChildUID,
+      String password) async {
+    String uid = await auth0.createUserWithEmailAndPasswordForChild(
+        childMap[userMapEmail], password);
+    childMap[userMapUID] = uid;
+    childMap.remove(userMapChildUID);
+
+    String displayname;
+    if (childMap[userMapPfadiName] == null || childMap[userMapPfadiName] == '') {
+      displayname = childMap[userMapVorName];
+    } else {
+      displayname = childMap[userMapPfadiName];
+    }
+
+    Map<String, dynamic> payload = {
+      'UID': uid,
+      'content': childMap,
+      'elternList': childMap[userMapEltern].keys.toList(),
+      'vorname': childMap[userMapVorName],
+      'oldChildUID': oldChildUID,
+    };
+    await callFunction(getcallable('upgradeChildMap'), param: payload);
+
+    Map<String, dynamic> deletePayload = {
+      'UID': oldChildUID,
+    };
+    await callFunction(getcallable('deleteChildMap'), param: deletePayload);
+
+    Map<String, dynamic> updatePriviledgePayload = <String, dynamic>{
+      'UID': uid,
+      'groupID': childMap[userMapgroupID],
+      'DisplayName': displayname,
+      'oldUID': oldChildUID
+    };
+    await callFunction(getcallable('updatePriviledge'),
+        param: updatePriviledgePayload);
+    return uid;
   }
 }

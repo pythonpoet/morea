@@ -48,6 +48,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> aSProfile) {
           if (!aSProfile.hasData) return moreaLoading.loading();
           profile = aSProfile.data.data;
+          print(profile);
 
           return Container(
               child: Scaffold(

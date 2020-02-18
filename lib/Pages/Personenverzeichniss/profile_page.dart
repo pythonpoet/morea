@@ -36,11 +36,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   bool hatEltern = false,
       hatKinder = false,
       display = false,
+      upgradeKidDisplay = false,
       newKidDisplay = false;
   Stream<bool> value;
   var controller = new StreamController<bool>();
   Future<String> qrCodeString;
   List elternMapList = ['Liam Bebecho'], kinderMapList = ['Walter'];
+  Map <String, dynamic> childToUpgradeMap;
 
   void reload() async {
     value = controller.stream;
@@ -116,8 +118,18 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     setState(() {});
   }
 
+  void upgradeKid(Map childMap) {
+    if (upgradeKidDisplay) {
+      upgradeKidDisplay = false;
+    } else {
+      upgradeKidDisplay = true;
+    }
+    this.childToUpgradeMap = childMap;
+    setState(() {});
+  }
+
   Future<void> getElternMap() async {
-    List elternUID = List.from(widget.profile['Eltern'].values);
+    List elternUID = List.from(widget.profile['Eltern'].keys);
     for (int i = 0; i < elternUID.length; i++) {
       var elternData = await moreaFire.getUserInformation(elternUID[i]);
       if (i == 0) {
@@ -130,7 +142,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getKindernMap() async {
-    List kinderUID = List.from(widget.profile['Kinder'].values);
+    List kinderUID = List.from(widget.profile['Kinder'].keys);
     for (int i = 0; i < kinderUID.length; i++) {
       var kinderData = await moreaFire.getUserInformation(kinderUID[i]);
       if (i == 0) {
@@ -218,9 +230,18 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                       child: newKidDisplay
-                          ? mergeChildParent.registernewChild(widget.profile,
-                              context, this.setProfileState, this.newKidakt, widget.signOut)
-                          : Container())
+                          ? mergeChildParent.registernewChild(
+                              widget.profile,
+                              context,
+                              this.setProfileState,
+                              this.newKidakt,
+                              widget.signOut)
+                          : Container()),
+                  Align(
+                      child: upgradeKidDisplay
+                          ? mergeChildParent.upgradeChild(
+                              context, this.upgradeKid, this.childToUpgradeMap, widget.signOut)
+                          : Container()),
                 ],
               )));
     }
@@ -376,49 +397,122 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   Widget kinderAnzeigen() {
     if (kinderMapList[0] != 'Walter') {
-      return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: kinderMapList.length,
-          itemBuilder: (context, int index) {
-            Map<String, dynamic> kinderMap =
-                Map<String, dynamic>.from(kinderMapList[index]);
-            return Container(
-              decoration: BoxDecoration(
-                  border: Border.all(width: 3),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ListTile(
-                    title: Text(
-                      'Name',
-                      style: MoreaTextStyle.lable,
-                    ),
-                    subtitle: Text(
-                      '${kinderMap["Vorname"]} ${kinderMap["Nachname"]}',
-                      style: MoreaTextStyle.normal,
-                    ),
-                  ),kinderMap.containsKey("Email")?
-                  ListTile(
-                    title: Text(
-                      'E-Mail-Adresse',
-                      style: MoreaTextStyle.lable,
-                    ),
-                    subtitle: Text(
-                      kinderMap['Email'],
-                      style: MoreaTextStyle.normal,
-                    ),
-                  ):
-                  Container(),
-                ],
-              ),
-            );
-          });
+      return ListView.separated(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: kinderMapList.length,
+        itemBuilder: (context, int index) {
+          Map<String, dynamic> kinderMap =
+              Map<String, dynamic>.from(kinderMapList[index]);
+          return Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: 3),
+                borderRadius: BorderRadius.all(Radius.circular(5))),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                ListTile(
+                  title: Text(
+                    'Name',
+                    style: MoreaTextStyle.lable,
+                  ),
+                  subtitle: Text(
+                    '${kinderMap["Vorname"]} ${kinderMap["Nachname"]}',
+                    style: MoreaTextStyle.normal,
+                  ),
+                ),
+                kinderMap.containsKey("Email")
+                    ? ListTile(
+                        title: Text(
+                          'E-Mail-Adresse',
+                          style: MoreaTextStyle.lable,
+                        ),
+                        subtitle: Text(
+                          kinderMap['Email'],
+                          style: MoreaTextStyle.normal,
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.only(left: 15, bottom: 20),
+                        child: RaisedButton(
+                          child: Text(
+                            'Account erstellen',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          onPressed: () =>
+                              showUpgradeWarning(kinderMap),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0)),
+                          color: Color(0xff7a62ff),
+                          textColor: Colors.white,
+                        ),
+                      ),
+              ],
+            ),
+          );
+        },
+        separatorBuilder: (context, int index) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 10),
+          );
+        },
+      );
     } else {
       return Container();
     }
+  }
+
+  showUpgradeWarning(Map childMap) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(
+                'Achtung',
+                style: MoreaTextStyle.warningTitle,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    'Bist du sicher, dass du für dein Kind ${childMap["Vorname"]} einen vollständigen Account machen willst?',
+                    style: MoreaTextStyle.normal,
+                  ),
+                  Text(
+                    'Das braucht ${childMap["Vorname"]} nur, wenn er auf seinem eigenen Handy die Pfadi Morea App haben will.',
+                    style: MoreaTextStyle.normal,
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                RaisedButton(
+                  child: Text(
+                    'Abbrechen',
+                    style: MoreaTextStyle.button,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                ),
+                RaisedButton(
+                  child: Text(
+                    'Account erstellen',
+                    style: MoreaTextStyle.button,
+                  ),
+                  onPressed: () {
+                    this.upgradeKid(childMap);
+                    Navigator.of(context).pop();
+                  },
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                  color: Color(0xff7a62ff),
+                  textColor: Colors.white,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 5),
+                )
+              ],
+            ));
   }
 }

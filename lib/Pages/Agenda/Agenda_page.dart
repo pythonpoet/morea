@@ -4,6 +4,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/utilities/MiData.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../morealayout.dart';
@@ -68,9 +69,12 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  Stream<List> _getAgenda(groupID) async* {
-    yield* agenda.getTotalAgendaOverview(
-        [groupID, ...widget.moreaFire.getSubscribedGroups]);
+  void _getAgenda(groupID) {
+    List<String> groupIDs = [];
+    if(groupID != null)
+      groupIDs.add(groupID);
+    groupIDs.addAll(widget.moreaFire.getSubscribedGroups);
+    agenda.getTotalAgendaOverview(groupIDs);
   }
 
   altevernichten(_agedaTitledatum, groupID, Map<String, dynamic> event) async {
@@ -139,7 +143,7 @@ class _AgendaStatePage extends State<AgendaState>
   void initState() {
     moreaLoading = MoreaLoading(this);
     moreafire = widget.moreaFire;
-
+    crud0 = CrudMedthods(widget.firestore);
     agenda = new prefix0.Agenda(widget.firestore, widget.moreaFire);
 
     //_getAgenda("3776");
@@ -147,6 +151,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
+    _getAgenda(moreafire.getUserMap[userMapgroupID]);
 
     super.initState();
   }
@@ -304,7 +309,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   Widget aAgenda(String groupID) {
     return StreamBuilder(
-        stream: _getAgenda(groupID).asBroadcastStream(),
+        stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
             return moreaLoading.loading();
@@ -389,6 +394,7 @@ class _AgendaStatePage extends State<AgendaState>
                                     _info['Eventname'].toString(),
                                     style: MoreaTextStyle.lable,
                                   ),
+                                  trailing: _info['groupID'] == null ? Text('Error') : Text(convMiDatatoWebflow(_info['groupID']), style: MoreaTextStyle.sender,),
                                   onTap: () => viewEvent(context, _info));
                             } else if (_info['Lager']) {
                               return ListTile(
@@ -417,6 +423,7 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
+                                  trailing: _info['groupID'] == null ? Text('Error') : Text(convMiDatatoWebflow(_info['groupID']), style: MoreaTextStyle.sender,),
                                   onTap: () => viewLager(context, _info));
                             } else {
                               return SizedBox();

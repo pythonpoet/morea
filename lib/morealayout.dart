@@ -15,6 +15,7 @@ class MoreaColors {
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;
   static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 1);
+  static Color greyButton = Color.fromRGBO(230, 230, 230, 1);
 
   //306bac 3626A7
   static Map<int, Color> violettMaterialColor = {
@@ -120,7 +121,9 @@ class MoreaTextStyle {
   static TextStyle sender =
       TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
   static TextStyle button =
-      TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
+      TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+
+  static TextStyle warningTitle = TextStyle(fontSize: 34, fontWeight: FontWeight.w700, color: Colors.red);
 }
 
 class MoreaDivider extends Divider {
@@ -383,7 +386,10 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: signedOut,
+            onTap: (){
+              Navigator.of(context).pop();
+              signedOut();
+            },
           )
         ],
       ),
@@ -420,7 +426,10 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: signedOut,
+            onTap: (){
+              Navigator.of(context).pop();
+              signedOut();
+            },
           )
         ],
       ),
@@ -460,7 +469,10 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: signedOut,
+            onTap: (){
+              Navigator.of(context).pop();
+              signedOut();
+            },
           )
         ],
       ),
