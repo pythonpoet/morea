@@ -168,6 +168,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   @override
   void initState() {
+    super.initState();
     mergeChildParent = new MergeChildParent(widget.crud0, widget.moreaFire);
     moreaFire = widget.moreaFire;
     crud0 = widget.crud0;
@@ -179,7 +180,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     } else {
       getkinder();
     }
-    super.initState();
   }
 
   @override

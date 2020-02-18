@@ -126,42 +126,43 @@ class Teleblitz {
   }
 
   Widget childAnmeldeButton(String groupID, String eventID) {
-    return anmeldebutton(moreaFire.getGroupID, eventID,
-        moreaFire.getUserMap[userMapUID], 'Chume', 'Chume nöd',);
+    return anmeldebutton(
+      moreaFire.getGroupID,
+      eventID,
+      moreaFire.getUserMap[userMapUID],
+      'Chume',
+      'Chume nöd',
+    );
   }
 
-  Widget parentListTitle(){
+  Widget parentListTitle() {
     return Container(
         padding: EdgeInsets.only(top: 30, bottom: 20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-                width: 120,
-                child: Text("", style: MoreaTextStyle.lable)),
+            SizedBox(width: 120, child: Text("", style: MoreaTextStyle.lable)),
             Expanded(
                 child: Text(
-                  'Bist du dabei?',
-                  style: MoreaTextStyle.lable,
-                ))
+              'Bist du dabei?',
+              style: MoreaTextStyle.lable,
+            ))
           ],
         ));
   }
 
-  Widget childListTitle(String displayname){
+  Widget childListTitle(String displayname) {
     return Container(
         padding: EdgeInsets.only(top: 30, bottom: 20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-                width: 120,
-                child: Text("", style: MoreaTextStyle.lable)),
+            SizedBox(width: 120, child: Text("", style: MoreaTextStyle.lable)),
             Expanded(
                 child: Text(
-                  '$displayname, bist du dabei?',
-                  style: MoreaTextStyle.lable,
-                ))
+              '$displayname, bist du dabei?',
+              style: MoreaTextStyle.lable,
+            ))
           ],
         ));
   }
@@ -194,7 +195,7 @@ class Teleblitz {
                               padding: EdgeInsets.symmetric(
                                   horizontal: 0, vertical: 15),
                               constraints:
-                              BoxConstraints(minWidth: 170, maxWidth: 170),
+                                  BoxConstraints(minWidth: 170, maxWidth: 170),
                               child: Center(
                                   child: new Text(abmelden,
                                       style: MoreaTextStyle.button))),
@@ -212,15 +213,17 @@ class Teleblitz {
                               borderRadius: new BorderRadius.circular(30.0)),
                         ),
                       ),
-                      Padding(padding: EdgeInsets.only(right: 5),),
+                      Padding(
+                        padding: EdgeInsets.only(right: 5),
+                      ),
                       Flexible(
                         child: RaisedButton(
                           padding: EdgeInsets.all(0),
                           child: Container(
-                            padding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 15),
                             constraints:
-                            BoxConstraints(maxWidth: 170, minWidth: 170),
+                                BoxConstraints(maxWidth: 170, minWidth: 170),
                             decoration: BoxDecoration(
                                 gradient: LinearGradient(colors: [
                                   MoreaColors.orange,
@@ -265,7 +268,9 @@ class Teleblitz {
                     Flexible(
                       child: Container(),
                     ),
-                    Padding(padding: EdgeInsets.only(right: 5),),
+                    Padding(
+                      padding: EdgeInsets.only(right: 5),
+                    ),
                     Flexible(
                       child: new RaisedButton(
                         padding: EdgeInsets.all(0),
@@ -341,7 +346,9 @@ class Teleblitz {
                             borderRadius: new BorderRadius.circular(30.0)),
                       ),
                     ),
-                    Padding(padding: EdgeInsets.only(right: 5),),
+                    Padding(
+                      padding: EdgeInsets.only(right: 5),
+                    ),
                     Flexible(
                       child: Container(),
                     ),

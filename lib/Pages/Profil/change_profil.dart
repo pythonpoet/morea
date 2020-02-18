@@ -93,12 +93,6 @@ class _ChangeProfileState extends State<ChangeProfile>
                       style: MoreaTextStyle.title,
                     ),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(
-                        thickness: 1,
-                        color: Colors.black26,
-                      )),
                   ListTile(
                     title: Text(
                       'Name',

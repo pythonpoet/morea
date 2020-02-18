@@ -15,17 +15,9 @@ class SelectTeleblitzType extends StatelessWidget {
       appBar: AppBar(
         title: Text('Typ Teleblitz auswählen'),
       ),
-      body: LayoutBuilder(builder: (context, viewportConstraints) {
-        return Container(
-          decoration: BoxDecoration(
-            color: MoreaColors.orange,
-            image: DecorationImage(
-                image: AssetImage('assets/images/background.png'),
-                alignment: Alignment.bottomCenter),
-          ),
-          child: Container(
-            margin: EdgeInsets.all(20),
-            constraints: BoxConstraints(minWidth: viewportConstraints.maxWidth),
+      body: MoreaBackgroundContainer(
+        child: SingleChildScrollView(
+          child: MoreaShadowContainer(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -35,15 +27,12 @@ class SelectTeleblitzType extends StatelessWidget {
                   padding: EdgeInsets.all(20),
                   child: Text("Typ auswählen", style: MoreaTextStyle.title),
                 ),
-                Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.black26,
-                    )),
                 ListTile(
                   title: Text('Normal', style: MoreaTextStyle.lable),
-                  subtitle: Text('Normaler Teleblitz mit Beginn und Schluss', style: MoreaTextStyle.normal,),
+                  subtitle: Text(
+                    'Normaler Teleblitz mit Beginn und Schluss',
+                    style: MoreaTextStyle.normal,
+                  ),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) =>
                           ChangeTeleblitz(this.stufe, 'normal', moreaFire))),
@@ -60,10 +49,11 @@ class SelectTeleblitzType extends StatelessWidget {
                       color: Colors.black26,
                     )),
                 ListTile(
-                  title:
-                      Text('Ausfall Aktivität', style: MoreaTextStyle.lable),
+                  title: Text('Ausfall Aktivität', style: MoreaTextStyle.lable),
                   subtitle: Text(
-                      'Ein Teleblitz mit einem Feld für den Grund des Ausfalls', style: MoreaTextStyle.normal,),
+                    'Ein Teleblitz mit einem Feld für den Grund des Ausfalls',
+                    style: MoreaTextStyle.normal,
+                  ),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) => ChangeTeleblitz(
                           this.stufe, 'keineAktivitaet', moreaFire))),
@@ -82,7 +72,9 @@ class SelectTeleblitzType extends StatelessWidget {
                 ListTile(
                   title: Text('Ferien', style: MoreaTextStyle.lable),
                   subtitle: Text(
-                      'Ein Teleblitz mit einem Feld für das Ende der Ferien', style: MoreaTextStyle.normal,),
+                    'Ein Teleblitz mit einem Feld für das Ende der Ferien',
+                    style: MoreaTextStyle.normal,
+                  ),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (BuildContext context) =>
                           ChangeTeleblitz(this.stufe, 'ferien', moreaFire))),
@@ -92,11 +84,9 @@ class SelectTeleblitzType extends StatelessWidget {
                 ),
               ],
             ),
-            decoration: MoreaShadow.teleblitz,
           ),
-          alignment: Alignment.topCenter,
-        );
-      }),
+        ),
+      ),
     );
   }
 }

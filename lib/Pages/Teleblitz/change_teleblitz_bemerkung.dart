@@ -28,8 +28,8 @@ class _ChangeBemerkungState extends State<ChangeBemerkung> {
 
   @override
   void dispose() {
-    super.dispose();
     bemerkungController.dispose();
+    super.dispose();
   }
 
   @override

@@ -350,6 +350,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   void initState() {
+    super.initState();
     datumvon = widget.eventinfo['Datum'];
     datumbis = widget.eventinfo['Datum bis'];
     datum = widget.eventinfo['Datum'];
@@ -364,8 +365,6 @@ class EventAddPageState extends State<EventAddPage> {
     crud0 = new CrudMedthods(widget.firestore);
     agenda = widget.agenda;
     initSubgoup();
-
-    super.initState();
   }
 
   @override

@@ -105,9 +105,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
               ),
               onPressed: () async {
                 print(widget.profile);
-                for(var elternUID in widget.profile[userMapEltern].values.toList()){
+                for(var elternUID in widget.profile[userMapEltern].keys.toList()){
                   var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
-                  elternMap[userMapKinder].remove(widget.profile[userMapVorName]);
+                  elternMap[userMapKinder].remove(widget.profile[userMapUID]);
                   print(elternMap);
                   await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
                 }

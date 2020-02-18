@@ -1,4 +1,7 @@
+import 'package:device_info/device_info.dart';
+import 'dart:io' show Platform;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Grundbausteine/blockedByAppVersion_page.dart';
@@ -11,9 +14,13 @@ import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
+
+import '../../morea_strings.dart';
+import '../../morealayout.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({this.auth, this.firestore});
@@ -41,12 +48,11 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   AuthStatus authStatus = AuthStatus.loading;
   MoreaFirebase moreaFire;
   Map<String, Function> navigationMap;
-  MoreaLoading moreaLoading;
+  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
   @override
   void initState() {
     super.initState();
-    moreaLoading = MoreaLoading(this);
     initializeDateFormatting();
     authStatusInit();
 
@@ -59,11 +65,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       prefix0.toAgendaPage: this.agendaPage,
       prefix0.toProfilePage: this.profilePage,
     };
+    firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
+        sound: true, badge: true, alert: true, provisional: false));
   }
 
   @override
   void dispose() {
-    moreaLoading.dispose();
+    print('disposing root');
     super.dispose();
   }
 
@@ -71,6 +79,107 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     this.moreaFire = new MoreaFirebase(widget.firestore);
     await this.moreaFire.getData(await auth.currentUser());
     await this.moreaFire.initTeleblitz();
+    firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+      print(message);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Neue Nachricht'),
+            actions: <Widget>[
+              RaisedButton(
+                color: MoreaColors.violett,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  navigationMap[toMessagePage]();
+                },
+                child: Text(
+                  'Ansehen',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              RaisedButton(
+                color: MoreaColors.violett,
+                child: Text(
+                  'Später',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }, onResume: (Map<String, dynamic> message) async {
+      print(message);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Neue Nachricht'),
+            actions: <Widget>[
+              RaisedButton(
+                color: MoreaColors.violett,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  navigationMap[toMessagePage]();
+                },
+                child: Text(
+                  'Ansehen',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              RaisedButton(
+                color: MoreaColors.violett,
+                child: Text(
+                  'Später',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print(message);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Neue Nachricht'),
+            actions: <Widget>[
+              RaisedButton(
+                color: MoreaColors.violett,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  navigationMap[toMessagePage]();
+                },
+                child: Text(
+                  'Ansehen',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              RaisedButton(
+                color: MoreaColors.violett,
+                child: Text(
+                  'Später',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    });
     authStatus = AuthStatus.homePage;
     setState(() {});
     return true;
@@ -156,42 +265,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         );
         break;
       case AuthStatus.loading:
-        return Scaffold(
-            appBar: AppBar(
-              title: Text('Teleblitz'),
-            ),
-            body: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  flex: 5,
-                  child: moreaLoading.loading(),
-                ),
-                Expanded(
-                    flex: 1,
-                    child: FlatButton(
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.cancel,
-                            color: Colors.grey,
-                          ),
-                          Text(" Logout",
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.grey))
-                        ],
-                      ),
-                      onPressed: () => signedOut(),
-                    ))
-              ],
-            ));
+        return MoreaLoadingWidget(this.signedOut);
         break;
       default:
-        return Container(
-          child: moreaLoading.loading(),
-          color: Colors.white,
-        );
+        return MoreaLoadingWidget(this.signedOut);
     }
   }
 
@@ -247,7 +324,22 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     }
   }
 
-  void signedOut() {
+  void signedOut() async {
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    String deviceID;
+    if (Platform.isAndroid) if (Platform.isAndroid) {
+      AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
+      deviceID = androidDeviceInfo.androidId;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
+      deviceID = iosDeviceInfo.identifierForVendor;
+    }
+    print(await auth.currentUser());
+    print(deviceID);
+    await callFunction(getcallable("deactivateDeviceNotification"),
+        param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
+    await auth.signOut();
+    firebaseMessaging.deleteInstanceID();
     moreaFire = null;
     setState(() {
       authStatus = AuthStatus.notSignedIn;

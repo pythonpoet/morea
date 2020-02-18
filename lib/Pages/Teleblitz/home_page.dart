@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Nachrichten/messages_page.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
@@ -35,7 +33,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   CrudMedthods crud0;
   MoreaFirebase moreafire;
   Teleblitz teleblitz;
-  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   MoreaLoading moreaLoading;
   GlobalKey _changeTeleblitzKey = GlobalKey();
   GlobalKey _bottomAppBarLeiterKey = GlobalKey();
@@ -58,9 +55,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void _signedOut() async {
-      await widget.auth.signOut();
-      widget.navigationMap[signedOut]();
+  void _signedOut() {
+    widget.navigationMap[signedOut]();
   }
 
   void forminit() {
@@ -96,64 +92,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     moreafire = widget.moreafire;
     crud0 = new CrudMedthods(widget.firestore);
     moreaLoading = new MoreaLoading(this);
-    firebaseMessaging.configure(
-        onMessage: (Map<String, dynamic> message) async {
-      print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  return Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => MessagesPage(
-                            moreaFire: moreafire,
-                            auth: widget.auth,
-                            firestore: widget.firestore,
-                            navigationMap: widget.navigationMap,
-                          )));
-                },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
-    }, onResume: (Map<String, dynamic> message) async {
-      print(message);
-      Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => MessagesPage(
-                moreaFire: moreafire,
-                auth: widget.auth,
-                firestore: widget.firestore,
-                navigationMap: widget.navigationMap,
-              )));
-    }, onLaunch: (Map<String, dynamic> message) async {
-      print(message);
-      Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => MessagesPage(
-                moreaFire: moreafire,
-                firestore: widget.firestore,
-                auth: widget.auth,
-                navigationMap: widget.navigationMap,
-              )));
-    });
     getuserinfo();
   }
 
@@ -177,7 +115,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           drawer: new Drawer(
             child: new ListView(children: navigation()),
           ),
-          body: moreaLoading.loading());
+          body: MoreaBackgroundContainer(
+              child: MoreaShadowContainer(
+                  child: Center(child: moreaLoading.loading()))));
     if ((moreafire.getSubscribedGroups.length > 0) ||
         (moreafire.getGroupID != null)) {
       List<Widget> anzeige = new List();

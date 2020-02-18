@@ -26,7 +26,6 @@ class LoginPage extends StatefulWidget {
 
 enum FormType { login, register, registereltern }
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
-enum Platform { isAndroid, isIOS }
 
 class _LoginPageState extends State<LoginPage> {
   DWIFormat dwiFormat = new DWIFormat();
@@ -233,6 +232,13 @@ class _LoginPageState extends State<LoginPage> {
         (await crud0.getDocument(pathGroups, "1165")).data;
     this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
   }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
   letsSetState(){
     setState(() {
       

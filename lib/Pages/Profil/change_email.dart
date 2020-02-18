@@ -23,8 +23,8 @@ class _ChangeEmailState extends State<ChangeEmail> {
 
   @override
   void dispose() {
-    super.dispose();
     email.dispose();
+    super.dispose();
   }
 
   @override

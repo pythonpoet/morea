@@ -44,10 +44,8 @@ class ViewEventPageState extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(top: 20),
-        ),
         ListTile(
+          contentPadding: EdgeInsets.all(20),
           title: Text(
             info['Eventname'],
             style: MoreaTextStyle.title,
@@ -56,10 +54,6 @@ class ViewEventPageState extends StatelessWidget {
             'Event',
             style: MoreaTextStyle.sender,
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(right: 15, left: 15, top: 20),
-          child: MoreaDivider(),
         ),
         ListTile(
           title: Text(
@@ -112,7 +106,6 @@ class ViewEventPageState extends StatelessWidget {
             info['Beschreibung'],
             style: MoreaTextStyle.normal,
           ),
-          contentPadding: EdgeInsets.all(15),
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 15),
@@ -123,7 +116,6 @@ class ViewEventPageState extends StatelessWidget {
             'Mitnehmen',
             style: MoreaTextStyle.lable,
           ),
-          contentPadding: EdgeInsets.all(15),
           subtitle: ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
@@ -132,7 +124,7 @@ class ViewEventPageState extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Text(
-                  info['Mitnehmen'][index],
+                  '- ' + info['Mitnehmen'][index],
                   style: MoreaTextStyle.normal,
                 ),
               );

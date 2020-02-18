@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
@@ -25,7 +26,8 @@ class ChangeTeleblitz extends StatefulWidget {
 
 enum FormType { keineAktivitaet, ferien, normal }
 
-class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
+class _ChangeTeleblitzState extends State<ChangeTeleblitz>
+    with TickerProviderStateMixin {
   String stufe;
   FormType formType;
   MoreaFirebase moreaFire;
@@ -49,6 +51,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   bool archived = false;
   bool draft = false;
   var oldTeleblitz;
+  MoreaLoading moreaLoading;
 
   TeleblitzManager teleblitzManager;
 
@@ -57,6 +60,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
     super.initState();
     this.stufe = widget.stufe;
     this.moreaFire = widget.moreaFire;
+    this.moreaLoading = MoreaLoading(this);
     this.teleblitzManager = TeleblitzManager(this.moreaFire);
     this.oldTeleblitz = downloadTeleblitz();
     if (widget.formType == "keineAktivitaet") {
@@ -73,12 +77,23 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
   }
 
   @override
+  void dispose() {
+    moreaLoading.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: this.oldTeleblitz,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container();
+          return Scaffold(
+              appBar: AppBar(
+                title: Text('Loading...'),
+              ),
+              body: MoreaBackgroundContainer(
+                  child: MoreaShadowContainer(child: moreaLoading.loading())));
         } else if (snapshot.connectionState == ConnectionState.done) {
           switch (formType) {
             case FormType.keineAktivitaet:
@@ -96,8 +111,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                     return MoreaBackgroundContainer(
                       child: SingleChildScrollView(
                         child: MoreaShadowContainer(
-                          constraints: BoxConstraints(
-                              minWidth: viewportConstraints.maxWidth),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -108,17 +121,13 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 child: Text(this.name,
                                     style: MoreaTextStyle.title),
                               ),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: Divider(
-                                    thickness: 1,
-                                    color: Colors.black26,
-                                  )),
                               ListTile(
-                                title: Text('Datum',
-                                    style: MoreaTextStyle.lable),
-                                subtitle: Text(datum, style: MoreaTextStyle.normal,),
+                                title:
+                                    Text('Datum', style: MoreaTextStyle.lable),
+                                subtitle: Text(
+                                  datum,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () => _selectDatum(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding:
@@ -134,7 +143,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                               ListTile(
                                 title: Text('Grund des Ausfalls',
                                     style: MoreaTextStyle.lable),
-                                subtitle: Text(this.grund, style: MoreaTextStyle.normal,),
+                                subtitle: Text(
+                                  this.grund,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -169,8 +181,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                     return MoreaBackgroundContainer(
                       child: SingleChildScrollView(
                         child: MoreaShadowContainer(
-                          constraints: BoxConstraints(
-                              minWidth: viewportConstraints.maxWidth),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -181,17 +191,13 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 child: Text(this.name,
                                     style: MoreaTextStyle.title),
                               ),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: Divider(
-                                    thickness: 1,
-                                    color: Colors.black26,
-                                  )),
                               ListTile(
                                 title: Text('Ende Ferien',
                                     style: MoreaTextStyle.lable),
-                                subtitle: Text(endeFerien, style: MoreaTextStyle.normal,),
+                                subtitle: Text(
+                                  endeFerien,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () => _selectDatumEndeFerien(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding: EdgeInsets.only(
@@ -221,8 +227,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                     return MoreaBackgroundContainer(
                       child: SingleChildScrollView(
                         child: MoreaShadowContainer(
-                          constraints: BoxConstraints(
-                              minWidth: viewportConstraints.maxWidth),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -233,17 +237,13 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                 child: Text(this.name,
                                     style: MoreaTextStyle.title),
                               ),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: Divider(
-                                    thickness: 1,
-                                    color: Colors.black26,
-                                  )),
                               ListTile(
-                                title: Text('Datum',
-                                    style: MoreaTextStyle.lable),
-                                subtitle: Text(datum, style: MoreaTextStyle.normal,),
+                                title:
+                                    Text('Datum', style: MoreaTextStyle.lable),
+                                subtitle: Text(
+                                  datum,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () => _selectDatum(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding:
@@ -257,9 +257,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                     color: Colors.black26,
                                   )),
                               ListTile(
-                                title: Text('Beginn',
-                                    style: MoreaTextStyle.lable),
-                                subtitle: Text(antreten, style: MoreaTextStyle.normal,),
+                                title:
+                                    Text('Beginn', style: MoreaTextStyle.lable),
+                                subtitle: Text(
+                                  antreten,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -282,7 +285,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                               ListTile(
                                 title: Text('Schluss',
                                     style: MoreaTextStyle.lable),
-                                subtitle: Text(abtreten, style: MoreaTextStyle.normal,),
+                                subtitle: Text(
+                                  abtreten,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -307,7 +313,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                   itemCount: mitnehmen.length,
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
-                                    return Text(mitnehmen[index], style: MoreaTextStyle.normal,);
+                                    return Text(
+                                      '- ' + mitnehmen[index],
+                                      style: MoreaTextStyle.normal,
+                                    );
                                   },
                                 ),
                                 onTap: () {
@@ -330,7 +339,10 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                               ListTile(
                                 title: Text('Bemerkung',
                                     style: MoreaTextStyle.lable),
-                                subtitle: Text(bemerkung, style: MoreaTextStyle.normal,),
+                                subtitle: Text(
+                                  bemerkung,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -349,9 +361,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz> {
                                     color: Colors.black26,
                                   )),
                               ListTile(
-                                title: Text('Sender',
-                                    style: MoreaTextStyle.lable),
-                                subtitle: Text(sender, style: MoreaTextStyle.normal,),
+                                title:
+                                    Text('Sender', style: MoreaTextStyle.lable),
+                                subtitle: Text(
+                                  sender,
+                                  style: MoreaTextStyle.normal,
+                                ),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>

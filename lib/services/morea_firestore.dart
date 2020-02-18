@@ -1,3 +1,5 @@
+import 'package:device_info/device_info.dart';
+import 'dart:io' show Platform;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/morea_strings.dart';
@@ -43,8 +45,6 @@ abstract class BaseMoreaFirebase {
 
   Stream<QuerySnapshot> getChildren();
 
-  Stream<QuerySnapshot> getMessages(String groupnr);
-
   Future<void> setMessageRead(String userUID, String messageID, String groupnr);
 
   Stream<QuerySnapshot> streamCollectionWerChunnt(String eventID);
@@ -67,7 +67,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   DWIFormat dwiformat = new DWIFormat();
   TeleblizFirestore tbz;
   Map<String, dynamic> _userMap;
-
+  Platform platform = Platform();
   Firestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   User moreaUser;
@@ -254,27 +254,22 @@ class MoreaFirebase extends BaseMoreaFirebase {
         'groups/$groupID/Devices', auth0.getUserID, tokendata);
   }
 
-  Stream<QuerySnapshot> getMessages(String groupnr) {
-    return crud0.streamCollection('/groups/$groupnr/messages');
-  }
-
-  Future<void> uploadMessage(groupnr, Map data) async {
-    await crud0.setDataWithoutDocumentName('groups/$groupnr/messages', data);
+  Future<void> uploadMessage(Map data) async {
+    await callFunction(getcallable('uploadAndNotifyMessage'), param: data);
     return null;
   }
 
   Future<void> setMessageRead(
       String userUID, String messageID, String groupnr) async {
-    userUID = dwiformat.simplestring(userUID);
     var oldMessage =
-        await crud0.getDocument('/groups/$groupnr/messages', messageID);
+        await crud0.getDocument('messages', messageID);
     List newRead = [];
     for (String index in oldMessage.data['read']) {
       newRead.add(index);
     }
     newRead.add(userUID);
     oldMessage.data['read'] = newRead;
-    await crud0.setData('groups/$groupnr/messages', messageID, oldMessage.data);
+    await crud0.setData('messages', messageID, oldMessage.data);
     return null;
   }
 
@@ -283,13 +278,22 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uploadDevTocken(String userID) async {
-     await firebaseMessaging.requestNotificationPermissions();
-      firebaseMessaging.configure();
+  DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  String deviceID;
+  if(Platform.isAndroid){
+    AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
+    deviceID = androidDeviceInfo.androidId;
+  } else if(Platform.isIOS){
+    IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
+    deviceID = iosDeviceInfo.identifierForVendor;
+  }
     await callFunction(getcallable("uploadDevTocken"),
         param: Map<String, String>.from({
           userMapDeviceToken: await firebaseMessaging.getToken(),
-          userMapUID: userID
+          userMapUID: userID,
+          "deviceID": deviceID,
         }));
+    return null;
   }
 
   Future<void> groupPriviledgeTN(
