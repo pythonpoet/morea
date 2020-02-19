@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeAbtreten extends StatefulWidget {
@@ -82,34 +83,35 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                           padding: const EdgeInsets.only(top: 20),
                           child: Text(
                             'Uhrzeit',
-                            style: MoreaTextStyle.lable,
+                            style: MoreaTextStyle.caption,
                           ),
                         ),
-                        Container(
-                          constraints: BoxConstraints(
-                              minWidth: viewportConstraints.maxWidth),
-                          alignment: Alignment.centerLeft,
-                          margin:
-                              EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              border: Border.all(color: Colors.black45)),
-                          child: FlatButton(
-                            child: Text(
-                              zeitAbtreten + ' Uhr',
-                              style: MoreaTextStyle.textField,
+                        FlatButton(
+                          child: Container(
+                            constraints: BoxConstraints(minWidth: viewportConstraints.maxWidth, maxWidth: viewportConstraints.maxWidth),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                zeitAbtreten + ' Uhr',
+                                style: MoreaTextStyle.textField,
+                              ),
                             ),
-                            onPressed: () {
-                              _selectTime(context);
-                            },
+                          ),
+                          focusColor: MoreaColors.violett,
+                          padding: EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
+                          onPressed: () {
+                            _selectTime(context);
+                          },
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              side: BorderSide(color: Colors.black45)
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(top: 20),
                           child: Text(
                             'Ort',
-                            style: MoreaTextStyle.lable,
+                            style: MoreaTextStyle.caption,
                           ),
                         ),
                         Padding(
@@ -121,7 +123,9 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                             style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                               border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
                               if (value.isEmpty) {
@@ -136,7 +140,7 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                           padding: const EdgeInsets.only(top: 20.0),
                           child: Text(
                             'Google Maps',
-                            style: MoreaTextStyle.lable,
+                            style: MoreaTextStyle.caption,
                           ),
                         ),
                         Padding(
@@ -149,7 +153,9 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                             style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                               border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
                               if (value.isEmpty) {

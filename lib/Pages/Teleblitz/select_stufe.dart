@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'select_teleblitz_type.dart';
@@ -27,7 +28,6 @@ class SelectStufe extends StatelessWidget {
                     child: Text(
                       "Stufe auswählen",
                       style: MoreaTextStyle.title,
-                      textAlign: TextAlign.center,
                     ),
                   ),
                   ListTile(

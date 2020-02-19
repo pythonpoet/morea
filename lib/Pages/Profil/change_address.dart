@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeAddress extends StatefulWidget {
@@ -68,7 +69,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Adresse',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -80,7 +81,9 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -95,7 +98,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Postleitzahl',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -107,7 +110,9 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -122,7 +127,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Ort',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -134,7 +139,9 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                       ),
                     ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeMitnehmen extends StatefulWidget {
@@ -31,7 +33,7 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
 
   @override
   void dispose() {
-    for(TextEditingController controller in mitnehmenController){
+    for (TextEditingController controller in mitnehmenController) {
       controller.dispose();
     }
     super.dispose();
@@ -94,28 +96,14 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
                               children: <Widget>[
                                 Expanded(
                                   flex: 7,
-                                  child: RaisedButton.icon(
-                                    onPressed: () {
-                                      this.setState(() {
-                                        mitnehmenController
-                                            .add(TextEditingController());
-                                      });
-                                    },
-                                    icon: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                      size: 16,
-                                    ),
-                                    label: Text(
-                                      "Element",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 18),
-                                    ),
-                                    color: MoreaColors.violett,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                  ),
+                                  child: moreaFlatIconButton(
+                                      'ELEMENT',
+                                      this.addElement,
+                                      Icon(
+                                        Icons.add,
+                                        size: 15,
+                                        color: MoreaColors.violett,
+                                      )),
                                 ),
                                 Expanded(
                                   flex: 1,
@@ -123,26 +111,14 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
                                 ),
                                 Expanded(
                                   flex: 7,
-                                  child: RaisedButton.icon(
-                                      onPressed: () {
-                                        this.setState(() {
-                                          mitnehmenController.removeLast();
-                                        });
-                                      },
-                                      icon: Icon(
+                                  child: moreaFlatIconButton(
+                                      'ELEMENT',
+                                      this.removeElement,
+                                      Icon(
                                         Icons.remove,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      label: Text(
-                                        "Element",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 18),
-                                      ),
-                                      color: MoreaColors.violett,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5)))),
+                                        size: 14,
+                                        color: MoreaColors.violett,
+                                      )),
                                 ),
                               ],
                             ),
@@ -172,7 +148,9 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
           style: MoreaTextStyle.textField,
           cursorColor: MoreaColors.violett,
           decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
             border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
           ),
           validator: (value) {
             if (value.isEmpty) {
@@ -185,6 +163,18 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
       ));
     }
     return mitnehmenList;
+  }
+
+  void addElement() {
+    this.setState(() {
+      mitnehmenController.add(TextEditingController());
+    });
+  }
+
+  void removeElement() {
+    this.setState(() {
+      mitnehmenController.removeLast();
+    });
   }
 
   bool saveAndSubmit() {

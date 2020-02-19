@@ -8,7 +8,6 @@ import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/utilities/notification.dart';
 import 'morealayout.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   notificationGetPermission();
@@ -45,8 +44,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-<<<<<<< HEAD
-=======
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -128,4 +125,3 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 }
->>>>>>> 2da8b0dad0b200da3ba7890b50aeb69e56ed69d9

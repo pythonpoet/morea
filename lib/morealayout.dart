@@ -101,30 +101,7 @@ Widget moreaLoadingIndicator(
   );
 }
 
-class MoreaTextStyle {
-  static TextStyle title = TextStyle(
-      fontSize: 34,
-      fontWeight: FontWeight.w700,
-      color: Color(0xff7a62ff),
-      shadows: <Shadow>[
-        Shadow(
-            color: Color.fromRGBO(0, 0, 0, 0.25),
-            offset: Offset(0, 3),
-            blurRadius: 6),
-      ]);
-  static TextStyle lable =
-      TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20);
-  static TextStyle normal = TextStyle(color: Colors.black, fontSize: 20);
-  static TextStyle htmlList =
-      TextStyle(fontWeight: FontWeight.w500, fontSize: 16);
-  static TextStyle textField = TextStyle(fontSize: 18);
-  static TextStyle sender =
-      TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w300);
-  static TextStyle button =
-      TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
 
-  static TextStyle warningTitle = TextStyle(fontSize: 34, fontWeight: FontWeight.w700, color: Colors.red);
-}
 
 class MoreaDivider extends Divider {
   final double thickness = 1;

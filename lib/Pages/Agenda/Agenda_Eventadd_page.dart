@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/info.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
@@ -34,12 +37,11 @@ class EventAddPageState extends State<EventAddPage> {
   Agenda agenda;
   MoreaFirebase moreafire;
   int value = 2;
-  List<String> mitnehemen = ['Pfadihämpt'];
-  final _addkeyEvent = new GlobalKey<FormState>(debugLabel: "_addkeyEvent");
-  final _addkeyLager = GlobalKey<FormState>(debugLabel: '_addkeyLager');
+  List<String> mitnehmen = [];
   final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
   final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
+  List<TextEditingController> mitnehmenController = [TextEditingController()];
 
   String eventname = ' ',
       datum = 'Datum wählen',
@@ -68,12 +70,12 @@ class EventAddPageState extends State<EventAddPage> {
     'Pios': false,
   };
 
-  _addItem(GlobalKey<FormState> key) {
-    if (validateAndSave(key)) {
-      setState(() {
-        value = value + 1;
-      });
+  @override
+  void dispose(){
+    for(TextEditingController controller in mitnehmenController){
+      controller.dispose();
     }
+    super.dispose();
   }
 
   bool validateAndSave(_key) {
@@ -103,8 +105,11 @@ class EventAddPageState extends State<EventAddPage> {
     }
   }
 
-  void eventHinzufuegen(_key) {
-    if (validateAndSave(_key)) {
+  void eventHinzufuegen() {
+    if (validateAndSave(_addEvent)) {
+      for (TextEditingController controller in mitnehmenController) {
+        mitnehmen.add(controller.text);
+      }
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
       Map<String, bool> finalGroupCheckbox =
           Map<String, bool>.from(this.groupCheckbox);
@@ -122,7 +127,7 @@ class EventAddPageState extends State<EventAddPage> {
         'groupIDs': finalGroupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
-        'Mitnehmen': mitnehemen,
+        'Mitnehmen': mitnehmen,
         'DeleteDate': order,
       };
 
@@ -141,8 +146,11 @@ class EventAddPageState extends State<EventAddPage> {
     }
   }
 
-  void lagerHinzufuegen(_key) {
-    if (validateAndSave(_key)) {
+  void lagerHinzufuegen() {
+    if (validateAndSave(_addLager)) {
+      for (TextEditingController controller in mitnehmenController) {
+        mitnehmen.add(controller.text);
+      }
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
       Map<String, bool> finalGroupCheckbox =
           Map<String, bool>.from(this.groupCheckbox);
@@ -162,7 +170,7 @@ class EventAddPageState extends State<EventAddPage> {
         'groupIDs': finalGroupCheckbox.keys.toList(),
         'Beschreibung': beschreibung,
         'Kontakt': kontakt,
-        'Mitnehmen': mitnehemen,
+        'Mitnehmen': mitnehmen,
         'DeleteDate': order,
       };
 
@@ -359,7 +367,7 @@ class EventAddPageState extends State<EventAddPage> {
     schlusszeit = widget.eventinfo['Schlusszeit'];
     if (widget.eventinfo.containsKey("Stufen"))
       stufen = Map<String, bool>.from(widget.eventinfo['Stufen']);
-    mitnehemen = List<String>.from(widget.eventinfo['Mitnehmen']);
+    mitnehmen = List<String>.from(widget.eventinfo['Mitnehmen']);
     order = widget.eventinfo['Order'];
     moreafire = widget.moreaFire;
     crud0 = new CrudMedthods(widget.firestore);
@@ -442,25 +450,74 @@ class EventAddPageState extends State<EventAddPage> {
                         autofocus: true,
                         keyboardType: TextInputType.text,
                         decoration:
-                            new InputDecoration(hintText: mitnehemen[index]),
-                        onSaved: (value) => mitnehemen[index] = value,
+                            new InputDecoration(hintText: mitnehmen[index]),
+                        onSaved: (value) => mitnehmen[index] = value,
                       ),
                     )
                   ],
                 ),
                 actions: <Widget>[
-                  new RaisedButton(
-                      child: new Text(
-                        'OK',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        validateAndSave(_changekey);
-                        Navigator.pop(context);
-                      }),
+                  moreaRaisedIconButton(
+                      'OK',
+                      validateMitnehmen,
+                      Icon(
+                        Icons.check,
+                        size: 14,
+                        color: Colors.white,
+                      )),
                 ],
               ),
             ));
+  }
+
+  validateMitnehmen() {
+    validateAndSave(_changekey);
+    Navigator.pop(context);
+  }
+
+  List<Widget> buildMitnehmen() {
+    List<Widget> mitnehmenList = [];
+    for (var u in mitnehmenController) {
+      mitnehmenList.add(Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: TextFormField(
+          controller: u,
+          maxLines: 1,
+          keyboardType: TextInputType.text,
+          style: MoreaTextStyle.textField,
+          cursorColor: MoreaColors.violett,
+          decoration: InputDecoration(
+            errorBorder:
+                OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: MoreaColors.violett)),
+          ),
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Bitte nicht leer lassen';
+            } else {
+              return null;
+            }
+          },
+        ),
+      ));
+    }
+    return mitnehmenList;
+  }
+
+  void addElement() {
+    this.setState(() {
+      mitnehmenController.add(TextEditingController());
+    });
+  }
+
+  void removeElement() {
+    if (mitnehmenController.length != 0) {
+      this.setState(() {
+            mitnehmenController.removeLast();
+          });
+    }
   }
 
   Widget lagerWidget() {
@@ -490,7 +547,13 @@ class EventAddPageState extends State<EventAddPage> {
                                 child: new TextFormField(
                                   initialValue: widget.eventinfo['Eventname'],
                                   decoration: new InputDecoration(
+                                    errorBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red)),
                                     border: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: MoreaColors.violett)),
                                     filled: false,
                                   ),
                                   onSaved: (value) => eventname = value,
@@ -544,7 +607,13 @@ class EventAddPageState extends State<EventAddPage> {
                                 child: new TextFormField(
                                   initialValue: widget.eventinfo['Lagerort'],
                                   decoration: new InputDecoration(
+                                    errorBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red)),
                                     border: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: MoreaColors.violett)),
                                     filled: false,
                                   ),
                                   keyboardType: TextInputType.text,
@@ -573,7 +642,13 @@ class EventAddPageState extends State<EventAddPage> {
                                 child: new TextFormField(
                                   initialValue: widget.eventinfo['Anfangsort'],
                                   decoration: new InputDecoration(
+                                      errorBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.red)),
                                       border: OutlineInputBorder(),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: MoreaColors.violett)),
                                       filled: false,
                                       hintText: 'Ort'),
                                   onSaved: (value) => anfangort = value,
@@ -601,7 +676,13 @@ class EventAddPageState extends State<EventAddPage> {
                                 child: new TextFormField(
                                   initialValue: widget.eventinfo['Schlussort'],
                                   decoration: new InputDecoration(
+                                      errorBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.red)),
                                       border: OutlineInputBorder(),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: MoreaColors.violett)),
                                       filled: false,
                                       hintText: 'Ort'),
                                   onSaved: (value) => schlussort = value,
@@ -654,7 +735,13 @@ class EventAddPageState extends State<EventAddPage> {
                                   initialValue:
                                       widget.eventinfo['Beschreibung'],
                                   decoration: new InputDecoration(
+                                    errorBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red)),
                                     border: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: MoreaColors.violett)),
                                     filled: false,
                                   ),
                                   maxLines: 10,
@@ -678,7 +765,13 @@ class EventAddPageState extends State<EventAddPage> {
                                       ['Pfadiname'],
                                   decoration: new InputDecoration(
                                     hintText: 'Pfadiname',
+                                    errorBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red)),
                                     border: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: MoreaColors.violett)),
                                     filled: false,
                                   ),
                                   onSaved: (value) => pfadiname = value,
@@ -692,7 +785,13 @@ class EventAddPageState extends State<EventAddPage> {
                                       ['Email'],
                                   decoration: new InputDecoration(
                                     hintText: 'Email',
+                                    errorBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red)),
                                     border: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: MoreaColors.violett)),
                                     filled: false,
                                   ),
                                   onSaved: (value) => email = value,
@@ -701,94 +800,88 @@ class EventAddPageState extends State<EventAddPage> {
                             ],
                           )),
                       Container(
-                        height: 400,
                         padding: EdgeInsets.all(10),
-                        child: Column(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Container(
-                              height: 20 * mitnehemen.length.toDouble(),
-                              child: Row(
+                            Expanded(
+                              flex: 3,
+                              child: Text('Mitnehmen'),
+                            ),
+                            Expanded(
+                              flex: 7,
+                              child: Column(
                                 children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Mitnehmen'),
+                                  Column(
+                                    children: buildMitnehmen(),
                                   ),
-                                  Expanded(
-                                    flex: 7,
-                                    child: ListView.builder(
-                                        itemCount: this.mitnehemen.length,
-                                        itemBuilder: (context, index) =>
-                                            this._buildRow(index)),
-                                  )
+                                  Container(
+                                    margin: EdgeInsets.only(top: 0,),
+                                    child: FractionallySizedBox(
+                                      widthFactor: 1,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            flex: 7,
+                                            child: moreaFlatIconButton(
+                                                'ELEMENT',
+                                                this.removeElement,
+                                                Icon(
+                                                  Icons.remove,
+                                                  size: 15,
+                                                  color: MoreaColors.violett,
+                                                )),
+                                          ),
+                                          Expanded(
+                                            flex: 1,
+                                            child: Container(),
+                                          ),
+                                          Expanded(
+                                            flex: 7,
+                                            child: moreaFlatIconButton(
+                                                'ELEMENT',
+                                                this.addElement,
+                                                Icon(
+                                                  Icons.add,
+                                                  size: 14,
+                                                  color: MoreaColors.violett,
+                                                )),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ],
-                              ),
-                            ),
-                            Form(
-                                key: _addkeyLager,
-                                child: Container(
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 3,
-                                        child: SizedBox(),
-                                      ),
-                                      Expanded(
-                                        flex: 5,
-                                        child: new TextFormField(
-                                            decoration: new InputDecoration(
-                                              border: OutlineInputBorder(),
-                                              filled: false,
-                                            ),
-                                            onSaved: (value) =>
-                                                mitnehemen.add(value)),
-                                      ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: new RaisedButton(
-                                          child: new Text('Add',
-                                              style:
-                                                  new TextStyle(fontSize: 15)),
-                                          onPressed: () =>
-                                              _addItem(_addkeyLager),
-                                          shape: new RoundedRectangleBorder(
-                                              borderRadius:
-                                                  new BorderRadius.circular(
-                                                      30.0)),
-                                          color: Color(0xff7a62ff),
-                                          textColor: Colors.white,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )),
-                            SizedBox(height: 30),
-                            Center(
-                              child: new RaisedButton(
-                                child: new Text('Speichern',
-                                    style: TextStyle(fontSize: 25)),
-                                shape: new RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(30.0)),
-                                color: Color(0xff7a62ff),
-                                textColor: Colors.white,
-                                onPressed: () => lagerHinzufuegen(_addLager),
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            Center(
-                              child: new FlatButton(
-                                child: new Text('Lager löschen',
-                                    style: TextStyle(
-                                        fontSize: 25, color: Colors.red)),
-                                shape: new RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(30.0)),
-                                onPressed: () => lagerdelete(),
                               ),
                             )
                           ],
                         ),
                       ),
+                      Container(
+                        margin: EdgeInsets.all(10),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: moreaFlatRedButton(
+                                'Löschen',
+                                this.lagerdelete,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 20),
+                            ),
+                            Expanded(
+                              child: moreaRaisedButton(
+                                'Speichern',
+                                this.lagerHinzufuegen,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                      )
                     ],
                   ))));
     }));
@@ -824,7 +917,13 @@ class EventAddPageState extends State<EventAddPage> {
                                       initialValue:
                                           widget.eventinfo['Eventname'],
                                       decoration: new InputDecoration(
+                                        errorBorder: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.red)),
                                         border: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: MoreaColors.violett)),
                                         filled: false,
                                       ),
                                       onSaved: (value) => eventname = value,
@@ -870,7 +969,13 @@ class EventAddPageState extends State<EventAddPage> {
                                       initialValue:
                                           widget.eventinfo['Anfangsort'],
                                       decoration: new InputDecoration(
+                                          errorBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red)),
                                           border: OutlineInputBorder(),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: MoreaColors.violett)),
                                           filled: false,
                                           hintText: 'Ort'),
                                       onSaved: (value) => anfangort = value,
@@ -900,7 +1005,13 @@ class EventAddPageState extends State<EventAddPage> {
                                       initialValue:
                                           widget.eventinfo['Schlussort'],
                                       decoration: new InputDecoration(
+                                          errorBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red)),
                                           border: OutlineInputBorder(),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: MoreaColors.violett)),
                                           filled: false,
                                           hintText: 'Ort'),
                                       onSaved: (value) => schlussort = value,
@@ -953,7 +1064,13 @@ class EventAddPageState extends State<EventAddPage> {
                                       initialValue:
                                           widget.eventinfo['Beschreibung'],
                                       decoration: new InputDecoration(
+                                        errorBorder: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.red)),
                                         border: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: MoreaColors.violett)),
                                         filled: false,
                                       ),
                                       maxLines: 10,
@@ -977,7 +1094,13 @@ class EventAddPageState extends State<EventAddPage> {
                                           ['Pfadiname'],
                                       decoration: new InputDecoration(
                                         hintText: 'Pfadiname',
+                                        errorBorder: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.red)),
                                         border: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: MoreaColors.violett)),
                                         filled: false,
                                       ),
                                       onSaved: (value) => pfadiname = value,
@@ -991,7 +1114,13 @@ class EventAddPageState extends State<EventAddPage> {
                                           ['Email'],
                                       decoration: new InputDecoration(
                                         hintText: 'Email',
+                                        errorBorder: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.red)),
                                         border: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: MoreaColors.violett)),
                                         filled: false,
                                       ),
                                       onSaved: (value) => email = value,
@@ -1000,123 +1129,91 @@ class EventAddPageState extends State<EventAddPage> {
                                 ],
                               )),
                           Container(
-                            height: 400,
                             padding: EdgeInsets.all(10),
-                            child: Column(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Container(
-                                  height: 20 * mitnehemen.length.toDouble(),
-                                  child: Row(
+                                Expanded(
+                                  flex: 3,
+                                  child: Text('Mitnehmen'),
+                                ),
+                                Expanded(
+                                  flex: 7,
+                                  child: Column(
                                     children: <Widget>[
-                                      Expanded(
-                                        flex: 3,
-                                        child: Text('Mitnehmen'),
+                                      Column(
+                                        children: buildMitnehmen(),
                                       ),
-                                      Expanded(
-                                        flex: 7,
-                                        child: ListView.builder(
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            itemCount: this.mitnehemen.length,
-                                            itemBuilder: (context, index) =>
-                                                this._buildRow(index)),
-                                      )
+                                      Container(
+                                        child: FractionallySizedBox(
+                                          widthFactor: 1,
+                                          child: Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                flex: 7,
+                                                child: moreaFlatIconButton(
+                                                    'ELEMENT',
+                                                    this.removeElement,
+                                                    Icon(
+                                                      Icons.remove,
+                                                      size: 15,
+                                                      color:
+                                                          MoreaColors.violett,
+                                                    )),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Container(),
+                                              ),
+                                              Expanded(
+                                                flex: 7,
+                                                child: moreaFlatIconButton(
+                                                    'ELEMENT',
+                                                    this.addElement,
+                                                    Icon(
+                                                      Icons.add,
+                                                      size: 14,
+                                                      color:
+                                                          MoreaColors.violett,
+                                                    )),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ],
-                                  ),
-                                ),
-                                Form(
-                                    key: _addkeyEvent,
-                                    child: Container(
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            flex: 3,
-                                            child: SizedBox(),
-                                          ),
-                                          Expanded(
-                                            flex: 5,
-                                            child: new TextFormField(
-                                                decoration: new InputDecoration(
-                                                  border: OutlineInputBorder(),
-                                                  filled: false,
-                                                ),
-                                                onSaved: (value) =>
-                                                    mitnehemen.add(value)),
-                                          ),
-                                          Expanded(
-                                            flex: 2,
-                                            child: new RaisedButton(
-                                              child: new Text('Add',
-                                                  style: new TextStyle(
-                                                      fontSize: 15)),
-                                              onPressed: () =>
-                                                  _addItem(_addkeyEvent),
-                                              shape: new RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                          30.0)),
-                                              color: Color(0xff7a62ff),
-                                              textColor: Colors.white,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                                SizedBox(height: 30),
-                                Center(
-                                  child: new RaisedButton(
-                                    child: new Text('Speichern',
-                                        style: TextStyle(fontSize: 25)),
-                                    shape: new RoundedRectangleBorder(
-                                        borderRadius:
-                                            new BorderRadius.circular(30.0)),
-                                    color: Color(0xff7a62ff),
-                                    textColor: Colors.white,
-                                    onPressed: () =>
-                                        eventHinzufuegen(_addEvent),
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                                Center(
-                                  child: new FlatButton(
-                                    child: new Text('Event löschen',
-                                        style: TextStyle(
-                                            fontSize: 25, color: Colors.red)),
-                                    shape: new RoundedRectangleBorder(
-                                        borderRadius:
-                                            new BorderRadius.circular(30.0)),
-                                    onPressed: () => eventdelete(),
                                   ),
                                 )
                               ],
                             ),
                           ),
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: moreaFlatRedButton(
+                                    'Löschen',
+                                    this.eventdelete,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 20),
+                                ),
+                                Expanded(
+                                  child: moreaRaisedButton(
+                                    'Speichern',
+                                    this.eventHinzufuegen,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 20),
+                          )
                         ],
                       ))));
         }));
-  }
-
-  _buildRow(int index) {
-    return new GestureDetector(
-      onTap: () => changemitnehmen(index),
-      child: Container(
-          child: Row(
-        children: <Widget>[
-          Expanded(
-              flex: 1,
-              child: Icon(
-                Icons.brightness_1,
-                size: 10,
-              )),
-          Expanded(
-            flex: 2,
-            child: Text(mitnehemen[index],
-                style: new TextStyle(
-                  fontSize: 15,
-                )),
-          )
-        ],
-      )),
-    );
   }
 }
