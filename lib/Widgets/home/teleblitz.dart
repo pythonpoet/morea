@@ -1135,6 +1135,9 @@ class Info {
   }
 
   Container getMitnehmen() {
+    String stringMitnehmen = this.mitnehmen.split('<ul><li>')[1];
+    stringMitnehmen = stringMitnehmen.split("</li></ul>")[0];
+    List<String> listMitnehmen = stringMitnehmen.split('</li><li>');
     if (this?.antreten?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
@@ -1151,15 +1154,13 @@ class Info {
                   ],
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                      child: Html(
-                    data: this.mitnehmen,
-                    defaultTextStyle: MoreaTextStyle.htmlList,
-                  ))
-                ],
+              ListView.builder(
+                padding: EdgeInsets.only(left: 15),
+                shrinkWrap: true,
+                itemCount: listMitnehmen.length,
+                itemBuilder: (context, index){
+                  return Text('- ' + listMitnehmen[index], style: MoreaTextStyle.normal,);
+                },
               ),
             ],
           ));

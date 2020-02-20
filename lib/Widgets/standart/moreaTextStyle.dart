@@ -23,11 +23,6 @@ class MoreaTextStyle {
       fontSize: 16,
       letterSpacing: 0.5,
       fontWeight: FontWeight.w500);
-  static TextStyle htmlList = TextStyle(
-      fontSize: 13,
-      color: Colors.black,
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w500,);
   static TextStyle textField =
       TextStyle(fontSize: 16, letterSpacing: 0.15, fontWeight: FontWeight.w500);
 
