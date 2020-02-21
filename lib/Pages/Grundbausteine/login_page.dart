@@ -9,6 +9,7 @@ import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:morea/services/utilities/notification.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 

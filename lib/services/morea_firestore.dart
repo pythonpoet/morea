@@ -245,6 +245,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> subscribeToGroup(String groupID) async {
+     await firebaseMessaging.requestNotificationPermissions();
+      firebaseMessaging.configure();
     Map<String, dynamic> tokendata = {
       'devtoken': await firebaseMessaging.getToken()
     };
@@ -259,7 +261,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> setMessageRead(
       String userUID, String messageID, String groupnr) async {
-    userUID = dwiformat.simplestring(userUID);
     var oldMessage =
         await crud0.getDocument('messages', messageID);
     List newRead = [];

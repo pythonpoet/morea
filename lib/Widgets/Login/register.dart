@@ -266,7 +266,7 @@ class Register implements BaseRegister {
         decoration: new InputDecoration(
           border: UnderlineInputBorder(),
           filled: true,
-          labelText: 'Pfadinamen',
+          labelText: 'Pfadiname',
         ),
         onSaved: (value) => moreaUser.pfadiName = value,
       );

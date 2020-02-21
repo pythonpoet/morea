@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -44,10 +45,8 @@ class ViewEventPageState extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(top: 20),
-        ),
         ListTile(
+          contentPadding: EdgeInsets.all(20),
           title: Text(
             info['Eventname'],
             style: MoreaTextStyle.title,
@@ -57,18 +56,17 @@ class ViewEventPageState extends StatelessWidget {
             style: MoreaTextStyle.sender,
           ),
         ),
-        Padding(
-          padding: EdgeInsets.only(right: 15, left: 15, top: 20),
-          child: MoreaDivider(),
-        ),
         ListTile(
           title: Text(
             'Datum',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Datum'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Datum'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -80,9 +78,12 @@ class ViewEventPageState extends StatelessWidget {
             'Beginn',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -94,9 +95,12 @@ class ViewEventPageState extends StatelessWidget {
             'Schluss',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -108,22 +112,24 @@ class ViewEventPageState extends StatelessWidget {
             'Beschreibung',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Beschreibung'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Beschreibung'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
-          contentPadding: EdgeInsets.all(15),
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 15),
           child: MoreaDivider(),
         ),
         ListTile(
+          contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
           title: Text(
             'Mitnehmen',
             style: MoreaTextStyle.lable,
           ),
-          contentPadding: EdgeInsets.all(15),
           subtitle: ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
@@ -132,8 +138,8 @@ class ViewEventPageState extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Text(
-                  info['Mitnehmen'][index],
-                  style: MoreaTextStyle.normal,
+                  '- ' + info['Mitnehmen'][index],
+                  style: MoreaTextStyle.subtitle,
                 ),
               );
             },
@@ -148,9 +154,12 @@ class ViewEventPageState extends StatelessWidget {
             'Kontakt',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Kontakt']['Pfadiname'] + ': ' + info['Kontakt']['Email'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Kontakt']['Pfadiname'] + ': ' + info['Kontakt']['Email'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(

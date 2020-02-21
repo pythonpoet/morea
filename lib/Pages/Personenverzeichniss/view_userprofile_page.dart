@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
@@ -87,10 +88,6 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             'Profil',
             style: MoreaTextStyle.title,
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: MoreaDivider(),
         ),
         ListTile(
           title: Text(
@@ -191,8 +188,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: MoreaDivider(),
+          padding: EdgeInsets.only(top: 20),
         ),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeName extends StatefulWidget {
@@ -67,7 +68,7 @@ class _ChangeNameState extends State<ChangeName> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Vorname',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -79,7 +80,9 @@ class _ChangeNameState extends State<ChangeName> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -94,7 +97,7 @@ class _ChangeNameState extends State<ChangeName> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Nachname',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -106,7 +109,9 @@ class _ChangeNameState extends State<ChangeName> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -121,7 +126,7 @@ class _ChangeNameState extends State<ChangeName> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Pfadiname',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -133,7 +138,9 @@ class _ChangeNameState extends State<ChangeName> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                       ),
                     ),

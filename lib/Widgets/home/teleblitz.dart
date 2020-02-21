@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
 import 'package:morea/Widgets/standart/info.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/crud.dart';
@@ -199,7 +199,7 @@ class Teleblitz {
                                   BoxConstraints(minWidth: 170, maxWidth: 170),
                               child: Center(
                                   child: new Text(abmelden,
-                                      style: MoreaTextStyle.button))),
+                                      style: MoreaTextStyle.flatButton))),
                           onPressed: () {
                             if (name == null) {
                               submit(eventMapAnmeldeStatusNegativ, groupID,
@@ -233,7 +233,7 @@ class Teleblitz {
                                 borderRadius: BorderRadius.circular(30)),
                             child: Center(
                                 child: new Text(anmelden,
-                                    style: MoreaTextStyle.button)),
+                                    style: MoreaTextStyle.flatButton)),
                             width: 120,
                           ),
                           onPressed: () {
@@ -288,7 +288,7 @@ class Teleblitz {
                               borderRadius: BorderRadius.circular(30)),
                           child: Center(
                               child: new Text(anmelden,
-                                  style: MoreaTextStyle.button)),
+                                  style: MoreaTextStyle.flatButton)),
                           width: 120,
                         ),
                         onPressed: () {
@@ -332,7 +332,7 @@ class Teleblitz {
                                 BoxConstraints(minWidth: 170, maxWidth: 170),
                             child: Center(
                                 child: new Text(abmelden,
-                                    style: MoreaTextStyle.button))),
+                                    style: MoreaTextStyle.flatButton))),
                         onPressed: () {
                           if (name == null) {
                             submit(eventMapAnmeldeStatusNegativ, groupID,
@@ -977,16 +977,12 @@ class Info {
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Beginn", style: MoreaTextStyle.lable)),
+                child: Text("Beginn:", style: MoreaTextStyle.lable)),
             Expanded(
               child: InkWell(
                 child: Text(
                   this.antreten,
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromARGB(255, 0, 0, 255),
-                      decoration: TextDecoration.underline),
+                  style: MoreaTextStyle.link,
                 ),
                 onTap: () {
                   urllauncher.openlinkMaps(this.antretenMap);
@@ -995,10 +991,6 @@ class Info {
             )
           ],
         ),
-        /*child: Center(
-        child: Text(this.antreten, style: TextStyle(fontSize: 18)),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 20),*/
       );
     } else {
       return Container();
@@ -1014,16 +1006,12 @@ class Info {
           children: <Widget>[
             SizedBox(
                 width: this._sizeleft,
-                child: Text("Schluss", style: MoreaTextStyle.lable)),
+                child: Text("Schluss:", style: MoreaTextStyle.lable)),
             Expanded(
                 child: InkWell(
               child: Text(
                 this.abtreten,
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromARGB(255, 0, 0, 255),
-                    decoration: TextDecoration.underline),
+                style: MoreaTextStyle.link,
               ),
               onTap: () {
                 urllauncher.openlinkMaps(this.abtretenMap);
@@ -1054,7 +1042,7 @@ class Info {
         children: <Widget>[
           SizedBox(
               width: this._sizeleft,
-              child: Text("Datum", style: MoreaTextStyle.lable)),
+              child: Text("Datum:", style: MoreaTextStyle.lable)),
           Expanded(
               child: Text(
             this.datum,
@@ -1147,6 +1135,9 @@ class Info {
   }
 
   Container getMitnehmen() {
+    String stringMitnehmen = this.mitnehmen.split('<ul><li>')[1];
+    stringMitnehmen = stringMitnehmen.split("</li></ul>")[0];
+    List<String> listMitnehmen = stringMitnehmen.split('</li><li>');
     if (this?.antreten?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
@@ -1163,15 +1154,13 @@ class Info {
                   ],
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                      child: Html(
-                    data: this.mitnehmen,
-                    defaultTextStyle: MoreaTextStyle.htmlList,
-                  ))
-                ],
+              ListView.builder(
+                padding: EdgeInsets.only(left: 15),
+                shrinkWrap: true,
+                itemCount: listMitnehmen.length,
+                itemBuilder: (context, index){
+                  return Text('- ' + listMitnehmen[index], style: MoreaTextStyle.normal,);
+                },
               ),
             ],
           ));

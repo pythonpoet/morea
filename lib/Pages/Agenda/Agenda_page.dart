@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/agenda.dart' as prefix0;
 import 'package:morea/services/auth.dart';
@@ -318,7 +319,7 @@ class _AgendaStatePage extends State<AgendaState>
                 child: Center(
                     child: Text(
                   'Keine Events/Lager eingetragen',
-                  style: TextStyle(fontSize: 20),
+                  style: MoreaTextStyle.normal,
                 )),
               ),
             );
@@ -328,7 +329,7 @@ class _AgendaStatePage extends State<AgendaState>
                 child: Center(
                     child: Text(
                   'Keine Events/Lager eingetragen',
-                  style: TextStyle(fontSize: 20),
+                  style: MoreaTextStyle.normal,
                 )),
               ),
             );
@@ -345,11 +346,6 @@ class _AgendaStatePage extends State<AgendaState>
                           'Agenda',
                           style: MoreaTextStyle.title,
                         ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                        child: MoreaDivider(),
                       ),
                       ListView.separated(
                           physics: NeverScrollableScrollPhysics(),
@@ -377,24 +373,25 @@ class _AgendaStatePage extends State<AgendaState>
                                         padding: const EdgeInsets.only(top: 10),
                                         child: Text(
                                           _info['Datum'].toString(),
-                                          style: MoreaTextStyle.normal,
+                                          style: MoreaTextStyle.subtitle,
                                         ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: Text(
                                           'Event',
-                                          style: MoreaTextStyle.normal,
+                                          style: MoreaTextStyle.subtitle,
                                         ),
                                       )
                                     ],
                                   ),
+                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
                                   title: Text(
                                     _info['Eventname'].toString(),
                                     style: MoreaTextStyle.lable,
                                   ),
                                   trailing: _info['groupID'] == null
-                                      ? Text('Error')
+                                      ? Text('')
                                       : Text(
                                           convMiDatatoWebflow(_info['groupID']),
                                           style: MoreaTextStyle.sender,
@@ -414,19 +411,20 @@ class _AgendaStatePage extends State<AgendaState>
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: Text(
-                                          _info['Eventname'],
-                                          style: MoreaTextStyle.normal,
+                                          _info['Datum'],
+                                          style: MoreaTextStyle.subtitle,
                                         ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: Text(
                                           'Lager',
-                                          style: MoreaTextStyle.normal,
+                                          style: MoreaTextStyle.subtitle,
                                         ),
                                       )
                                     ],
                                   ),
+                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
                                   trailing: _info['groupID'] == null
                                       ? Text('Error')
                                       : Text(

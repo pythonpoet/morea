@@ -3,6 +3,8 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
@@ -93,26 +95,23 @@ class _ChangeProfileState extends State<ChangeProfile>
                       style: MoreaTextStyle.title,
                     ),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(
-                        thickness: 1,
-                        color: Colors.black26,
-                      )),
                   ListTile(
                     title: Text(
                       'Name',
                       style: MoreaTextStyle.lable,
                     ),
-                    subtitle: Text(
-                      userInfo['Pfadinamen'] == ''
-                          ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
-                          : userInfo['Vorname'] +
-                              ' ' +
-                              userInfo['Nachname'] +
-                              ' v/o ' +
-                              userInfo['Pfadinamen'],
-                      style: MoreaTextStyle.normal,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        userInfo['Pfadinamen'] == ''
+                            ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
+                            : userInfo['Vorname'] +
+                                ' ' +
+                                userInfo['Nachname'] +
+                                ' v/o ' +
+                                userInfo['Pfadinamen'],
+                        style: MoreaTextStyle.subtitle,
+                      ),
                     ),
                     trailing: Icon(
                       Icons.arrow_forward_ios,
@@ -124,6 +123,11 @@ class _ChangeProfileState extends State<ChangeProfile>
                             userInfo['Nachname'],
                             userInfo['Pfadinamen'],
                             _changeName))),
+                    contentPadding: EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                      bottom: 5,
+                    ),
                   ),
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -136,14 +140,24 @@ class _ChangeProfileState extends State<ChangeProfile>
                       'Adresse',
                       style: MoreaTextStyle.lable,
                     ),
-                    subtitle: Text(
-                      userInfo['Adresse'] +
-                          ', ' +
-                          userInfo['PLZ'] +
-                          ' ' +
-                          userInfo['Ort'],
-                      style: MoreaTextStyle.normal,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            userInfo['Adresse'],
+                            style: MoreaTextStyle.subtitle,
+                          ),
+                          Text(
+                            userInfo['PLZ'] + ' ' + userInfo['Ort'],
+                            style: MoreaTextStyle.subtitle,
+                          )
+                        ],
+                      ),
                     ),
+                    contentPadding:
+                        EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                     trailing: Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.black,
@@ -166,10 +180,15 @@ class _ChangeProfileState extends State<ChangeProfile>
                         'E-Mail-Adresse',
                         style: MoreaTextStyle.lable,
                       ),
-                      subtitle: Text(
-                        userInfo['Email'],
-                        style: MoreaTextStyle.normal,
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          userInfo['Email'],
+                          style: MoreaTextStyle.subtitle,
+                        ),
                       ),
+                      contentPadding: EdgeInsets.only(
+                          left: 15, right: 15, bottom: 5, top: 5),
                       trailing: Icon(
                         Icons.arrow_forward_ios,
                         color: Colors.black,
@@ -188,10 +207,15 @@ class _ChangeProfileState extends State<ChangeProfile>
                       'Handynummer',
                       style: MoreaTextStyle.lable,
                     ),
-                    subtitle: Text(
-                      userInfo['Handynummer'],
-                      style: MoreaTextStyle.normal,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        userInfo['Handynummer'],
+                        style: MoreaTextStyle.subtitle,
+                      ),
                     ),
+                    contentPadding:
+                        EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                     trailing: Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.black,
@@ -211,10 +235,15 @@ class _ChangeProfileState extends State<ChangeProfile>
                       'Geschlecht',
                       style: MoreaTextStyle.lable,
                     ),
-                    subtitle: Text(
-                      userInfo['Geschlecht'],
-                      style: MoreaTextStyle.normal,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        userInfo['Geschlecht'],
+                        style: MoreaTextStyle.subtitle,
+                      ),
                     ),
+                    contentPadding:
+                        EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                     trailing: Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.black,
@@ -227,30 +256,37 @@ class _ChangeProfileState extends State<ChangeProfile>
                         thickness: 1,
                         color: Colors.black26,
                       )),
-                  userInfo.containsKey("Geburtstag")? Column(children:[
-                  ListTile(
-                    title: Text(
-                      'Geburtstag',
-                      style: MoreaTextStyle.lable,
-                    ),
-                    subtitle: Text(
-                      userInfo['Geburtstag'],
-                      style: MoreaTextStyle.normal,
-                    ),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.black,
-                    ),
-                    onTap: () => _changeGeburtstag(),
-                  ),Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Divider(
-                        thickness: 1,
-                        color: Colors.black26,
-                      )),])
-                  :
-                  Container(),
-                  
+                  userInfo.containsKey("Geburtstag")
+                      ? Column(children: [
+                          ListTile(
+                            title: Text(
+                              'Geburtstag',
+                              style: MoreaTextStyle.lable,
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Text(
+                                userInfo['Geburtstag'],
+                                style: MoreaTextStyle.subtitle,
+                              ),
+                            ),
+                            contentPadding: EdgeInsets.only(
+                                left: 15, right: 15, bottom: 5, top: 5),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.black,
+                            ),
+                            onTap: () => _changeGeburtstag(),
+                          ),
+                          Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Divider(
+                                thickness: 1,
+                                color: Colors.black26,
+                              )),
+                        ])
+                      : Container(),
                   ListTile(
                     title: Text(
                       'Passwort',
@@ -342,25 +378,14 @@ class _ChangeProfileState extends State<ChangeProfile>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.cancel,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  label: Text(
-                    "Abbrechen",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+              moreaRaisedIconButton('Abbrechen', this.navigatorPop, Icon(Icons.cancel, color: Colors.white, size: 15,))
             ],
           );
         });
+  }
+
+  void navigatorPop() {
+    Navigator.of(context).pop();
   }
 
   void _changeGeburtstag() async {
@@ -376,7 +401,7 @@ class _ChangeProfileState extends State<ChangeProfile>
         onConfirm: (date) {
       userInfo['Geburtstag'] =
           DateFormat('dd.MM.yyy', 'de').format(date).toString();
-    }, currentTime: DateTime.now(), locale: LocaleType.de);
+    }, currentTime: DateTime.now().add(Duration(days: -365 * 4)), locale: LocaleType.de);
 
     setState(() {});
   }
