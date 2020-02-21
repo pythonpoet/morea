@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -57,7 +58,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Neues Passwort',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -70,7 +71,9 @@ class _ChangePasswordState extends State<ChangePassword> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -91,7 +94,9 @@ class _ChangePasswordState extends State<ChangePassword> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {

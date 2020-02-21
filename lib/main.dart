@@ -8,7 +8,6 @@ import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/utilities/notification.dart';
 import 'morealayout.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   notificationGetPermission();

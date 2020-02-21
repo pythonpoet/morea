@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
@@ -114,16 +115,21 @@ class _ProfileState extends State<Profile> {
                     'Name',
                     style: MoreaTextStyle.lable,
                   ),
-                  subtitle: Text(
-                    userInfo['Pfadinamen'] == ''
-                        ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
-                        : userInfo['Vorname'] +
-                            ' ' +
-                            userInfo['Nachname'] +
-                            ' v/o ' +
-                            userInfo['Pfadinamen'],
-                    style: MoreaTextStyle.normal,
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      userInfo['Pfadinamen'] == ''
+                          ? userInfo['Vorname'] + ' ' + userInfo['Nachname']
+                          : userInfo['Vorname'] +
+                              ' ' +
+                              userInfo['Nachname'] +
+                              ' v/o ' +
+                              userInfo['Pfadinamen'],
+                      style: MoreaTextStyle.subtitle,
+                    ),
                   ),
+                  contentPadding:
+                      EdgeInsets.only(left: 15, right: 15, bottom: 5),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -136,19 +142,24 @@ class _ProfileState extends State<Profile> {
                     'Adresse',
                     style: MoreaTextStyle.lable,
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        userInfo['Adresse'] + ', ',
-                        style: MoreaTextStyle.normal,
-                      ),
-                      Text(
-                        userInfo['PLZ'] + ' ' + userInfo['Ort'],
-                        style: MoreaTextStyle.normal,
-                      )
-                    ],
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          userInfo['Adresse'] + ', ',
+                          style: MoreaTextStyle.subtitle,
+                        ),
+                        Text(
+                          userInfo['PLZ'] + ' ' + userInfo['Ort'],
+                          style: MoreaTextStyle.subtitle,
+                        )
+                      ],
+                    ),
                   ),
+                  contentPadding:
+                      EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -161,10 +172,15 @@ class _ProfileState extends State<Profile> {
                     'E-Mail-Adresse',
                     style: MoreaTextStyle.lable,
                   ),
-                  subtitle: Text(
-                    userInfo['Email'],
-                    style: MoreaTextStyle.normal,
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      userInfo['Email'],
+                      style: MoreaTextStyle.subtitle,
+                    ),
                   ),
+                  contentPadding:
+                      EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -177,10 +193,15 @@ class _ProfileState extends State<Profile> {
                     'Handynummer',
                     style: MoreaTextStyle.lable,
                   ),
-                  subtitle: Text(
-                    userInfo['Handynummer'],
-                    style: MoreaTextStyle.normal,
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      userInfo['Handynummer'],
+                      style: MoreaTextStyle.subtitle,
+                    ),
                   ),
+                  contentPadding:
+                      EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -193,10 +214,15 @@ class _ProfileState extends State<Profile> {
                     'Geschlecht',
                     style: MoreaTextStyle.lable,
                   ),
-                  subtitle: Text(
-                    userInfo['Geschlecht'],
-                    style: MoreaTextStyle.normal,
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      userInfo['Geschlecht'],
+                      style: MoreaTextStyle.subtitle,
+                    ),
                   ),
+                  contentPadding:
+                      EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -210,10 +236,15 @@ class _ProfileState extends State<Profile> {
                           'Geburtstag',
                           style: MoreaTextStyle.lable,
                         ),
-                        subtitle: Text(
-                          userInfo['Geburtstag'],
-                          style: MoreaTextStyle.normal,
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Text(
+                            userInfo['Geburtstag'],
+                            style: MoreaTextStyle.subtitle,
+                          ),
                         ),
+                        contentPadding: EdgeInsets.only(
+                            left: 15, right: 15, bottom: 5, top: 5),
                       )
                     : Container(),
                 Padding(

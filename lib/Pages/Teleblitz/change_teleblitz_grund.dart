@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeGrund extends StatefulWidget {
@@ -78,7 +79,9 @@ class _ChangeGrundState extends State<ChangeGrund> {
                             style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                               border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
                               if (value.isEmpty) {

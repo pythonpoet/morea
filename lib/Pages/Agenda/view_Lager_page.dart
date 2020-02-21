@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -53,6 +54,7 @@ class ViewLagerPageState extends StatelessWidget {
           contentPadding: EdgeInsets.all(20),
         ),
         ListTile(
+          contentPadding: EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 10),
             title: Text(
               'Datum',
               style: MoreaTextStyle.lable,
@@ -65,14 +67,14 @@ class ViewLagerPageState extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
                     'von: ' + info['Datum'],
-                    style: MoreaTextStyle.normal,
+                    style: MoreaTextStyle.subtitle,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 10),
                   child: Text(
                     'bis: ' + info['Datum bis'],
-                    style: MoreaTextStyle.normal,
+                    style: MoreaTextStyle.subtitle,
                   ),
                 )
               ],
@@ -86,9 +88,12 @@ class ViewLagerPageState extends StatelessWidget {
             'Lagerort',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Lagerort'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Lagerort'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -100,9 +105,12 @@ class ViewLagerPageState extends StatelessWidget {
             'Beginn',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -114,9 +122,12 @@ class ViewLagerPageState extends StatelessWidget {
             'Schluss',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -128,9 +139,12 @@ class ViewLagerPageState extends StatelessWidget {
             'Beschreibung',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Beschreibung'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Beschreibung'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(
@@ -142,6 +156,7 @@ class ViewLagerPageState extends StatelessWidget {
             'Mitnehmen',
             style: MoreaTextStyle.lable,
           ),
+          contentPadding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
           subtitle: ListView.builder(
               itemCount: info['Mitnehmen'].length,
               shrinkWrap: true,
@@ -151,7 +166,7 @@ class ViewLagerPageState extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
                     '- ' + info['Mitnehmen'][index],
-                    style: MoreaTextStyle.normal,
+                    style: MoreaTextStyle.subtitle,
                   ),
                 );
               }),
@@ -165,9 +180,12 @@ class ViewLagerPageState extends StatelessWidget {
             'Kontakt',
             style: MoreaTextStyle.lable,
           ),
-          subtitle: Text(
-            info['Kontakt']['Pfadiname'] + ': ' + info['Kontakt']['Email'],
-            style: MoreaTextStyle.normal,
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              info['Kontakt']['Pfadiname'] + ': ' + info['Kontakt']['Email'],
+              style: MoreaTextStyle.subtitle,
+            ),
           ),
         ),
         Padding(

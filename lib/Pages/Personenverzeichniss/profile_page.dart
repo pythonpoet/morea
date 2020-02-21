@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/crud.dart';
@@ -489,7 +490,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 RaisedButton(
                   child: Text(
                     'Abbrechen',
-                    style: MoreaTextStyle.button,
+                    style: MoreaTextStyle.flatButton,
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                   shape: RoundedRectangleBorder(
@@ -498,7 +499,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 RaisedButton(
                   child: Text(
                     'Account erstellen',
-                    style: MoreaTextStyle.button,
+                    style: MoreaTextStyle.flatButton,
                   ),
                   onPressed: () {
                     this.upgradeKid(childMap);

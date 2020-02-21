@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeEmail extends StatefulWidget {
@@ -61,7 +62,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'E-Mail-Adresse',
-                        style: MoreaTextStyle.lable,
+                        style: MoreaTextStyle.caption,
                       ),
                     ),
                     Padding(
@@ -73,7 +74,9 @@ class _ChangeEmailState extends State<ChangeEmail> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {

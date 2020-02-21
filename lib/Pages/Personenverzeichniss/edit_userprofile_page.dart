@@ -5,6 +5,7 @@ import 'package:morea/Pages/Profil/change_email.dart';
 import 'package:morea/Pages/Profil/change_name.dart';
 import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/cloud_functions.dart';
