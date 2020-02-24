@@ -25,6 +25,12 @@ class MoreaTextStyle {
       fontSize: 16,
       letterSpacing: 0.15);
 
+  static TextStyle lableOrange = TextStyle(
+      color: MoreaColors.orange,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+      letterSpacing: 0.15);
+
   static TextStyle normal = TextStyle(
       color: Colors.black,
       fontSize: 16,

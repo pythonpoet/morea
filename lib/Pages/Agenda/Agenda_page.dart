@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
@@ -311,8 +312,7 @@ class _AgendaStatePage extends State<AgendaState>
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
-            return MoreaBackgroundContainer(
-                child: moreaLoading.loading());
+            return MoreaBackgroundContainer(child: moreaLoading.loading());
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(
               child: MoreaShadowContainer(
@@ -351,78 +351,158 @@ class _AgendaStatePage extends State<AgendaState>
                             altevernichten(_info['Datum'], groupID, _info);
 
                             if (_info['Event']) {
-                              return Card(
-                                child: ListTile(
-                                    key: ObjectKey(_info),
-                                    subtitle: ListView(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            _info['Datum'].toString(),
-                                            style: MoreaTextStyle.subtitle,
+                              return GestureDetector(
+                                onTap: () => viewEvent(context, _info),
+                                child: Card(
+                                  key: ObjectKey(_info),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 100,
+                                        child: AspectRatio(
+                                          aspectRatio: 1.0,
+                                          child: Container(
+                                            margin: EdgeInsets.all(10),
+                                            padding: EdgeInsets.only(right: 10),
+                                            decoration: BoxDecoration(
+                                                border: Border(
+                                                    right: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.black))),
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/icon/event.png'),
+                                            ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            'Event',
-                                            style: MoreaTextStyle.subtitle,
+                                      ),
+                                      Expanded(
+                                        child: ListTile(
+                                          subtitle: ListView(
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            children: <Widget>[
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10),
+                                                child: Text(
+                                                  _info['Datum'].toString(),
+                                                  style:
+                                                      MoreaTextStyle.subtitle,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10),
+                                                child: Text(
+                                                  'Event',
+                                                  style:
+                                                      MoreaTextStyle.subtitle,
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                    contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
-                                    title: Text(
-                                      _info['Eventname'].toString(),
-                                      style: MoreaTextStyle.lableViolett,
-                                    ),
-                                    trailing: _info['groupID'] == null
-                                        ? Text('')
-                                        : Text(
-                                            convMiDatatoWebflow(_info['groupID']),
-                                            style: MoreaTextStyle.sender,
+                                          contentPadding: EdgeInsets.only(
+                                              left: 15,
+                                              right: 15,
+                                              bottom: 10,
+                                              top: 10),
+                                          title: Text(
+                                            _info['Eventname'].toString(),
+                                            style: MoreaTextStyle.lableViolett,
                                           ),
-                                    onTap: () => viewEvent(context, _info)),
+                                          trailing: _info['groupID'] == null
+                                              ? Text('')
+                                              : Text(
+                                                  convMiDatatoWebflow(
+                                                      _info['groupID']),
+                                                  style: MoreaTextStyle.sender,
+                                                ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             } else if (_info['Lager']) {
-                              return Card(
-                                child: ListTile(
-                                    key: ObjectKey(_info),
-                                    title: Text(
-                                      _info['Eventname'],
-                                      style: MoreaTextStyle.lableViolett,
-                                    ),
-                                    subtitle: ListView(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            _info['Datum'],
-                                            style: MoreaTextStyle.subtitle,
+                              return GestureDetector(
+                                onTap: () => viewLager(context, _info),
+                                child: Card(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 100,
+                                        child: AspectRatio(
+                                          aspectRatio: 1.0,
+                                          child: Container(
+                                            margin: EdgeInsets.all(10),
+                                            padding: EdgeInsets.only(right: 10),
+                                            decoration: BoxDecoration(
+                                                border: Border(
+                                                    right: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.black))),
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/icon/lager.png'),
+                                            ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            'Lager',
-                                            style: MoreaTextStyle.subtitle,
+                                      ),
+                                      Expanded(
+                                        child: ListTile(
+                                          key: ObjectKey(_info),
+                                          title: Text(
+                                            _info['Eventname'],
+                                            style: MoreaTextStyle.lableViolett,
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                    contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
-                                    trailing: _info['groupID'] == null
-                                        ? Text('Error')
-                                        : Text(
-                                            convMiDatatoWebflow(_info['groupID']),
-                                            style: MoreaTextStyle.sender,
+                                          subtitle: ListView(
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            children: <Widget>[
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10),
+                                                child: Text(
+                                                  _info['Datum'],
+                                                  style:
+                                                      MoreaTextStyle.subtitle,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10),
+                                                child: Text(
+                                                  'Lager',
+                                                  style:
+                                                      MoreaTextStyle.subtitle,
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                    onTap: () => viewLager(context, _info)),
+                                          contentPadding: EdgeInsets.only(
+                                              left: 15,
+                                              right: 15,
+                                              bottom: 10,
+                                              top: 10),
+                                          trailing: _info['groupID'] == null
+                                              ? Text('Error')
+                                              : Text(
+                                                  convMiDatatoWebflow(
+                                                      _info['groupID']),
+                                                  style: MoreaTextStyle.sender,
+                                                ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             } else {
                               return SizedBox();
