@@ -398,64 +398,59 @@ class _MessagesPageState extends State<MessagesPage>
     }
     String receiversString = receivers.join(',');
     if (!(document['read'].contains(this.uid))) {
-      return Container(
-          padding: EdgeInsets.only(right: 20, left: 20),
-          child: ListTile(
-            key: UniqueKey(),
-            title: Text(document['title'], style: MoreaTextStyle.lable),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('von: ${document['sender']}',
-                    style: MoreaTextStyle.sender),
-                Text(
-                    'für: $receiversString', style: MoreaTextStyle.sender,),
-              ],
-            ),
-            contentPadding: EdgeInsets.only(),
-            leading: CircleAvatar(
-              child: Text(document['sender'][0]),
-            ),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () async {
-              await moreaFire.setMessageRead(
-                  this.uid, document.documentID, this.stufe);
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (BuildContext context) {
-                return SingleMessagePage(message);
-              }));
-            },
-          ));
-    } else {
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: ListTile(
-          key: UniqueKey(),
-          title: Text(
-            document['title'],
-            style: MoreaTextStyle.normal,
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text('von: ${document['sender']}',
-                  style: MoreaTextStyle.sender),
-              Text(
-                'für: $receiversString', style: MoreaTextStyle.sender,),
-            ],
-          ),
-          contentPadding: EdgeInsets.only(),
-          leading: CircleAvatar(
-            child: Text(document['sender'][0]),
-          ),
-          trailing: Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) {
-              return SingleMessagePage(message);
-            }));
-          },
+      return ListTile(
+        key: UniqueKey(),
+        title: Text(document['title'], style: MoreaTextStyle.lableViolett),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('von: ${document['sender']}',
+                style: MoreaTextStyle.senderBold),
+            Text(
+                'für: $receiversString', style: MoreaTextStyle.senderBold,),
+          ],
         ),
+        contentPadding: EdgeInsets.only(right: 15, left: 15),
+        leading: CircleAvatar(
+          child: Text(document['sender'][0] + document['sender'][1], style: MoreaTextStyle.lable,),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, color: MoreaColors.violett,),
+        onTap: () async {
+          await moreaFire.setMessageRead(
+              this.uid, document.documentID, this.stufe);
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return SingleMessagePage(message);
+          }));
+        },
+      );
+    } else {
+      return ListTile(
+        key: UniqueKey(),
+        title: Text(
+          document['title'],
+          style: MoreaTextStyle.normal,
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('von: ${document['sender']}',
+                style: MoreaTextStyle.sender),
+            Text(
+              'für: $receiversString', style: MoreaTextStyle.sender,),
+          ],
+        ),
+        contentPadding: EdgeInsets.only(left: 15, right: 15),
+        leading: CircleAvatar(
+          child: Text(document['sender'][0] + document['sender'][1], style: MoreaTextStyle.lable,),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios),
+        onTap: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return SingleMessagePage(message);
+          }));
+        },
       );
     }
   }

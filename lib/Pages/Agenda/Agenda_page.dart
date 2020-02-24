@@ -336,109 +336,98 @@ class _AgendaStatePage extends State<AgendaState>
           } else {
             return MoreaBackgroundContainer(
               child: SingleChildScrollView(
-                child: MoreaShadowContainer(
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text(
-                          'Agenda',
-                          style: MoreaTextStyle.title,
-                        ),
-                      ),
-                      ListView.separated(
+                      ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: slagenda.data.length,
                           shrinkWrap: true,
-                          separatorBuilder: (context, int index) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: MoreaDivider(),
-                            );
-                          },
                           itemBuilder: (context, int index) {
                             final Map<String, dynamic> _info =
                                 Map<String, dynamic>.from(slagenda.data[index]);
                             altevernichten(_info['Datum'], groupID, _info);
 
                             if (_info['Event']) {
-                              return ListTile(
-                                  key: ObjectKey(_info),
-                                  subtitle: ListView(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          _info['Datum'].toString(),
-                                          style: MoreaTextStyle.subtitle,
+                              return Card(
+                                child: ListTile(
+                                    key: ObjectKey(_info),
+                                    subtitle: ListView(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            _info['Datum'].toString(),
+                                            style: MoreaTextStyle.subtitle,
+                                          ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          'Event',
-                                          style: MoreaTextStyle.subtitle,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
-                                  title: Text(
-                                    _info['Eventname'].toString(),
-                                    style: MoreaTextStyle.lable,
-                                  ),
-                                  trailing: _info['groupID'] == null
-                                      ? Text('')
-                                      : Text(
-                                          convMiDatatoWebflow(_info['groupID']),
-                                          style: MoreaTextStyle.sender,
-                                        ),
-                                  onTap: () => viewEvent(context, _info));
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            'Event',
+                                            style: MoreaTextStyle.subtitle,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+                                    title: Text(
+                                      _info['Eventname'].toString(),
+                                      style: MoreaTextStyle.lableViolett,
+                                    ),
+                                    trailing: _info['groupID'] == null
+                                        ? Text('')
+                                        : Text(
+                                            convMiDatatoWebflow(_info['groupID']),
+                                            style: MoreaTextStyle.sender,
+                                          ),
+                                    onTap: () => viewEvent(context, _info)),
+                              );
                             } else if (_info['Lager']) {
-                              return ListTile(
-                                  key: ObjectKey(_info),
-                                  title: Text(
-                                    _info['Eventname'],
-                                    style: MoreaTextStyle.lable,
-                                  ),
-                                  subtitle: ListView(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          _info['Datum'],
-                                          style: MoreaTextStyle.subtitle,
+                              return Card(
+                                child: ListTile(
+                                    key: ObjectKey(_info),
+                                    title: Text(
+                                      _info['Eventname'],
+                                      style: MoreaTextStyle.lableViolett,
+                                    ),
+                                    subtitle: ListView(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            _info['Datum'],
+                                            style: MoreaTextStyle.subtitle,
+                                          ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          'Lager',
-                                          style: MoreaTextStyle.subtitle,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
-                                  trailing: _info['groupID'] == null
-                                      ? Text('Error')
-                                      : Text(
-                                          convMiDatatoWebflow(_info['groupID']),
-                                          style: MoreaTextStyle.sender,
-                                        ),
-                                  onTap: () => viewLager(context, _info));
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            'Lager',
+                                            style: MoreaTextStyle.subtitle,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+                                    trailing: _info['groupID'] == null
+                                        ? Text('Error')
+                                        : Text(
+                                            convMiDatatoWebflow(_info['groupID']),
+                                            style: MoreaTextStyle.sender,
+                                          ),
+                                    onTap: () => viewLager(context, _info)),
+                              );
                             } else {
                               return SizedBox();
                             }
                           }),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 20),
-                      )
                     ],
                   ),
                 ),

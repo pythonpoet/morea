@@ -18,6 +18,13 @@ class MoreaTextStyle {
       fontWeight: FontWeight.w600,
       fontSize: 16,
       letterSpacing: 0.15);
+
+  static TextStyle lableViolett = TextStyle(
+      color: MoreaColors.violett,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+      letterSpacing: 0.15);
+
   static TextStyle normal = TextStyle(
       color: Colors.black,
       fontSize: 16,
@@ -41,6 +48,9 @@ class MoreaTextStyle {
 
   static TextStyle sender =
       TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.normal, letterSpacing: 1.5);
+
+  static TextStyle senderBold =
+  TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1.5);
 
   static TextStyle raisedButton = TextStyle(
       fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white);
