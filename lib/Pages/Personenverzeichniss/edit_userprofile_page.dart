@@ -112,6 +112,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   print(elternMap);
                   await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
                 }
+                if(widget.profile['UID'] == null){
+                  widget.profile['UID'] = widget.profile['childUID'];
+                }
                 await callFunction(getcallable('deleteUserMap'), param: {'UID': widget.profile['UID'], 'groupID': widget.profile[userMapgroupID],});
                 Navigator.pop(context);
               })
@@ -268,7 +271,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'E-Mail-Adresse',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: Text(_email),
+        subtitle: _email == null ? null : Text(_email),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
                 ChangeEmail(_email, changeEmail))),
@@ -286,7 +289,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'Handynummer',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: Text(_handynummer),
+        subtitle: _handynummer == null ? null : Text(_handynummer),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
                 ChangePhoneNumber(_handynummer, changePhoneNumber))),

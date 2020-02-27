@@ -125,7 +125,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             style: MoreaTextStyle.lable,
           ),
           subtitle: Text(
-            profile["Email"],
+            profile["Email"] == null ? '' : profile['Email'],
             style: MoreaTextStyle.normal,
           ),
           onTap: () => urllauncher.openMail(profile['Email']),
@@ -140,7 +140,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             style: MoreaTextStyle.lable,
           ),
           subtitle: Text(
-            profile['Handynummer'],
+            profile['Handynummer'] == null ? '' : profile['Handynummer'],
             style: MoreaTextStyle.normal,
           ),
           onTap: () => urllauncher.openPhone(profile['Handynummer']),
