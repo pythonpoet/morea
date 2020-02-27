@@ -53,7 +53,7 @@ flutter_icons:
     android: false
     ios: true
     image_path: "assets/icon/morea_transparent.png"
-    adaptive_icon_background: "#ffffff"
+    adaptive_icon_background: "#000000"
 
 
 
