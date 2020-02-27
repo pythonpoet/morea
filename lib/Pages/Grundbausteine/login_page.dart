@@ -270,9 +270,7 @@ class _LoginPageState extends State<LoginPage> {
                       key: formKey,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height >= 1100.0
-                            ? MediaQuery.of(context).size.height
-                            : 1100.0,
+                        height: (_formType  == FormType.login)? MediaQuery.of(context).size.height - 117: 1100,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buildInputs(),
@@ -432,8 +430,11 @@ class _LoginPageState extends State<LoginPage> {
           textColor: Colors.white,
         ),
         new FlatButton(
-          child: new Text(
-            'Noch kein Konto? Hier registrieren',
+          child:    new Text(
+            MediaQuery.of(context).size.width < 376?
+              'Noch kein Konto? \nHier registrieren'
+              :
+              'Noch kein Konto? Hier registrieren',
             style: new TextStyle(fontSize: 20),
           ),
           onPressed: moveToRegister,
