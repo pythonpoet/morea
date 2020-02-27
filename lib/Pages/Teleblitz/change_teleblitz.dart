@@ -471,7 +471,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       'ferien': this.ferien,
       'keine-aktivitat': this.keineAktivitaet,
       '_draft': false,
-      '_archived': false
+      '_archived': false,
+      'groupIDs': [convWebflowtoMiData(stufe)],
     };
     teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
     await widget.moreaFire
@@ -597,6 +598,7 @@ class TeleblitzManager {
     var result = newTeleblitz['ende-ferien'].split('.');
     newTeleblitz['ende-ferien'] =
         result[2] + '-' + result[1] + '-' + result[0] + 'T00:00:00.000Z';
+    newTeleblitz.remove('groupIDs');
     var jsonMap = {"fields": newTeleblitz};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
