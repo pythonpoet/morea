@@ -499,7 +499,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 RaisedButton(
                   child: Text(
                     'Account erstellen',
-                    style: MoreaTextStyle.flatButton,
+                    style: MoreaTextStyle.raisedButton,
                   ),
                   onPressed: () {
                     this.upgradeKid(childMap);

@@ -105,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                 if (datenschutz.akzeptiert) {
                   moreaUser.pos = "Teilnehmer";
                   await moreaUser.createMoreaUser(
-                      widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                      widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
                   await mailChimpAPIManager.updateUserInfo(
                       moreaUser.email,
                       moreaUser.vorName,
@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                             .data["Datenschutz"]);
                     if (datenschutz.akzeptiert) {
                       await moreaUser.createMoreaUser(
-                          widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                          widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
                       await mailChimpAPIManager.updateUserInfo(
                           moreaUser.email,
                           moreaUser.vorName,

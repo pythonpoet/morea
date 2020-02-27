@@ -40,7 +40,8 @@ enum AuthStatus {
   homePage,
   messagePage,
   agendaPage,
-  profilePage
+  profilePage,
+  homePageTutorial
 }
 
 class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
@@ -164,6 +165,18 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           ),
         );
         break;
+      case AuthStatus.homePageTutorial:
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (contex) => HomePage(
+              auth: auth,
+              firestore: widget.firestore,
+              navigationMap: navigationMap,
+              moreafire: moreaFire,
+              tutorial: true,
+          )
+          ),
+        );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
         break;
@@ -221,10 +234,14 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   //Functions for the Navigation
   //Switches authStatus and rebuilds RootPage
 
-  void signedIn() async {
+  void signedIn({bool tutorialautostart}) async {
     await initMoreaFire();
     setState(() {
-      authStatus = AuthStatus.homePage;
+      if(tutorialautostart){
+        authStatus = AuthStatus.homePageTutorial;
+      } else {
+        authStatus = AuthStatus.homePage;
+      }
     });
   }
 
