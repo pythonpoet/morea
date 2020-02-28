@@ -161,6 +161,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
               firestore: widget.firestore,
               navigationMap: navigationMap,
               moreafire: moreaFire,
+              tutorial: false,
             ),
           ),
         );

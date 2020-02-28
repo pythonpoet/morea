@@ -14,7 +14,12 @@ import 'package:morea/Widgets/home/teleblitz.dart';
 import 'package:morea/Widgets/home/elternpend.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({this.auth, this.firestore, this.navigationMap, this.moreafire, this.tutorial});
+  HomePage(
+      {this.auth,
+      this.firestore,
+      this.navigationMap,
+      this.moreafire,
+      this.tutorial});
 
   final BaseAuth auth;
   final Firestore firestore;
@@ -87,6 +92,22 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  void autostartTutorial() {
+    switch (_formType) {
+      case FormType.leiter:
+        tutorialLeiter();
+        break;
+      case FormType.teilnehmer:
+        tutorialTN();
+        break;
+      case FormType.eltern:
+        tutorialEltern();
+        break;
+      case FormType.loading:
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -94,6 +115,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     crud0 = new CrudMedthods(widget.firestore);
     moreaLoading = new MoreaLoading(this);
     getuserinfo();
+    if (widget.tutorial) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => this.autostartTutorial());
+    }
   }
 
   @override
