@@ -18,7 +18,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		E88A2BDD23FBED8C002521BB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E88A2BDC23FBED8C002521BB /* GoogleService-Info.plist */; };
+		E835038A240839E900486A93 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E8350389240839E900486A93 /* GoogleService-Info.plist */; };
 		F7EDC78E14B9F27A8483EA16 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A369E01E9C114DA88AB293D /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
@@ -58,9 +58,9 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2F3D23A6AED2B3E516AEB88 /* Pods-Runner.debug old.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug old.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug old.xcconfig"; sourceTree = "<group>"; };
+		E8350389240839E900486A93 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E88A2BDA23FBEA93002521BB /* RunnerDebug Runner 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RunnerDebug Runner 2.entitlements"; sourceTree = "<group>"; };
 		E88A2BDB23FBEA9C002521BB /* RunnerRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerRelease.entitlements; sourceTree = "<group>"; };
-		E88A2BDC23FBED8C002521BB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E8B52A1523B68766003C2421 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		E8B52A1823B68DD2003C2421 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		E8B52A1923B68DD2003C2421 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -125,8 +125,8 @@
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
-				E88A2BDC23FBED8C002521BB /* GoogleService-Info.plist */,
 				97C147021CF9000F007C117D /* Info.plist */,
+				E8350389240839E900486A93 /* GoogleService-Info.plist */,
 				97C146F11CF9000F007C117D /* Supporting Files */,
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
@@ -239,7 +239,7 @@
 				9740EEB41CF90195004384FC /* Debug.xcconfig in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
-				E88A2BDD23FBED8C002521BB /* GoogleService-Info.plist in Resources */,
+				E835038A240839E900486A93 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

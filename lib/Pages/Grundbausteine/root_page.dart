@@ -40,7 +40,8 @@ enum AuthStatus {
   homePage,
   messagePage,
   agendaPage,
-  profilePage
+  profilePage,
+  homePageTutorial
 }
 
 class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
@@ -82,103 +83,49 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
       print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
+      if (message['data']['typeMorea'] == 'Message') {
+        showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Neue Nachricht'),
+                    actions: <Widget>[
+                      RaisedButton(
+                        color: MoreaColors.violett,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          navigationMap[toMessagePage]();
+                        },
+                        child: Text(
+                          'Ansehen',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      RaisedButton(
+                        color: MoreaColors.violett,
+                        child: Text(
+                          'Später',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  );
                 },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
+              );
+      }
     }, onResume: (Map<String, dynamic> message) async {
       print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
-                },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
+      if(message['data']['typeMorea'] == 'Message'){
+        navigationMap[prefix0.toMessagePage]();
+      }
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
-                },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
+      if(message['data']['typeMorea'] == 'Message'){
+        navigationMap[prefix0.toMessagePage]();
+      }
     });
     authStatus = AuthStatus.homePage;
     setState(() {});
@@ -214,10 +161,23 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
               firestore: widget.firestore,
               navigationMap: navigationMap,
               moreafire: moreaFire,
+              tutorial: false,
             ),
           ),
         );
         break;
+      case AuthStatus.homePageTutorial:
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (contex) => HomePage(
+              auth: auth,
+              firestore: widget.firestore,
+              navigationMap: navigationMap,
+              moreafire: moreaFire,
+              tutorial: true,
+          )
+          ),
+        );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
         break;
@@ -275,10 +235,14 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   //Functions for the Navigation
   //Switches authStatus and rebuilds RootPage
 
-  void signedIn() async {
+  void signedIn({bool tutorialautostart}) async {
     await initMoreaFire();
     setState(() {
-      authStatus = AuthStatus.homePage;
+      if(tutorialautostart){
+        authStatus = AuthStatus.homePageTutorial;
+      } else {
+        authStatus = AuthStatus.homePage;
+      }
     });
   }
 
@@ -336,7 +300,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     }
     print(await auth.currentUser());
     print(deviceID);
-    await callFunction(getcallable("deactivateDeviceNotification"),
+    callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
     await auth.signOut();
     firebaseMessaging.deleteInstanceID();

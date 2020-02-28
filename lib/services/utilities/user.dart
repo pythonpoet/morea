@@ -364,7 +364,7 @@ class User {
   }
 
   Future<dynamic> createMoreaUser(
-      Auth auth, String _password, MoreaFirebase moreafire, onSignedIn) async {
+      Auth auth, String _password, MoreaFirebase moreafire, onSignedIn, {bool tutorial}) async {
     try {
       userID = await auth.createUserWithEmailAndPassword(email, _password);
       print('Registered user: $userID');
@@ -382,7 +382,11 @@ class User {
         await moreafire.uploadDevTocken(userID);
 
         //sends user to rootpage
-        onSignedIn();
+        if(tutorial){
+          onSignedIn(tutorialautostart: true);
+        } else {
+          onSignedIn();
+        }
       }
       return userID;
     } catch (e) {

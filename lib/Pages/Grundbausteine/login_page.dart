@@ -9,7 +9,6 @@ import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
-import 'package:morea/services/utilities/notification.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 
@@ -17,7 +16,7 @@ class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
 
   final BaseAuth auth;
-  final VoidCallback onSignedIn;
+  final Function onSignedIn;
   final Firestore firestore;
 
   @override
@@ -42,7 +41,6 @@ class _LoginPageState extends State<LoginPage> {
   String _password;
   String error;
   FormType _formType = FormType.login;
-  List<Map> _stufenselect = new List();
   bool _load = false;
 
   PageController pageController;
@@ -82,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {
                 _load = false;
               });
-              widget.onSignedIn();
+              widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
                 _load = false;
@@ -105,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                 if (datenschutz.akzeptiert) {
                   moreaUser.pos = "Teilnehmer";
                   await moreaUser.createMoreaUser(
-                      widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                      widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
                   await mailChimpAPIManager.updateUserInfo(
                       moreaUser.email,
                       moreaUser.vorName,
@@ -136,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                             .data["Datenschutz"]);
                     if (datenschutz.akzeptiert) {
                       await moreaUser.createMoreaUser(
-                          widget.auth, register.getPassword, moreafire, widget.onSignedIn);
+                          widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
                       await mailChimpAPIManager.updateUserInfo(
                           moreaUser.email,
                           moreaUser.vorName,
@@ -228,9 +226,6 @@ class _LoginPageState extends State<LoginPage> {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
     register = new Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
-    Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, "1165")).data;
-    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
   }
 
   @override
@@ -270,9 +265,7 @@ class _LoginPageState extends State<LoginPage> {
                       key: formKey,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height >= 1100.0
-                            ? MediaQuery.of(context).size.height
-                            : 1100.0,
+                        height: (_formType  == FormType.login)? MediaQuery.of(context).size.height - 117: 1100,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buildInputs(),
@@ -432,8 +425,11 @@ class _LoginPageState extends State<LoginPage> {
           textColor: Colors.white,
         ),
         new FlatButton(
-          child: new Text(
-            'Noch kein Konto? Hier registrieren',
+          child:    new Text(
+            MediaQuery.of(context).size.width < 376?
+              'Noch kein Konto? \nHier registrieren'
+              :
+              'Noch kein Konto? Hier registrieren',
             style: new TextStyle(fontSize: 20),
           ),
           onPressed: moveToRegister,
