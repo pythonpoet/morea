@@ -233,7 +233,7 @@ class Teleblitz {
                                 borderRadius: BorderRadius.circular(30)),
                             child: Center(
                                 child: new Text(anmelden,
-                                    style: MoreaTextStyle.flatButton)),
+                                    style: MoreaTextStyle.raisedButton)),
                             width: 120,
                           ),
                           onPressed: () {
@@ -1158,6 +1158,7 @@ class Info {
                 padding: EdgeInsets.only(left: 15),
                 shrinkWrap: true,
                 itemCount: listMitnehmen.length,
+                physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index){
                   return Text('- ' + listMitnehmen[index], style: MoreaTextStyle.normal,);
                 },

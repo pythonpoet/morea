@@ -82,103 +82,49 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
       print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
+      if (message['data']['typeMorea'] == 'Message') {
+        showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Neue Nachricht'),
+                    actions: <Widget>[
+                      RaisedButton(
+                        color: MoreaColors.violett,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          navigationMap[toMessagePage]();
+                        },
+                        child: Text(
+                          'Ansehen',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      RaisedButton(
+                        color: MoreaColors.violett,
+                        child: Text(
+                          'Später',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  );
                 },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
+              );
+      }
     }, onResume: (Map<String, dynamic> message) async {
       print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
-                },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
+      if(message['data']['typeMorea'] == 'Message'){
+        navigationMap[prefix0.toMessagePage]();
+      }
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Neue Nachricht'),
-            actions: <Widget>[
-              RaisedButton(
-                color: MoreaColors.violett,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
-                },
-                child: Text(
-                  'Ansehen',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              RaisedButton(
-                color: MoreaColors.violett,
-                child: Text(
-                  'Später',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },
-      );
+      if(message['data']['typeMorea'] == 'Message'){
+        navigationMap[prefix0.toMessagePage]();
+      }
     });
     authStatus = AuthStatus.homePage;
     setState(() {});
@@ -336,7 +282,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     }
     print(await auth.currentUser());
     print(deviceID);
-    await callFunction(getcallable("deactivateDeviceNotification"),
+    callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
     await auth.signOut();
     firebaseMessaging.deleteInstanceID();

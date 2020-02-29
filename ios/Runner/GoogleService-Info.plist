@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
+<plist version="2.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>20884476221-rh4mlhanh5r54gkjt8qipnkd0ft9vb8j.apps.googleusercontent.com</string>
+	<string>782312393773-j08q5fos63cl88m2iuaogr89else5uhi.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.20884476221-rh4mlhanh5r54gkjt8qipnkd0ft9vb8j</string>
+	<string>com.googleusercontent.apps.782312393773-j08q5fos63cl88m2iuaogr89else5uhi</string>
 	<key>API_KEY</key>
-	<string>AIzaSyANJ4v99f5Mc687nl5hWhrSfnrUUyRw2aI</string>
+	<string>AIzaSyDh5sOEcl2Dlp5UZB6zb9PV_3dgAIYRCEM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>20884476221</string>
+	<string>782312393773</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>ch.morea.morea</string>
+	<string>ch.morea.app</string>
 	<key>PROJECT_ID</key>
-	<string>dev-pfadi-morea</string>
+	<string>pfadi-morea</string>
 	<key>STORAGE_BUCKET</key>
-	<string>dev-pfadi-morea.appspot.com</string>
+	<string>pfadi-morea.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:20884476221:ios:4373d9a22db872e7793554</string>
+	<string>1:782312393773:ios:b067405efa9a1ef4373ca4</string>
 	<key>DATABASE_URL</key>
-	<string>https://dev-pfadi-morea.firebaseio.com</string>
+	<string>https://pfadi-morea.firebaseio.com</string>
 </dict>
 </plist>
