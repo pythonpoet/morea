@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
+import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/crud.dart';
@@ -97,6 +98,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     await childParendPend.waitOnUserDataChange(widget.profile[userMapUID]);
     display = false;
     setState(() {});
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text(
+                  'Du wurdest mit deinem Elternteil verbunden.'),
+            )).then((onvalue) => RestartWidget.restartApp(context));
+       
   }
 
   void parentaktuallisieren() {

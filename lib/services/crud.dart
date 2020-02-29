@@ -69,14 +69,7 @@ class CrudMedthods implements BaseCrudMethods {
     StreamController<bool> controller = new BehaviorSubject();
     value = controller.stream;
     controller.add(false);
-    Firestore.instance.collection(path).snapshots().listen((onData) {
-      onData.documentChanges.forEach((change) async {
-        if ((change.oldIndex == change.newIndex) &&
-            (change.document.documentID == document)) {
-          controller.add(true);
-        }
-      });
-    });
+    db.collection(path).document(document).snapshots().distinct().skip(1).listen((onData)=> controller.add(true));
     await value.firstWhere((bool item) => item);
     controller.close();
     return true;
