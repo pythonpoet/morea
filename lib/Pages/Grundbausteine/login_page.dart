@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Widgets/Login/register.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
@@ -416,49 +419,20 @@ class _LoginPageState extends State<LoginPage> {
   List<Widget> buildSubmitButtons() {
     if (_formType == FormType.login) {
       return [
-        new RaisedButton(
-          child: new Text('Anmelden', style: new TextStyle(fontSize: 20)),
-          onPressed: validateAndSubmit,
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(30.0)),
-          color: Color(0xff7a62ff),
-          textColor: Colors.white,
-        ),
-        new FlatButton(
-          child:    new Text(
-            MediaQuery.of(context).size.width < 376?
-              'Noch kein Konto? \nHier registrieren'
-              :
-              'Noch kein Konto? Hier registrieren',
-            style: new TextStyle(fontSize: 20),
-          ),
-          onPressed: moveToRegister,
-        ),
+        moreaRaisedButton('ANMELDEN', validateAndSubmit),
+        moreaFlatIconButton('NEU REGISTRIEREN', moveToRegister, Icon(Icons.create, color: MoreaColors.violett,)),
         new FlatButton(
           child: new Text(
-            'Passwort vergessen?',
-            style: new TextStyle(fontSize: 15),
+            'PASSWORT VERGESSEN',
+            style: MoreaTextStyle.flatButton,
           ),
           onPressed: passwortreset,
         )
       ];
     } else {
       return [
-        new RaisedButton(
-          child: new Text('Registrieren', style: new TextStyle(fontSize: 20)),
-          onPressed: validateAndSubmit,
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(30.0)),
-          color: Color(0xff7a62ff),
-          textColor: Colors.white,
-        ),
-        new FlatButton(
-          child: new Text(
-            'Ich habe bereits ein Konto',
-            style: new TextStyle(fontSize: 20),
-          ),
-          onPressed: moveToLogin,
-        ),
+        moreaRaisedButton('REGISTRIEREN', validateAndSubmit),
+        moreaFlatButton('ICH HABE BEREITS EIN KONTO', moveToLogin),
       ];
     }
   }

@@ -169,7 +169,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             style: MoreaTextStyle.lable,
           ),
           subtitle: Text(
-            profile['Geburtstag'],
+            profile['Geburtstag'] == null ? '' : profile['Geburtstag'],
             style: MoreaTextStyle.normal,
           ),
         ),
