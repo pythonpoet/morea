@@ -340,14 +340,14 @@ class Register implements BaseRegister {
         [
           divider(),
            Container(
+             padding: EdgeInsets.only(left: 12),
               color: Colors.grey[200],
               height: 55,
-              width: 1000,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   new Text(
-                    "   Geburtstag",
+                    "Geburtstag",
                     style: TextStyle(
                         color: Colors.grey[600], fontSize: 16),
                   ),

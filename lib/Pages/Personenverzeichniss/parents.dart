@@ -56,7 +56,7 @@ class MergeChildParent extends BaseMergeChildParent {
         padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
         child: new Card(
           child: new Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(10),
             child: new Column(
               children: <Widget>[
                 Flexible(
