@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Widgets/Login/register.dart';
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
@@ -29,7 +30,7 @@ class LoginPage extends StatefulWidget {
 enum FormType { login, register, registereltern }
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   User moreaUser;
   Register register;
   CrudMedthods crud0;
-
+  MoreaLoading moreaLoading;
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
@@ -92,67 +93,65 @@ class _LoginPageState extends State<LoginPage> {
             break;
           case FormType.register:
             var regDat = await register.validateTeilnehmer(context);
-            if(!(regDat is User))
-              return
-              moreaUser = regDat;
+            if (!(regDat is User)) return moreaUser = regDat;
+            setState(() {
+              _load = true;
+            });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
+            await datenschutz.moreaDatenschutzerklaerung(
+                context,
+                (await crud.getDocument(pathConfig, "init"))
+                    .data["Datenschutz"]);
+            if (datenschutz.akzeptiert) {
+              moreaUser.pos = "Teilnehmer";
+              await moreaUser.createMoreaUser(widget.auth, register.getPassword,
+                  moreafire, widget.onSignedIn,
+                  tutorial: true);
+              await mailChimpAPIManager.updateUserInfo(
+                  moreaUser.email,
+                  moreaUser.vorName,
+                  moreaUser.nachName,
+                  moreaUser.geschlecht,
+                  moreaUser.groupID,
+                  moreafire);
+            } else {
               setState(() {
-                _load = true;
+                _load = false;
               });
-              CrudMedthods crud = new CrudMedthods(widget.firestore);
-              await datenschutz.moreaDatenschutzerklaerung(
-                  context,
-                  (await crud.getDocument(pathConfig, "init"))
-                      .data["Datenschutz"]);
-                if (datenschutz.akzeptiert) {
-                  moreaUser.pos = "Teilnehmer";
-                  await moreaUser.createMoreaUser(
-                      widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
-                  await mailChimpAPIManager.updateUserInfo(
-                      moreaUser.email,
-                      moreaUser.vorName,
-                      moreaUser.nachName,
-                      moreaUser.geschlecht,
-                      moreaUser.groupID,
-                      moreafire);
-                } else {
-                  setState(() {
-                    _load = false;
-                  });
-                  return null;
-                }
-                 
+              return null;
+            }
+
             break;
           case FormType.registereltern:
             var regDat = await register.validateParent(context);
-            if(!(regDat is User))
-              return
-              moreaUser = regDat;
-              setState(() {
-                _load = true;
-              });
-                    CrudMedthods crud = new CrudMedthods(widget.firestore);
-                    await datenschutz.moreaDatenschutzerklaerung(
-                        context,
-                        (await crud.getDocument(pathConfig, "init"))
-                            .data["Datenschutz"]);
-                    if (datenschutz.akzeptiert) {
-                      await moreaUser.createMoreaUser(
-                          widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
-                      await mailChimpAPIManager.updateUserInfo(
-                          moreaUser.email,
-                          moreaUser.vorName,
-                          moreaUser.nachName,
-                          moreaUser.geschlecht,
-                          moreaUser.groupID,
-                          moreafire);
-                    }
-                  
+            if (!(regDat is User)) return moreaUser = regDat;
+            setState(() {
+              _load = true;
+            });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
+            await datenschutz.moreaDatenschutzerklaerung(
+                context,
+                (await crud.getDocument(pathConfig, "init"))
+                    .data["Datenschutz"]);
+            if (datenschutz.akzeptiert) {
+              await moreaUser.createMoreaUser(widget.auth, register.getPassword,
+                  moreafire, widget.onSignedIn,
+                  tutorial: true);
+              await mailChimpAPIManager.updateUserInfo(
+                  moreaUser.email,
+                  moreaUser.vorName,
+                  moreaUser.nachName,
+                  moreaUser.geschlecht,
+                  moreaUser.groupID,
+                  moreafire);
+            }
+
             break;
         }
       } catch (e) {
         setState(() {
-                _load = false;
-              });
+          _load = false;
+        });
         widget.auth.displayAuthError(
             widget.auth.checkForAuthErrors(context, e), context);
         print(e);
@@ -220,6 +219,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    moreaLoading = MoreaLoading(this);
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
     initSubgoup();
@@ -228,59 +228,53 @@ class _LoginPageState extends State<LoginPage> {
   initSubgoup() async {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
-    register = new Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+    register = new Register(
+        moreaUser: moreaUser,
+        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
   }
 
   @override
   void dispose() {
     pageController.dispose();
+    moreaLoading.dispose();
     super.dispose();
   }
 
-  letsSetState(){
-    setState(() {
-      
-    });
+  letsSetState() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget loadingIndicator = _load
-        ? new Container(
-            width: 70.0,
-            height: 70.0,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
-        : new Container();
-
-    return new Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
+    if (_load) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: moreaLoading.loading(),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                color: Colors.white70,
-                child: new SingleChildScrollView(
-                  child: new Form(
-                      key: formKey,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: (_formType  == FormType.login)? MediaQuery.of(context).size.height - 117: 1100,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: buildInputs(),
-                        ),
-                      )),
-                )),
-            new Align(
-              child: loadingIndicator,
-              alignment: FractionalOffset.center,
-            ),
-          ],
-        ));
+      );
+    } else {
+      return new Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+          ),
+          body: Container(
+              color: Colors.white70,
+              child: new SingleChildScrollView(
+                child: new Form(
+                    key: formKey,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: (_formType == FormType.login)
+                          ? MediaQuery.of(context).size.height - 117
+                          : 1100,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: buildInputs(),
+                      ),
+                    )),
+              )));
+    }
   }
 
   Widget buildMenuBar(BuildContext context) {
@@ -415,12 +409,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  
   List<Widget> buildSubmitButtons() {
     if (_formType == FormType.login) {
       return [
         moreaRaisedButton('ANMELDEN', validateAndSubmit),
-        moreaFlatIconButton('NEU REGISTRIEREN', moveToRegister, Icon(Icons.create, color: MoreaColors.violett,)),
+        moreaFlatIconButton(
+            'NEU REGISTRIEREN',
+            moveToRegister,
+            Icon(
+              Icons.create,
+              color: MoreaColors.violett,
+            )),
         new FlatButton(
           child: new Text(
             'PASSWORT VERGESSEN',
