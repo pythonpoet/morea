@@ -648,8 +648,9 @@ class _ChangeProfileState extends State<ChangeProfile>
 
   void delete() async {
     Navigator.of(context).pop();
-    this.loading = true;
-    setState(() {});
+    setState(() {
+      this.loading = true;
+    });
     if (this.userInfo[userMapEltern] != null) {
       for (var elternUID in this.userInfo[userMapEltern].keys.toList()) {
         var elternMap =
@@ -681,6 +682,8 @@ class _ChangeProfileState extends State<ChangeProfile>
     if (this.userInfo['UID'] == null) {
       this.userInfo['UID'] = this.userInfo['childUID'];
     }
+    Navigator.of(context).popUntil(ModalRoute.withName('/'));
+    await widget.navigationMap[signedOut]();
     if (this.userInfo[userMapgroupID] != null) {
       await callFunction(getcallable('deleteUserMap'), param: {
         'UID': this.userInfo['UID'],
@@ -711,6 +714,5 @@ class _ChangeProfileState extends State<ChangeProfile>
         'UID': this.userInfo['UID'],
       });
     }
-    widget.navigationMap[signedOut]();
   }
 }
