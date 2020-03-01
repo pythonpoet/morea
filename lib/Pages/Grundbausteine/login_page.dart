@@ -92,21 +92,22 @@ class _LoginPageState extends State<LoginPage> {
             break;
           case FormType.register:
             var regDat = await register.validateTeilnehmer(context);
-            if(!(regDat is User))
-              return
-              moreaUser = regDat;
-              setState(() {
-                _load = true;
-              });
-              CrudMedthods crud = new CrudMedthods(widget.firestore);
-              await datenschutz.moreaDatenschutzerklaerung(
-                  context,
-                  (await crud.getDocument(pathConfig, "init"))
-                      .data["Datenschutz"]);
-                if (datenschutz.akzeptiert) {
+            if (!(regDat is User)) return moreaUser = regDat;
+            setState(() {
+              _load = true;
+            });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
+            await datenschutz.moreaDatenschutzerklaerung(
+                context,
+                (await crud.getDocument(pathConfig, "init"))
+                    .data["Datenschutz"]);
+            if (datenschutz.akzeptiert) {
+              _showMailchimpWarning(context).then((accepted) async {
+                if (accepted) {
                   moreaUser.pos = "Teilnehmer";
-                  await moreaUser.createMoreaUser(
-                      widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
+                  await moreaUser.createMoreaUser(widget.auth,
+                      register.getPassword, moreafire, widget.onSignedIn,
+                      tutorial: true);
                   await mailChimpAPIManager.updateUserInfo(
                       moreaUser.email,
                       moreaUser.vorName,
@@ -118,41 +119,58 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _load = false;
                   });
-                  return null;
                 }
-                 
+              });
+            } else {
+              setState(() {
+                _load = false;
+              });
+              return null;
+            }
+
             break;
           case FormType.registereltern:
             var regDat = await register.validateParent(context);
-            if(!(regDat is User))
-              return
-              moreaUser = regDat;
-              setState(() {
-                _load = true;
+            if (!(regDat is User)) return moreaUser = regDat;
+            setState(() {
+              _load = true;
+            });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
+            await datenschutz.moreaDatenschutzerklaerung(
+                context,
+                (await crud.getDocument(pathConfig, "init"))
+                    .data["Datenschutz"]);
+            if (datenschutz.akzeptiert) {
+              _showMailchimpWarning(context).then((accepted) async {
+                if (accepted) {
+                  moreaUser.pos = "Teilnehmer";
+                  await moreaUser.createMoreaUser(widget.auth,
+                      register.getPassword, moreafire, widget.onSignedIn,
+                      tutorial: true);
+                  await mailChimpAPIManager.updateUserInfo(
+                      moreaUser.email,
+                      moreaUser.vorName,
+                      moreaUser.nachName,
+                      moreaUser.geschlecht,
+                      moreaUser.groupID,
+                      moreafire);
+                } else {
+                  setState(() {
+                    _load = false;
+                  });
+                }
               });
-                    CrudMedthods crud = new CrudMedthods(widget.firestore);
-                    await datenschutz.moreaDatenschutzerklaerung(
-                        context,
-                        (await crud.getDocument(pathConfig, "init"))
-                            .data["Datenschutz"]);
-                    if (datenschutz.akzeptiert) {
-                      await moreaUser.createMoreaUser(
-                          widget.auth, register.getPassword, moreafire, widget.onSignedIn, tutorial: true);
-                      await mailChimpAPIManager.updateUserInfo(
-                          moreaUser.email,
-                          moreaUser.vorName,
-                          moreaUser.nachName,
-                          moreaUser.geschlecht,
-                          moreaUser.groupID,
-                          moreafire);
-                    }
-                  
+            }else {
+              setState(() {
+                _load = false;
+              });
+            }
             break;
         }
       } catch (e) {
         setState(() {
-                _load = false;
-              });
+          _load = false;
+        });
         widget.auth.displayAuthError(
             widget.auth.checkForAuthErrors(context, e), context);
         print(e);
@@ -228,7 +246,9 @@ class _LoginPageState extends State<LoginPage> {
   initSubgoup() async {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
-    register = new Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+    register = new Register(
+        moreaUser: moreaUser,
+        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
   }
 
   @override
@@ -237,10 +257,8 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  letsSetState(){
-    setState(() {
-      
-    });
+  letsSetState() {
+    setState(() {});
   }
 
   @override
@@ -268,7 +286,9 @@ class _LoginPageState extends State<LoginPage> {
                       key: formKey,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: (_formType  == FormType.login)? MediaQuery.of(context).size.height - 117: 1100,
+                        height: (_formType == FormType.login)
+                            ? MediaQuery.of(context).size.height - 117
+                            : 1100,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buildInputs(),
@@ -415,12 +435,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  
   List<Widget> buildSubmitButtons() {
     if (_formType == FormType.login) {
       return [
         moreaRaisedButton('ANMELDEN', validateAndSubmit),
-        moreaFlatIconButton('NEU REGISTRIEREN', moveToRegister, Icon(Icons.create, color: MoreaColors.violett,)),
+        moreaFlatIconButton(
+            'NEU REGISTRIEREN',
+            moveToRegister,
+            Icon(
+              Icons.create,
+              color: MoreaColors.violett,
+            )),
         new FlatButton(
           child: new Text(
             'PASSWORT VERGESSEN',
@@ -447,5 +472,42 @@ class _LoginPageState extends State<LoginPage> {
     pageController?.animateToPage(1,
         duration: Duration(milliseconds: 700), curve: Curves.decelerate);
     _formType = FormType.registereltern;
+  }
+
+  Future<bool> _showMailchimpWarning(context) async {
+    bool accepted;
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'E-Mail-Verteiler',
+          style: MoreaTextStyle.lableViolett,
+        ),
+        content: Text(
+          'Mit der Registrierung in der Morea App wirst du automatisch mit den eingegebenen Angaben in den Morea-E-Mail-Verteiler aufgenommen.\nDer E-Mail-Verteiler ist auf mailchimp.com.',
+          style: MoreaTextStyle.normal,
+        ),
+        actions: <Widget>[
+          moreaFlatIconButton('ABBRECHEN', () {
+            accepted = false;
+            Navigator.of(context).pop();
+          },
+              Icon(
+                Icons.cancel,
+                color: MoreaColors.violett,
+              )),
+          moreaRaisedIconButton('OK', () {
+            accepted = true;
+            Navigator.of(context).pop();
+          },
+              Icon(
+                Icons.check,
+                color: Colors.white,
+              ))
+        ],
+      ),
+    );
+    return accepted;
   }
 }
