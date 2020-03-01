@@ -112,6 +112,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
   }
 
   void delete() async {
+    setState(() {
+      loading = true;
+    });
+    Navigator.of(context).pop();
     if (widget.profile[userMapEltern] != null) {
       for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
         var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
@@ -139,19 +143,21 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     if (widget.profile['UID'] == null) {
       widget.profile['UID'] = widget.profile['childUID'];
     }
-    if(widget.profile[userMapgroupID] != null){
+    if (widget.profile[userMapgroupID] != null) {
       await callFunction(getcallable('deleteUserMap'), param: {
         'UID': widget.profile['UID'],
         'groupID': widget.profile[userMapgroupID],
       });
     } else if (widget.profile[userMapSubscribedGroups] != null) {
-      if(widget.profile[userMapSubscribedGroups].length == 1){
+      if (widget.profile[userMapSubscribedGroups].length == 1) {
         await callFunction(getcallable('deleteUserMap'), param: {
           'UID': widget.profile['UID'],
           'groupID': widget.profile[userMapSubscribedGroups][0],
         });
       } else {
-        for(int i = widget.profile[userMapSubscribedGroups].length - 1; i < 1; i--){
+        for (int i = widget.profile[userMapSubscribedGroups].length - 1;
+            i < 1;
+            i--) {
           await callFunction(getcallable('desubFromGroup'), param: {
             'UID': widget.profile[userMapUID],
             'groupID': widget.profile[userMapSubscribedGroups][i],
@@ -164,17 +170,30 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       }
     } else {
       showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error', style: MoreaTextStyle.warningTitle,),
-          content: RichText(text: TextSpan(text: 'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: ', style: MoreaTextStyle.normal, children: [
-            LinkTextSpan(text: 'it@morea.ch', url: 'mailto:<it@morea.ch>', onLinkTap: (url) => launch(url), style: MoreaTextStyle.link)
-          ]),),
-        )
-      );
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(
+                  'Error',
+                  style: MoreaTextStyle.warningTitle,
+                ),
+                content: RichText(
+                  text: TextSpan(
+                      text:
+                          'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: ',
+                      style: MoreaTextStyle.normal,
+                      children: [
+                        LinkTextSpan(
+                            text: 'it@morea.ch',
+                            url: 'mailto:<it@morea.ch>',
+                            onLinkTap: (url) => launch(url),
+                            style: MoreaTextStyle.link)
+                      ]),
+                ),
+                actions: <Widget>[
+                  moreaFlatButton('OK', () => Navigator.of(context).pop()),
+                ],
+              ));
     }
-    
-    Navigator.of(context).pop();
     Navigator.of(context).pop();
     Navigator.of(context).pop();
   }
