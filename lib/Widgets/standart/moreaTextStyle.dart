@@ -55,6 +55,9 @@ class MoreaTextStyle {
   static TextStyle flatButton = TextStyle(
       fontSize: 14, fontWeight: FontWeight.w700, color: MoreaColors.violett);
 
+  static TextStyle smallFlatButton = TextStyle(
+      fontSize: 10, fontWeight: FontWeight.w700, color: MoreaColors.violett);
+
   static TextStyle warningButton = TextStyle(
       fontSize: 14, fontWeight: FontWeight.w700, color: Colors.red);
 

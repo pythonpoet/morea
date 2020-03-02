@@ -72,6 +72,22 @@ Widget moreaFlatIconButton(String text, Function action, Icon icon) {
   );
 }
 
+Widget moreaSmallFlatIconButton(String text, Function action, Icon icon) {
+  return FlatButton.icon(
+    onPressed: action,
+    icon: icon,
+    label: Text(
+      text,
+      style: MoreaTextStyle.smallFlatButton,
+    ),
+    color: Colors.transparent,
+    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        side: BorderSide(color: MoreaColors.violett,),),
+  );
+}
+
 Widget moreaFlatButton(String text, Function action) {
   return FlatButton(
     onPressed: action,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/Umfragen/umfragen.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 
@@ -352,6 +353,16 @@ Drawer moreaDrawer(
             trailing: new Icon(Icons.enhanced_encryption),
             onTap: () => makeLeiterWidget(context,
                 moreafire.getUserMap[userMapUID], moreafire.getGroupID),
+          ),
+          ListTile(
+            title: Text('Umfragen'),
+            trailing: Icon(Icons.sort),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    Umfragen()
+              )
+            ),
           ),
           new Divider(),
           new ListTile(
