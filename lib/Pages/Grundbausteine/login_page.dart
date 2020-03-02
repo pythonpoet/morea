@@ -260,18 +260,16 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           ),
           body: Container(
               color: Colors.white70,
+              width: MediaQuery.of(context).size.width,
+              height: (_formType == FormType.login)
+                  ? MediaQuery.of(context).size.height - 117
+                  : 1100,
               child: new SingleChildScrollView(
                 child: new Form(
                     key: formKey,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: (_formType == FormType.login)
-                          ? MediaQuery.of(context).size.height - 117
-                          : 1100,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: buildInputs(),
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: buildInputs(),
                     )),
               )));
     }
