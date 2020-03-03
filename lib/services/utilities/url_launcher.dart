@@ -26,7 +26,7 @@ class Urllauncher implements BaseUrllauncher {
   }
 
   Future<void> openPhone(String phonenumber) async {
-    String url = 'tel:<$phonenumber>';
+    String url = 'tel:$phonenumber';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
