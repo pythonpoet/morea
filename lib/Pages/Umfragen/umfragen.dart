@@ -1,17 +1,20 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Umfragen/umfrage.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class Umfragen extends StatefulWidget {
   @override
   _UmfragenState createState() => _UmfragenState();
 }
 
-class _UmfragenState extends State<Umfragen> {
+enum FlareState { open, close, wait }
 
-  FixedExtentScrollController fixedExtentScrollController = FixedExtentScrollController();
+class _UmfragenState extends State<Umfragen> {
+  FlareState flareState = FlareState.wait;
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +28,53 @@ class _UmfragenState extends State<Umfragen> {
                 labelPadding: EdgeInsets.only(bottom: 10),
                 tabs: <Widget>[Text('Alle Umfragen'), Text('Meine Umfragen')],
               )),
-          floatingActionButton: FloatingActionButton(
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
+          floatingActionButton: SpeedDial(
             backgroundColor: MoreaColors.violett,
             shape: CircleBorder(side: BorderSide(color: Colors.white)),
-            onPressed: null,
+            onOpen: () => setState(() {
+              flareState = FlareState.open;
+            }),
+            onClose: () => setState(() {
+              flareState = FlareState.close;
+            }),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: FlareActor(
+                'assets/animated_icon/plus_cancel.flr',
+                alignment: Alignment.center,
+                fit: BoxFit.contain,
+                animation: flareState == FlareState.open
+                    ? 'go'
+                    : flareState == FlareState.close ? 'back' : 'idle',
+              ),
+            ),
+            children: [
+              SpeedDialChild(
+                  child: Icon(
+                    Icons.format_list_bulleted,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: MoreaColors.violett,
+                  shape: CircleBorder(side: BorderSide(color: Colors.white)),
+                  label: 'Single choice'),
+              SpeedDialChild(
+                  child: Icon(
+                    Icons.event_note,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: MoreaColors.violett,
+                  shape: CircleBorder(side: BorderSide(color: Colors.white)),
+                  label: 'Multiple choice'),
+              SpeedDialChild(
+                  child: Icon(
+                    Icons.lock,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: MoreaColors.violett,
+                  shape: CircleBorder(side: BorderSide(color: Colors.white)),
+                  label: 'Multiple choice mit Limit'
+              )
+            ],
           ),
           body: TabBarView(
             children: <Widget>[
@@ -69,11 +111,7 @@ class _UmfragenState extends State<Umfragen> {
   GestureDetector _buildCard() {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (BuildContext context) =>
-              Umfrage()
-        )
-      ),
+          MaterialPageRoute(builder: (BuildContext context) => Umfrage())),
       child: Card(
         color: Colors.white,
         child: Padding(
@@ -88,7 +126,10 @@ class _UmfragenState extends State<Umfragen> {
                     flex: 2,
                     child: CircleAvatar(
                       backgroundColor: MoreaColors.violett,
-                      child: Text('R', style: MoreaTextStyle.raisedButton,),
+                      child: Text(
+                        'R',
+                        style: MoreaTextStyle.raisedButton,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -105,13 +146,23 @@ class _UmfragenState extends State<Umfragen> {
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
                           children: <Widget>[
-                            Text('Titel', style: MoreaTextStyle.lable,),
-                            Padding(padding: EdgeInsets.only(left: 10),),
+                            Text(
+                              'Titel',
+                              style: MoreaTextStyle.lable,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 10),
+                            ),
                             Text('Von Test', style: MoreaTextStyle.sender),
                           ],
                         ),
-                        Padding(padding: EdgeInsets.only(top: 10),),
-                        Text('Erstellt am: 22.02.20', style: MoreaTextStyle.subtitle,)
+                        Padding(
+                          padding: EdgeInsets.only(top: 10),
+                        ),
+                        Text(
+                          'Erstellt am: 22.02.20',
+                          style: MoreaTextStyle.subtitle,
+                        )
                       ],
                     ),
                   ),
@@ -153,8 +204,22 @@ class _UmfragenState extends State<Umfragen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        moreaSmallFlatIconButton('10/15', () => print('test'), Icon(Icons.group, size: 15, color: MoreaColors.violett,)),
-                        moreaSmallFlatIconButton('Kommentare', null, Icon(Icons.comment, size: 15, color: MoreaColors.violett,))
+                        moreaSmallFlatIconButton(
+                            '10/15',
+                            () => print('test'),
+                            Icon(
+                              Icons.group,
+                              size: 15,
+                              color: MoreaColors.violett,
+                            )),
+                        moreaSmallFlatIconButton(
+                            'Kommentare',
+                            null,
+                            Icon(
+                              Icons.comment,
+                              size: 15,
+                              color: MoreaColors.violett,
+                            ))
                       ],
                     ),
                   )
@@ -166,5 +231,4 @@ class _UmfragenState extends State<Umfragen> {
       ),
     );
   }
-
 }

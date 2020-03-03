@@ -109,6 +109,12 @@ class MoreaDivider extends Divider {
   final Color color = Colors.black26;
 }
 
+class MoreaDividerWhite extends Divider {
+  final double thickness = 1;
+  final Color color = Colors.white;
+  final double height = 1;
+}
+
 BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
   return BottomAppBar(
     color: MoreaColors.bottomAppBar,

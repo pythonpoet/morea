@@ -25,6 +25,12 @@ class MoreaTextStyle {
       fontSize: 16,
       letterSpacing: 0.15);
 
+  static TextStyle lableWhite = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+      letterSpacing: 0.15);
+
   static TextStyle normal = TextStyle(
       color: Colors.black,
       fontSize: 16,
@@ -37,6 +43,12 @@ class MoreaTextStyle {
       fontSize: 14,
       fontWeight: FontWeight.w600,
       color: Colors.black,
+      letterSpacing: 0.4);
+
+  static TextStyle captionWhite = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
       letterSpacing: 0.4);
 
   static TextStyle subtitle = TextStyle(

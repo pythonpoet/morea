@@ -35,6 +35,8 @@ dependencies:
     flip_card: ^0.4.4
     showcaseview: ^0.1.5
     device_info: ^0.4.1+4
+    flutter_speed_dial: ^1.2.5
+    flare_flutter: any
 
 
     shared_preferences: any
@@ -92,6 +94,7 @@ flutter:
         - assets/images/logo.jpeg
         - assets/images/background.png
         - assets/icon/logo_loading.png
+        - assets/animated_icon/plus_cancel.flr
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.io/assets-and-images/#resolution-aware.
