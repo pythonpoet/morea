@@ -11,7 +11,9 @@ import 'morea_strings.dart';
 
 class MoreaColors {
   static Color violett = Color(0xff7a62ff);
+  static Color violettDark = Color(0xff5c48bf);
   static Color orange = Color(0xffff9262);
+  static Color orangeDark = Color(0xffDC7D55);
   static int violettInt = 0xff7a62ff;
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;

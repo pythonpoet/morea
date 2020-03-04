@@ -1,6 +1,7 @@
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Umfragen/umfrage.dart';
+import 'package:morea/Pages/Umfragen/wahl_treffen.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
@@ -37,8 +38,9 @@ class _UmfragenState extends State<Umfragen> {
             onClose: () => setState(() {
               flareState = FlareState.close;
             }),
-            child: AspectRatio(
-              aspectRatio: 1,
+            child: SizedBox(
+              width: 35,
+              height: 35,
               child: FlareActor(
                 'assets/animated_icon/plus_cancel.flr',
                 alignment: Alignment.center,
@@ -51,29 +53,27 @@ class _UmfragenState extends State<Umfragen> {
             children: [
               SpeedDialChild(
                   child: Icon(
-                    Icons.format_list_bulleted,
-                    color: Colors.white,
-                  ),
-                  backgroundColor: MoreaColors.violett,
-                  shape: CircleBorder(side: BorderSide(color: Colors.white)),
-                  label: 'Single choice'),
-              SpeedDialChild(
-                  child: Icon(
                     Icons.event_note,
                     color: Colors.white,
                   ),
                   backgroundColor: MoreaColors.violett,
                   shape: CircleBorder(side: BorderSide(color: Colors.white)),
-                  label: 'Multiple choice'),
+                  onTap: null,
+                  label: 'Termin finden'),
               SpeedDialChild(
                   child: Icon(
-                    Icons.lock,
+                    Icons.format_list_bulleted,
                     color: Colors.white,
                   ),
                   backgroundColor: MoreaColors.violett,
                   shape: CircleBorder(side: BorderSide(color: Colors.white)),
-                  label: 'Multiple choice mit Limit'
-              )
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          WahlTreffen()
+                    )
+                  ),
+                  label: 'Eine Wahl treffen'),
             ],
           ),
           body: TabBarView(

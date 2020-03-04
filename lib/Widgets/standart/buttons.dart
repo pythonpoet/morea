@@ -13,6 +13,17 @@ Widget moreaEditActionbutton({@required Function route, Key key}) {
   );
 }
 
+Widget moreaFloatingActionbutton({@required Function route, @required Icon icon, Key key}) {
+  return new FloatingActionButton(
+    key: key == null ? null : key,
+    elevation: 1.0,
+    child: icon,
+    backgroundColor: MoreaColors.violett,
+    onPressed: () => route(),
+    shape: CircleBorder(side: BorderSide(color: Colors.white)),
+  );
+}
+
 Widget moreaRaisedButton(String text, Function action) {
   return RaisedButton(
     color: MoreaColors.violett,
@@ -102,6 +113,19 @@ Widget moreaFlatButton(String text, Function action) {
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(5)),
         side: BorderSide(color: MoreaColors.violett)),
+  );
+}
+
+Widget moreaSmallIconButton(String text, Function action, Icon icon) {
+  return FlatButton.icon(
+    onPressed: action,
+    icon: icon,
+    label: Text(
+      text,
+      style: MoreaTextStyle.smallFlatButton,
+    ),
+    color: Colors.transparent,
+    shape: null,
   );
 }
 
