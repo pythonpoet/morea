@@ -500,6 +500,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
         context: context,
         initialDate: now,
         firstDate: now,
+        locale: Locale('de'),
         lastDate: now.add(Duration(days: 9999)));
     if (picked != null) {
       setState(() {

@@ -6,6 +6,7 @@ import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'termin_finden.dart';
 
 class Umfragen extends StatefulWidget {
   @override
@@ -58,7 +59,13 @@ class _UmfragenState extends State<Umfragen> {
                   ),
                   backgroundColor: MoreaColors.violett,
                   shape: CircleBorder(side: BorderSide(color: Colors.white)),
-                  onTap: null,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context){
+                        return TerminFinden();
+                      }
+                    )
+                  ),
                   label: 'Termin finden'),
               SpeedDialChild(
                   child: Icon(
