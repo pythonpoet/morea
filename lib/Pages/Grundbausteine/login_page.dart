@@ -81,9 +81,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               moreafire.uploadDevTocken(moreaUser.userID);
-              setState(() {
-                _load = false;
-              });
               widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
