@@ -16,8 +16,9 @@ abstract class BaseUrllauncher {
 }
 
 class Urllauncher implements BaseUrllauncher {
+  //TODO mailto:email?subject=subsect
   Future<void> openMail(String email) async {
-    String url = 'mailto:<$email>';
+    String url = 'mailto:$email';
     if (await canLaunch(url)) {
       await launch(url);
     } else {

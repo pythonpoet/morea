@@ -141,6 +141,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   moreaUser.geschlecht,
                   moreaUser.groupID,
                   moreafire);
+            }else {
+              setState(() {
+                _load = false;
+              });
+              return null;
             }
 
             break;
@@ -359,47 +364,57 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       ];
     } else {
       return [
+        
         Padding(
           padding: EdgeInsets.only(top: 20),
           child: buildMenuBar(context),
         ),
-        Expanded(
-          flex: 2,
-          child: PageView(
-            controller: pageController,
-            onPageChanged: (i) {
-              if (i == 0) {
-                setState(() {
-                  right = Colors.white;
-                  left = Colors.black;
-                });
-              } else if (i == 1) {
-                setState(() {
-                  right = Colors.black;
-                  left = Colors.white;
-                });
-              }
-            },
-            children: <Widget>[
-              Container(
-                child: Column(
-                  children: <Widget>[
-                    register.registerTeilnehmerWidget(context, letsSetState),
-                    Column(children: buildSubmitButtons())
-                  ],
-                ),
+            SizedBox(
+              height: 1000,
+              child: Column(
+                children: <Widget>[
+                  Flexible(
+                    fit: FlexFit.loose,
+                    flex: 2,
+                    child: PageView(
+                      
+                      controller: pageController,
+                      onPageChanged: (i) {
+                        if (i == 0) {
+                          setState(() {
+                            right = Colors.white;
+                            left = Colors.black;
+                          });
+                        } else if (i == 1) {
+                          setState(() {
+                            right = Colors.black;
+                            left = Colors.white;
+                          });
+                        }
+                      },
+                      children: <Widget>[
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              register.registerTeilnehmerWidget(context, letsSetState),
+                              Column(children: buildSubmitButtons())
+                            ],
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              register.registerParentWidget(context, letsSetState),
+                              Column(children: buildSubmitButtons())
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                child: Column(
-                  children: <Widget>[
-                    register.registerParentWidget(context, letsSetState),
-                    Column(children: buildSubmitButtons())
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
+            ),
       ];
     }
   }
