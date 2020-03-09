@@ -298,12 +298,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
       deviceID = iosDeviceInfo.identifierForVendor;
     }
-    print(await auth.currentUser());
-    print(deviceID);
-    callFunction(getcallable("deactivateDeviceNotification"),
+    await callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
     await auth.signOut();
-    firebaseMessaging.deleteInstanceID();
+    await firebaseMessaging.deleteInstanceID();
     moreaFire = null;
     setState(() {
       authStatus = AuthStatus.notSignedIn;

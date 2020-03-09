@@ -90,6 +90,7 @@ class _ProfileState extends State<Profile> {
                       moreaFire: widget.moreaFire,
                       navigationMap: widget.navigationMap,
                       updateProfile: updateProfile,
+                      crud0: crud0,
                     );
                   }))),
         ),
