@@ -4,6 +4,7 @@ import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/form_fields.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/classes/umfrage_settings.dart';
 
 class WahlTreffen extends StatefulWidget {
   @override
@@ -13,6 +14,9 @@ class WahlTreffen extends StatefulWidget {
 class _WahlTreffenState extends State<WahlTreffen> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _ortController = TextEditingController();
+  final TextEditingController _notizController = TextEditingController();
+  final UmfrageSettings umfrageSettings = UmfrageSettings();
   List<Map<String, dynamic>> options = [];
 
   @override
@@ -41,6 +45,8 @@ class _WahlTreffenState extends State<WahlTreffen> {
       }
     ]);
     print(options);
+    umfrageSettings.hidden = false;
+    umfrageSettings.maybe = true;
   }
 
   @override
@@ -53,6 +59,7 @@ class _WahlTreffenState extends State<WahlTreffen> {
         ),
         title: Text('Neue Umfrage'),
       ),
+      floatingActionButton: moreaFloatingActionbutton(route: null, icon: Icon(Icons.check)),
       body: Form(
         key: _form,
         child: MoreaBackgroundContainer(
@@ -117,14 +124,85 @@ class _WahlTreffenState extends State<WahlTreffen> {
                             return Padding(
                               padding: const EdgeInsets.only(right: 10.0),
                               child: Chip(
-                                label:
-                                    Text(options[index]['controller'].text),
+                                label: Text(options[index]['controller'].text),
                               ),
                             );
                           },
                           scrollDirection: Axis.horizontal,
                           itemCount: options.length),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: Text(
+                        'Optional',
+                        style: MoreaTextStyle.subtitle,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Ort',
+                        style: MoreaTextStyle.caption,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: MoreaSingleLineTextField(
+                        keyboardType: TextInputType.text,
+                        validator: null,
+                        controller: _ortController,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Notiz',
+                        style: MoreaTextStyle.caption,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: MoreaSingleLineTextField(
+                        keyboardType: TextInputType.text,
+                        validator: null,
+                        controller: _notizController,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: Text(
+                        'Einstellungen',
+                        style: MoreaTextStyle.subtitle,
+                      ),
+                    ),
+                    SwitchListTile(
+                      title: Text(
+                        '\"Vielleicht\" aktivieren',
+                        style: MoreaTextStyle.lable,
+                      ),
+                      value: umfrageSettings.maybe,
+                      onChanged: (val) {
+                        setState(() {
+                          umfrageSettings.maybe = val;
+                        });
+                      },
+                    ),
+                    SwitchListTile(
+                      title: Text(
+                        'Versteckte Umfrage',
+                        style: MoreaTextStyle.lable,
+                      ),
+                      subtitle: Text(
+                        'Teilnehmer können Namen, Abstimmungen und Kommentare der anderen nicht sehen.',
+                        style: MoreaTextStyle.subtitle,
+                      ),
+                      value: umfrageSettings.hidden,
+                      onChanged: (val) {
+                        setState(() {
+                          umfrageSettings.hidden = val;
+                        });
+                      },
+                    )
                   ],
                 ),
               ),
