@@ -45,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
   String error;
   FormType _formType = FormType.login;
   bool _load = false;
+  bool _mailchimp = false;
 
   PageController pageController;
   Color left = Colors.black;
@@ -97,35 +98,34 @@ class _LoginPageState extends State<LoginPage> {
               _load = true;
             });
             CrudMedthods crud = new CrudMedthods(widget.firestore);
-            await datenschutz.moreaDatenschutzerklaerung(
-                context,
-                (await crud.getDocument(pathConfig, "init"))
-                    .data["Datenschutz"]);
-            if (datenschutz.akzeptiert) {
-              _showMailchimpWarning(context).then((accepted) async {
-                if (accepted) {
-                  moreaUser.pos = "Teilnehmer";
-                  await moreaUser.createMoreaUser(widget.auth,
-                      register.getPassword, moreafire, widget.onSignedIn,
-                      tutorial: true);
-                  await mailChimpAPIManager.updateUserInfo(
-                      moreaUser.email,
-                      moreaUser.vorName,
-                      moreaUser.nachName,
-                      moreaUser.geschlecht,
-                      moreaUser.groupID,
-                      moreafire);
-                } else {
-                  setState(() {
-                    _load = false;
-                  });
-                }
-              });
+            if (_mailchimp) {
+              await datenschutz.moreaDatenschutzerklaerung(
+                  context,
+                  (await crud.getDocument(pathConfig, "init"))
+                      .data["Datenschutz"]);
+              if (datenschutz.akzeptiert) {
+                moreaUser.pos = "Teilnehmer";
+                await moreaUser.createMoreaUser(widget.auth,
+                    register.getPassword, moreafire, widget.onSignedIn,
+                    tutorial: true);
+                await mailChimpAPIManager.updateUserInfo(
+                    moreaUser.email,
+                    moreaUser.vorName,
+                    moreaUser.nachName,
+                    moreaUser.geschlecht,
+                    moreaUser.groupID,
+                    moreafire);
+              } else {
+                setState(() {
+                  _load = false;
+                });
+                return null;
+              }
             } else {
+              await _showMailchimpWarning(context);
               setState(() {
                 _load = false;
               });
-              return null;
             }
 
             break;
@@ -135,32 +135,31 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               _load = true;
             });
-            CrudMedthods crud = new CrudMedthods(widget.firestore);
-            await datenschutz.moreaDatenschutzerklaerung(
-                context,
-                (await crud.getDocument(pathConfig, "init"))
-                    .data["Datenschutz"]);
-            if (datenschutz.akzeptiert) {
-              _showMailchimpWarning(context).then((accepted) async {
-                if (accepted) {
-                  moreaUser.pos = "Teilnehmer";
-                  await moreaUser.createMoreaUser(widget.auth,
-                      register.getPassword, moreafire, widget.onSignedIn,
-                      tutorial: true);
-                  await mailChimpAPIManager.updateUserInfo(
-                      moreaUser.email,
-                      moreaUser.vorName,
-                      moreaUser.nachName,
-                      moreaUser.geschlecht,
-                      moreaUser.groupID,
-                      moreafire);
-                } else {
-                  setState(() {
-                    _load = false;
-                  });
-                }
-              });
-            }else {
+            if (_mailchimp) {
+              CrudMedthods crud = new CrudMedthods(widget.firestore);
+              await datenschutz.moreaDatenschutzerklaerung(
+                  context,
+                  (await crud.getDocument(pathConfig, "init"))
+                      .data["Datenschutz"]);
+              if (datenschutz.akzeptiert) {
+                moreaUser.pos = "Teilnehmer";
+                await moreaUser.createMoreaUser(widget.auth,
+                    register.getPassword, moreafire, widget.onSignedIn,
+                    tutorial: true);
+                await mailChimpAPIManager.updateUserInfo(
+                    moreaUser.email,
+                    moreaUser.vorName,
+                    moreaUser.nachName,
+                    moreaUser.geschlecht,
+                    moreaUser.groupID,
+                    moreafire);
+              } else {
+                setState(() {
+                  _load = false;
+                });
+              }
+            } else {
+              await _showMailchimpWarning(context);
               setState(() {
                 _load = false;
               });
@@ -415,7 +414,8 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 child: Column(
                   children: <Widget>[
-                    register.registerTeilnehmerWidget(context, letsSetState),
+                    register.registerTeilnehmerWidget(
+                        context, letsSetState, _mailchimp, changeMailchimp),
                     Column(children: buildSubmitButtons())
                   ],
                 ),
@@ -423,7 +423,8 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 child: Column(
                   children: <Widget>[
-                    register.registerParentWidget(context, letsSetState),
+                    register.registerParentWidget(context, letsSetState,
+                        _mailchimp, this.changeMailchimp),
                     Column(children: buildSubmitButtons())
                   ],
                 ),
@@ -474,40 +475,34 @@ class _LoginPageState extends State<LoginPage> {
     _formType = FormType.registereltern;
   }
 
-  Future<bool> _showMailchimpWarning(context) async {
-    bool accepted;
+  Future<void> _showMailchimpWarning(context) async {
     await showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          'E-Mail-Verteiler',
-          style: MoreaTextStyle.lableViolett,
-        ),
+        title: Text('Fehler', style: MoreaTextStyle.warningTitle),
         content: Text(
-          'Mit der Registrierung in der Morea App wirst du automatisch mit den eingegebenen Angaben in den Morea-E-Mail-Verteiler aufgenommen.\nDer E-Mail-Verteiler ist auf mailchimp.com.',
+          'Damit du alle Informationen von uns bekommst, musst du dich in unseren E-Mail-Verteiler eintragen lassen.\nBitte setze in der Registrierung den ensprechende Haken',
           style: MoreaTextStyle.normal,
         ),
         actions: <Widget>[
-          moreaFlatIconButton('ABBRECHEN', () {
-            accepted = false;
+          moreaFlatIconButton('SCHLIESSEN', () {
             Navigator.of(context).pop();
           },
               Icon(
                 Icons.cancel,
                 color: MoreaColors.violett,
               )),
-          moreaRaisedIconButton('OK', () {
-            accepted = true;
-            Navigator.of(context).pop();
-          },
-              Icon(
-                Icons.check,
-                color: Colors.white,
-              ))
         ],
       ),
     );
-    return accepted;
+    return null;
+  }
+
+  void changeMailchimp(bool newVal) {
+    setState(() {
+      _mailchimp = newVal;
+    });
+    print(_mailchimp);
   }
 }
