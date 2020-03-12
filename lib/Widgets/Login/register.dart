@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Widgets/standart/info.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/utilities/MiData.dart';
@@ -125,7 +126,7 @@ class Register implements BaseRegister {
           ));
     else return moreaUser;
   }
-  Widget registerParentWidget(BuildContext context, Function setState){
+  Widget registerParentWidget(BuildContext context, Function setState, bool mailchimp, Function changeMailchimp){
         return Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,7 +144,18 @@ class Register implements BaseRegister {
           registerSection(icon: Icon(Icons.phone), widgets: [registerHandyNummer()]),
           registerSection(icon: Icon(Icons.email), widgets: [registerEmail()]),
           registerSection(icon: Icon(Icons.vpn_key), widgets: [registerPassword(),registerPasswordNew()]),
-          
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: CheckboxListTile(
+              title: Text('Ich akzeptiere, dass ich in den E-Mail-Verteiler aufgenommen werde.', style: MoreaTextStyle.normal,),
+              value: mailchimp,
+              onChanged: (bool value) {
+                mailchimp = value;
+                changeMailchimp(mailchimp);
+                print(mailchimp);
+              },
+            ),
+          ),
           SizedBox(
             height: 24,
           )
@@ -151,7 +163,7 @@ class Register implements BaseRegister {
       ),
     );
   }
-  Widget registerTeilnehmerWidget(BuildContext context, Function setState) {
+  Widget registerTeilnehmerWidget(BuildContext context, Function setState, bool mailchimp, Function changeMailchimp) {
     return FutureBuilder(
       future: docSnapAbteilung,
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap){
@@ -177,7 +189,18 @@ class Register implements BaseRegister {
             registerSection(icon: Icon(Icons.phone), widgets: [registerHandyNummer()]),
             registerSection(icon: Icon(Icons.email), widgets: [registerEmail()]),
             registerSection(icon: Icon(Icons.vpn_key), widgets: [registerPassword(), registerPasswordNew()]),
-            
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: CheckboxListTile(
+                title: Text('Ich akzeptiere, dass ich in den E-Mail-Verteiler aufgenommen werde.', style: MoreaTextStyle.normal,),
+                value: mailchimp,
+                onChanged: (bool value) {
+                  mailchimp = value;
+                  changeMailchimp(mailchimp);
+                  print(mailchimp);
+                },
+              ),
+            ),
             SizedBox(
               height: 24,
             )

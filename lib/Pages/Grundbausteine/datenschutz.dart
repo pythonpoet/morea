@@ -93,6 +93,7 @@ class Datenschutz implements BaseDatenschutz {
                                 child: const Text('Ablehnen',
                                     style: TextStyle(color: Color(0xff7a62ff))),
                                 onPressed: () {
+                                  akzeptiert = false;
                                   Navigator.pop(context);
                                 }),
                           ),
