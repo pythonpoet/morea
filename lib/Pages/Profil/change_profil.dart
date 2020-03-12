@@ -8,6 +8,8 @@ import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
+import 'package:morea/services/cloud_functions.dart';
+import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 
@@ -21,12 +23,14 @@ class ChangeProfile extends StatefulWidget {
   final MoreaFirebase moreaFire;
   final Map<String, Function> navigationMap;
   final Function updateProfile;
+  final CrudMedthods crud0;
 
   ChangeProfile(
       {@required this.auth,
       @required this.moreaFire,
       @required this.navigationMap,
-      @required this.updateProfile});
+      @required this.updateProfile,
+      @required this.crud0});
 
   @override
   _ChangeProfileState createState() => _ChangeProfileState();
@@ -301,7 +305,17 @@ class _ChangeProfileState extends State<ChangeProfile>
                             ChangePassword(this._changePassword))),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Divider(
+                        thickness: 1,
+                        color: Colors.black26,
+                      )),
+                  Padding(padding: EdgeInsets.only(top: 20)),
+                  Center(
+                      child: moreaFlatRedButton('ACCOUNT LÖSCHEN',
+                          () => this.deleteaccount(context))),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20),
                   )
                 ],
               ),
@@ -378,7 +392,14 @@ class _ChangeProfileState extends State<ChangeProfile>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              moreaRaisedIconButton('Abbrechen', this.navigatorPop, Icon(Icons.cancel, color: Colors.white, size: 15,))
+              moreaRaisedIconButton(
+                  'Abbrechen',
+                  this.navigatorPop,
+                  Icon(
+                    Icons.cancel,
+                    color: Colors.white,
+                    size: 15,
+                  ))
             ],
           );
         });
@@ -401,7 +422,9 @@ class _ChangeProfileState extends State<ChangeProfile>
         onConfirm: (date) {
       userInfo['Geburtstag'] =
           DateFormat('dd.MM.yyy', 'de').format(date).toString();
-    }, currentTime: DateTime.now().add(Duration(days: -365 * 4)), locale: LocaleType.de);
+    },
+        currentTime: DateTime.now().add(Duration(days: -365 * 4)),
+        locale: LocaleType.de);
 
     setState(() {});
   }
@@ -601,5 +624,95 @@ class _ChangeProfileState extends State<ChangeProfile>
             )).then((onValue) {
       return null;
     });
+  }
+
+  void deleteaccount(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              'Achtung',
+              style: MoreaTextStyle.warningTitle,
+            ),
+            content: Text(
+                'Du bist dabei dein Account vollständig zu löschen.\nBist du sicher, dass du fortfahren willst?'),
+            actions: <Widget>[
+              moreaFlatButton('NEIN', () => Navigator.of(context).pop()),
+              moreaFlatRedButton('JA', this.delete)
+            ],
+          );
+        });
+  }
+
+  void delete() async {
+    Navigator.of(context).pop();
+    setState(() {
+      this.loading = true;
+    });
+    if (this.userInfo[userMapEltern] != null) {
+      for (var elternUID in this.userInfo[userMapEltern].keys.toList()) {
+        var elternMap =
+            (await widget.crud0.getDocument(pathUser, elternUID)).data;
+        elternMap[userMapKinder].remove(this.userInfo[userMapUID]);
+        await widget.moreaFire
+            .updateUserInformation(elternMap[userMapUID], elternMap);
+      }
+    }
+    if (this.userInfo[userMapKinder] != null) {
+      for (var childUID in this.userInfo[userMapKinder].keys.toList()) {
+        Map childMap =
+            (await widget.crud0.getDocument(pathUser, childUID)).data;
+        if (childMap[userMapChildUID] == null) {
+          childMap[userMapEltern].remove(this.userInfo[userMapUID]);
+          await widget.moreaFire
+              .updateUserInformation(childMap[userMapUID], childMap);
+        } else {
+          if (childMap[userMapEltern].length == 1) {
+            await callFunction(getcallable('deleteUserMap'),
+                param: {'UID': childUID, 'groupID': childMap[userMapgroupID]});
+          } else {
+            childMap[userMapEltern].remove(this.userInfo[userMapUID]);
+            await widget.moreaFire.updateUserInformation(childUID, childMap);
+          }
+        }
+      }
+    }
+    if (this.userInfo['UID'] == null) {
+      this.userInfo['UID'] = this.userInfo['childUID'];
+    }
+    Navigator.of(context).popUntil(ModalRoute.withName('/'));
+    await widget.navigationMap[signedOut]();
+    if (this.userInfo[userMapgroupID] != null) {
+      await callFunction(getcallable('deleteUserMap'), param: {
+        'UID': this.userInfo['UID'],
+        'groupID': this.userInfo[userMapgroupID],
+      });
+    } else if (this.userInfo[userMapSubscribedGroups] != null) {
+      if (this.userInfo[userMapSubscribedGroups].length == 1) {
+        await callFunction(getcallable('deleteUserMap'), param: {
+          'UID': this.userInfo['UID'],
+          'groupID': this.userInfo[userMapSubscribedGroups][0],
+        });
+      } else {
+        for (int i = this.userInfo[userMapSubscribedGroups].length - 1;
+            i > 0;
+            i--) {
+          await callFunction(getcallable('desubFromGroup'), param: {
+            'UID': this.userInfo[userMapUID],
+            'groupID': this.userInfo[userMapSubscribedGroups][i],
+          });
+        }
+        await callFunction(getcallable('deleteUserMap'), param: {
+          'UID': this.userInfo['UID'],
+          'groupID': this.userInfo[userMapSubscribedGroups][0],
+        });
+      }
+    } else {
+      await callFunction(getcallable('deleteChildMap'), param: {
+        'UID': this.userInfo['UID'],
+      });
+    }
   }
 }

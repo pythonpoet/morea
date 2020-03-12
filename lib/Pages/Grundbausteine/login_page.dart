@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Widgets/Login/register.dart';
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
@@ -29,7 +30,7 @@ class LoginPage extends StatefulWidget {
 enum FormType { login, register, registereltern }
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   User moreaUser;
   Register register;
   CrudMedthods crud0;
-
+  MoreaLoading moreaLoading;
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
@@ -81,9 +82,6 @@ class _LoginPageState extends State<LoginPage> {
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               moreafire.uploadDevTocken(moreaUser.userID);
-              setState(() {
-                _load = false;
-              });
               widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
@@ -237,6 +235,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    moreaLoading = MoreaLoading(this);
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
     initSubgoup();
@@ -253,6 +252,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     pageController.dispose();
+    moreaLoading.dispose();
     super.dispose();
   }
 
@@ -262,44 +262,33 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget loadingIndicator = _load
-        ? new Container(
-            width: 70.0,
-            height: 70.0,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
-        : new Container();
-
-    return new Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
+    if (_load) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: moreaLoading.loading(),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                color: Colors.white70,
-                child: new SingleChildScrollView(
-                  child: new Form(
-                      key: formKey,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: (_formType == FormType.login)
-                            ? MediaQuery.of(context).size.height - 117
-                            : 1100,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: buildInputs(),
-                        ),
-                      )),
-                )),
-            new Align(
-              child: loadingIndicator,
-              alignment: FractionalOffset.center,
-            ),
-          ],
-        ));
+      );
+    } else {
+      return new Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+          ),
+          body: Container(
+              color: Colors.white70,
+              width: MediaQuery.of(context).size.width,
+              height: (_formType == FormType.login)
+                  ? MediaQuery.of(context).size.height - 117
+                  : 1100,
+              child: new SingleChildScrollView(
+                child: new Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: buildInputs(),
+                    )),
+              )));
+    }
   }
 
   Widget buildMenuBar(BuildContext context) {
@@ -389,49 +378,59 @@ class _LoginPageState extends State<LoginPage> {
       ];
     } else {
       return [
+        
         Padding(
           padding: EdgeInsets.only(top: 20),
           child: buildMenuBar(context),
         ),
-        Expanded(
-          flex: 2,
-          child: PageView(
-            controller: pageController,
-            onPageChanged: (i) {
-              if (i == 0) {
-                setState(() {
-                  right = Colors.white;
-                  left = Colors.black;
-                });
-              } else if (i == 1) {
-                setState(() {
-                  right = Colors.black;
-                  left = Colors.white;
-                });
-              }
-            },
-            children: <Widget>[
-              Container(
-                child: Column(
-                  children: <Widget>[
-                    register.registerTeilnehmerWidget(
-                        context, letsSetState, _mailchimp, changeMailchimp),
-                    Column(children: buildSubmitButtons())
-                  ],
-                ),
-              ),
-              Container(
-                child: Column(
-                  children: <Widget>[
-                    register.registerParentWidget(context, letsSetState,
+            SizedBox(
+              height: 1000,
+              child: Column(
+                children: <Widget>[
+                  Flexible(
+                    fit: FlexFit.loose,
+                    flex: 2,
+                    child: PageView(
+                      
+                      controller: pageController,
+                      onPageChanged: (i) {
+                        if (i == 0) {
+                          setState(() {
+                            right = Colors.white;
+                            left = Colors.black;
+                          });
+                        } else if (i == 1) {
+                          setState(() {
+                            right = Colors.black;
+                            left = Colors.white;
+                          });
+                        }
+                      },
+                      children: <Widget>[
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              register.registerTeilnehmerWidget(context, letsSetState,
                         _mailchimp, this.changeMailchimp),
-                    Column(children: buildSubmitButtons())
-                  ],
-                ),
+                              Column(children: buildSubmitButtons())
+                            ],
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              register.registerParentWidget(context, letsSetState,
+                        _mailchimp, this.changeMailchimp),
+                              Column(children: buildSubmitButtons())
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )
+            ),
       ];
     }
   }
