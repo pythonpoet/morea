@@ -249,7 +249,7 @@ class User {
     if (adresse != null)
       userMap[userMapAdresse] = adresse;
     else
-      throw "$userMapAdresse can't be null";
+      print('adresse error');
 
     if (email != null)
       userMap[userMapEmail] = email;
@@ -259,12 +259,12 @@ class User {
     if (vorName != null)
       userMap[userMapVorName] = vorName;
     else
-      throw "$userMapVorName has to be non-null";
+      print('vorname error');
 
     if (nachName != null)
       userMap[userMapNachName] = nachName;
     else
-      throw "$userMapNachName has to be non-null";
+      print('nachname error');
 
     if (userID != null)
       userMap[userMapUID] = userID;
@@ -274,17 +274,17 @@ class User {
     if (ort != null)
       userMap[userMapOrt] = ort;
     else
-      throw "$userMapOrt has to be non-null";
+      print('ort error');
 
     if (plz != null)
       userMap[userMapPLZ] = plz;
     else
-      throw "$userMapPLZ has to be non-null";
+      print('plz error');
 
     if (pos != null)
       userMap[userMapPos] = pos;
     else
-      throw "$userMapPos has to be non-null";
+      print('pos error');
 
     switch (pos) {
       case "Teilnehmer":
@@ -326,12 +326,12 @@ class User {
         if (handynummer != null)
           userMap[userMapHandynummer] = handynummer;
         else
-          throw "$userMapHandynummer has to be non-null";
+          print('handynummer error');
 
         if (geschlecht != null)
           userMap[userMapGeschlecht] = geschlecht;
         else
-          throw "$userMapGeschlecht has to be non-null";
+          print('geschlecht error');
         break;
       case "Erziehungsberechtigter":
         if (handynummer != null)

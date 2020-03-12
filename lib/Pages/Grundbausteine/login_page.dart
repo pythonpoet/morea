@@ -133,14 +133,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             setState(() {
               _load = true;
             });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
             if (_mailchimp) {
-              CrudMedthods crud = new CrudMedthods(widget.firestore);
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
                       .data["Datenschutz"]);
               if (datenschutz.akzeptiert) {
-                moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
@@ -200,7 +199,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 keyboardType: TextInputType.emailAddress,
                 decoration: new InputDecoration(
                   labelText: 'Passwort zurücksetzen',
-                  hintText: 'z.B. maxi@stinkt.undso',
+                  hintText: 'z.B. test@gmail.com',
                 ),
                 onChanged: (String value) {
                   this.moreaUser.email = value;
@@ -223,7 +222,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     context: context,
                     child: new AlertDialog(
                       title: new Text(
-                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $moreaUser.email erhalten'),
+                          'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
                     ));
                 widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
