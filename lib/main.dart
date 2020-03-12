@@ -7,6 +7,8 @@ import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/utilities/notification.dart';
 import 'morealayout.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   notificationGetPermission();
@@ -39,6 +41,14 @@ class MyApp extends StatelessWidget {
               firestore: firestore,
             )),
       },
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
+      ],
+      supportedLocales: [
+        const Locale('de', 'CH'),
+      ],
     );
   }
 }
