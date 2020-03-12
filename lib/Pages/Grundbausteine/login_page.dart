@@ -384,7 +384,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: buildMenuBar(context),
         ),
             SizedBox(
-              height: 1000,
+              height: 1050,
               child: Column(
                 children: <Widget>[
                   Flexible(
