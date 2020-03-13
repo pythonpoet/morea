@@ -289,6 +289,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   }
 
   void signedOut() async {
+    setState(() {
+      authStatus = AuthStatus.loading;
+    });
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceID;
     if (Platform.isAndroid) if (Platform.isAndroid) {
