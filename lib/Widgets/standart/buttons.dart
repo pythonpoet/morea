@@ -71,3 +71,21 @@ Widget moreaFlatIconButton(String text, Function action, Icon icon) {
         side: BorderSide(color: MoreaColors.violett)),
   );
 }
+
+Widget moreaFlatButton(String text, Function action) {
+  return FlatButton(
+    onPressed: action,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Text(
+        text,
+        style: MoreaTextStyle.flatButton,
+      ),
+    ),
+    color: Colors.transparent,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        side: BorderSide(color: MoreaColors.violett)),
+  );
+}
+

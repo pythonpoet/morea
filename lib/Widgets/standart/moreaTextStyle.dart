@@ -18,6 +18,13 @@ class MoreaTextStyle {
       fontWeight: FontWeight.w600,
       fontSize: 16,
       letterSpacing: 0.15);
+
+  static TextStyle lableViolett = TextStyle(
+      color: MoreaColors.violett,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+      letterSpacing: 0.15);
+
   static TextStyle normal = TextStyle(
       color: Colors.black,
       fontSize: 16,

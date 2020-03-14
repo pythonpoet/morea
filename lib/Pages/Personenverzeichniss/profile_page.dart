@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
+import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/crud.dart';
@@ -97,6 +98,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     await childParendPend.waitOnUserDataChange(widget.profile[userMapUID]);
     display = false;
     setState(() {});
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Text(
+                  'Du wurdest mit deinem Elternteil verbunden.'),
+            )).then((onvalue) => RestartWidget.restartApp(context));
+       
   }
 
   void parentaktuallisieren() {
@@ -311,8 +319,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
             children: <Widget>[
               RaisedButton(
                 child: Text(
-                  'Mit Kind Koppeln',
-                  style: TextStyle(fontSize: 20),
+                  'MIT KIND VERBINDEN',
+                  style: MoreaTextStyle.raisedButton,
                 ),
                 onPressed: () => parentaktuallisieren(),
                 shape: new RoundedRectangleBorder(
@@ -327,8 +335,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
             children: <Widget>[
               RaisedButton(
                 child: Text(
-                  'Neues Kind registrieren',
-                  style: TextStyle(fontSize: 20),
+                  'NEUES KIND REGISTRIEREN',
+                  style: MoreaTextStyle.raisedButton,
                 ),
                 onPressed: () => this.newKidakt(),
                 shape: new RoundedRectangleBorder(
@@ -439,8 +447,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                         padding: const EdgeInsets.only(left: 15, bottom: 20),
                         child: RaisedButton(
                           child: Text(
-                            'Account erstellen',
-                            style: TextStyle(fontSize: 20),
+                            'ACCOUNT ERSTELLEN',
+                            style: MoreaTextStyle.raisedButton,
                           ),
                           onPressed: () =>
                               showUpgradeWarning(kinderMap),
@@ -499,7 +507,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 RaisedButton(
                   child: Text(
                     'Account erstellen',
-                    style: MoreaTextStyle.flatButton,
+                    style: MoreaTextStyle.raisedButton,
                   ),
                   onPressed: () {
                     this.upgradeKid(childMap);
