@@ -27,7 +27,7 @@ class Datenschutz implements BaseDatenschutz {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => Container(
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.all(10),
               child: new Card(
                   child: Container(
                 padding: EdgeInsets.all(10),
@@ -38,7 +38,7 @@ class Datenschutz implements BaseDatenschutz {
                       child: Text(
                         'Datenschutzerklährung',
                         style: new TextStyle(
-                            fontSize: 25,
+                            fontSize: 24,
                             color: Color(0xff7a62ff),
                             fontWeight: FontWeight.bold),
                       ),
@@ -84,7 +84,7 @@ class Datenschutz implements BaseDatenschutz {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Expanded(
-                            flex: 2,
+                            flex: 1,
                             child: SizedBox(),
                           ),
                           Expanded(
@@ -93,6 +93,7 @@ class Datenschutz implements BaseDatenschutz {
                                 child: const Text('Ablehnen',
                                     style: TextStyle(color: Color(0xff7a62ff))),
                                 onPressed: () {
+                                  akzeptiert = false;
                                   Navigator.pop(context);
                                 }),
                           ),

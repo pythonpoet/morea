@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
@@ -81,20 +82,17 @@ class _ProfileState extends State<Profile> {
               ],
             ),
           ),
-          child: FloatingActionButton(
-            child: Icon(Icons.edit),
-            backgroundColor: MoreaColors.violett,
-            shape: CircleBorder(side: BorderSide(color: Colors.white)),
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) {
-              return ChangeProfile(
-                auth: widget.auth,
-                moreaFire: widget.moreaFire,
-                navigationMap: widget.navigationMap,
-                updateProfile: updateProfile,
-              );
-            })),
-          ),
+          child: moreaEditActionbutton(
+              route: () => Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return ChangeProfile(
+                      auth: widget.auth,
+                      moreaFire: widget.moreaFire,
+                      navigationMap: widget.navigationMap,
+                      updateProfile: updateProfile,
+                      crud0: crud0,
+                    );
+                  }))),
         ),
       ),
       body: MoreaBackgroundContainer(

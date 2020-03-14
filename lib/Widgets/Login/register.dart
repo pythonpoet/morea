@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Widgets/standart/info.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/utilities/MiData.dart';
@@ -125,7 +126,7 @@ class Register implements BaseRegister {
           ));
     else return moreaUser;
   }
-  Widget registerParentWidget(BuildContext context, Function setState){
+  Widget registerParentWidget(BuildContext context, Function setState, bool mailchimp, Function changeMailchimp){
         return Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,7 +144,18 @@ class Register implements BaseRegister {
           registerSection(icon: Icon(Icons.phone), widgets: [registerHandyNummer()]),
           registerSection(icon: Icon(Icons.email), widgets: [registerEmail()]),
           registerSection(icon: Icon(Icons.vpn_key), widgets: [registerPassword(),registerPasswordNew()]),
-          
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: CheckboxListTile(
+              title: Text('Ich akzeptiere, dass ich in den E-Mail-Verteiler aufgenommen werde.', style: MoreaTextStyle.normal,),
+              value: mailchimp,
+              onChanged: (bool value) {
+                mailchimp = value;
+                changeMailchimp(mailchimp);
+                print(mailchimp);
+              },
+            ),
+          ),
           SizedBox(
             height: 24,
           )
@@ -151,7 +163,7 @@ class Register implements BaseRegister {
       ),
     );
   }
-  Widget registerTeilnehmerWidget(BuildContext context, Function setState) {
+  Widget registerTeilnehmerWidget(BuildContext context, Function setState, bool mailchimp, Function changeMailchimp) {
     return FutureBuilder(
       future: docSnapAbteilung,
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap){
@@ -177,7 +189,18 @@ class Register implements BaseRegister {
             registerSection(icon: Icon(Icons.phone), widgets: [registerHandyNummer()]),
             registerSection(icon: Icon(Icons.email), widgets: [registerEmail()]),
             registerSection(icon: Icon(Icons.vpn_key), widgets: [registerPassword(), registerPasswordNew()]),
-            
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: CheckboxListTile(
+                title: Text('Ich akzeptiere, dass ich in den E-Mail-Verteiler aufgenommen werde.', style: MoreaTextStyle.normal,),
+                value: mailchimp,
+                onChanged: (bool value) {
+                  mailchimp = value;
+                  changeMailchimp(mailchimp);
+                  print(mailchimp);
+                },
+              ),
+            ),
             SizedBox(
               height: 24,
             )
@@ -340,47 +363,53 @@ class Register implements BaseRegister {
         [
           divider(),
            Container(
+             padding: EdgeInsets.only(left: 12),
               color: Colors.grey[200],
               height: 55,
-              width: 1000,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  new Text(
-                    "   Geburtstag",
-                    style: TextStyle(
-                        color: Colors.grey[600], fontSize: 16),
+                  Expanded(
+                    flex: 1,
+                    child: new Text(
+                      "Geburtstag",
+                      style: TextStyle(
+                          color: Colors.grey[600], fontSize: 16),
+                    ),
                   ),
-                  new FlatButton(
-                    child: Text(_alter,
-                        style: TextStyle(
-                            color: Colors.grey[500], fontSize: 16)),
-                    onPressed: () async {
-                      await DatePicker.showDatePicker(context,
-                          showTitleActions: true,
-                          theme: DatePickerTheme(
-                              doneStyle: TextStyle(
-                                  color: MoreaColors.violett,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold)),
-                          minTime: DateTime.now()
-                              .add(new Duration(days: -365 * 100)),
-                          maxTime: DateTime.now()
-                              .add(new Duration(days: -365 * 3)),
-                          onConfirm: (date) {
-                            moreaUser.geburtstag =
-                                DateFormat('dd.MM.yyy', 'de')
-                                    .format(date)
-                                    .toString();
-                            _alter = DateFormat('dd.MM.yyy', 'de')
-                                .format(date)
-                                .toString();
-                          },
-                          currentTime: DateTime.now(),
-                          locale: LocaleType.de);
+                  Expanded(
+                    flex: 1,
+                    child: new FlatButton(
+                      child: Text(_alter,
+                          style: TextStyle(
+                              color: Colors.grey[500], fontSize: 16)),
+                      onPressed: () async {
+                        await DatePicker.showDatePicker(context,
+                            showTitleActions: true,
+                            theme: DatePickerTheme(
+                                doneStyle: TextStyle(
+                                    color: MoreaColors.violett,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold)),
+                            minTime: DateTime.now()
+                                .add(new Duration(days: -365 * 100)),
+                            maxTime: DateTime.now()
+                                .add(new Duration(days: -365 * 3)),
+                            onConfirm: (date) {
+                              moreaUser.geburtstag =
+                                  DateFormat('dd.MM.yyy', 'de')
+                                      .format(date)
+                                      .toString();
+                              _alter = DateFormat('dd.MM.yyy', 'de')
+                                  .format(date)
+                                  .toString();
+                            },
+                            currentTime: DateTime.now(),
+                            locale: LocaleType.de);
 
-                      setState();
-                    },
+                        setState();
+                      },
+                    ),
                   )
                 ],
               ),

@@ -1,15 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/rich_text_parser.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
-import 'package:share/share.dart';
+import 'package:morea/services/utilities/url_launcher.dart';
 
 class AboutThisApp extends StatelessWidget {
+  final Urllauncher urllauncher = Urllauncher();
+  final String aboutText =
+      "Warum haben wir eine App für die Pfadi Morea kreiert?\nHeutzutage will man alles mit dem Handy machen können, vom chatten bis zum eBanking. Also wollten wir euch dies auch für die Pfadi ermöglichen. Unser Ziel ist es, gewisse Abläufe für euch zu vereinfachen. So haben wir den E-Mail-Verteiler in die App integriert, so dass ihr automatisch in den Verteiler aufgenommen werdet, wenn ihr euch für die App registriert.\nDie App soll in Zukunft erweitert werden mit Funktionen, die euch das Leben in der Pfadi weiter vereinfachen.\nFalls ihr Ideen für die Weiterentwicklung der App habt oder wenn ihr Fehler findet, dann schreibt uns auf ";
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Über dieses App"),
+        title: new Text("Über dieses App", style: MoreaTextStyle.lable,),
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -17,22 +22,28 @@ class AboutThisApp extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: new Text("Gefällt dir die App?", style: MoreaTextStyle.lable,),
+                  padding: EdgeInsets.all(20),
+                  child: RichText(
+                    text: TextSpan(text: 'Die Pfadi Morea hat eine App!?', style: TextStyle(
+                        color: MoreaColors.violett,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        letterSpacing: 0.15)),
+                  ),
                 ),
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Text("Erzähle allen davon!"),
-                    new IconButton(
-                      icon: Icon(Icons.share),
-                      onPressed: () => {
-                        Share.share("Möchtest du auch in die Pfadi? Lade dir unsere Pfadi Morea App im Playstore/Applestore herunter und komm vorbei!")
-                      },
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.only(right: 20.0, left: 20.0,),
+                  child: RichText(
+                    text: TextSpan(
+                      text: aboutText,
+                      style: MoreaTextStyle.normal,
+                      children: <TextSpan>[
+                        LinkTextSpan(text: 'it@morea.ch', style: MoreaTextStyle.link, onLinkTap: (url){urllauncher.openMail('it@morea.ch');}, url: 'mailto:<it@morea.ch>'),
+                        TextSpan(text: '.\nAzb Jarvis und Roran', style: MoreaTextStyle.normal)
+                      ]
+                    )
+                  ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.only(bottom: 20),
                 )

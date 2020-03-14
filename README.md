@@ -1,39 +1,35 @@
 # Morea
 
-Teleblitz app
+This Project is an IOS and Android application.
+It is used for the youth organisation [Pfadi Morea] (https://www.morea.ch).
 
+The use-cases can be seperated into three parts:
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
- 
- ## What is it for
- 
- - This application is used to store activity information by the "Leiter" users and display it on devices of "Teilnehmer".
- - This application can display an agenda, with previously uploaded Events by "Leiter"
- 
- ## What will (hopefully) the application be in the future
- 
- For "Teilnehmer":
+For "Teilnehmer":
  - Get your information for the next activity.
  - Sign up for the next activity.
  - An agenda with the important events of scout group.
- - A place where you can comunicate with others of your scout group.
+ - Connect your user account with your parent.
+
+ For "Eltern":
+ - Get your childs information for the next activity.
+ - Sign up for the next activity.
+ - An agenda with the important events of scout group.
+ - Connect your user account with your child.
  
  For "Leiter":
  - An application to upload the information for the next activity.
  - See who is coming to the next activity.
  - Set events to the agenda.
  - Write to your "Teilnehmer"
+ - Send push notification
+
+## Contact
+
+If your intressed in what we have done have suggestions or might implement 
+our app for your organisation pls contact us: production@morea.ch
+
+
+ 
  
 

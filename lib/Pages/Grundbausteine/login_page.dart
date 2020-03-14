@@ -2,14 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Widgets/Login/register.dart';
+import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
+import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/morealayout.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
-import 'package:morea/services/utilities/notification.dart';
 import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 
@@ -17,7 +20,7 @@ class LoginPage extends StatefulWidget {
   LoginPage({this.auth, this.onSignedIn, this.firestore});
 
   final BaseAuth auth;
-  final VoidCallback onSignedIn;
+  final Function onSignedIn;
   final Firestore firestore;
 
   @override
@@ -27,7 +30,7 @@ class LoginPage extends StatefulWidget {
 enum FormType { login, register, registereltern }
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
@@ -35,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   User moreaUser;
   Register register;
   CrudMedthods crud0;
-
+  MoreaLoading moreaLoading;
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
@@ -43,6 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   String error;
   FormType _formType = FormType.login;
   bool _load = false;
+  bool _mailchimp = false;
 
   PageController pageController;
   Color left = Colors.black;
@@ -82,12 +86,7 @@ class _LoginPageState extends State<LoginPage> {
             if (moreaUser.userID != null) {
               //upload deviceToken
               moreafire.uploadDevTocken(moreaUser.userID);
-              //reset loading indicator
-              setState(() {
-                _load = false;
-              });
-              //navigate to homeScreen
-              widget.onSignedIn();
+              widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
                 _load = false;
@@ -97,70 +96,82 @@ class _LoginPageState extends State<LoginPage> {
           case FormType.register:
             //Check if userMap is right
             var regDat = await register.validateTeilnehmer(context);
-            if(!(regDat is User))
-              return
-              moreaUser = regDat;
-              setState(() {
-                _load = true;
-              });
-              CrudMedthods crud = new CrudMedthods(widget.firestore);
-              //prompt user with Datenschutzerklärung
+            if (!(regDat is User)) return moreaUser = regDat;
+            setState(() {
+              _load = true;
+            });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
+            if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
                       .data["Datenschutz"]);
-                if (datenschutz.akzeptiert) {
-                  moreaUser.pos = "Teilnehmer";
-                  //Create User
-                  await moreaUser.createMoreaUser(
-                      widget.auth, register.getPassword, moreafire, widget.onSignedIn);
-                  //Add to mailChimpAPIManager
-                  await mailChimpAPIManager.updateUserInfo(
-                      moreaUser.email,
-                      moreaUser.vorName,
-                      moreaUser.nachName,
-                      moreaUser.geschlecht,
-                      moreaUser.groupID,
-                      moreafire);
-                } else {
-                  setState(() {
-                    _load = false;
-                  });
-                  return null;
-                }
-                 
+              if (datenschutz.akzeptiert) {
+                moreaUser.pos = "Teilnehmer";
+                await moreaUser.createMoreaUser(widget.auth,
+                    register.getPassword, moreafire, widget.onSignedIn,
+                    tutorial: true);
+                await mailChimpAPIManager.updateUserInfo(
+                    moreaUser.email,
+                    moreaUser.vorName,
+                    moreaUser.nachName,
+                    moreaUser.geschlecht,
+                    moreaUser.groupID,
+                    moreafire);
+              } else {
+                setState(() {
+                  _load = false;
+                });
+                return null;
+              }
+            } else {
+              await _showMailchimpWarning(context);
+              setState(() {
+                _load = false;
+              });
+            }
+
             break;
           case FormType.registereltern:
             var regDat = await register.validateParent(context);
-            if(!(regDat is User))
-              return
-              moreaUser = regDat;
+            if (!(regDat is User)) return moreaUser = regDat;
+            setState(() {
+              _load = true;
+            });
+            CrudMedthods crud = new CrudMedthods(widget.firestore);
+            if (_mailchimp) {
+              await datenschutz.moreaDatenschutzerklaerung(
+                  context,
+                  (await crud.getDocument(pathConfig, "init"))
+                      .data["Datenschutz"]);
+              if (datenschutz.akzeptiert) {
+                await moreaUser.createMoreaUser(widget.auth,
+                    register.getPassword, moreafire, widget.onSignedIn,
+                    tutorial: true);
+                await mailChimpAPIManager.updateUserInfo(
+                    moreaUser.email,
+                    moreaUser.vorName,
+                    moreaUser.nachName,
+                    moreaUser.geschlecht,
+                    moreaUser.groupID,
+                    moreafire);
+              } else {
+                setState(() {
+                  _load = false;
+                });
+              }
+            } else {
+              await _showMailchimpWarning(context);
               setState(() {
-                _load = true;
+                _load = false;
               });
-                    CrudMedthods crud = new CrudMedthods(widget.firestore);
-                    await datenschutz.moreaDatenschutzerklaerung(
-                        context,
-                        (await crud.getDocument(pathConfig, "init"))
-                            .data["Datenschutz"]);
-                    if (datenschutz.akzeptiert) {
-                      await moreaUser.createMoreaUser(
-                          widget.auth, register.getPassword, moreafire, widget.onSignedIn);
-                      await mailChimpAPIManager.updateUserInfo(
-                          moreaUser.email,
-                          moreaUser.vorName,
-                          moreaUser.nachName,
-                          moreaUser.geschlecht,
-                          moreaUser.groupID,
-                          moreafire);
-                    }
-                  
+            }
             break;
         }
       } catch (e) {
         setState(() {
-                _load = false;
-              });
+          _load = false;
+        });
         widget.auth.displayAuthError(
             widget.auth.checkForAuthErrors(context, e), context);
         print(e);
@@ -193,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: new InputDecoration(
                   labelText: 'Passwort zurücksetzen',
-                  hintText: 'z.B. maxi@stinkt.undso',
+                  hintText: 'z.B. test@gmail.com',
                 ),
                 onChanged: (String value) {
                   this.moreaUser.email = value;
@@ -216,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                     context: context,
                     child: new AlertDialog(
                       title: new Text(
-                          'Sie haben ein Passwortzurücksetzungsemail auf die Emailadresse: $moreaUser.email erhalten'),
+                          'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
                     ));
                 widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
@@ -228,6 +239,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    moreaLoading = MoreaLoading(this);
     pageController = PageController();
     moreafire = new MoreaFirebase(widget.firestore);
     initSubgoup();
@@ -236,59 +248,51 @@ class _LoginPageState extends State<LoginPage> {
   initSubgoup() async {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
-    register = new Register(moreaUser: moreaUser, docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+    register = new Register(
+        moreaUser: moreaUser,
+        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
   }
 
   @override
   void dispose() {
     pageController.dispose();
+    moreaLoading.dispose();
     super.dispose();
   }
 
-  letsSetState(){
-    setState(() {
-      
-    });
+  letsSetState() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget loadingIndicator = _load
-        ? new Container(
-            width: 70.0,
-            height: 70.0,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
-        : new Container();
-
-    return new Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
+    if (_load) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: moreaLoading.loading(),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                color: Colors.white70,
-                child: new SingleChildScrollView(
-                  child: new Form(
-                      key: formKey,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: (_formType  == FormType.login)? MediaQuery.of(context).size.height - 117: 1100,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: buildInputs(),
-                        ),
-                      )),
-                )),
-            new Align(
-              child: loadingIndicator,
-              alignment: FractionalOffset.center,
-            ),
-          ],
-        ));
+      );
+    } else {
+      return new Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+          ),
+          body: Container(
+              color: Colors.white70,
+              width: MediaQuery.of(context).size.width,
+              height: (_formType == FormType.login)
+                  ? MediaQuery.of(context).size.height - 117
+                  : 1100,
+              child: new SingleChildScrollView(
+                child: new Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: buildInputs(),
+                    )),
+              )));
+    }
   }
 
   Widget buildMenuBar(BuildContext context) {
@@ -382,94 +386,80 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.only(top: 20),
           child: buildMenuBar(context),
         ),
-        Expanded(
-          flex: 2,
-          child: PageView(
-            controller: pageController,
-            onPageChanged: (i) {
-              if (i == 0) {
-                setState(() {
-                  right = Colors.white;
-                  left = Colors.black;
-                });
-              } else if (i == 1) {
-                setState(() {
-                  right = Colors.black;
-                  left = Colors.white;
-                });
-              }
-            },
+        SizedBox(
+          height: 1050,
+          child: Column(
             children: <Widget>[
-              Container(
-                child: Column(
+              Flexible(
+                fit: FlexFit.loose,
+                flex: 2,
+                child: PageView(
+                  controller: pageController,
+                  onPageChanged: (i) {
+                    if (i == 0) {
+                      setState(() {
+                        right = Colors.white;
+                        left = Colors.black;
+                      });
+                    } else if (i == 1) {
+                      setState(() {
+                        right = Colors.black;
+                        left = Colors.white;
+                      });
+                    }
+                  },
                   children: <Widget>[
-                    register.registerTeilnehmerWidget(context, letsSetState),
-                    Column(children: buildSubmitButtons())
-                  ],
-                ),
-              ),
-              Container(
-                child: Column(
-                  children: <Widget>[
-                    register.registerParentWidget(context, letsSetState),
-                    Column(children: buildSubmitButtons())
+                    Container(
+                      child: Column(
+                        children: <Widget>[
+                          register.registerTeilnehmerWidget(context,
+                              letsSetState, _mailchimp, this.changeMailchimp),
+                          Column(children: buildSubmitButtons())
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Column(
+                        children: <Widget>[
+                          register.registerParentWidget(context, letsSetState,
+                              _mailchimp, this.changeMailchimp),
+                          Column(children: buildSubmitButtons())
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
-        )
+        ),
       ];
     }
   }
 
-  
   List<Widget> buildSubmitButtons() {
     if (_formType == FormType.login) {
       return [
-        new RaisedButton(
-          child: new Text('Anmelden', style: new TextStyle(fontSize: 20)),
-          onPressed: validateAndSubmit,
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(30.0)),
-          color: Color(0xff7a62ff),
-          textColor: Colors.white,
-        ),
-        new FlatButton(
-          child:    new Text(
-            MediaQuery.of(context).size.width < 376?
-              'Noch kein Konto? \nHier registrieren'
-              :
-              'Noch kein Konto? Hier registrieren',
-            style: new TextStyle(fontSize: 20),
-          ),
-          onPressed: moveToRegister,
-        ),
+        moreaRaisedButton('ANMELDEN', validateAndSubmit),
+        moreaFlatIconButton(
+            'NEU REGISTRIEREN',
+            moveToRegister,
+            Icon(
+              Icons.create,
+              color: MoreaColors.violett,
+            )),
         new FlatButton(
           child: new Text(
-            'Passwort vergessen?',
-            style: new TextStyle(fontSize: 15),
+            'PASSWORT VERGESSEN',
+            style: MoreaTextStyle.flatButton,
           ),
           onPressed: passwortreset,
         )
       ];
     } else {
       return [
-        new RaisedButton(
-          child: new Text('Registrieren', style: new TextStyle(fontSize: 20)),
-          onPressed: validateAndSubmit,
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(30.0)),
-          color: Color(0xff7a62ff),
-          textColor: Colors.white,
-        ),
-        new FlatButton(
-          child: new Text(
-            'Ich habe bereits ein Konto',
-            style: new TextStyle(fontSize: 20),
-          ),
-          onPressed: moveToLogin,
-        ),
+        moreaRaisedButton('REGISTRIEREN', validateAndSubmit),
+        moreaFlatButton('ICH HABE BEREITS EIN KONTO', moveToLogin),
       ];
     }
   }
@@ -484,5 +474,36 @@ class _LoginPageState extends State<LoginPage> {
     pageController?.animateToPage(1,
         duration: Duration(milliseconds: 700), curve: Curves.decelerate);
     _formType = FormType.registereltern;
+  }
+
+  Future<void> _showMailchimpWarning(context) async {
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Fehler', style: MoreaTextStyle.warningTitle),
+        content: Text(
+          'Damit du alle Informationen von uns bekommst, musst du dich in unseren E-Mail-Verteiler eintragen lassen.\nBitte setze in der Registrierung den ensprechende Haken',
+          style: MoreaTextStyle.normal,
+        ),
+        actions: <Widget>[
+          moreaFlatIconButton('SCHLIESSEN', () {
+            Navigator.of(context).pop();
+          },
+              Icon(
+                Icons.cancel,
+                color: MoreaColors.violett,
+              )),
+        ],
+      ),
+    );
+    return null;
+  }
+
+  void changeMailchimp(bool newVal) {
+    setState(() {
+      _mailchimp = newVal;
+    });
+    print(_mailchimp);
   }
 }

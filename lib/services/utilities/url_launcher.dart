@@ -16,8 +16,9 @@ abstract class BaseUrllauncher {
 }
 
 class Urllauncher implements BaseUrllauncher {
+  //TODO mailto:email?subject=subsect
   Future<void> openMail(String email) async {
-    String url = 'mailto:<$email>';
+    String url = 'mailto:$email';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -26,7 +27,7 @@ class Urllauncher implements BaseUrllauncher {
   }
 
   Future<void> openPhone(String phonenumber) async {
-    String url = 'tel:<$phonenumber>';
+    String url = 'tel:$phonenumber';
     if (await canLaunch(url)) {
       await launch(url);
     } else {

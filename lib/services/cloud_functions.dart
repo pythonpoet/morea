@@ -9,9 +9,7 @@ abstract class BaseMCloudFunctions {
 
 class MCloudFunctions extends BaseMCloudFunctions {
   HttpsCallable getcallable(String functionName) {
-    return CloudFunctions.instance.getHttpsCallable(
-      functionName: functionName,
-    );
+    return CloudFunctions(region: 'europe-west1').getHttpsCallable(functionName: functionName);
   }
 
   Future<HttpsCallableResult> callFunction(HttpsCallable callable,
@@ -21,9 +19,7 @@ class MCloudFunctions extends BaseMCloudFunctions {
 }
 
 HttpsCallable getcallable(String functionName) {
-  return CloudFunctions.instance.getHttpsCallable(
-    functionName: functionName,
-  );
+  return CloudFunctions(region: 'europe-west1').getHttpsCallable(functionName: functionName);
 }
 
 Future<HttpsCallableResult> callFunction(HttpsCallable callable,
