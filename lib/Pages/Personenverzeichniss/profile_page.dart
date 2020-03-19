@@ -319,8 +319,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
             children: <Widget>[
               RaisedButton(
                 child: Text(
-                  'Mit Kind Koppeln',
-                  style: TextStyle(fontSize: 20),
+                  'MIT KIND VERBINDEN',
+                  style: MoreaTextStyle.raisedButton,
                 ),
                 onPressed: () => parentaktuallisieren(),
                 shape: new RoundedRectangleBorder(
@@ -335,8 +335,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
             children: <Widget>[
               RaisedButton(
                 child: Text(
-                  'Neues Kind registrieren',
-                  style: TextStyle(fontSize: 20),
+                  'NEUES KIND REGISTRIEREN',
+                  style: MoreaTextStyle.raisedButton,
                 ),
                 onPressed: () => this.newKidakt(),
                 shape: new RoundedRectangleBorder(
@@ -447,8 +447,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                         padding: const EdgeInsets.only(left: 15, bottom: 20),
                         child: RaisedButton(
                           child: Text(
-                            'Account erstellen',
-                            style: TextStyle(fontSize: 20),
+                            'ACCOUNT ERSTELLEN',
+                            style: MoreaTextStyle.raisedButton,
                           ),
                           onPressed: () =>
                               showUpgradeWarning(kinderMap),
@@ -507,7 +507,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 RaisedButton(
                   child: Text(
                     'Account erstellen',
-                    style: MoreaTextStyle.flatButton,
+                    style: MoreaTextStyle.raisedButton,
                   ),
                   onPressed: () {
                     this.upgradeKid(childMap);

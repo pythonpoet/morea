@@ -40,7 +40,8 @@ enum AuthStatus {
   homePage,
   messagePage,
   agendaPage,
-  profilePage
+  profilePage,
+  homePageTutorial
 }
 
 class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
@@ -160,10 +161,23 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
               firestore: widget.firestore,
               navigationMap: navigationMap,
               moreafire: moreaFire,
+              tutorial: false,
             ),
           ),
         );
         break;
+      case AuthStatus.homePageTutorial:
+        return ShowCaseWidget(
+          builder: Builder(
+            builder: (contex) => HomePage(
+              auth: auth,
+              firestore: widget.firestore,
+              navigationMap: navigationMap,
+              moreafire: moreaFire,
+              tutorial: true,
+          )
+          ),
+        );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
         break;
@@ -221,10 +235,14 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   //Functions for the Navigation
   //Switches authStatus and rebuilds RootPage
 
-  void signedIn() async {
+  void signedIn({bool tutorialautostart}) async {
     await initMoreaFire();
     setState(() {
-      authStatus = AuthStatus.homePage;
+      if(tutorialautostart){
+        authStatus = AuthStatus.homePageTutorial;
+      } else {
+        authStatus = AuthStatus.homePage;
+      }
     });
   }
 
@@ -271,6 +289,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   }
 
   void signedOut() async {
+    setState(() {
+      authStatus = AuthStatus.loading;
+    });
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceID;
     if (Platform.isAndroid) if (Platform.isAndroid) {
@@ -280,12 +301,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
       deviceID = iosDeviceInfo.identifierForVendor;
     }
-    print(await auth.currentUser());
-    print(deviceID);
-    callFunction(getcallable("deactivateDeviceNotification"),
+    await callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
     await auth.signOut();
-    firebaseMessaging.deleteInstanceID();
+    await firebaseMessaging.deleteInstanceID();
     moreaFire = null;
     setState(() {
       authStatus = AuthStatus.notSignedIn;

@@ -213,6 +213,7 @@ class _AgendaStatePage extends State<AgendaState>
           disableAnimation: true,
           description: 'Hier kannst du Events/Lager hinzufügen',
           child: new FloatingActionButton(
+            elevation: 1,
             child: Icon(Icons.add),
             backgroundColor: Color(0xff7a62ff),
             onPressed: () => routetoAddevent(),

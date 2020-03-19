@@ -1,10 +1,12 @@
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_html/rich_text_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_address.dart';
 import 'package:morea/Pages/Profil/change_email.dart';
 import 'package:morea/Pages/Profil/change_name.dart';
 import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
@@ -14,6 +16,7 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/utilities/MiData.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EditUserProfilePage extends StatefulWidget {
   EditUserProfilePage({this.profile, this.moreaFire, this.crud0});
@@ -89,38 +92,110 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       context: context,
       builder: (BuildContext context) => new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
+        title: Text(
+          'Achtung',
+          style: MoreaTextStyle.warningTitle,
+        ),
         content: Container(
-          child: Text(
-              'Es werden nur die Userdaten gelöscht,\num den Account komplett zu löschen,\nkontaktiere Jarvis '),
+          child: Text('Du bist dabei einen User zu löschen.'),
         ),
         actions: <Widget>[
           new FlatButton(
-              child: const Text('CANCEL'),
+              child: const Text('ABBRECHEN'),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new FlatButton(
-              child: const Text(
-                'Löschen',
-                style: TextStyle(color: Colors.redAccent),
-              ),
-              onPressed: () async {
-                print(widget.profile);
-                for(var elternUID in widget.profile[userMapEltern].keys.toList()){
-                  var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
-                  elternMap[userMapKinder].remove(widget.profile[userMapUID]);
-                  print(elternMap);
-                  await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
-                }
-                if(widget.profile['UID'] == null){
-                  widget.profile['UID'] = widget.profile['childUID'];
-                }
-                await callFunction(getcallable('deleteUserMap'), param: {'UID': widget.profile['UID'], 'groupID': widget.profile[userMapgroupID],});
-                Navigator.pop(context);
-              })
+          moreaFlatRedButton('LÖSCHEN', this.delete)
         ],
       ),
     );
+  }
+
+  void delete() async {
+    setState(() {
+      loading = true;
+    });
+    Navigator.of(context).pop();
+    if (widget.profile[userMapEltern] != null) {
+      for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
+        var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
+        elternMap[userMapKinder].remove(widget.profile[userMapUID]);
+        await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
+      }
+    }
+    if (widget.profile[userMapKinder] != null) {
+      for (var childUID in widget.profile[userMapKinder].keys.toList()) {
+        Map childMap = (await crud0.getDocument(pathUser, childUID)).data;
+        if (childMap[userMapChildUID] == null) {
+          childMap[userMapEltern].remove(widget.profile[userMapUID]);
+          await moreafire.updateUserInformation(childMap[userMapUID], childMap);
+        } else {
+          if (childMap[userMapEltern].length == 1) {
+            await callFunction(getcallable('deleteUserMap'),
+                param: {'UID': childUID, 'groupID': childMap[userMapgroupID]});
+          } else {
+            childMap[userMapEltern].remove(widget.profile[userMapUID]);
+            await moreafire.updateUserInformation(childUID, childMap);
+          }
+        }
+      }
+    }
+    if (widget.profile['UID'] == null) {
+      widget.profile['UID'] = widget.profile['childUID'];
+    }
+    if (widget.profile[userMapgroupID] != null) {
+      await callFunction(getcallable('deleteUserMap'), param: {
+        'UID': widget.profile['UID'],
+        'groupID': widget.profile[userMapgroupID],
+      });
+    } else if (widget.profile[userMapSubscribedGroups] != null) {
+      if (widget.profile[userMapSubscribedGroups].length == 1) {
+        await callFunction(getcallable('deleteUserMap'), param: {
+          'UID': widget.profile['UID'],
+          'groupID': widget.profile[userMapSubscribedGroups][0],
+        });
+      } else {
+        for (int i = widget.profile[userMapSubscribedGroups].length - 1;
+            i < 1;
+            i--) {
+          await callFunction(getcallable('desubFromGroup'), param: {
+            'UID': widget.profile[userMapUID],
+            'groupID': widget.profile[userMapSubscribedGroups][i],
+          });
+        }
+        await callFunction(getcallable('deleteUserMap'), param: {
+          'UID': widget.profile['UID'],
+          'groupID': widget.profile[userMapSubscribedGroups][0],
+        });
+      }
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(
+                  'Error',
+                  style: MoreaTextStyle.warningTitle,
+                ),
+                content: RichText(
+                  text: TextSpan(
+                      text:
+                          'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: ',
+                      style: MoreaTextStyle.normal,
+                      children: [
+                        LinkTextSpan(
+                            text: 'it@morea.ch',
+                            url: 'mailto:<it@morea.ch>',
+                            onLinkTap: (url) => launch(url),
+                            style: MoreaTextStyle.link)
+                      ]),
+                ),
+                actions: <Widget>[
+                  moreaFlatButton('OK', () => Navigator.of(context).pop()),
+                ],
+              ));
+    }
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   Map mapUserData() {
@@ -323,7 +398,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'Geburtstag',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: Text(_geburtstag),
+        subtitle: _geburtstag == null ? Text('') : Text(_geburtstag),
         onTap: () async {
           await DatePicker.showDatePicker(context,
               showTitleActions: true,
@@ -366,10 +441,15 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 color: Colors.black,
               ),
             ),
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        child: MoreaDivider(),
-      ),
+      (_pos == "Mutter" ||
+              _pos == 'Vater' ||
+              _pos == 'Erziehungsberechtigter' ||
+              _pos == 'Erziehungsberechtigte')
+          ? Container()
+          : Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: MoreaDivider(),
+            ),
       ListTile(
         title: Text(
           'Rolle',
@@ -391,12 +471,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
   List<Widget> buildSubmitButtons() {
     return [
       Center(
-        child: FlatButton(
-          child: new Text('Person aus Datenbank löschen',
-              style: new TextStyle(fontSize: 20, color: Colors.redAccent)),
-          onPressed: () => {deleteuseraccount()},
-        ),
-      ),
+          child: moreaFlatRedButton('PERSON LÖSCHEN', this.deleteuseraccount)),
       SizedBox(
         height: 15,
       )

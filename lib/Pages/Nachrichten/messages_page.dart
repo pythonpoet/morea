@@ -402,7 +402,7 @@ class _MessagesPageState extends State<MessagesPage>
           padding: EdgeInsets.only(right: 20, left: 20),
           child: ListTile(
             key: UniqueKey(),
-            title: Text(document['title'], style: MoreaTextStyle.lable),
+            title: Text(document['title'], style: MoreaTextStyle.lableViolett),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

@@ -346,7 +346,6 @@ class EventAddPageState extends State<EventAddPage> {
     }
   }
 
-//TODO pass Abteilunggoup to this page
   initSubgoup() async {
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, "1165")).data;

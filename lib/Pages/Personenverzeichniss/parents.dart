@@ -32,6 +32,7 @@ class MergeChildParent extends BaseMergeChildParent {
   bool parentReaderror = false, allowScanner = true;
   final formKey = new GlobalKey<FormState>();
   StreamController<bool> streamRegisterStatus = new BehaviorSubject();
+  bool loading = false;
 
   String userId, error;
 
@@ -56,7 +57,7 @@ class MergeChildParent extends BaseMergeChildParent {
         padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
         child: new Card(
           child: new Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(10),
             child: new Column(
               children: <Widget>[
                 Flexible(
@@ -182,7 +183,18 @@ class MergeChildParent extends BaseMergeChildParent {
     await qrCode.germanScanQR();
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context){
+          return AlertDialog(
+            title: Text('Kind wird verbunden...'),
+            content: Center(child: simpleMoreaLoadingIndicator(),),
+          );
+        }
+      );
       await childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
+      Navigator.of(context).pop();
       allowScanner = false;
       parentReaderror = false;
       parentaktuallisieren();
