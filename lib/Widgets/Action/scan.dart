@@ -14,7 +14,7 @@ Future<Widget> makeLeiterWidget(
   bool buttonPressed = false;
   return scanDialog(context, [
     Text(
-      'Eltern/Erziehungsberechtigte koppeln',
+      'Teilnehmer koppeln',
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
     ),
     SizedBox(
@@ -49,7 +49,7 @@ Future<Widget> makeLeiterWidget(
                   await qrCode.germanScanQR(),
                   stream.add(666),
                   if (qrCode.germanError ==
-                      'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.')
+                      'Um den Kopplungsvorgang mit dem TN abzuschliessen, scanne den Qr-Code, der im Profil des TN\'s ersichtlich ist.')
                     {
                       makeLeiter(userID, qrCode.qrResult, groupID)
                           .then((onValue) {
