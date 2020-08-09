@@ -72,9 +72,28 @@ final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
 final String eventMapAnmeldeStatusPositiv = "Chunt";
 final String eventMapAnmeldeUID = "AnmeldeUID";
 
-//Teleblitz-local Map
+//Teleblitz
 final String tlbzMapLoading = "Loading";
 final String tlbzMapNoElement = "noElement";
+final String tlbzMapTeleblitzType = "TeleblitzType";
+final String tlbzMapArchived = "_archived";
+final String tlbzMapDraft = "_draft";
+final String tlbzMapAntreten = "antreten";
+final String tlbzMapAbtreten = "abtreten";
+final String tlbzMapBemerkung = "bemerkung";
+final String tlbzMapDatum = "datum";
+final String tlbzMapEndeFerien = "ende-ferien";
+final String tlbzMapFerien = "ferien";
+final String tlbzMapGoogleMaps = "google-map";
+final String tlbzMapGrund = "grund";
+final String tlbzMapKeineAktivitaet = "keine-aktivitat";
+final String tlbzMapMapAbtreten = "map-abtreten";
+final String tlbzMapMitnehmenTest = "mitnehmen-test";
+final String tlbzMapName = "name";
+final String tlbzMapNameDesSenders = "name-des-senders";
+final String tlbzMapSlug = "slug";
+final String tlbzMapGroupIDs = "groupIDs";
+
 
 //Keys der Map der Navigation
 final String signedOut = 'signedOut';

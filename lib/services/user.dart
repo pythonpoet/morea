@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';

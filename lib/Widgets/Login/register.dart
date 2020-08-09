@@ -6,8 +6,8 @@ import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/MiData.dart';
-import 'package:morea/services/utilities/user.dart';
 abstract class BaseRegister {}
 
 class Register implements BaseRegister {
