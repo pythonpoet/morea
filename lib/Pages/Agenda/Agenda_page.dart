@@ -73,7 +73,7 @@ class _AgendaStatePage extends State<AgendaState>
   void _getAgenda(groupID) {
     List<String> groupIDs = [];
     if (groupID != null) groupIDs.add(groupID);
-    groupIDs.addAll(widget.moreaFire.getSubscribedGroups);
+    groupIDs.addAll(widget.moreaFire.getGroupIDs);
     agenda.getTotalAgendaOverview(groupIDs);
   }
 
@@ -152,7 +152,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
-    _getAgenda(moreafire.getUserMap[userMapgroupID]);
+    _getAgenda(moreafire.getUserMap[userMapGroupIDs]);
   }
 
   @override
@@ -207,7 +207,7 @@ class _AgendaStatePage extends State<AgendaState>
                     ],
                   ),
                 ),
-                child: aAgenda(moreafire.getUserMap[userMapgroupID]))),
+                child: aAgenda(moreafire.getUserMap[userMapGroupIDs]))),
         floatingActionButton: Showcase(
           key: _floatingActionButtonKey,
           disableAnimation: true,
@@ -271,7 +271,7 @@ class _AgendaStatePage extends State<AgendaState>
             child: moreaChildBottomAppBar(widget.navigationMap)),
         drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
             moreafire.getEmail, context, moreafire, crud0, _signedOut),
-        body: aAgenda(moreafire.getUserMap[userMapgroupID]),
+        body: aAgenda(moreafire.getUserMap[userMapGroupIDs]),
       );
     }
   }

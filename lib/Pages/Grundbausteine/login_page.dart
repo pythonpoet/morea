@@ -11,9 +11,9 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
-import 'package:morea/services/utilities/user.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     moreaUser.vorName,
                     moreaUser.nachName,
                     moreaUser.geschlecht,
-                    moreaUser.groupID,
+                    moreaUser.groupIDs[0],
                     moreafire);
               } else {
                 setState(() {
@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     moreaUser.vorName,
                     moreaUser.nachName,
                     moreaUser.geschlecht,
-                    moreaUser.groupID,
+                    moreaUser.groupIDs[0],
                     moreafire);
               } else {
                 setState(() {

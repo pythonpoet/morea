@@ -92,14 +92,14 @@ class EventAddPageState extends State<EventAddPage> {
     groupCheckbox = Map<String, bool>();
     if (widget.eventinfo['eventID'] == null) {
       for (Map groupMap in subgroups) {
-        this.groupCheckbox[groupMap[userMapgroupID]] = false;
+        this.groupCheckbox[groupMap[userMapGroupIDs]] = false;
       }
     } else {
       for (Map groupMap in subgroups) {
-        if (widget.eventinfo['groupIDs'].contains(groupMap[userMapgroupID])) {
-          this.groupCheckbox[groupMap[userMapgroupID]] = true;
+        if (widget.eventinfo['groupIDs'].contains(groupMap[userMapGroupIDs])) {
+          this.groupCheckbox[groupMap[userMapGroupIDs]] = true;
         } else {
-          this.groupCheckbox[groupMap[userMapgroupID]] = false;
+          this.groupCheckbox[groupMap[userMapGroupIDs]] = false;
         }
       }
     }
@@ -708,11 +708,11 @@ class EventAddPageState extends State<EventAddPage> {
                                           title: new Text(
                                               group[groupMapgroupNickName]),
                                           value: groupCheckbox[
-                                              group[userMapgroupID]],
+                                              group[userMapGroupIDs]],
                                           onChanged: (bool value) {
                                             setState(() {
                                               groupCheckbox[
-                                                      group[userMapgroupID]] =
+                                                      group[userMapGroupIDs]] =
                                                   value;
                                             });
                                           },
@@ -1038,11 +1038,11 @@ class EventAddPageState extends State<EventAddPage> {
                                               title: new Text(
                                                   group[groupMapgroupNickName]),
                                               value: groupCheckbox[
-                                                  group[userMapgroupID]],
+                                                  group[userMapGroupIDs]],
                                               onChanged: (bool value) {
                                                 setState(() {
                                                   groupCheckbox[group[
-                                                      userMapgroupID]] = value;
+                                                      userMapGroupIDs]] = value;
                                                 });
                                               },
                                             );

@@ -16,26 +16,23 @@ Description:
      
 */
 
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/services/Event/event_Prototyp.dart';
 
-abstract class BaseTeleblitz{
-  void readTeleblitz(Stream<Map<String,dynamic>> sTeleblitz);
+abstract class BaseTeleblitz extends Event{
+  void readTeleblitz(Map<String,dynamic> teleblitz);
 }
 
 class Teleblitz extends BaseTeleblitz{
-  String teleblitzType, timestamp, archived, draft, antreten, abtreten, bemerkunk, datum, ende_ferien, ferien, google_map, grund, keine_aktivitaet, map_abtreten, mitnehmen_test, name, name_des_senders, slug;
+  String teleblitzType, timestamp, archived, draft, antreten, abtreten, bemerkunk, datum, endeFerien, ferien, googleMap, grund, keineAktivitaet, mapAbtreten, mitnehmenTest, name, nameDesSenders, slug;
   List<String> groupIDs;
   Map<String, dynamic> teleblitz;
 
-  Stream<Map<String,dynamic>> sTeleblitz;
-  Teleblitz(this.sTeleblitz){
-    readTeleblitz(this.sTeleblitz);
+  Teleblitz(this.teleblitz){
+    readTeleblitz(this.teleblitz);
   }
     
-  void readTeleblitz(Stream<Map<String,dynamic>> sTeleblitz)async{
-    await for(Map<String,dynamic> teleblitz in sTeleblitz){
+  void readTeleblitz(Map<String,dynamic> teleblitz)async{
       this.teleblitz = teleblitz;
 
       if(teleblitz.containsKey(tlbzMapTeleblitzType))
@@ -79,7 +76,7 @@ class Teleblitz extends BaseTeleblitz{
          throw "$tlbzMapDatum has to be non-null";
       
       if(teleblitz.containsKey(tlbzMapEndeFerien))
-        this.ende_ferien = teleblitz[tlbzMapEndeFerien];
+        this.endeFerien = teleblitz[tlbzMapEndeFerien];
       else
          throw "$tlbzMapEndeFerien has to be non-null";
 
@@ -89,7 +86,7 @@ class Teleblitz extends BaseTeleblitz{
          throw "$tlbzMapFerien has to be non-null";
 
       if(teleblitz.containsKey(tlbzMapGoogleMaps))
-        this.google_map = teleblitz[tlbzMapGoogleMaps];
+        this.googleMap = teleblitz[tlbzMapGoogleMaps];
       else
          throw "$tlbzMapGoogleMaps has to be non-null";
 
@@ -99,17 +96,17 @@ class Teleblitz extends BaseTeleblitz{
          throw "$tlbzMapGrund has to be non-null";
 
       if(teleblitz.containsKey(tlbzMapKeineAktivitaet))
-        this.keine_aktivitaet = teleblitz[tlbzMapKeineAktivitaet];
+        this.keineAktivitaet = teleblitz[tlbzMapKeineAktivitaet];
       else
          throw "$tlbzMapKeineAktivitaet has to be non-null";
 
       if(teleblitz.containsKey(tlbzMapMapAbtreten))
-        this.map_abtreten = teleblitz[tlbzMapMapAbtreten];
+        this.mapAbtreten = teleblitz[tlbzMapMapAbtreten];
       else
          throw "$tlbzMapMapAbtreten has to be non-null";
 
       if(teleblitz.containsKey(tlbzMapMitnehmenTest))
-        this.mitnehmen_test = teleblitz[tlbzMapMitnehmenTest];
+        this.mitnehmenTest = teleblitz[tlbzMapMitnehmenTest];
       else
          throw "$tlbzMapMitnehmenTest has to be non-null";
 
@@ -119,7 +116,7 @@ class Teleblitz extends BaseTeleblitz{
          throw "$tlbzMapName has to be non-null";
 
       if(teleblitz.containsKey(tlbzMapNameDesSenders))
-        this.name_des_senders = teleblitz[tlbzMapNameDesSenders];
+        this.nameDesSenders = teleblitz[tlbzMapNameDesSenders];
       else
          throw "$tlbzMapNameDesSenders has to be non-null";
 
@@ -128,6 +125,6 @@ class Teleblitz extends BaseTeleblitz{
       else
          throw "$tlbzMapSlug has to be non-null";
 
-    }
+    
   }
 }

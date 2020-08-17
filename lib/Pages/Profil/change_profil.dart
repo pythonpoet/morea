@@ -671,7 +671,7 @@ class _ChangeProfileState extends State<ChangeProfile>
         } else {
           if (childMap[userMapEltern].length == 1) {
             await callFunction(getcallable('deleteUserMap'),
-                param: {'UID': childUID, 'groupID': childMap[userMapgroupID]});
+                param: {'UID': childUID, 'groupIDs': childMap[userMapGroupIDs]});
           } else {
             childMap[userMapEltern].remove(this.userInfo[userMapUID]);
             await widget.moreaFire.updateUserInformation(childUID, childMap);
@@ -684,10 +684,10 @@ class _ChangeProfileState extends State<ChangeProfile>
     }
     Navigator.of(context).popUntil(ModalRoute.withName('/'));
     await widget.navigationMap[signedOut]();
-    if (this.userInfo[userMapgroupID] != null) {
+    if (this.userInfo[userMapGroupIDs] != null) {
       await callFunction(getcallable('deleteUserMap'), param: {
         'UID': this.userInfo['UID'],
-        'groupID': this.userInfo[userMapgroupID],
+        'groupID': this.userInfo[userMapGroupIDs],
       });
     } else if (this.userInfo[userMapSubscribedGroups] != null) {
       if (this.userInfo[userMapSubscribedGroups].length == 1) {

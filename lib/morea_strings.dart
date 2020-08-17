@@ -33,7 +33,8 @@ final String pathChildren = "children";
 final String mapTimestamp = "Timestamp";
 //userMap
 final String userMapUID = "UID";
-final String userMapgroupID = "groupID";
+//final String userMapgroupID = "groupID";
+final String userMapGroupIDs = "groupIDs";
 final String userMapGroupEdditingAllow = "groupEdditingAllow";
 final String userMapPfadiName = "Pfadinamen";
 final String userMapNachName = "Nachname";
@@ -66,11 +67,31 @@ final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
 final String groupMapPriviledge = "Priviledge";
 final String groupMapDisplayName = "DisplayName";
+final String groupMapGroupJoinDate = "groupJoinDate";
+final String groupMapUploadeByUserID = "uploadedByUserID";
+final String groupMapUploadedTimeStamp = "uploadedTimeStamp";
+final String groupMapParticipatingGroups = "participatingGroups";
+final String groupMapEventStartTimeStamp = "eventStartTimeStamp";
+final String groupMapEventEndTimeStamp = "eventEndTimeStamp";
+final String groupMapGroupUpperClass = "groupMapGroupUpperClass";
+final String groupMapGroupLowerClass = "groupMapGroupLowerClass";
+final String groupMapGroupLicence = "groupMapGroupLicence";
+final String groupMapGroupLicenceType = "groupMapGroupLicenceType";
+final String groupMapGroupLienceTypePremium = "groupMapGroupLienceTypePremium";
+final String groupMapGroupLienceTypeStandart = "groupMapGroupLienceTypeStandart";
+final String groupMapGroupLienceTypeAnarchy = "groupMapGroupLienceTypeAnarchy";
+final String groupMapAdminGroupMemberBrowser = "groupMapAdminGroupMemberBrowser";
+final String groupMapEnableDisplayName = "groupMapEnableDisplayName";
+final String groupMapEventTeleblitzEnable = "groupMapEventTeleblitzEnable";
+final String groupMapChatEnable = "groupMapChatEnable";
+final String groupMapGroupLicencePath = "groupMapGroupLicencePath";
+final String groupMapGroupLicenceDocument = "groupMapGroupLicenceDocument";
 
 //eventMap
 final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
 final String eventMapAnmeldeStatusPositiv = "Chunt";
 final String eventMapAnmeldeUID = "AnmeldeUID";
+final String eventMapType = "TeleblitzType";
 
 //Teleblitz
 final String tlbzMapLoading = "Loading";

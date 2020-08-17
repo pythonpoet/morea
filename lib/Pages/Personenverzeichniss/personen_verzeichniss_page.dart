@@ -38,16 +38,13 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1 + widget.moreaFire.getSubscribedGroups.length,
+      length: 1 + widget.moreaFire.getGroupIDs.length,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personen'),
           bottom: TabBar(
             tabs: <Widget>[
-              Tab(
-                text: convMiDatatoWebflow(widget.moreaFire.getGroupID),
-              ),
-              ...widget.moreaFire.getSubscribedGroups.map((groupID) => Tab(
+              ...widget.moreaFire.getGroupIDs.map((groupID) => Tab(
                     text: convMiDatatoWebflow(groupID),
                   ))
             ],
@@ -55,8 +52,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         ),
         body: TabBarView(
           children: <Widget>[
-            personen(widget.moreaFire.getGroupID),
-            ...widget.moreaFire.getSubscribedGroups
+            ...widget.moreaFire.getGroupIDs
                 .map((groupID) => personen(groupID))
           ],
         ),

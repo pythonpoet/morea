@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:device_info/device_info.dart';
 import 'dart:io' show Platform;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:rxdart/rxdart.dart';
 import 'auth.dart';
 import 'crud.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,7 +21,7 @@ abstract class BaseMoreaFirebase {
 
   String get getPfandiName;
 
-  String get getGroupID;
+  List<String> get getGroupIDs;
 
   String get getVorName;
 
@@ -29,13 +33,12 @@ abstract class BaseMoreaFirebase {
 
   String get getEmail;
 
-  List<String> get getSubscribedGroups;
-
   Map<String, dynamic> get getGroupMap;
 
   Map<String, dynamic> get getUserMap;
 
   Map<String, Map<String, String>> get getChildMap;
+  Stream<Map<String,GroupData>> get getGroupDataStream;
 
   Future<void> createUserInformation(Map userInfo);
 
@@ -72,6 +75,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   User moreaUser;
 
+  StreamController<Map<String,GroupData>> sCGroupMaps = BehaviorSubject();
+
   MoreaFirebase(Firestore firestore, {List groupIDs}) {
     this.firestore = firestore;
     crud0 = new CrudMedthods(firestore);
@@ -83,7 +88,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   String get getPfandiName => moreaUser.pfadiName;
 
-  String get getGroupID => moreaUser.groupID;
+  List<String> get getGroupIDs => moreaUser.groupIDs;
 
   String get getVorName => moreaUser.vorName;
 
@@ -95,10 +100,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   String get getGeschlecht => moreaUser.geschlecht;
 
-  //String get getHomeFeedMainEventID => _homeFeedMainEventID;
-
-  List<String> get getSubscribedGroups => moreaUser.subscribedGroups;
-
   Map<String, dynamic> get getGroupMap => moreaUser.groupMap;
 
   Map<String, dynamic> get getUserMap => _userMap;
@@ -106,6 +107,10 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, Map<String, String>> get getChildMap => moreaUser.childMap;
 
   Map<String, int> get getGroupPrivilege => moreaUser.groupPrivilege;
+
+  int getHighestEventPriviledge(List<String> groupIDs) => moreaUser.getHighestEventPriviledge(groupIDs);
+
+  Stream<Map<String,GroupData>> get getGroupDataStream => sCGroupMaps.stream;
 
   Future<void> getData(String userID) async {
     _userMap = Map<String, dynamic>.from(
@@ -115,10 +120,16 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
-    groupIDs.addAll(getSubscribedGroups);
-    if (getGroupID != null) groupIDs.add(getGroupID);
     tbz = new TeleblizFirestore(firestore, groupIDs);
+
+    for(String groupID in this.getGroupIDs){
+      sCGroupMaps.addStream(crud0.streamDocument(pathGroups, groupID).map((DocumentSnapshot dSGroup)  {
+        return  Map<String,GroupData>.of({dSGroup.documentID: GroupData(groupData:dSGroup.data)});
+      }));
+    }
   }
+
+
 
   Future<void> createUserInformation(Map userInfo) async {
     try {
@@ -303,7 +314,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       String groupID, String userID, String displayName) async {
     return callFunction(getcallable("priviledgeTN"),
         param: Map<String, String>.from({
-          userMapgroupID: groupID,
+          userMapGroupIDs: groupID,
           userMapUID: userID,
           "DisplayName": displayName
         }));
@@ -368,7 +379,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
     Map<String, dynamic> updatePriviledgePayload = <String, dynamic>{
       'UID': uid,
-      'groupID': childMap[userMapgroupID],
+      'groupIDs': childMap[userMapGroupIDs],
       'DisplayName': displayname,
       'oldUID': oldChildUID
     };

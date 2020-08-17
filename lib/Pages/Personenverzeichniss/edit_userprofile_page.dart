@@ -71,7 +71,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   ? userdata[userMapVorName]
                   : userdata[userMapPfadiName],
               oldGroup,
-              userdata[userMapgroupID])
+              userdata[userMapGroupIDs])
           .then((onValue) => setState);
       mailchimpApiManager.updateUserInfo(
           _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
@@ -132,7 +132,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
         } else {
           if (childMap[userMapEltern].length == 1) {
             await callFunction(getcallable('deleteUserMap'),
-                param: {'UID': childUID, 'groupID': childMap[userMapgroupID]});
+                param: {'UID': childUID, 'groupID': childMap[userMapGroupIDs]});
           } else {
             childMap[userMapEltern].remove(widget.profile[userMapUID]);
             await moreafire.updateUserInformation(childUID, childMap);
@@ -143,10 +143,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     if (widget.profile['UID'] == null) {
       widget.profile['UID'] = widget.profile['childUID'];
     }
-    if (widget.profile[userMapgroupID] != null) {
+    if (widget.profile[userMapGroupIDs] != null) {
       await callFunction(getcallable('deleteUserMap'), param: {
         'UID': widget.profile['UID'],
-        'groupID': widget.profile[userMapgroupID],
+        'groupID': widget.profile[userMapGroupIDs],
       });
     } else if (widget.profile[userMapSubscribedGroups] != null) {
       if (widget.profile[userMapSubscribedGroups].length == 1) {
@@ -210,7 +210,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     userInfo[userMapHandynummer] = this._handynummer;
     userInfo[userMapGeschlecht] = this._geschlecht;
     userInfo[userMapAlter] = this._geburtstag;
-    userInfo[userMapgroupID] = _stufe;
+    userInfo[userMapGroupIDs] = _stufe;
     userInfo[userMapPos] = _pos;
     return userInfo;
   }
@@ -221,7 +221,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     selectedrolle = widget.profile['Pos'];
     moreafire = widget.moreaFire;
     crud0 = widget.crud0;
-    oldGroup = widget.profile[userMapgroupID];
+    oldGroup = widget.profile[userMapGroupIDs];
     initStrings();
     initSubgoup();
     loading = false;
@@ -546,7 +546,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
             content: DropdownButton<String>(
                 items: _stufenselect.map((Map group) {
                   return new DropdownMenuItem<String>(
-                    value: group[userMapgroupID],
+                    value: group[userMapGroupIDs],
                     child: new Text(group[groupMapgroupNickName]),
                   );
                 }).toList(),

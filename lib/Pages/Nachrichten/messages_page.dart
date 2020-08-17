@@ -52,10 +52,7 @@ class _MessagesPageState extends State<MessagesPage>
     this.moreaFire = widget.moreaFire;
     crud0 = CrudMedthods(widget.firestore);
     messagesManager = MessagesManager(crud0);
-    List<String> groups = [];
-    groups.add(moreaFire.getGroupID);
-    groups.addAll(moreaFire.getSubscribedGroups);
-    messagesManager.getMessages(groups);
+    messagesManager.getMessages(moreaFire.getGroupIDs);
   }
 
   @override

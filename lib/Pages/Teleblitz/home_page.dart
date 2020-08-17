@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/services/Event/event_Widget.dart';
+import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/utilities/MiData.dart';
@@ -132,6 +134,23 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return teleblitzwidget();
   }
 
+
+  Widget arrangeEvents(){
+    return StreamBuilder(
+      stream: moreafire.getGroupDataStream,
+      builder: (BuildContext context, AsyncSnapshot<Map<String, GroupData>>aSData){
+        if(!aSData.hasData)
+          return moreaLoading.loading();
+
+         List<String> sortedEvents = sortHomeFeedByStartDate(aSData.data);
+        
+        return Column(
+          children: [...sortedEvents.map((String eventID) => EventWidget(moreaFirebase: this.moreafire, crudMedthods: this.crud0, eventID: eventID, function: moreafire.tbz.anmeldeStatus))]
+        );
+      },
+    );
+  }
+
   Widget teleblitzwidget() {
     if (_formType == FormType.loading)
       return Scaffold(
@@ -144,19 +163,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           body: MoreaBackgroundContainer(
               child: MoreaShadowContainer(
                   child: Center(child: moreaLoading.loading()))));
+
+                  
     if ((moreafire.getSubscribedGroups.length > 0) ||
         (moreafire.getGroupID != null)) {
       List<Widget> anzeige = new List();
       if (moreafire.getGroupID != null)
         anzeige.add(teleblitz.displayContent(
             moreaLoading.loading, moreafire.getGroupID));
-      moreafire.getSubscribedGroups.forEach((groupID) {
+        moreafire.getSubscribedGroups.forEach((groupID) {
         anzeige.add(teleblitz.displayContent(moreaLoading.loading, groupID));
       });
 
       return DefaultTabController(
-        length: moreafire.getSubscribedGroups.length +
-            ((moreafire.getGroupID != null) ? 1 : 0),
+        length: (moreafire.getGroupIDs.length > 0) ? moreafire.getGroupIDs.length : 1,
         child: Scaffold(
           backgroundColor: MoreaColors.bottomAppBar,
           key: _scaffoldKey,
@@ -165,12 +185,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             backgroundColor: MoreaColors.orange,
             title: new Text('Teleblitz'),
             bottom: TabBar(
-                tabs: getTabList(((moreafire.getGroupID == null)
-                    ? moreafire.getSubscribedGroups
-                    : [
-                        moreafire.getGroupID,
-                        ...moreafire.getSubscribedGroups
-                      ]))),
+                tabs: getTabList(moreafire.getGroupIDs)),
             actions: tutorialButton(),
             leading: Showcase.withWidget(
               key: _drawerKey,
@@ -199,7 +214,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
           drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
               moreafire.getEmail, context, moreafire, crud0, _signedOut),
-          body: TabBarView(children: anzeige),
+          body: TabBarView(
+            children: anzeige
+            ),
           floatingActionButton: (moreafire.getPos == "Leiter")
               ? Showcase(
                   key: _changeTeleblitzKey,

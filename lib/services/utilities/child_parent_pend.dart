@@ -23,7 +23,7 @@ class ChildParendPend extends BaseChildParendPend {
             param: Map.from({
               userMapPos: userMap[userMapPos],
               userMapUID: userMap[userMapUID],
-              userMapgroupID: userMap[userMapgroupID],
+              userMapGroupIDs: userMap[userMapGroupIDs],
               mapTimestamp: DateTime.now().toIso8601String()
             })))
         .data;
@@ -70,12 +70,12 @@ class ChildParendPend extends BaseChildParendPend {
       childData[userMapUID] = childUID;
       await crud0.setData(pathUser, childUID, childData);
       moreaFirebase.groupPriviledgeTN(
-          childData[userMapgroupID],
+          childData[userMapGroupIDs],
           childUID,
           (childData[userMapPfadiName] == ' '
               ? childData[userMapVorName]
               : childData[userMapPfadiName]));
-      moreaFirebase.subscribeToGroup(childData[userMapgroupID]);
+      moreaFirebase.subscribeToGroup(childData[userMapGroupIDs]);
       String requestStr = await this.childGenerateRequestString(childData);
       return parentSendsRequestString(requestStr, parentData);
     } catch (error) {

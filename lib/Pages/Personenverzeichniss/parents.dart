@@ -7,11 +7,15 @@ import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+
+
+
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
-import 'package:morea/services/utilities/user.dart';
+
 import 'package:rxdart/rxdart.dart';
 
 abstract class BaseMergeChildParent {
@@ -33,8 +37,9 @@ class MergeChildParent extends BaseMergeChildParent {
   final formKey = new GlobalKey<FormState>();
   StreamController<bool> streamRegisterStatus = new BehaviorSubject();
   bool loading = false;
-
+  Widget widget = new Container();
   String userId, error;
+  List someList;
 
   BuildContext showDialogcontext;
 
@@ -618,9 +623,9 @@ class MergeChildParent extends BaseMergeChildParent {
         } else {
           moreaUser.displayName = moreaUser.pfadiName;
         }
-        await moreafire.groupPriviledgeTN(
-            moreaUser.groupID, childUID, moreaUser.displayName);
-
+        moreaUser.groupIDs.forEach((String groupID) async { await moreafire.groupPriviledgeTN(
+            groupID, childUID, moreaUser.displayName);});
+      
         return true;
       }
     }

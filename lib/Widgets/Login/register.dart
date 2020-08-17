@@ -432,14 +432,14 @@ class Register implements BaseRegister {
                     underline: SizedBox(),
                       items: _stufenselect.map((Map group) {
                         return new DropdownMenuItem<String>(
-                          value: group[userMapgroupID],
+                          value: group[userMapGroupIDs],
                           child: new Text(group[groupMapgroupNickName]),
                         );
                       }).toList(),
                       hint: Text(_selectedstufe),
                       onChanged: (newVal) {
                         _selectedstufe = convMiDatatoWebflow(newVal);
-                        moreaUser.groupID = newVal;
+                        moreaUser.groupIDs = [newVal];
                         setState();
                       }),
                 ],
