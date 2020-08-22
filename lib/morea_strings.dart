@@ -73,6 +73,7 @@ final String groupMapUploadedTimeStamp = "uploadedTimeStamp";
 final String groupMapParticipatingGroups = "participatingGroups";
 final String groupMapEventStartTimeStamp = "eventStartTimeStamp";
 final String groupMapEventEndTimeStamp = "eventEndTimeStamp";
+final String groupMapGroupOption = "groupMapGroupOption";
 final String groupMapGroupUpperClass = "groupMapGroupUpperClass";
 final String groupMapGroupLowerClass = "groupMapGroupLowerClass";
 final String groupMapGroupLicence = "groupMapGroupLicence";

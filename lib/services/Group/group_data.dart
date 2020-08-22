@@ -1,6 +1,3 @@
-// TODO: 1) Priviledge System 2) Where to Sorte Default Priviledges and GroupOptions aswell as premium location
-
-
 import 'dart:async';
 import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,6 +55,7 @@ class GroupData {
   CrudMedthods crud0;
   //Attributes
   GroupLicence groupLicence;
+  GroupOption groupOption;
   HomeFeed homeFeed;
   Priviledge priviledge;
   Map<String, dynamic> groupData;
@@ -82,6 +80,13 @@ class GroupData {
         this.priviledge.readMap(groupMap[groupMapPriviledge], this.roles);
       else
         throw "$groupMapPriviledge has to be non-null";
+      if(groupMap.containsKey(groupMapGroupLicence))
+        this.groupLicence = GroupLicence(groupMap[groupMapGroupLicence]);
+      else throw "$groupMapGroupLicence has to be non-null";
+
+      if(groupMap.containsKey(groupMapGroupOption))
+        this.groupOption = GroupOption(groupMap[groupMapGroupOption]);
+      else throw "$groupMapGroupOption has to be non-null";
         
     }
   }
