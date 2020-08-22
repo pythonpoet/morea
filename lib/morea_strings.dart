@@ -86,6 +86,10 @@ final String groupMapEventTeleblitzEnable = "groupMapEventTeleblitzEnable";
 final String groupMapChatEnable = "groupMapChatEnable";
 final String groupMapGroupLicencePath = "groupMapGroupLicencePath";
 final String groupMapGroupLicenceDocument = "groupMapGroupLicenceDocument";
+final String groupMapPriviledgeEntryType = "groupMapPriviledgeEntryType";
+final String groupMapPriviledgeEntryName = "groupMapPriviledgeEntryName";
+final String groupMapPriviledgeEntryLocation = "groupMapPriviledgeEntryLocation";
+final String groupMapRoles = "roles";
 
 //eventMap
 final String eventMapAnmeldeStatusNegativ = "ChuntNoed";

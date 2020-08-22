@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/user.dart';
+import 'package:morea/services/utilities/blockedUserChecker.dart';
 
  Stream<Map<String, dynamic>> getGroupData(CrudMedthods crudMedthods, String groupID)async*{
   await for(DocumentSnapshot dsEventData in crudMedthods.streamDocument(pathGroups, groupID)){
@@ -60,7 +61,7 @@ class GroupData {
   HomeFeed homeFeed;
   Priviledge priviledge;
   Map<String, dynamic> groupData;
-
+  Map<String, PriviledgeEntry> roles;
   GroupData({this.groupData}){
     if(this.groupData != null)
       readGroup(this.groupData);
@@ -73,9 +74,12 @@ class GroupData {
         this.homeFeed.readMap(groupMap[groupMapHomeFeed]);
       else
          throw "$groupMapHomeFeed has to be non-null";
+      if(groupMap.containsKey(groupMapRoles))
+        this.roles = (groupMap[groupMapRoles] as Map<String,dynamic>).map(
+          (key, value) => MapEntry(key, PriviledgeEntry().read(value)));
 
       if(groupMap.containsKey(groupMapPriviledge))
-        this.priviledge.readMap(groupMap[groupMapPriviledge]);
+        this.priviledge.readMap(groupMap[groupMapPriviledge], this.roles);
       else
         throw "$groupMapPriviledge has to be non-null";
         
@@ -133,10 +137,10 @@ class HomeFeedEntry {
 }
 class Priviledge {
   Map<String, PriviledgeEntry> priviledge;
-  void readMap(Map<String,dynamic> data){
+  void readMap(Map<String,dynamic> data, Map<String, PriviledgeEntry> map){
     for(String userID in data.keys){
       if(data[userID].containsKey(groupMapPriviledge))
-        this.priviledge[userID].priviledge = data[userID][groupMapPriviledge];
+        this.priviledge[userID] = PriviledgeEntry(data:data[userID][groupMapPriviledge],map: map);
       else
          throw "$groupMapPriviledge of user: $userID has to be non-null";
       if(data[userID].containsKey(groupMapDisplayName))
@@ -150,13 +154,22 @@ class Priviledge {
          throw "$groupMapGroupJoinDate of user: $userID has to be non-null";
     }
     if(!data.containsKey(sessionUserID)){
-      this.priviledge[sessionUserID].priviledge = 0;
-      this.priviledge[sessionUserID].displayName = sessionUserName;
-      this.priviledge[sessionUserID].groupJoinDate = Timestamp.now().toString();
+      if(map.containsKey("guest")){
+        this.priviledge[sessionUserID] = map["guest"];
+        this.priviledge[sessionUserID].displayName = sessionUserName;
+        this.priviledge[sessionUserID].groupJoinDate = Timestamp.now().toString();
+      }else
+        throw "user: $sessionUserID is not allowd to interact with group";
+      
     }
   }
 }
 class PriviledgeEntry{
+  // PriviledgeEntry
+  String priviledgeEntryType;
+  String priviledgeEntryName;
+  String priviledgeEntryLocation;
+
   //User
   String displayName;
   String groupJoinDate;
@@ -171,6 +184,42 @@ class PriviledgeEntry{
   bool eventTeleblitzAnmelden;
   bool evnetTeleblitzSeeParticipants;
   bool eventTeleblitzShare;
+
+  PriviledgeEntry({Map<String,dynamic> data, Map<String,PriviledgeEntry> map}){
+    if(data.containsKey(groupMapPriviledgeEntryLocation)){
+      if(data[groupMapPriviledgeEntryLocation] == "local"){
+        if(map.containsKey(data[groupMapPriviledgeEntryType]))
+          this.read(map[groupMapPriviledgeEntryType]);
+        else 
+          throw "Role ${data[groupMapPriviledgeEntryType]} does not exists localy";
+      }else if(data[groupMapPriviledgeEntryLocation] == "global"){
+        if(globalConfigRoles.containsKey(data[groupMapPriviledgeEntryType]))
+          this.read(globalConfigRoles[groupMapPriviledgeEntryType]);
+        else 
+          throw "Role ${data[groupMapPriviledgeEntryType]} does not exists globaly";
+      }
+    
+    }else
+      throw "\"groupMapPriviledgeEntryLocation\" cant be empty";
+            
+
+  }
+
+  PriviledgeEntry read(PriviledgeEntry priviledgeEntry){
+    this.priviledgeEntryName = priviledgeEntry.priviledgeEntryName;
+
+    this.groupSeeMembers = priviledgeEntry.groupSeeMembers;
+    this.groupSeeMembersDetails = priviledgeEntry.groupSeeMembersDetails;
+    this.groupJoinDate = priviledgeEntry.groupJoinDate;
+
+    this.eventTeleblitzRead = priviledgeEntry.eventTeleblitzRead;
+    this.eventTeleblitzEdit = priviledgeEntry.eventTeleblitzEdit;
+    this.eventTeleblitzAnmelden = priviledgeEntry.eventTeleblitzAnmelden;
+    this.evnetTeleblitzSeeParticipants = priviledgeEntry.evnetTeleblitzSeeParticipants;
+    this.eventTeleblitzShare = priviledgeEntry.eventTeleblitzShare;
+    return this;
+  }
+
 }
 class GroupOption{
   List<String> groupUpperClass;
