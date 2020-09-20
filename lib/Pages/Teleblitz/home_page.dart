@@ -164,16 +164,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: MoreaShadowContainer(
                   child: Center(child: moreaLoading.loading()))));
 
-                  
-    if ((moreafire.getSubscribedGroups.length > 0) ||
-        (moreafire.getGroupID != null)) {
-      List<Widget> anzeige = new List();
-      if (moreafire.getGroupID != null)
-        anzeige.add(teleblitz.displayContent(
-            moreaLoading.loading, moreafire.getGroupID));
-        moreafire.getSubscribedGroups.forEach((groupID) {
-        anzeige.add(teleblitz.displayContent(moreaLoading.loading, groupID));
-      });
+                
 
       return DefaultTabController(
         length: (moreafire.getGroupIDs.length > 0) ? moreafire.getGroupIDs.length : 1,
@@ -215,7 +206,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
               moreafire.getEmail, context, moreafire, crud0, _signedOut),
           body: TabBarView(
-            children: anzeige
+            children: [arrangeEvents()]
             ),
           floatingActionButton: (moreafire.getPos == "Leiter")
               ? Showcase(
@@ -274,15 +265,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   )),
         ),
       );
-    } else
-      return Scaffold(
-          appBar: AppBar(
-            title: Text('Teleblitz'),
-          ),
-          drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
-              moreafire.getEmail, context, moreafire, crud0, _signedOut),
-          body: requestPrompttoParent());
-  }
+    } 
 
   List<Widget> getTabList(List<String> subscribedGroups) {
     List<Widget> tabList = new List();

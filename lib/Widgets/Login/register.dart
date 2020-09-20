@@ -6,6 +6,7 @@ import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/MiData.dart';
 abstract class BaseRegister {}
@@ -20,6 +21,7 @@ class Register implements BaseRegister {
       error,
       _geschlecht = 'Geschlecht wählen';
   List<Map> _stufenselect = new List();
+  GroupData groupdata;
     List<String> _verwandtschaft = [
     'Mutter',
     'Vater',
@@ -169,7 +171,11 @@ class Register implements BaseRegister {
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap){
         if(!snap.hasData)
           return simpleMoreaLoadingIndicator();
-        this._stufenselect = new List<Map>.from(snap.data[groupMapSubgroup]);
+        print("type= " + snap.data.data.runtimeType.toString());
+        Map<String, dynamic> groupData2= snap.data.data;
+        this.groupdata = new GroupData(groupData: groupData2);
+        
+       
       return Container(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -213,7 +219,8 @@ class Register implements BaseRegister {
         future: docSnapAbteilung,
         builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap){
           if(!snap.hasData)
-          return simpleMoreaLoadingIndicator();
+            return simpleMoreaLoadingIndicator();
+
         this._stufenselect = new List<Map>.from(snap.data[groupMapSubgroup]);
       return Container(
         child: Column(
@@ -430,15 +437,14 @@ class Register implements BaseRegister {
                 children: <Widget>[
                   new DropdownButton<String>(
                     underline: SizedBox(),
-                      items: _stufenselect.map((Map group) {
-                        return new DropdownMenuItem<String>(
-                          value: group[userMapGroupIDs],
-                          child: new Text(group[groupMapgroupNickName]),
-                        );
-                      }).toList(),
+                    items: this.groupdata.groupOption.groupLowerClass.values.map(
+                      (GroupLowerHirarchyEntry entry) => DropdownMenuItem<String>(
+                        value: entry.groupID,
+                        child: Text(entry.groupNickName)
+                      )).toList(),
                       hint: Text(_selectedstufe),
                       onChanged: (newVal) {
-                        _selectedstufe = convMiDatatoWebflow(newVal);
+                        _selectedstufe = this.groupdata.groupOption.groupLowerClass[newVal].groupNickName;
                         moreaUser.groupIDs = [newVal];
                         setState();
                       }),

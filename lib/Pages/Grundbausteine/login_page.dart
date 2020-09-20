@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         switch (_formType) {
           //Login
           case FormType.login:
-          //Sets Login indicator
+            //Sets Login indicator
             setState(() {
               _load = true;
             });
@@ -148,13 +148,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
-                await mailChimpAPIManager.updateUserInfo(
-                    moreaUser.email,
-                    moreaUser.vorName,
-                    moreaUser.nachName,
-                    moreaUser.geschlecht,
-                    moreaUser.groupIDs[0],
-                    moreafire);
               } else {
                 setState(() {
                   _load = false;
@@ -250,7 +243,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     moreaUser = new User(crud0);
     register = new Register(
         moreaUser: moreaUser,
-        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+        docSnapAbteilung:
+            crud0.getDocument(pathGroups, "f7bl3m4GSpvvo7iw5wNd"));
   }
 
   @override

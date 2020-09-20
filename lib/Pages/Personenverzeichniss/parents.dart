@@ -8,8 +8,6 @@ import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 
-
-
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/user.dart';
@@ -189,15 +187,16 @@ class MergeChildParent extends BaseMergeChildParent {
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
       showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context){
-          return AlertDialog(
-            title: Text('Kind wird verbunden...'),
-            content: Center(child: simpleMoreaLoadingIndicator(),),
-          );
-        }
-      );
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Kind wird verbunden...'),
+              content: Center(
+                child: simpleMoreaLoadingIndicator(),
+              ),
+            );
+          });
       await childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
       Navigator.of(context).pop();
       allowScanner = false;
@@ -623,9 +622,11 @@ class MergeChildParent extends BaseMergeChildParent {
         } else {
           moreaUser.displayName = moreaUser.pfadiName;
         }
-        moreaUser.groupIDs.forEach((String groupID) async { await moreafire.groupPriviledgeTN(
-            groupID, childUID, moreaUser.displayName);});
-      
+        moreaUser.groupIDs.forEach((String groupID) async {
+          await moreafire.groupPriviledgeTN(groupID, childUID,
+              moreaUser.displayName, moreaUser.generateAndValitateUserMap());
+        });
+
         return true;
       }
     }

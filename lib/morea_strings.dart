@@ -28,12 +28,13 @@ final String pathAnmeldungen = "Anmeldungen";
 final String pathRequest = "request";
 final String pathInit = "init";
 final String pathChildren = "children";
+final String pathPriviledge = "priviledge";
 
 //Maps
 final String mapTimestamp = "Timestamp";
 //userMap
 final String userMapUID = "UID";
-//final String userMapgroupID = "groupID";
+final String userMapgroupID = "groupID";
 final String userMapGroupIDs = "groupIDs";
 final String userMapGroupEdditingAllow = "groupEdditingAllow";
 final String userMapPfadiName = "Pfadinamen";
@@ -65,31 +66,44 @@ final String groupMapgroupNickName = "groupNickName";
 final String groupMapSubgroup = "subgroups";
 final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
-final String groupMapPriviledge = "Priviledge";
-final String groupMapDisplayName = "DisplayName";
-final String groupMapGroupJoinDate = "groupJoinDate";
+
 final String groupMapUploadeByUserID = "uploadedByUserID";
 final String groupMapUploadedTimeStamp = "uploadedTimeStamp";
 final String groupMapParticipatingGroups = "participatingGroups";
 final String groupMapEventStartTimeStamp = "eventStartTimeStamp";
 final String groupMapEventEndTimeStamp = "eventEndTimeStamp";
-final String groupMapGroupOption = "groupMapGroupOption";
+final String groupMapGroupOption = "groupOption";
 final String groupMapGroupUpperClass = "groupMapGroupUpperClass";
 final String groupMapGroupLowerClass = "groupMapGroupLowerClass";
-final String groupMapGroupLicence = "groupMapGroupLicence";
+final String groupMapGroupLicence = "groupLicence";
 final String groupMapGroupLicenceType = "groupMapGroupLicenceType";
 final String groupMapGroupLienceTypePremium = "groupMapGroupLienceTypePremium";
-final String groupMapGroupLienceTypeStandart = "groupMapGroupLienceTypeStandart";
+final String groupMapGroupLienceTypeStandart =
+    "groupMapGroupLienceTypeStandart";
 final String groupMapGroupLienceTypeAnarchy = "groupMapGroupLienceTypeAnarchy";
-final String groupMapAdminGroupMemberBrowser = "groupMapAdminGroupMemberBrowser";
+final String groupMapAdminGroupMemberBrowser =
+    "groupMapAdminGroupMemberBrowser";
 final String groupMapEnableDisplayName = "groupMapEnableDisplayName";
 final String groupMapEventTeleblitzEnable = "groupMapEventTeleblitzEnable";
 final String groupMapChatEnable = "groupMapChatEnable";
 final String groupMapGroupLicencePath = "groupMapGroupLicencePath";
 final String groupMapGroupLicenceDocument = "groupMapGroupLicenceDocument";
-final String groupMapPriviledgeEntryType = "groupMapPriviledgeEntryType";
-final String groupMapPriviledgeEntryName = "groupMapPriviledgeEntryName";
-final String groupMapPriviledgeEntryLocation = "groupMapPriviledgeEntryLocation";
+
+// GroupMap -> PriviledgeEntry
+final String groupMapPriviledgeEntryCustomInfo = 'customInfo';
+final String groupMapPriviledgeEntryType = "roleType";
+final String groupMapDisplayName = "displayName";
+final String groupMapGroupJoinDate = "groupJoinDate";
+
+//GroupMap -> Roles
+final String groupMapRolesRoleName = 'roleName';
+final String groupMapRolesCustomInfoTypes = 'customInfoTypes';
+final String groupMapPriviledgeEntrySeeMembers =
+    "groupMapPriviledgeEntrySeeMembers";
+final String groupMapPriviledgeEntrySeeMembersDetails =
+    "groupMapPriviledgeEntrySeeMembersDetails";
+final String eventTeleblitzPriviledge = 'teleblitzPriviledge';
+final String groupMapPriviledgeEntryLocation = "roleLocation";
 final String groupMapRoles = "roles";
 
 //eventMap
@@ -119,7 +133,6 @@ final String tlbzMapName = "name";
 final String tlbzMapNameDesSenders = "name-des-senders";
 final String tlbzMapSlug = "slug";
 final String tlbzMapGroupIDs = "groupIDs";
-
 
 //Keys der Map der Navigation
 final String signedOut = 'signedOut';

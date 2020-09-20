@@ -102,6 +102,9 @@ class Auth implements BaseAuth {
     this._user = await _firebaseAuth.currentUser();
     return _user != null ? _user.email : null;
   }
+  Future<void> deleteUserID() async{
+    (await FirebaseAuth.instance.currentUser()).delete();
+  }
 
   Future<bool> reauthenticate(String email, String password) async {
     bool reAuthenticated;

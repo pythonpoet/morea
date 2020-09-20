@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.morea.morea">
+    package="productions.morea.app">
 
     <!-- The INTERNET permission is required for development. Specifically,
          flutter needs it to communicate with the running application
@@ -16,7 +16,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
-        android:label="Pfadi Morea"
+        android:label="Morea"
         android:roundIcon="@mipmap/ic_morea_launcher_round">
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

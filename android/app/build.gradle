@@ -41,7 +41,7 @@ android {
         disable 'InvalidPackage'
     }
     defaultConfig {
-        applicationId "ch.morea.morea"
+        applicationId "productions.morea.app"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()

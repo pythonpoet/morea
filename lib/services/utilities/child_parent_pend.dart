@@ -69,12 +69,15 @@ class ChildParendPend extends BaseChildParendPend {
           await this.parentCreatesUser(_childEmail, _childPasswort);
       childData[userMapUID] = childUID;
       await crud0.setData(pathUser, childUID, childData);
-      moreaFirebase.groupPriviledgeTN(
-          childData[userMapGroupIDs],
-          childUID,
-          (childData[userMapPfadiName] == ' '
-              ? childData[userMapVorName]
-              : childData[userMapPfadiName]));
+      (childData[userMapGroupIDs] as List<String>).forEach((groupID) {
+        moreaFirebase.groupPriviledgeTN(
+            groupID,
+            childUID,
+            (childData[userMapPfadiName] == ' '
+                ? childData[userMapVorName]
+                : childData[userMapPfadiName]),
+            childData);
+      });
       moreaFirebase.subscribeToGroup(childData[userMapGroupIDs]);
       String requestStr = await this.childGenerateRequestString(childData);
       return parentSendsRequestString(requestStr, parentData);

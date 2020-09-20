@@ -35,7 +35,7 @@ class EventWidgetState extends State<EventWidget>{
 
           switch (eventData.eventType) {
             case EventType.teleblitz:
-                return TeleblitzWidget(eventData: eventData, moreaFirebase: null, crudMedthods: widget.crudMedthods, groupID: null, eventID: null, function: null);
+                return TeleblitzWidget(eventData: eventData, moreaFirebase: null, crudMedthods: widget.crudMedthods, eventID: null, function: null);
               break;
             //TODO implement New Events here!
             default:

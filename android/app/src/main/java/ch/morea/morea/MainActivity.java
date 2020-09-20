@@ -1,4 +1,4 @@
-package ch.morea.morea;
+package productions.morea.app;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

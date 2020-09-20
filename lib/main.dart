@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Pfadi Morea',
+      title: 'Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
         backgroundColor: Colors.white,

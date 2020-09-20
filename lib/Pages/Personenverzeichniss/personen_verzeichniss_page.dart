@@ -52,8 +52,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         ),
         body: TabBarView(
           children: <Widget>[
-            ...widget.moreaFire.getGroupIDs
-                .map((groupID) => personen(groupID))
+            ...widget.moreaFire.getGroupIDs.map((groupID) => personen(groupID))
           ],
         ),
       ),
@@ -62,21 +61,14 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
 
   Widget personen(String groupID) {
     return FutureBuilder(
-        future: widget.crud0.getDocument(pathGroups, groupID),
+        future:
+            widget.crud0.getCollection('$pathGroups/$groupID/$pathPriviledge'),
         builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> groupSnap) {
+            (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
           if (!groupSnap.hasData) return moreaLoading.loading();
           List<Map<String, Map<String, dynamic>>> person = new List();
-          if (groupSnap.data.data.containsKey(groupMapPriviledge)) if (groupSnap
-                  .data[groupMapPriviledge].length >
-              0) {
-            Map<String, dynamic>.from(groupSnap.data[groupMapPriviledge])
-                .forEach((k, v) => {
-                      if (k != 'groupID')
-                        {
-                          person.add({k: Map<String, dynamic>.from(v)})
-                        }
-                    });
+
+          if (groupSnap.data.documents.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
               child: MoreaShadowContainer(
@@ -95,18 +87,19 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                       shrinkWrap: true,
                       itemCount: person.length,
                       itemBuilder: (context, int index) {
-                        String name, userUID;
-                        person[index].forEach((k, v) {
-                          name = v[groupMapDisplayName];
-                          userUID = k;
-                        });
+                        Map<String, dynamic> person = Map<String, dynamic>.from(
+                            groupSnap.data.documents[index].data);
+                        String name = person[groupMapDisplayName];
+                        String userUID =
+                            groupSnap.data.documents[index].documentID;
+
                         return ListTile(
                           title: new Text(
                             name,
                             style: MoreaTextStyle.lable,
                           ),
                           onTap: () => navigatetoprofile(
-                              widget.moreaFire.getUserInformation(userUID)),
+                              person[groupMapPriviledgeEntryCustomInfo]),
                           trailing: Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.black,

@@ -78,7 +78,11 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
-    await this.moreaFire.getData(await auth.currentUser());
+    if(await this.moreaFire.getData(await auth.currentUser()) == false){
+      setState(() {
+        this.signedOut();
+      });
+    }
     await this.moreaFire.initTeleblitz();
     firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
@@ -301,8 +305,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
       deviceID = iosDeviceInfo.identifierForVendor;
     }
+    /*
     await callFunction(getcallable("deactivateDeviceNotification"),
-        param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
+        param: {'uid': (await auth.currentUser()), 'deviceID': deviceID}); */
     await auth.signOut();
     await firebaseMessaging.deleteInstanceID();
     moreaFire = null;

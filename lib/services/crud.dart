@@ -69,7 +69,13 @@ class CrudMedthods implements BaseCrudMethods {
     StreamController<bool> controller = new BehaviorSubject();
     value = controller.stream;
     controller.add(false);
-    db.collection(path).document(document).snapshots().distinct().skip(1).listen((onData)=> controller.add(true));
+    db
+        .collection(path)
+        .document(document)
+        .snapshots()
+        .distinct()
+        .skip(1)
+        .listen((onData) => controller.add(true));
     await value.firstWhere((bool item) => item);
     controller.close();
     return true;

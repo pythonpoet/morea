@@ -38,7 +38,7 @@ abstract class BaseMoreaFirebase {
   Map<String, dynamic> get getUserMap;
 
   Map<String, Map<String, String>> get getChildMap;
-  Stream<Map<String,GroupData>> get getGroupDataStream;
+  Stream<Map<String, GroupData>> get getGroupDataStream;
 
   Future<void> createUserInformation(Map userInfo);
 
@@ -75,7 +75,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   User moreaUser;
 
-  StreamController<Map<String,GroupData>> sCGroupMaps = BehaviorSubject();
+  StreamController<Map<String, GroupData>> sCGroupMaps = BehaviorSubject();
 
   MoreaFirebase(Firestore firestore, {List groupIDs}) {
     this.firestore = firestore;
@@ -108,28 +108,36 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Map<String, int> get getGroupPrivilege => moreaUser.groupPrivilege;
 
-  int getHighestEventPriviledge(List<String> groupIDs) => moreaUser.getHighestEventPriviledge(groupIDs);
+  int getHighestEventPriviledge(List<String> groupIDs) =>
+      moreaUser.getHighestEventPriviledge(groupIDs);
 
-  Stream<Map<String,GroupData>> get getGroupDataStream => sCGroupMaps.stream;
+  Stream<Map<String, GroupData>> get getGroupDataStream => sCGroupMaps.stream;
 
-  Future<void> getData(String userID) async {
-    _userMap = Map<String, dynamic>.from(
-        (await crud0.getDocument(pathUser, userID)).data);
+  Future<bool> getData(String userID) async {
+    DocumentSnapshot userData = (await crud0.getDocument(pathUser, userID));
+    if (!userData.exists) {
+      auth0.deleteUserID();
+      return false;
+    }
+
+    this._userMap = Map<String, dynamic>.from(userData.data);
     await moreaUser.getUserData(_userMap);
+    return true;
   }
 
   initTeleblitz() {
     List<String> groupIDs = new List<String>();
     tbz = new TeleblizFirestore(firestore, groupIDs);
 
-    for(String groupID in this.getGroupIDs){
-      sCGroupMaps.addStream(crud0.streamDocument(pathGroups, groupID).map((DocumentSnapshot dSGroup)  {
-        return  Map<String,GroupData>.of({dSGroup.documentID: GroupData(groupData:dSGroup.data)});
+    for (String groupID in this.getGroupIDs) {
+      sCGroupMaps.addStream(crud0
+          .streamDocument(pathGroups, groupID)
+          .map((DocumentSnapshot dSGroup) {
+        return Map<String, GroupData>.of(
+            {dSGroup.documentID: GroupData(groupData: dSGroup.data)});
       }));
     }
   }
-
-
 
   Future<void> createUserInformation(Map userInfo) async {
     try {
@@ -259,8 +267,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> subscribeToGroup(String groupID) async {
-     await firebaseMessaging.requestNotificationPermissions();
-      firebaseMessaging.configure();
+    await firebaseMessaging.requestNotificationPermissions();
+    firebaseMessaging.configure();
     Map<String, dynamic> tokendata = {
       'devtoken': await firebaseMessaging.getToken()
     };
@@ -275,8 +283,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> setMessageRead(
       String userUID, String messageID, String groupnr) async {
-    var oldMessage =
-        await crud0.getDocument('messages', messageID);
+    var oldMessage = await crud0.getDocument('messages', messageID);
     List newRead = [];
     for (String index in oldMessage.data['read']) {
       newRead.add(index);
@@ -292,15 +299,15 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uploadDevTocken(String userID) async {
-  DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  String deviceID;
-  if(Platform.isAndroid){
-    AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
-    deviceID = androidDeviceInfo.androidId;
-  } else if(Platform.isIOS){
-    IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
-    deviceID = iosDeviceInfo.identifierForVendor;
-  }
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    String deviceID;
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
+      deviceID = androidDeviceInfo.androidId;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
+      deviceID = iosDeviceInfo.identifierForVendor;
+    }
     await callFunction(getcallable("uploadDevTocken"),
         param: Map<String, String>.from({
           userMapDeviceToken: await firebaseMessaging.getToken(),
@@ -310,13 +317,16 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  Future<void> groupPriviledgeTN(
-      String groupID, String userID, String displayName) async {
+  Future<void> groupPriviledgeTN(String groupID, String userID,
+      String displayName, Map<String, dynamic> customInfo) async {
     return callFunction(getcallable("priviledgeTN"),
         param: Map<String, String>.from({
-          userMapGroupIDs: groupID,
+          "groupID": groupID,
           userMapUID: userID,
-          "DisplayName": displayName
+          groupMapDisplayName: displayName,
+          groupMapPriviledgeEntryType: "Teilnehmer",
+          groupMapPriviledgeEntryLocation: "local",
+          groupMapPriviledgeEntryCustomInfo: customInfo
         }));
   }
 
@@ -357,7 +367,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
     childMap.remove(userMapChildUID);
 
     String displayname;
-    if (childMap[userMapPfadiName] == null || childMap[userMapPfadiName] == '') {
+    if (childMap[userMapPfadiName] == null ||
+        childMap[userMapPfadiName] == '') {
       displayname = childMap[userMapVorName];
     } else {
       displayname = childMap[userMapPfadiName];
