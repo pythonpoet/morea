@@ -47,6 +47,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey _bottomAppBarTNKey = GlobalKey();
 
+  static final ScrollController homeScreenScrollController =
+      new ScrollController();
+
   //final formKey = new GlobalKey<FormState>();
 
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
@@ -134,8 +137,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget scrollView() {
-    return SingleChildScrollView(
-      child: arrangeEvents(),
+    return MoreaBackgroundContainer(
+      child: SingleChildScrollView(
+        child: arrangeEvents(),
+        controller: homeScreenScrollController,
+      ),
     );
   }
 

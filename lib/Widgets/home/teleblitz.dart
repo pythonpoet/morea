@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
@@ -28,7 +29,6 @@ class Teleblitz {
   CrudMedthods crud0;
   Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
-  final ScrollController _clickController = new ScrollController();
   Map<String, Stream<String>> anmeldeStream = new Map();
   Map<String, StreamController<String>> anmeldeStreamController = new Map();
 
@@ -58,7 +58,7 @@ class Teleblitz {
   void submit(
       String anabmelden, List<String> groupIDs, String eventID, String uid,
       {String name}) {
-    _clickController.animateTo(0.0,
+    HomePageState.homeScreenScrollController.animateTo(0.0,
         curve: Curves.easeOut, duration: const Duration(milliseconds: 400));
 
     if (anabmelden == 'Chunt') {
