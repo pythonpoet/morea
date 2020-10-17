@@ -96,14 +96,18 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
   Future<void> runTransaction(
-      String path, String document, Map<String, dynamic> data) async {
+      String path, String document, Map<String, dynamic> data,
+      {Map Function(DocumentSnapshot) function}) async {
     DocumentReference docRef = db.collection(path).document(document);
 
     try {
       TransactionHandler transactionHandler = (Transaction tran) async {
         await tran.get(docRef).then((DocumentSnapshot snap) async {
           if (snap.exists) {
-            await tran.update(docRef, data);
+            if (function != null)
+              await tran.update(docRef, function(snap));
+            else
+              await tran.update(docRef, data);
           } else {
             await tran.set(docRef, data);
           }
@@ -127,16 +131,14 @@ class CrudMedthods implements BaseCrudMethods {
     });
   }
 
-  Future<void> setDataWithoutDocumentName(
+  Future<String> setDataWithoutDocumentName(
       String path, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
-    await Firestore.instance
-        .collection(path)
-        .document()
-        .setData(data)
-        .catchError((e) {
+    DocumentReference documentReference = this.db.collection(path).document();
+    await documentReference.setData(data).catchError((e) {
       print(e);
     });
+    return documentReference.documentID;
   }
 
   Future<void> updateMessage(

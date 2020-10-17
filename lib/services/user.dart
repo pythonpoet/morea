@@ -33,8 +33,9 @@ class User {
   User(this.crud0);
 
   int getHighestEventPriviledge(List<String> groupIDs) {
+    if (groupIDs == null) return 0;
     int returnValue = 0;
-    for (int i; i < groupIDs.length; i++) {
+    for (int i = 0; i < groupIDs.length; i++) {
       if (this.groupIDs.contains(groupIDs[i])) if (groupPrivilege[groupIDs[i]] >
           returnValue) returnValue = groupPrivilege[groupIDs[i]];
     }
@@ -112,12 +113,12 @@ class User {
       displayName = vorName;
     }
     for (String groupID in groupIDs) {
+      var someVar = (await crud0.getDocument(
+          '$pathGroups/$groupID/$pathPriviledge', this.userID));
       GroupData groupData = new GroupData(
           groupData: Map<String, dynamic>.from(
               (await crud0.getDocument(pathGroups, groupID)).data),
-          groupUserData: Map<String, dynamic>.from((await crud0.getDocument(
-                  '$pathGroups/$groupID/$pathPriviledge', this.userID))
-              .data));
+          groupUserData: Map<String, dynamic>.from(someVar.data));
 
       subscribedGroups[groupID] = groupData;
     }
@@ -165,7 +166,7 @@ class User {
       throw "$userMapHandynummer has to be non-null";
 
     if (_userMap.containsKey(userMapGroupIDs))
-      groupIDs = _userMap[userMapGroupIDs];
+      groupIDs = List<String>.from(_userMap[userMapGroupIDs]);
     //groupID can be null (Because parents don't have to be asigned to a group).
 
     if (_userMap.containsKey(userMapGeburtstag))
@@ -197,12 +198,14 @@ class User {
       subscribedGroups = null;
     } else {
       for (String groupID in groupIDs) {
-        subscribedGroups[groupID].readGroup(
-            Map<String, dynamic>.from(
+        GroupData groupData = new GroupData(
+            groupData: Map<String, dynamic>.from(
                 (await crud0.getDocument(pathGroups, groupID)).data),
-            Map<String, dynamic>.from((await crud0.getDocument(
+            groupUserData: Map<String, dynamic>.from((await crud0.getDocument(
                     '$pathGroups/$groupID/$pathPriviledge', this.userID))
                 .data));
+
+        subscribedGroups[groupID] = groupData;
       }
     }
   }

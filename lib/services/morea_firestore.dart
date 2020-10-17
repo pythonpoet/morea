@@ -100,6 +100,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   String get getGeschlecht => moreaUser.geschlecht;
 
+  Map<String, GroupData> get getMapGroupData => moreaUser.subscribedGroups;
+
   Map<String, dynamic> get getGroupMap => moreaUser.groupMap;
 
   Map<String, dynamic> get getUserMap => _userMap;
@@ -125,16 +127,21 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return true;
   }
 
-  initTeleblitz() {
+  initTeleblitz() async {
     List<String> groupIDs = new List<String>();
     tbz = new TeleblizFirestore(firestore, groupIDs);
 
     for (String groupID in this.getGroupIDs) {
+      var someVar = (await crud0.getDocument(
+              '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID))
+          .data;
       sCGroupMaps.addStream(crud0
           .streamDocument(pathGroups, groupID)
           .map((DocumentSnapshot dSGroup) {
-        return Map<String, GroupData>.of(
-            {dSGroup.documentID: GroupData(groupData: dSGroup.data)});
+        return Map<String, GroupData>.of({
+          dSGroup.documentID:
+              GroupData(groupData: dSGroup.data, groupUserData: someVar)
+        });
       }));
     }
   }
@@ -210,6 +217,65 @@ class MoreaFirebase extends BaseMoreaFirebase {
           "Name": name
         }));
     return null;
+  }
+
+  Future<void> createEvent(List<String> groupIDs, String eventEndTimeStamp,
+      String eventStartTimeStamp, Map<String, dynamic> data) async {
+    //Upload the Event
+    data['Timestamp'] = DateTime.now().toString();
+    String eventID =
+        await this.crud0.setDataWithoutDocumentName(pathEvents, data);
+
+    //Upload homeFeed
+    this.uploadHomeFeedEntry(
+        eventID, groupIDs, eventEndTimeStamp, eventStartTimeStamp, data);
+  }
+
+  Future<void> uploadHomeFeedEntry(
+      String eventID,
+      List<String> groupIDs,
+      String eventEndTimeStamp,
+      String eventStartTimeStamp,
+      Map<String, dynamic> data) {
+    for (String groupID in groupIDs)
+      //Upload the HomeFeed
+      this.getMapGroupData[groupID].uploadHomeFeedEntry(this.moreaUser.userID,
+          eventID, eventEndTimeStamp, eventStartTimeStamp, data, this.crud0);
+  }
+
+/*
+  Future<void> updateEvent(String eventID, Map<String, dynamic> data,
+      {List<String> groupIDADD, List<String> groupIDRM}) async {
+    // Check if groupID was removed
+    this.crud0.runTransaction(pathEvents, eventID, data);
+    if (groupIDADD != null)
+      this.uploadHomeFeedEntry(groupIDADD, data[groupMapEventEndTimeStamp],
+          data[groupMapEventStartTimeStamp], data);
+    if (groupIDRM != null)
+      groupIDRM.forEach((groupID) {
+        this.deleteHomeFeedEntry(eventID, groupID);
+      });
+  }
+*/
+  Future<void> deleteHomeFeedEntry(String eventID, String groupID) async {
+    this.crud0.runTransaction(
+      pathGroups,
+      groupID,
+      {},
+      function: (snap) {
+        snap.data[groupMapHomeFeed].removeWhere((key, value) => key == eventID);
+        return snap.data;
+      },
+    );
+  }
+
+  Future<void> deleteEvent(String eventID, List<String> groupIDs) {
+    //Remove HomeFeedEntry
+    for (String groupID in groupIDs) {
+      this.deleteHomeFeedEntry(eventID, groupID);
+    }
+    //Remove Event
+    return this.crud0.deletedocument(pathEvents, eventID);
   }
 
   Future<void> uploadteleblitz(String groupID, Map data) async {
@@ -320,7 +386,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Future<void> groupPriviledgeTN(String groupID, String userID,
       String displayName, Map<String, dynamic> customInfo) async {
     return callFunction(getcallable("priviledgeTN"),
-        param: Map<String, String>.from({
+        param: Map<String, dynamic>.from({
           "groupID": groupID,
           userMapUID: userID,
           groupMapDisplayName: displayName,

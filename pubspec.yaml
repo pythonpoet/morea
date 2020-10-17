@@ -34,9 +34,7 @@ dependencies:
     barcode_scan: ^1.0.0
     flutter_masked_text: ^0.8.0
     rxdart: ^0.22.4
-    flutter_datetime_picker:
-        git:
-            url: https://github.com/derohimat/flutter_datetime_picker.git
+    flutter_datetime_picker: ^1.4.0
     flip_card: ^0.4.4
     showcaseview: ^0.1.5
     device_info: ^0.4.1+4

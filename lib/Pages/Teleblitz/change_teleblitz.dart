@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
+import 'package:morea/services/Event/event_data.dart';
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
@@ -35,6 +36,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 
   //Variabeln vom Teleblitz
   String name,
+      startTime,
+      endTime,
       datum,
       antreten,
       mapAntreten,
@@ -45,8 +48,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       grund,
       endeFerien,
       id,
-      slug;
-
+      slug,
+      rawDate;
   List<String> mitnehmen;
   bool keineAktivitaet, ferien;
   bool archived = false;
@@ -93,8 +96,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
               appBar: AppBar(
                 title: Text('Loading...'),
               ),
-              body: MoreaBackgroundContainer(
-                  child: moreaLoading.loading()));
+              body: MoreaBackgroundContainer(child: moreaLoading.loading()));
         } else if (snapshot.connectionState == ConnectionState.done) {
           switch (formType) {
             case FormType.keineAktivitaet:
@@ -134,8 +136,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                 ),
                                 onTap: () => _selectDatum(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15, bottom: 5),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, bottom: 5),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -148,7 +150,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                 title: Text('Grund des Ausfalls',
                                     style: MoreaTextStyle.lable),
                                 subtitle: Padding(
-                                  padding: const EdgeInsets.only(top:10.0),
+                                  padding: const EdgeInsets.only(top: 10.0),
                                   child: Text(
                                     this.grund,
                                     style: MoreaTextStyle.subtitle,
@@ -162,7 +164,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
                                 contentPadding: EdgeInsets.only(
-                                    right: 15, left: 15, bottom: 15, top:5),
+                                    right: 15, left: 15, bottom: 15, top: 5),
                               ),
                             ],
                           ),
@@ -259,8 +261,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                 ),
                                 onTap: () => _selectDatum(context),
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 5),
+                                contentPadding: EdgeInsets.only(
+                                    left: 15, right: 15, top: 0, bottom: 5),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -288,8 +290,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                               this.setBeginn)));
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15, top: 5, bottom: 5),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, top: 5, bottom: 5),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -302,7 +304,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                 title: Text('Schluss',
                                     style: MoreaTextStyle.lable),
                                 subtitle: Padding(
-                                  padding: const EdgeInsets.only(top:10.0),
+                                  padding: const EdgeInsets.only(top: 10.0),
                                   child: Text(
                                     abtreten,
                                     style: MoreaTextStyle.subtitle,
@@ -315,8 +317,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                               this.mapAbtreten, this.setEnde)));
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15, top: 5, bottom: 5),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, top: 5, bottom: 5),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -349,8 +351,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                               this.setMitnehmen)));
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15, top: 10, bottom: 10),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, top: 10, bottom: 10),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -376,8 +378,8 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                                               this.setBemerkung)));
                                 },
                                 trailing: Icon(Icons.arrow_forward_ios),
-                                contentPadding:
-                                    EdgeInsets.only(right: 15, left: 15, top:5, bottom:5),
+                                contentPadding: EdgeInsets.only(
+                                    right: 15, left: 15, top: 5, bottom: 5),
                               ),
                               Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -473,10 +475,22 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       '_draft': false,
       '_archived': false,
       'groupIDs': [convWebflowtoMiData(stufe)],
+      'EventType': 'Teleblitz'
     };
-    teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-    await widget.moreaFire
-        .uploadteleblitz(convWebflowtoMiData(stufe), newTeleblitz);
+    EventData event = EventData(newTeleblitz);
+    int hours = int.parse(this.antreten.substring(0, 2));
+    int minutes = int.parse(this.antreten.substring(3, 5));
+    //Upload Teleblitz to Website TODO: convert date
+    //teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
+    DateTime start = (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
+        .add(Duration(hours: hours, minutes: minutes));
+    hours = int.parse(this.abtreten.substring(0, 2));
+    minutes = int.parse(this.abtreten.substring(3, 5));
+    DateTime end = (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
+        .add(Duration(hours: hours, minutes: minutes));
+    await widget.moreaFire.createEvent([convWebflowtoMiData(stufe)],
+        start.toIso8601String(), end.toIso8601String(), newTeleblitz);
+
     Navigator.of(context).popUntil(ModalRoute.withName('/'));
   }
 
@@ -489,6 +503,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
         lastDate: now.add(Duration(days: 9999)));
     if (picked != null) {
       setState(() {
+        this.rawDate = picked.toIso8601String();
         this.datum = DateFormat('EEEE, dd.MM.yyy', 'de').format(picked);
       });
     }
@@ -508,14 +523,16 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     }
   }
 
-  void setBeginn(String ort, String zeit, String map) {
+  void setBeginn(String ort, String zeit, String map, String zeitRaw) {
     this.antreten = zeit + ' Uhr, ' + ort;
     this.mapAntreten = map;
+    this.startTime = zeit;
   }
 
   void setEnde(String ort, String zeit, String map) {
     this.abtreten = zeit + ' Uhr, ' + ort;
     this.mapAbtreten = map;
+    this.endTime = zeit;
   }
 
   void setMitnehmen(List<String> mitnehmen) {

@@ -11,13 +11,13 @@ String convWebflowtoMiData(String stufe) {
     case 'NahaniMeitli':
       return '3779';
     case 'DrasonBuebe':
-      return '4013';
+      return 'Op3qqioWs36MCeoWgDYL';
     case 'Wombat (Wölfe)':
       return '3776';
     case 'Nahani (Meitli)':
       return '3779';
     case 'Drason (Buebe)':
-      return '4013';
+      return 'Op3qqioWs36MCeoWgDYL';
     default:
       print("stufe = " + stufe);
       return stufe;

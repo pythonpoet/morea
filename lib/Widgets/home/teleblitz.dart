@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
@@ -12,7 +11,6 @@ import 'package:morea/morealayout.dart';
 import 'package:morea/services/Event/event_data.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 import 'package:rxdart/rxdart.dart';
@@ -37,8 +35,27 @@ class Teleblitz {
     this.moreaFire = moreaFire;
     this.crud0 = crud0;
   }
+  int getHighestEventPriviledge(List<String> groupIDs) {
+    if (groupIDs == null) return 0;
+    int returnValue = 0;
+    for (int i = 0; i < groupIDs.length; i++) {
+      if (moreaFire.getGroupIDs.contains(groupIDs[i])) {
+        if (moreaFire.getMapGroupData[groupIDs[i]].priviledge.role
+                .teleblitzPriviledge ==
+            null)
+          throw 'Teleblitz Priviledge cant be null';
+        else if (moreaFire.getMapGroupData[groupIDs[i]].priviledge.role
+                .teleblitzPriviledge >
+            returnValue)
+          returnValue = moreaFire
+              .getMapGroupData[groupIDs[i]].priviledge.role.teleblitzPriviledge;
+      }
+    }
+    return returnValue;
+  }
 
-  void submit(String anabmelden, List<String> groupIDs, String eventID, String uid,
+  void submit(
+      String anabmelden, List<String> groupIDs, String eventID, String uid,
       {String name}) {
     _clickController.animateTo(0.0,
         curve: Curves.easeOut, duration: const Duration(milliseconds: 400));
@@ -51,7 +68,7 @@ class Teleblitz {
     if (name == null) {
       name = moreaFire.getDisplayName;
     }
-    if (moreaFire.getHighestEventPriviledge(groupIDs) < 2) {
+    if (this.getHighestEventPriviledge(groupIDs) < 2) {
       moreaFire.childAnmelden(eventID, moreaFire.getUserMap[userMapUID],
           moreaFire.getUserMap[userMapUID], anabmelden, name);
     } else {
@@ -72,7 +89,7 @@ class Teleblitz {
     info.setMitnehmen(eventData.mitnehmenTest);
     info.setkeineAktivitat(eventData.keineAktivitaet);
     info.setGrund(eventData.grund);
-    info.setFerien(eventData.ferien);
+    info.setFerien(eventData.ferien.toString());
     info.setEndeFerien(eventData.endeFerien);
   }
 
@@ -122,11 +139,11 @@ class Teleblitz {
   Widget parentAnmeldeButton(List<String> groupIDs, String eventID) {
     List<Widget> anmeldebuttons = new List();
 
-    groupIDs.forEach((String groupID){
-     moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
-      anmeldebuttons.add(
-          anmeldebutton(groupIDs, eventID, uid, "ja", "nein", name: vorname));
-    });
+    groupIDs.forEach((String groupID) {
+      moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
+        anmeldebuttons.add(
+            anmeldebutton(groupIDs, eventID, uid, "ja", "nein", name: vorname));
+      });
     });
 
     return Column(children: anmeldebuttons);
@@ -174,8 +191,8 @@ class Teleblitz {
         ));
   }
 
-  Widget anmeldebutton(
-      List<String> groupIDs, String eventID, String uid, String anmelden, abmelden,
+  Widget anmeldebutton(List<String> groupIDs, String eventID, String uid,
+      String anmelden, abmelden,
       {String name}) {
     return StreamBuilder(
       stream: anmeldeStreamController[uid].stream,
@@ -376,19 +393,18 @@ class Teleblitz {
       Stream<String> Function(String userID, String eventID) function) {
     List<Widget> anmeldebuttons = new List();
     groupIDs.forEach((String groupID) {
-      
-    
-    moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
-      anmeldeStreamController[uid] = new BehaviorSubject();
-      anmeldeStreamController[uid].addStream(function(uid, eventID));
-      anmeldebuttons.add(anmeldeIndicator(
-        uid,
-        eventID,
-        function,
-        "$vorname ist angemolden",
-        "$vorname ist abgemolden",
-      ));
-    });});
+      moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
+        anmeldeStreamController[uid] = new BehaviorSubject();
+        anmeldeStreamController[uid].addStream(function(uid, eventID));
+        anmeldebuttons.add(anmeldeIndicator(
+          uid,
+          eventID,
+          function,
+          "$vorname ist angemolden",
+          "$vorname ist abgemolden",
+        ));
+      });
+    });
     return Column(children: anmeldebuttons);
   }
 
@@ -475,7 +491,7 @@ class Teleblitz {
 
   Widget teleblitz(String name, List<String> groupIDs, String eventID,
       Stream<String> Function(String userID, String eventID) function) {
-    switch (moreaFire.getHighestEventPriviledge(groupIDs)) {
+    switch (this.getHighestEventPriviledge(groupIDs)) {
       case 0:
         return MoreaShadowContainer(
           child: Padding(
@@ -815,31 +831,27 @@ class Teleblitz {
     }
   }
 
- 
-  Widget simpleTeleblitz(EventData eventData, String eventID, Stream<String> Function(String, String) function){
-    
-      switch (eventData.teleblitzType) {
-        case TeleblitzType.notImplemented:
-          return notImplemented();
-          break;
-        case TeleblitzType.ferien:
-          defineInfo(eventData);
-          return ferien();
-          break;
-        case TeleblitzType.keineAktivitaet:
-           defineInfo(eventData);
-          return  keineAktivitat();
-          break;
-        case TeleblitzType.teleblitz:
-           defineInfo(eventData);
-          return teleblitz(eventData.name, eventData.groupIDs, eventID, function);
-        default:
-          return notImplemented();
-      }
-          
-  
+  Widget simpleTeleblitz(EventData eventData, String eventID,
+      Stream<String> Function(String, String) function) {
+    switch (eventData.teleblitzType) {
+      case TeleblitzType.notImplemented:
+        return notImplemented();
+        break;
+      case TeleblitzType.ferien:
+        defineInfo(eventData);
+        return ferien();
+        break;
+      case TeleblitzType.keineAktivitaet:
+        defineInfo(eventData);
+        return keineAktivitat();
+        break;
+      case TeleblitzType.teleblitz:
+        defineInfo(eventData);
+        return teleblitz(eventData.name, eventData.groupIDs, eventID, function);
+      default:
+        return notImplemented();
+    }
   }
-
 }
 
 class Info {
@@ -859,7 +871,7 @@ class Info {
   String datum;
   String bemerkung;
   String sender;
-  String mitnehmen;
+  List<String> mitnehmen;
   String keineaktivitat;
   String grund;
   String ferien;
@@ -1109,9 +1121,6 @@ class Info {
   }
 
   Container getMitnehmen() {
-    String stringMitnehmen = this.mitnehmen.split('<ul><li>')[1];
-    stringMitnehmen = stringMitnehmen.split("</li></ul>")[0];
-    List<String> listMitnehmen = stringMitnehmen.split('</li><li>');
     if (this?.antreten?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
@@ -1131,10 +1140,13 @@ class Info {
               ListView.builder(
                 padding: EdgeInsets.only(left: 15),
                 shrinkWrap: true,
-                itemCount: listMitnehmen.length,
+                itemCount: this.mitnehmen.length,
                 physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index){
-                  return Text('- ' + listMitnehmen[index], style: MoreaTextStyle.normal,);
+                itemBuilder: (context, index) {
+                  return Text(
+                    '- ' + this.mitnehmen[index],
+                    style: MoreaTextStyle.normal,
+                  );
                 },
               ),
             ],

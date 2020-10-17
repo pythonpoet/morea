@@ -96,7 +96,6 @@ class Agenda extends BaseAgenda {
 
   void getTotalAgendaOverview(List<String> groupIDs) {
     //eliminates duplicates of groupIDs
-    groupIDs.toSet().toList();
     for (String groupID in groupIDs) {
       addToList(groupID).firstWhere((bool test) => test == true);
     }

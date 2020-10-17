@@ -70,10 +70,7 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  void _getAgenda(groupID) {
-    List<String> groupIDs = [];
-    if (groupID != null) groupIDs.add(groupID);
-    groupIDs.addAll(widget.moreaFire.getGroupIDs);
+  void _getAgenda(List<String> groupIDs) {
     agenda.getTotalAgendaOverview(groupIDs);
   }
 
@@ -152,7 +149,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
-    _getAgenda(moreafire.getUserMap[userMapGroupIDs]);
+    _getAgenda(moreafire.getGroupIDs);
   }
 
   @override
@@ -271,7 +268,7 @@ class _AgendaStatePage extends State<AgendaState>
             child: moreaChildBottomAppBar(widget.navigationMap)),
         drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
             moreafire.getEmail, context, moreafire, crud0, _signedOut),
-        body: aAgenda(moreafire.getUserMap[userMapGroupIDs]),
+        body: aAgenda(moreafire.getGroupIDs),
       );
     }
   }
@@ -307,13 +304,12 @@ class _AgendaStatePage extends State<AgendaState>
     });
   }
 
-  Widget aAgenda(String groupID) {
+  Widget aAgenda(List<String> groupID) {
     return StreamBuilder(
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
-            return MoreaBackgroundContainer(
-                child: moreaLoading.loading());
+            return MoreaBackgroundContainer(child: moreaLoading.loading());
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(
               child: MoreaShadowContainer(
@@ -386,7 +382,8 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+                                  contentPadding: EdgeInsets.only(
+                                      left: 15, right: 15, bottom: 10, top: 10),
                                   title: Text(
                                     _info['Eventname'].toString(),
                                     style: MoreaTextStyle.lable,
@@ -425,7 +422,8 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+                                  contentPadding: EdgeInsets.only(
+                                      left: 15, right: 15, bottom: 10, top: 10),
                                   trailing: _info['groupID'] == null
                                       ? Text('Error')
                                       : Text(

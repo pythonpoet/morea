@@ -14,7 +14,6 @@ import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -78,7 +77,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
-    if(await this.moreaFire.getData(await auth.currentUser()) == false){
+    if (await this.moreaFire.getData(await auth.currentUser()) == false) {
       setState(() {
         this.signedOut();
       });
@@ -89,45 +88,45 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       print(message);
       if (message['data']['typeMorea'] == 'Message') {
         showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('Neue Nachricht'),
-                    actions: <Widget>[
-                      RaisedButton(
-                        color: MoreaColors.violett,
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          navigationMap[toMessagePage]();
-                        },
-                        child: Text(
-                          'Ansehen',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      RaisedButton(
-                        color: MoreaColors.violett,
-                        child: Text(
-                          'Später',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      )
-                    ],
-                  );
-                },
-              );
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Neue Nachricht'),
+              actions: <Widget>[
+                RaisedButton(
+                  color: MoreaColors.violett,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    navigationMap[toMessagePage]();
+                  },
+                  child: Text(
+                    'Ansehen',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                RaisedButton(
+                  color: MoreaColors.violett,
+                  child: Text(
+                    'Später',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          },
+        );
       }
     }, onResume: (Map<String, dynamic> message) async {
       print(message);
-      if(message['data']['typeMorea'] == 'Message'){
+      if (message['data']['typeMorea'] == 'Message') {
         navigationMap[prefix0.toMessagePage]();
       }
     }, onLaunch: (Map<String, dynamic> message) async {
       print(message);
-      if(message['data']['typeMorea'] == 'Message'){
+      if (message['data']['typeMorea'] == 'Message') {
         navigationMap[prefix0.toMessagePage]();
       }
     });
@@ -173,14 +172,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       case AuthStatus.homePageTutorial:
         return ShowCaseWidget(
           builder: Builder(
-            builder: (contex) => HomePage(
-              auth: auth,
-              firestore: widget.firestore,
-              navigationMap: navigationMap,
-              moreafire: moreaFire,
-              tutorial: true,
-          )
-          ),
+              builder: (contex) => HomePage(
+                    auth: auth,
+                    firestore: widget.firestore,
+                    navigationMap: navigationMap,
+                    moreafire: moreaFire,
+                    tutorial: true,
+                  )),
         );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
@@ -242,7 +240,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   void signedIn({bool tutorialautostart}) async {
     await initMoreaFire();
     setState(() {
-      if(tutorialautostart){
+      if (tutorialautostart) {
         authStatus = AuthStatus.homePageTutorial;
       } else {
         authStatus = AuthStatus.homePage;

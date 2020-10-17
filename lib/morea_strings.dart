@@ -67,11 +67,11 @@ final String groupMapSubgroup = "subgroups";
 final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
 
-final String groupMapUploadeByUserID = "uploadedByUserID";
-final String groupMapUploadedTimeStamp = "uploadedTimeStamp";
-final String groupMapParticipatingGroups = "participatingGroups";
-final String groupMapEventStartTimeStamp = "eventStartTimeStamp";
-final String groupMapEventEndTimeStamp = "eventEndTimeStamp";
+final String groupMapUploadeByUserID = "userID";
+final String groupMapUploadedTimeStamp = "timeStamp";
+final String groupMapParticipatingGroups = "groupID";
+final String groupMapEventStartTimeStamp = "startTimeStamp";
+final String groupMapEventEndTimeStamp = "endTimeStamp";
 final String groupMapGroupOption = "groupOption";
 final String groupMapGroupUpperClass = "groupMapGroupUpperClass";
 final String groupMapGroupLowerClass = "groupMapGroupLowerClass";

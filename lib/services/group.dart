@@ -110,16 +110,17 @@ class PriviledgeEntry extends RoleEntry {
   }
 
   void readRole(Map<String, RoleEntry> global, Map<String, RoleEntry> local) {
-    if (this.roleType == 'local') {
+    if (this.roleLocation == 'local') {
       if (local.containsKey(this.roleType)) {
-        local[this.roleType].customInfoTypes.forEach((key, value) {
-          this.customInfo[key] =
-              rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
-        });
+        if (local[groupMapPriviledgeEntryCustomInfo] != null)
+          local[this.roleType].customInfoTypes.forEach((key, value) {
+            this.customInfo[key] =
+                rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
+          });
         this.role = local[this.roleType];
       }
-      print("Role ${this.roleType} is not defined in $local");
-    } else if (this.roleType == 'global') {
+      print("Role ${this.roleLocation} is not defined in $local");
+    } else if (this.roleLocation == 'global') {
       if (global.containsKey(this.roleType)) {
         global[this.roleType].customInfoTypes.forEach((key, value) {
           this.customInfo[key] =

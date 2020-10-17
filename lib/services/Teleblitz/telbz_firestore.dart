@@ -177,8 +177,8 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     return doc.exists;
   }
 
-  Future<void> uploadTelbzAkt(String groupnr, Map<String, dynamic> data) async {
-    return await crud0.runTransaction(pathGroups, groupnr, data);
+  Future<void> uploadTelbzAkt(String groupID, Map<String, dynamic> data) async {
+    return await crud0.runTransaction(pathGroups, groupID, data);
   }
 
   Future<void> uploadTelbz(String eventID, Map<String, dynamic> data) async {
