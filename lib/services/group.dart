@@ -121,14 +121,15 @@ class PriviledgeEntry extends RoleEntry {
       }
       print("Role ${this.roleLocation} is not defined in $local");
     } else if (this.roleLocation == 'global') {
-      if (global.containsKey(this.roleType)) {
-        global[this.roleType].customInfoTypes.forEach((key, value) {
-          this.customInfo[key] =
-              rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
-        });
+      if (global.containsKey("Parent")) {
+        if (global[this.roleType].customInfoTypes != null)
+          global[this.roleType].customInfoTypes.forEach((key, value) {
+            this.customInfo[key] =
+                rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
+          });
         this.role = global[this.roleType];
-      }
-      print("Role ${this.roleType} is not defined in $global");
+      } else
+        print("Role ${this.roleType} is not defined in $global");
     }
   }
 }
@@ -144,7 +145,8 @@ class RoleEntry {
     if (data != null) this.read(data);
   }
   void read(Map<String, dynamic> data) {
-    this.customInfoTypes = data[groupMapRolesCustomInfoTypes];
+    if (data.containsKey(groupMapRolesCustomInfoTypes))
+      this.customInfoTypes = data[groupMapRolesCustomInfoTypes];
     this.roleName = data[groupMapRolesRoleName];
     this.seeMembers = data[groupMapPriviledgeEntrySeeMembers];
     this.seeMembersDetail = data[groupMapPriviledgeEntrySeeMembersDetails];

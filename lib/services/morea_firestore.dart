@@ -8,6 +8,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
 import 'package:morea/services/cloud_functions.dart';
+import 'package:morea/services/group.dart';
 import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
 import 'package:rxdart/rxdart.dart';
@@ -108,10 +109,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Map<String, Map<String, String>> get getChildMap => moreaUser.childMap;
 
-  Map<String, int> get getGroupPrivilege => moreaUser.groupPrivilege;
-
-  int getHighestEventPriviledge(List<String> groupIDs) =>
-      moreaUser.getHighestEventPriviledge(groupIDs);
+  Map<String, RoleEntry> get getGroupPrivilege => moreaUser.groupPrivilege;
 
   Stream<Map<String, GroupData>> get getGroupDataStream => sCGroupMaps.stream;
 

@@ -4,6 +4,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/group.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 String sessionUserID, sessionUserName;
@@ -24,23 +25,13 @@ class User {
       userID;
   //List<String> subscribedGroups = new List<String>();
   List<String> groupIDs = new List<String>();
-  Map<String, int> groupPrivilege = new Map();
+  Map<String, RoleEntry> groupPrivilege = new Map();
   Map<String, Map<String, String>> childMap;
   Map<String, dynamic> _userMap, groupMap, elternMap;
   CrudMedthods crud0;
   Map<String, GroupData> subscribedGroups = new Map<String, GroupData>();
 
   User(this.crud0);
-
-  int getHighestEventPriviledge(List<String> groupIDs) {
-    if (groupIDs == null) return 0;
-    int returnValue = 0;
-    for (int i = 0; i < groupIDs.length; i++) {
-      if (this.groupIDs.contains(groupIDs[i])) if (groupPrivilege[groupIDs[i]] >
-          returnValue) returnValue = groupPrivilege[groupIDs[i]];
-    }
-    return returnValue;
-  }
 
   getTeilnehmer() async {
     if (_userMap.containsKey("groupID")) throw "groupID is a depricaded key.";
@@ -243,23 +234,34 @@ class User {
       Map<String, String> childs) async {
     Map<String, Map<String, String>> childMap = new Map();
     for (String childUID in childs.keys) {
-      Map<String, dynamic> childUserDat =
-          (await crud0.getDocument(pathUser, childUID)).data;
-      if (childMap.containsKey(childUserDat[userMapGroupIDs]))
-        childMap[childUserDat[userMapGroupIDs]][childUID] = childs[childUID];
-      else
-        childMap[childUserDat[userMapGroupIDs]] = {childUID: childs[childUID]};
+      Map<String, dynamic> childUserDat = Map<String, dynamic>.from(
+          (await crud0.getDocument(pathUser, childUID)).data);
+      print(childUserDat);
+
       for (String groupID in childUserDat[userMapGroupIDs]) {
-        if (subscribedGroups[groupID] = null)
+        if (childMap.containsKey(groupID))
+          childMap[groupID][childUID] = childs[childUID];
+        else
+          childMap[groupID] = {childUID: childs[childUID]};
+        if (subscribedGroups[groupID] == null)
           subscribedGroups[groupID] = GroupData();
       }
     }
-    parentGroupPrivilege(childMap);
+    await parentGroupPrivilege(childMap);
     return childMap;
   }
 
-  parentGroupPrivilege(Map<String, Map<String, String>> childMap) {
-    for (String groupID in childMap.keys) groupPrivilege[groupID] = 2;
+  parentGroupPrivilege(Map<String, Map<String, String>> childMap) async {
+    for (String groupID in childMap.keys) {
+      GroupData groupData = new GroupData(
+          groupData: Map<String, dynamic>.from(
+              (await crud0.getDocument(pathGroups, groupID)).data));
+      if (groupData.groupOption.parentialControl.enabled) {
+        if (!this.groupIDs.contains(groupID)) this.groupIDs.add(groupID);
+        groupData.setParentPriviledge();
+        subscribedGroups[groupID] = groupData;
+      }
+    }
   }
 
   Map<String, dynamic> generateAndValitateUserMap() {

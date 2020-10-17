@@ -96,14 +96,15 @@ class GroupData {
       } else
         throw "$groupMapRoles has to be non-null";
 
-      this.priviledge = PriviledgeEntry(data: groupUserData);
-      priviledge.readRole(globalConfigRoles, this.roles);
-      if (groupMap.containsKey(groupMapGroupLicence))
-        this.groupLicence = GroupLicence(
-            Map<String, dynamic>.from(groupMap[groupMapGroupLicence]));
-      else
-        throw "$groupMapGroupLicence has to be non-null";
-
+      if (groupUserData != null) {
+        this.priviledge = PriviledgeEntry(data: groupUserData);
+        priviledge.readRole(globalConfigRoles, this.roles);
+        if (groupMap.containsKey(groupMapGroupLicence))
+          this.groupLicence = GroupLicence(
+              Map<String, dynamic>.from(groupMap[groupMapGroupLicence]));
+        else
+          throw "$groupMapGroupLicence has to be non-null";
+      }
       if (groupMap.containsKey(groupMapGroupOption))
         this.groupOption = GroupOption(
             Map<String, dynamic>.from(groupMap[groupMapGroupOption]));
@@ -137,6 +138,16 @@ class GroupData {
         return snap.data;
       },
     );
+  }
+
+  setParentPriviledge() {
+    if (this.groupOption.parentialControl.enabled) {
+      this.priviledge = PriviledgeEntry();
+      this.priviledge.roleLocation =
+          this.groupOption.parentialControl.roleLocation;
+      this.priviledge.roleType = this.groupOption.parentialControl.roleType;
+      this.priviledge.readRole(globalConfigRoles, this.roles);
+    }
   }
 }
 
@@ -226,6 +237,8 @@ class GroupOption {
   List<String> groupUpperClass;
   Map<String, GroupLowerHirarchyEntry> groupLowerClass;
 
+  ParentialControl parentialControl = ParentialControl();
+
   //Admin
   bool adminGroupMemberBrowser;
   bool enableDisplayName;
@@ -237,6 +250,18 @@ class GroupOption {
   GroupOption(Map<String, dynamic> data) {
     if (data.containsKey(groupMapGroupUpperClass))
       groupUpperClass = List<String>.from(data[groupMapGroupUpperClass]);
+    if (data.containsKey(groupMapParentalControl)) {
+      if (data[groupMapParentalControl]["enabled"]) {
+        this.parentialControl.enabled = true;
+        this.parentialControl.roleLocation =
+            data[groupMapParentalControl][groupMapPriviledgeEntryLocation];
+        this.parentialControl.roleType =
+            data[groupMapParentalControl][groupMapPriviledgeEntryType];
+      } else
+        this.parentialControl.enabled = false;
+    } else
+      this.parentialControl.enabled = false;
+
     if (data.containsKey("groupMapLowerClass")) {
       groupLowerClass =
           Map<String, dynamic>.from(data["groupMapLowerClass"] as Map).map(
@@ -263,6 +288,11 @@ class GroupOption {
     this.groupLowerClass.forEach((key, value) => list.add(value.groupID));
     return list;
   }
+}
+
+class ParentialControl {
+  String roleLocation, roleType;
+  bool enabled;
 }
 
 class GroupLicence {

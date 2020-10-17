@@ -5,7 +5,7 @@ import 'package:morea/morea_strings.dart';
 import 'package:morea/services/group.dart';
 
 //First Document pulled from Firebase
-Map<String, PriviledgeEntry> globalConfigRoles;
+Map<String, RoleEntry> globalConfigRoles = Map<String, RoleEntry>();
 
 Future<AuthStatus> check4BlockedAuthStatus(
     String userID, Firestore firestore) async {
@@ -14,6 +14,7 @@ Future<AuthStatus> check4BlockedAuthStatus(
           .data;
   print(init.runtimeType);
   if (init == null) throw "No init doc exists";
+  initGetGroupConfigRoles(data: init);
   if (!init.containsKey(configMapBlockedDevToken))
     throw "create $configMapBlockedDevToken in config --> init";
   List<String> blockedDevTokens = new List.from(init[configMapBlockedDevToken]);
@@ -28,12 +29,12 @@ Future<AuthStatus> check4BlockedAuthStatus(
   return userID == null ? AuthStatus.notSignedIn : AuthStatus.loading;
 }
 
-Map<String, PriviledgeEntry> initGetGroupConfigRoles(
-    {Map<String, dynamic> data}) {
+Map<String, RoleEntry> initGetGroupConfigRoles({Map<String, dynamic> data}) {
   if (data != null) {
     if (data.containsKey(groupMapRoles))
-      globalConfigRoles = (data[groupMapRoles] as Map<String, dynamic>)
-          .map((key, value) => MapEntry(key, PriviledgeEntry(data: value)));
+      for (String key in Map<String, dynamic>.from(data[groupMapRoles]).keys)
+        globalConfigRoles[key] = RoleEntry(
+            data: Map<String, dynamic>.from(data[groupMapRoles][key]));
     else
       throw "$groupMapRoles can't be empty";
   }

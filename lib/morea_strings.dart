@@ -73,6 +73,7 @@ final String groupMapParticipatingGroups = "groupID";
 final String groupMapEventStartTimeStamp = "startTimeStamp";
 final String groupMapEventEndTimeStamp = "endTimeStamp";
 final String groupMapGroupOption = "groupOption";
+final String groupMapParentalControl = "parentalControl";
 final String groupMapGroupUpperClass = "groupMapGroupUpperClass";
 final String groupMapGroupLowerClass = "groupMapGroupLowerClass";
 final String groupMapGroupLicence = "groupLicence";
