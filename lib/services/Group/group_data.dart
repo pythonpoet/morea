@@ -16,7 +16,6 @@ Stream<Map<String, dynamic>> getGroupData(
 }
 
 List<String> sortHomeFeedByStartDate(Map<String, GroupData> mapGroupData) {
-  //TODO add Timestamp in Firebase
   List<String> sort = new List<String>();
   Map<String, String> unsorted = Map<String, String>();
   mapGroupData.forEach((String groupID, GroupData groupData) {

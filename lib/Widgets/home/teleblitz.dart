@@ -8,6 +8,7 @@ import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
 import 'package:morea/services/Event/event_data.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -77,7 +78,7 @@ class Teleblitz {
     }
   }
 
-  void defineInfo(EventData eventData) {
+  void defineInfo(TeleblitzData eventData) {
     info.setTitel(eventData.name);
     info.setDatum(eventData.datum);
     info.setAntreten(eventData.antreten);
@@ -831,7 +832,7 @@ class Teleblitz {
     }
   }
 
-  Widget simpleTeleblitz(EventData eventData, String eventID,
+  Widget simpleTeleblitz(TeleblitzData eventData, String eventID,
       Stream<String> Function(String, String) function) {
     switch (eventData.teleblitzType) {
       case TeleblitzType.notImplemented:

@@ -110,7 +110,7 @@ final String groupMapRoles = "roles";
 final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
 final String eventMapAnmeldeStatusPositiv = "Chunt";
 final String eventMapAnmeldeUID = "AnmeldeUID";
-final String eventMapType = "TeleblitzType";
+final String eventMapType = "EventType";
 
 //Teleblitz
 final String tlbzMapLoading = "Loading";

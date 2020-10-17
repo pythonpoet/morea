@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
 import 'package:morea/services/Event/event_data.dart';
 import 'package:morea/services/Event/teleblitz_Widget.dart';
 
@@ -35,12 +36,13 @@ class EventWidgetState extends State<EventWidget> {
             switch (eventData.eventType) {
               case EventType.teleblitz:
                 return TeleblitzWidget(
-                    eventData: eventData,
+                    eventData: eventData as TeleblitzData,
                     moreaFirebase: widget.moreaFirebase,
                     crudMedthods: widget.crudMedthods,
                     eventID: widget.eventID,
                     function: widget.function);
                 break;
+
               //TODO implement New Events here!
               default:
                 return Container(

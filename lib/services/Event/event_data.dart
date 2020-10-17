@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/morea_strings.dart';
+import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
 import 'package:morea/services/crud.dart';
 
 Stream<Map<String, dynamic>> getEventStreamMap(
@@ -11,39 +12,45 @@ Stream<Map<String, dynamic>> getEventStreamMap(
   }
 }
 
-enum EventType { teleblitz }
-enum TeleblitzType { ferien, keineAktivitaet, teleblitz, notImplemented }
+enum EventType { teleblitz, notImplemented }
 
 class EventData {
-  String timestamp,
-      antreten,
-      abtreten,
-      bemerkung,
-      datum,
-      endeFerien,
-      googleMap,
-      grund,
-      keineAktivitaet,
-      mapAbtreten,
-      name,
-      nameDesSenders,
-      slug;
-  bool archived, draft, ferien;
-  String eventID;
-  List<String> groupIDs, mitnehmenTest;
+  String eventID, timestamp;
+  List<String> groupIDs, changelog;
   Map<String, dynamic> eventData;
   EventType eventType;
-  TeleblitzType teleblitzType;
-  EventData(this.eventData) {
-    readTeleblitz(this.eventData);
+
+  EventData.init(this.eventData) {
+    validate(this.eventData);
+  }
+  factory EventData(Map<String, dynamic> eventData) {
+    if (!eventData.containsKey(eventMapType))
+      throw "$eventMapType has to be non-null";
+    else
+      switch (eventData[eventMapType]) {
+        case "Teleblitz":
+          return TeleblitzData(eventData);
+          break;
+        default:
+          throw "${eventData[eventMapType]} is not implemented";
+      }
   }
 
   void setEventID(String setEventID) => this.eventID = setEventID;
 
-  void readTeleblitz(Map<String, dynamic> eventData) async {
-    this.eventData = eventData;
+  void getEventType(String eventType) {
+    switch (eventType) {
+      case "Teleblitz":
+        this.eventType = EventType.teleblitz;
 
-    this.teleblitzType = readTeleblitzType(eventData);
+        break;
+      default:
+        this.eventType = EventType.notImplemented;
+    }
+  }
+
+  void validate(Map<String, dynamic> eventData) {
+    this.eventData = eventData;
 
     if (eventData.containsKey('groupIDs'))
       this.groupIDs = new List.from(eventData['groupIDs']);
@@ -55,112 +62,13 @@ class EventData {
     else
       throw "$mapTimestamp has to be non-null";
 
-    if (eventData.containsKey(tlbzMapArchived))
-      this.archived = eventData[tlbzMapArchived];
+    if (!eventData.containsKey(eventMapType))
+      throw "$eventMapType has to be non-null";
     else
-      throw "$tlbzMapArchived has to be non-null";
-
-    if (eventData.containsKey(tlbzMapDraft))
-      this.draft = eventData[tlbzMapDraft];
-    else
-      throw "$tlbzMapDraft has to be non-null";
-
-    if (eventData.containsKey(tlbzMapAntreten))
-      this.antreten = eventData[tlbzMapAntreten];
-    else
-      throw "$tlbzMapAntreten has to be non-null";
-
-    if (eventData.containsKey(tlbzMapAbtreten))
-      this.abtreten = eventData[tlbzMapAbtreten];
-    else
-      throw "$tlbzMapAbtreten has to be non-null";
-
-    if (eventData.containsKey(tlbzMapBemerkung))
-      this.bemerkung = eventData[tlbzMapBemerkung];
-    else
-      throw "$tlbzMapBemerkung has to be non-null";
-
-    if (eventData.containsKey(tlbzMapDatum))
-      this.datum = eventData[tlbzMapDatum];
-    else
-      throw "$tlbzMapDatum has to be non-null";
-
-    if (eventData.containsKey(tlbzMapEndeFerien))
-      this.endeFerien = eventData[tlbzMapEndeFerien];
-    else
-      throw "$tlbzMapEndeFerien has to be non-null";
-
-    if (eventData.containsKey(tlbzMapFerien))
-      this.ferien = eventData[tlbzMapFerien];
-    else
-      throw "$tlbzMapFerien has to be non-null";
-
-    if (eventData.containsKey(tlbzMapGoogleMaps))
-      this.googleMap = eventData[tlbzMapGoogleMaps];
-    else
-      throw "$tlbzMapGoogleMaps has to be non-null";
-
-    if (eventData.containsKey(tlbzMapGrund))
-      this.grund = eventData[tlbzMapGrund];
-    else
-      throw "$tlbzMapGrund has to be non-null";
-
-    if (eventData.containsKey(tlbzMapKeineAktivitaet))
-      this.keineAktivitaet = eventData[tlbzMapKeineAktivitaet].toString();
-    else
-      throw "$tlbzMapKeineAktivitaet has to be non-null";
-
-    if (eventData.containsKey(tlbzMapMapAbtreten))
-      this.mapAbtreten = eventData[tlbzMapMapAbtreten];
-    else
-      throw "$tlbzMapMapAbtreten has to be non-null";
-
-    if (eventData.containsKey(tlbzMapMitnehmenTest))
-      this.mitnehmenTest = new List.from(eventData[tlbzMapMitnehmenTest]);
-    else
-      throw "$tlbzMapMitnehmenTest has to be non-null";
-
-    if (eventData.containsKey(tlbzMapName))
-      this.name = eventData[tlbzMapName];
-    else
-      throw "$tlbzMapName has to be non-null";
-
-    if (eventData.containsKey(tlbzMapNameDesSenders))
-      this.nameDesSenders = eventData[tlbzMapNameDesSenders];
-    else
-      throw "$tlbzMapNameDesSenders has to be non-null";
-
-    if (eventData.containsKey(tlbzMapSlug))
-      this.slug = eventData[tlbzMapSlug];
-    else
-      throw "$tlbzMapSlug has to be non-null";
-  }
-
-  TeleblitzType readTeleblitzType(Map<String, dynamic> tlbz) {
-    if (tlbz.containsKey("EventType")) if (tlbz["EventType"] != "Teleblitz")
-      return TeleblitzType.notImplemented;
-    this.eventType = EventType.teleblitz;
-    var keineAkt = tlbz["keine-aktivitat"];
-    var keineFerien = tlbz["ferien"];
-    if (keineAkt.runtimeType == String) {
-      keineAkt = keineAkt.toLowerCase() == 'true';
-    }
-    if (keineFerien.runtimeType == String) {
-      keineFerien = keineFerien.toLowerCase() == 'true';
-    }
-
-    if (keineAkt) {
-      return TeleblitzType.keineAktivitaet;
-    } else if (keineFerien) {
-      return TeleblitzType.ferien;
-    } else {
-      return TeleblitzType.teleblitz;
-    }
+      getEventType(eventData[eventMapType]);
   }
 
   Map<String, dynamic> pack() {
-    print(this.toString());
-    print("this: $this");
     return eventData;
   }
 
