@@ -121,13 +121,14 @@ class PriviledgeEntry extends RoleEntry {
       }
       print("Role ${this.roleLocation} is not defined in $local");
     } else if (this.roleLocation == 'global') {
-      if (global.containsKey("Parent")) {
+      if (global.containsKey(this.roleType)) {
         if (global[this.roleType].customInfoTypes != null)
           global[this.roleType].customInfoTypes.forEach((key, value) {
             this.customInfo[key] =
                 rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
           });
         this.role = global[this.roleType];
+        print(this.role);
       } else
         print("Role ${this.roleType} is not defined in $global");
     }
@@ -150,6 +151,12 @@ class RoleEntry {
     this.roleName = data[groupMapRolesRoleName];
     this.seeMembers = data[groupMapPriviledgeEntrySeeMembers];
     this.seeMembersDetail = data[groupMapPriviledgeEntrySeeMembersDetails];
-    this.teleblitzPriviledge = data[eventTeleblitzPriviledge];
+    if (data[eventTeleblitzPriviledge] is int)
+      this.teleblitzPriviledge = data[eventTeleblitzPriviledge];
+    else if (data[eventTeleblitzPriviledge] is String)
+      this.teleblitzPriviledge = int.parse(data[eventTeleblitzPriviledge]);
+    else
+      throw "Runtype: ${data[eventTeleblitzPriviledge].runtimeType} for teleblitzPriviledge is not supported";
+    print(this.teleblitzPriviledge);
   }
 }

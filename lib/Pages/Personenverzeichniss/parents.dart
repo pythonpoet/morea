@@ -50,7 +50,7 @@ class MergeChildParent extends BaseMergeChildParent {
     moreaUser = User(crud0);
     register = Register(
         moreaUser: moreaUser,
-        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+        docSnapAbteilung: crud0.getDocument(pathGroups, moreaGroupID));
   }
 
   Widget registernewChild(Map<String, dynamic> parentData, BuildContext context,

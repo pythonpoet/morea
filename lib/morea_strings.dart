@@ -30,6 +30,8 @@ final String pathInit = "init";
 final String pathChildren = "children";
 final String pathPriviledge = "priviledge";
 
+final String moreaGroupID = 'f7bl3m4GSpvvo7iw5wNd';
+
 //Maps
 final String mapTimestamp = "Timestamp";
 //userMap

@@ -236,7 +236,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, "1165")).data;
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data;
     this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
     setState(() {});
   }

@@ -179,15 +179,8 @@ class User {
     } else {
       displayName = vorName;
     }
-
-    if (_userMap.containsKey(userMapKinder)) {
-      Map<String, String> kinderMap =
-          Map<String, String>.from(_userMap[userMapKinder]);
-      childMap = await createChildMap(kinderMap);
-    }
-    if (_userMap[userMapGroupIDs] == null) {
-      subscribedGroups = null;
-    } else {
+    // Add parents groups to subscribedgroups
+    if (this.groupIDs.length > 0) {
       for (String groupID in groupIDs) {
         GroupData groupData = new GroupData(
             groupData: Map<String, dynamic>.from(
@@ -198,6 +191,12 @@ class User {
 
         subscribedGroups[groupID] = groupData;
       }
+    }
+    // Add childs groups to subscribedgroups
+    if (_userMap.containsKey(userMapKinder)) {
+      Map<String, String> kinderMap =
+          Map<String, String>.from(_userMap[userMapKinder]);
+      childMap = await createChildMap(kinderMap);
     }
   }
 
@@ -243,8 +242,6 @@ class User {
           childMap[groupID][childUID] = childs[childUID];
         else
           childMap[groupID] = {childUID: childs[childUID]};
-        if (subscribedGroups[groupID] == null)
-          subscribedGroups[groupID] = GroupData();
       }
     }
     await parentGroupPrivilege(childMap);
@@ -259,7 +256,7 @@ class User {
       if (groupData.groupOption.parentialControl.enabled) {
         if (!this.groupIDs.contains(groupID)) this.groupIDs.add(groupID);
         groupData.setParentPriviledge();
-        subscribedGroups[groupID] = groupData;
+        this.subscribedGroups[groupID] = groupData;
       }
     }
   }

@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
+import 'package:morea/Widgets/home/elternpend.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Event/event_Widget.dart';
 import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'select_stufe.dart';
 import 'package:morea/services/morea_firestore.dart';
@@ -150,10 +150,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       stream: moreafire.getGroupDataStream,
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, GroupData>> aSData) {
-        if (!aSData.hasData) return moreaLoading.loading();
+        if (!(aSData.connectionState == ConnectionState.active))
+          return Center(child: moreaLoading.loading());
 
         List<String> sortedEvents = sortHomeFeedByStartDate(aSData.data);
-
+        if (sortedEvents.length == 0) return requestPrompttoParent();
         return Column(children: [
           ...sortedEvents.map((String eventID) => EventWidget(
               moreaFirebase: this.moreafire,
@@ -166,122 +167,67 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget teleblitzwidget() {
-    if (_formType == FormType.loading)
-      return Scaffold(
-          appBar: AppBar(
-            title: Text('Teleblitz'),
-          ),
-          drawer: new Drawer(
-            child: new ListView(children: navigation()),
-          ),
-          body: MoreaBackgroundContainer(
-              child: MoreaShadowContainer(
-                  child: Center(child: moreaLoading.loading()))));
-
-    return DefaultTabController(
-      length:
-          (moreafire.getGroupIDs.length > 0) ? moreafire.getGroupIDs.length : 1,
-      child: Scaffold(
-        backgroundColor: MoreaColors.bottomAppBar,
-        key: _scaffoldKey,
-        appBar: new AppBar(
-          elevation: 0,
-          backgroundColor: MoreaColors.orange,
-          title: new Text('Teleblitz'),
-          bottom: TabBar(tabs: getTabList(moreafire.getGroupIDs)),
-          actions: tutorialButton(),
-          leading: Showcase.withWidget(
-            key: _drawerKey,
-            disableAnimation: true,
-            height: 300,
-            width: 150,
-            container: Container(
-              padding: EdgeInsets.all(5),
-              constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5), color: Colors.white),
-              child: Column(
-                children: [
-                  Text(
-                    tutorialDrawer(),
-                  ),
-                ],
-              ),
-            ),
-            child: IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () => _scaffoldKey.currentState.openDrawer(),
-            ),
-          ),
-        ),
-        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
-            moreafire.getEmail, context, moreafire, crud0, _signedOut),
-        body: TabBarView(children: [scrollView()]),
-        floatingActionButton: (moreafire.getPos == "Leiter")
-            ? Showcase(
-                key: _changeTeleblitzKey,
-                disableAnimation: true,
-                description: 'Hier kannst du den Teleblitz ändern',
-                child: moreaEditActionbutton(
-                  route: routeEditTelebliz,
-                ))
-            : SizedBox(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: (moreafire.getPos == "Leiter")
-            ? Showcase.withWidget(
-                key: _bottomAppBarLeiterKey,
-                disableAnimation: true,
-                height: 500,
-                width: 150,
-                container: Container(
-                  padding: EdgeInsets.all(5),
-                  constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.white),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Hier kannst du zu den verschiedenen Screens wechseln. Wechsle zum nächsten Screen und drücke dort den Hilfeknopf oben rechts.',
-                      ),
-                    ],
-                  ),
-                ),
-                child: moreaLeiterBottomAppBar(widget.navigationMap, "Ändern"))
-            : Showcase.withWidget(
-                key: _bottomAppBarTNKey,
-                height: 300,
-                width: 150,
-                disableAnimation: true,
-                container: Container(
-                  padding: EdgeInsets.all(5),
-                  constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.white),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Hier kannst du zu den verschiedenen Screens wechseln. Wechsle zum nächsten Screen und drücke dort den Hilfeknopf oben rechts.',
-                      ),
-                    ],
-                  ),
-                ),
-                child: moreaChildBottomAppBar(
-                  widget.navigationMap,
-                )),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Teleblitz'),
       ),
+      drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
+          moreafire.getEmail, context, moreafire, crud0, _signedOut),
+      body: MoreaBackgroundContainer(child: scrollView()),
+      floatingActionButton: (moreafire.getPos == "Leiter")
+          ? Showcase(
+              key: _changeTeleblitzKey,
+              disableAnimation: true,
+              description: 'Hier kannst du den Teleblitz ändern',
+              child: moreaEditActionbutton(
+                route: routeEditTelebliz,
+              ))
+          : SizedBox(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: (moreafire.getPos == "Leiter")
+          ? Showcase.withWidget(
+              key: _bottomAppBarLeiterKey,
+              disableAnimation: true,
+              height: 500,
+              width: 150,
+              container: Container(
+                padding: EdgeInsets.all(5),
+                constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white),
+                child: Column(
+                  children: [
+                    Text(
+                      'Hier kannst du zu den verschiedenen Screens wechseln. Wechsle zum nächsten Screen und drücke dort den Hilfeknopf oben rechts.',
+                    ),
+                  ],
+                ),
+              ),
+              child: moreaLeiterBottomAppBar(widget.navigationMap, "Ändern"))
+          : Showcase.withWidget(
+              key: _bottomAppBarTNKey,
+              height: 300,
+              width: 150,
+              disableAnimation: true,
+              container: Container(
+                padding: EdgeInsets.all(5),
+                constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white),
+                child: Column(
+                  children: [
+                    Text(
+                      'Hier kannst du zu den verschiedenen Screens wechseln. Wechsle zum nächsten Screen und drücke dort den Hilfeknopf oben rechts.',
+                    ),
+                  ],
+                ),
+              ),
+              child: moreaChildBottomAppBar(
+                widget.navigationMap,
+              )),
     );
-  }
-
-  List<Widget> getTabList(List<String> subscribedGroups) {
-    List<Widget> tabList = new List();
-    for (String groupID in subscribedGroups) {
-      tabList.add(new Tab(
-        text: convMiDatatoWebflow(groupID),
-      ));
-    }
-    return tabList;
   }
 
   List<Widget> navigation() {

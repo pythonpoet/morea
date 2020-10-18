@@ -243,8 +243,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     moreaUser = new User(crud0);
     register = new Register(
         moreaUser: moreaUser,
-        docSnapAbteilung:
-            crud0.getDocument(pathGroups, "f7bl3m4GSpvvo7iw5wNd"));
+        docSnapAbteilung: crud0.getDocument(pathGroups, moreaGroupID));
   }
 
   @override

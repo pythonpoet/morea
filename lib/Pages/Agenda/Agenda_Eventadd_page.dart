@@ -71,8 +71,8 @@ class EventAddPageState extends State<EventAddPage> {
   };
 
   @override
-  void dispose(){
-    for(TextEditingController controller in mitnehmenController){
+  void dispose() {
+    for (TextEditingController controller in mitnehmenController) {
       controller.dispose();
     }
     super.dispose();
@@ -348,7 +348,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, "1165")).data;
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data;
     this.subgroups =
         new List<Map<dynamic, dynamic>>.from(data[groupMapSubgroup]);
     this.groupCheckboxinit(this.subgroups);
@@ -514,8 +514,8 @@ class EventAddPageState extends State<EventAddPage> {
   void removeElement() {
     if (mitnehmenController.length != 0) {
       this.setState(() {
-            mitnehmenController.removeLast();
-          });
+        mitnehmenController.removeLast();
+      });
     }
   }
 
@@ -815,7 +815,9 @@ class EventAddPageState extends State<EventAddPage> {
                                     children: buildMitnehmen(),
                                   ),
                                   Container(
-                                    margin: EdgeInsets.only(top: 0,),
+                                    margin: EdgeInsets.only(
+                                      top: 0,
+                                    ),
                                     child: FractionallySizedBox(
                                       widthFactor: 1,
                                       child: Row(

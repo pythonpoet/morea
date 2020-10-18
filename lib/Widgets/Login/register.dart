@@ -21,7 +21,6 @@ class Register implements BaseRegister {
       userId,
       error,
       _geschlecht = 'Geschlecht wählen';
-  List<Map> _stufenselect = new List();
   GroupData groupdata;
   List<String> _verwandtschaft = [
     'Mutter',
@@ -242,8 +241,7 @@ class Register implements BaseRegister {
       future: docSnapAbteilung,
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap) {
         if (!snap.hasData) return simpleMoreaLoadingIndicator();
-
-        this._stufenselect = new List<Map>.from(snap.data[groupMapSubgroup]);
+        this.groupdata = new GroupData(groupData: snap.data.data);
         return Container(
           child: Column(
             mainAxisSize: MainAxisSize.min,

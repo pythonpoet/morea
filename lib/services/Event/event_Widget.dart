@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:morea/Widgets/home/elternpend.dart';
 import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
 import 'package:morea/services/Event/event_data.dart';
 import 'package:morea/services/Event/teleblitz_Widget.dart';

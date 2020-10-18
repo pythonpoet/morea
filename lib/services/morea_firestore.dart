@@ -43,7 +43,8 @@ abstract class BaseMoreaFirebase {
 
   Future<void> createUserInformation(Map userInfo);
 
-  Future<void> updateUserInformation(String userUID, Map userInfo);
+  Future<void> updateUserInformation(
+      String userUID, Map<String, dynamic> userInfo);
 
   Future<DocumentSnapshot> getUserInformation(String userUID);
 
@@ -58,8 +59,6 @@ abstract class BaseMoreaFirebase {
   Future<String> getWebflowApiKey();
 
   Future<void> uploadChildUserInformation(Map<String, dynamic> childUserInfo);
-
-  Future<void> priviledgeEltern(String groupID);
 
   Future<void> upgradeChild(
       Map<String, dynamic> childMap, String oldUID, String password);
@@ -128,20 +127,22 @@ class MoreaFirebase extends BaseMoreaFirebase {
   initTeleblitz() async {
     List<String> groupIDs = new List<String>();
     tbz = new TeleblizFirestore(firestore, groupIDs);
-
-    for (String groupID in this.getGroupIDs) {
-      var someVar = (await crud0.getDocument(
-              '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID))
-          .data;
-      sCGroupMaps.addStream(crud0
-          .streamDocument(pathGroups, groupID)
-          .map((DocumentSnapshot dSGroup) {
-        return Map<String, GroupData>.of({
-          dSGroup.documentID:
-              GroupData(groupData: dSGroup.data, groupUserData: someVar)
-        });
-      }));
-    }
+    if (this.getGroupIDs.length == 0)
+      sCGroupMaps.add(Map<String, GroupData>());
+    else
+      for (String groupID in this.getGroupIDs) {
+        var someVar = (await crud0.getDocument(
+                '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID))
+            .data;
+        sCGroupMaps.addStream(crud0
+            .streamDocument(pathGroups, groupID)
+            .map((DocumentSnapshot dSGroup) {
+          return Map<String, GroupData>.of({
+            dSGroup.documentID:
+                GroupData(groupData: dSGroup.data, groupUserData: someVar)
+          });
+        }));
+      }
   }
 
   Future<void> createUserInformation(Map userInfo) async {
@@ -157,7 +158,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   //Vorschlag an Maxi
-  Future<void> updateUserInformation(String userUID, Map userInfo) {
+  Future<void> updateUserInformation(
+      String userUID, Map<String, dynamic> userInfo) {
     if (userInfo[userMapAccountCreated] is Timestamp)
       userInfo[userMapAccountCreated] =
           userInfo[userMapAccountCreated].toString();
@@ -411,15 +413,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
       Map<String, dynamic> childUserInfo) async {
     return await callFunction(getcallable("createChildUserMap"),
         param: childUserInfo);
-  }
-
-  @override
-  Future<void> priviledgeEltern(String groupID) async {
-    return await callFunction(getcallable('priviledgeEltern'), param: {
-      'groupID': groupID,
-      'UID': getUserMap[userMapUID],
-      'DisplayName': this.getVorName
-    });
   }
 
   @override
