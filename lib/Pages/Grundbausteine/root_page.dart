@@ -71,7 +71,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    print('disposing root');
     super.dispose();
   }
 

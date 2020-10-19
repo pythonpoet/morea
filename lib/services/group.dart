@@ -136,8 +136,11 @@ class PriviledgeEntry extends RoleEntry {
 }
 
 class RoleEntry {
+  //General Priviledge: 0 no w/r, 1 no w but r access, 2  w/r access, 3 w/r acces able to change general for all users.
+  int groupPriviledge = 0;
   Map<String, dynamic> customInfoTypes;
   String roleName;
+
   bool seeMembers;
   bool seeMembersDetail;
   int teleblitzPriviledge;
@@ -146,6 +149,8 @@ class RoleEntry {
     if (data != null) this.read(data);
   }
   void read(Map<String, dynamic> data) {
+    if (data.containsKey(groupMapgroupPriviledge))
+      this.groupPriviledge = data[groupMapgroupPriviledge];
     if (data.containsKey(groupMapRolesCustomInfoTypes))
       this.customInfoTypes = data[groupMapRolesCustomInfoTypes];
     this.roleName = data[groupMapRolesRoleName];

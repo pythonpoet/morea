@@ -86,6 +86,7 @@ final String groupMapGroupLienceTypeStandart =
 final String groupMapGroupLienceTypeAnarchy = "groupMapGroupLienceTypeAnarchy";
 final String groupMapAdminGroupMemberBrowser =
     "groupMapAdminGroupMemberBrowser";
+final String groupMapgroupPriviledge = "groupPriviledge";
 final String groupMapEnableDisplayName = "groupMapEnableDisplayName";
 final String groupMapEventTeleblitzEnable = "groupMapEventTeleblitzEnable";
 final String groupMapChatEnable = "groupMapChatEnable";

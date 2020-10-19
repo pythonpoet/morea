@@ -66,7 +66,7 @@ class GroupData {
   Map<String, dynamic> groupData;
   Map<String, RoleEntry> roles = Map<String, RoleEntry>();
   Map<String, dynamic> groupUserData;
-  String groupID;
+  String groupID, groupNickName;
   GroupData({this.groupData, this.groupUserData}) {
     if (this.groupData != null) readGroup(this.groupData, this.groupUserData);
   }
@@ -79,6 +79,12 @@ class GroupData {
         this.groupID = groupMap["groupID"];
       else
         throw "groupID cant be empty";
+
+      if (groupMap.containsKey(groupMapgroupNickName))
+        this.groupNickName = groupMap[groupMapgroupNickName];
+      else
+        throw "$groupMapgroupNickName cant be emty";
+
       if (groupMap.containsKey(groupMapHomeFeed)) {
         this.homeFeed = HomeFeed();
         this

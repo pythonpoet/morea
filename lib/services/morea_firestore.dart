@@ -455,4 +455,10 @@ class MoreaFirebase extends BaseMoreaFirebase {
         param: updatePriviledgePayload);
     return uid;
   }
+  // ***************************************************************************
+  //
+  //  Function section: Group
+  //
+  // ***************************************************************************
+
 }

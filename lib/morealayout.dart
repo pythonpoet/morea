@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:morea/Pages/Group/group_page.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 
@@ -100,8 +101,6 @@ Widget moreaLoadingIndicator(
     ),
   );
 }
-
-
 
 class MoreaDivider extends Divider {
   final double thickness = 1;
@@ -336,6 +335,16 @@ Drawer moreaDrawer(
             ),
           ),
           new ListTile(
+              title: new Text('Group Page'),
+              trailing: new Icon(Icons.group),
+              onTap: () => Navigator.of(context)
+                  .push(new MaterialPageRoute(
+                      builder: (BuildContext context) => new GroupPage(
+                            moreaFire: moreafire,
+                          )))
+                  .then((onvalue) =>
+                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
+          new ListTile(
               title: new Text('Personen'),
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context)
@@ -363,7 +372,7 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: (){
+            onTap: () {
               Navigator.of(context).pop();
               signedOut();
             },
@@ -403,7 +412,7 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: (){
+            onTap: () {
               Navigator.of(context).pop();
               signedOut();
             },
@@ -446,7 +455,7 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: (){
+            onTap: () {
               Navigator.of(context).pop();
               signedOut();
             },
