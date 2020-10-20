@@ -38,7 +38,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1 + widget.moreaFire.getGroupIDs.length,
+      length: widget.moreaFire.getGroupIDs.length,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personen'),
@@ -67,7 +67,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
             (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
           if (!groupSnap.hasData) return moreaLoading.loading();
           List<Map<String, Map<String, dynamic>>> person = new List();
-
+          print(groupSnap.data.documents.length);
           if (groupSnap.data.documents.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
@@ -85,11 +85,13 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                     ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: person.length,
+                      itemCount: groupSnap.data.documents.length,
                       itemBuilder: (context, int index) {
-                        Map<String, dynamic> person = Map<String, dynamic>.from(
-                            groupSnap.data.documents[index].data);
-                        String name = person[groupMapDisplayName];
+                        Map<String, dynamic> person =
+                            Map.from(groupSnap.data.documents[index].data);
+                        String name = groupSnap
+                            .data.documents[index].data[groupMapDisplayName];
+                        print(name);
                         String userUID =
                             groupSnap.data.documents[index].documentID;
 
@@ -132,7 +134,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         });
   }
 
-  navigatetoprofile(Future<DocumentSnapshot> userdata) {
+  navigatetoprofile(Map<String, dynamic> userdata) {
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) =>
             new ViewUserProfilePage(userdata, widget.moreaFire, widget.crud0)));

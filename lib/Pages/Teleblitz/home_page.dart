@@ -168,6 +168,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget teleblitzwidget() {
     return Scaffold(
+      backgroundColor: MoreaColors.bottomAppBar,
       appBar: AppBar(
         title: Text('Teleblitz'),
       ),

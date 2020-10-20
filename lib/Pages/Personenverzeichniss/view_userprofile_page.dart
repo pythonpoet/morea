@@ -13,7 +13,7 @@ import 'package:morea/services/crud.dart';
 class ViewUserProfilePage extends StatefulWidget {
   ViewUserProfilePage(this.userData, this.moreaFire, this.crud0);
 
-  final Future<DocumentSnapshot> userData;
+  final Map<String, dynamic> userData;
   final CrudMedthods crud0;
   final MoreaFirebase moreaFire;
 
@@ -43,39 +43,28 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: FutureBuilder(
-        future: widget.userData,
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> aSProfile) {
-          if (!aSProfile.hasData) return moreaLoading.loading();
-          profile = aSProfile.data.data;
-          print(profile);
-
-          return Container(
-              child: Scaffold(
-                  appBar: AppBar(
-                    title: Text(profile['Vorname'].toString()),
+        child: Container(
+            child: Scaffold(
+                appBar: AppBar(
+                  title: Text(profile['Vorname'].toString()),
+                ),
+                body: MoreaBackgroundContainer(
+                    child: SingleChildScrollView(
+                  child: MoreaShadowContainer(
+                    child: viewprofile(),
                   ),
-                  body: MoreaBackgroundContainer(
-                      child: SingleChildScrollView(
-                    child: MoreaShadowContainer(
-                      child: viewprofile(),
-                    ),
-                  )),
-                  floatingActionButton: new FloatingActionButton(
-                      elevation: 1.0,
-                      child: new Icon(Icons.edit),
-                      backgroundColor: Color(0xff7a62ff),
-                      onPressed: () => Navigator.of(context).push(
-                          new MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  new EditUserProfilePage(
-                                      profile: profile,
-                                      moreaFire: widget.moreaFire,
-                                      crud0: widget.crud0))))));
-        },
-      ),
-    );
+                )),
+                floatingActionButton: new FloatingActionButton(
+                    elevation: 1.0,
+                    child: new Icon(Icons.edit),
+                    backgroundColor: Color(0xff7a62ff),
+                    onPressed: () => Navigator.of(context).push(
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                new EditUserProfilePage(
+                                    profile: profile,
+                                    moreaFire: widget.moreaFire,
+                                    crud0: widget.crud0)))))));
   }
 
   Widget viewprofile() {
