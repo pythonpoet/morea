@@ -11,9 +11,9 @@ import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/services/crud.dart';
 
 class ViewUserProfilePage extends StatefulWidget {
-  ViewUserProfilePage(this.userData, this.moreaFire, this.crud0);
+  ViewUserProfilePage(this.uID, this.moreaFire, this.crud0);
 
-  final Map<String, dynamic> userData;
+  final String uID;
   final CrudMedthods crud0;
   final MoreaFirebase moreaFire;
 
@@ -44,27 +44,42 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
   Widget build(BuildContext context) {
     return Container(
         child: Container(
-            child: Scaffold(
-                appBar: AppBar(
-                  title: Text(profile['Vorname'].toString()),
-                ),
-                body: MoreaBackgroundContainer(
-                    child: SingleChildScrollView(
-                  child: MoreaShadowContainer(
-                    child: viewprofile(),
-                  ),
-                )),
-                floatingActionButton: new FloatingActionButton(
-                    elevation: 1.0,
-                    child: new Icon(Icons.edit),
-                    backgroundColor: Color(0xff7a62ff),
-                    onPressed: () => Navigator.of(context).push(
-                        new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                new EditUserProfilePage(
-                                    profile: profile,
-                                    moreaFire: widget.moreaFire,
-                                    crud0: widget.crud0)))))));
+            child: FutureBuilder<DocumentSnapshot>(
+                future: widget.crud0.getDocument(pathUser, widget.uID),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return moreaLoading.loading();
+                  } else if (!snapshot.hasData) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: Text('Profil nicht vorhanden'),
+                      ),
+                    );
+                  } else {
+                    this.profile = snapshot.data.data;
+                    return Scaffold(
+                        appBar: AppBar(
+                          title: Text(this.profile[userMapVorName]),
+                        ),
+                        body: MoreaBackgroundContainer(
+                            child: SingleChildScrollView(
+                          child: MoreaShadowContainer(
+                            child: viewprofile(),
+                          ),
+                        )),
+                        floatingActionButton: new FloatingActionButton(
+                            elevation: 1.0,
+                            child: new Icon(Icons.edit),
+                            backgroundColor: Color(0xff7a62ff),
+                            onPressed: () => Navigator.of(context).push(
+                                new MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        new EditUserProfilePage(
+                                            profile: profile,
+                                            moreaFire: widget.moreaFire,
+                                            crud0: widget.crud0)))));
+                  }
+                })));
   }
 
   Widget viewprofile() {

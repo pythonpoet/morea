@@ -66,8 +66,6 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
           if (!groupSnap.hasData) return moreaLoading.loading();
-          List<Map<String, Map<String, dynamic>>> person = new List();
-          print(groupSnap.data.documents.length);
           if (groupSnap.data.documents.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
@@ -87,11 +85,8 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                       shrinkWrap: true,
                       itemCount: groupSnap.data.documents.length,
                       itemBuilder: (context, int index) {
-                        Map<String, dynamic> person =
-                            Map.from(groupSnap.data.documents[index].data);
                         String name = groupSnap
                             .data.documents[index].data[groupMapDisplayName];
-                        print(name);
                         String userUID =
                             groupSnap.data.documents[index].documentID;
 
@@ -101,7 +96,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                             style: MoreaTextStyle.lable,
                           ),
                           onTap: () => navigatetoprofile(
-                              person[groupMapPriviledgeEntryCustomInfo]),
+                              groupSnap.data.documents[index].documentID),
                           trailing: Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.black,
@@ -134,9 +129,9 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         });
   }
 
-  navigatetoprofile(Map<String, dynamic> userdata) {
+  navigatetoprofile(String uID) {
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) =>
-            new ViewUserProfilePage(userdata, widget.moreaFire, widget.crud0)));
+            new ViewUserProfilePage(uID, widget.moreaFire, widget.crud0)));
   }
 }

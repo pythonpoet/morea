@@ -167,7 +167,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<HttpsCallableResult> goToNewGroup(
-      String userID, String displayName, String oldGroup, String newGroup) {
+      String userID, String displayName, List<String> oldGroup, List<String> newGroup) {
     return callFunction(getcallable("goToNewGroup"), param: {
       userMapUID: userID,
       "oldGroup": oldGroup,

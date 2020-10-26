@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 
 class ChangePhoneNumber extends StatefulWidget {
   final String phoneNumber;
@@ -74,6 +75,7 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
+                          helperText: 'Format "+4179xxxxxxx" oder "004179xxxxxxx"',
                           errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
@@ -81,6 +83,8 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'Bitte nicht leer lassen';
+                          } else if (!MoreaInputValidator.phoneNumber(value)) {
+                            return 'Bitte gültige Telefonnummer wählen';
                           } else {
                             return null;
                           }

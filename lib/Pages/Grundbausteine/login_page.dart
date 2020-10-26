@@ -14,6 +14,7 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
@@ -116,7 +117,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     moreaUser.vorName,
                     moreaUser.nachName,
                     moreaUser.geschlecht,
-                    moreaUser.groupIDs[0],
+                    moreaUser.groupIDs,
                     moreafire);
               } else {
                 setState(() {
@@ -348,8 +349,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       borderSide: new BorderSide(width: 4, color: Colors.black),
                     ),
                   ),
-                  validator: (value) =>
-                      value.isEmpty ? 'Email darf nicht leer sein' : null,
+                  validator: (value) {
+                    if(value.isEmpty){
+                      return 'Bitte nicht leer lassen';
+                    } else if (!MoreaInputValidator.email(value)){
+                      return 'Bitte gültige E-Mail verwenden';
+                    } else {
+                      return null;
+                    }
+                  },
                   keyboardType: TextInputType.emailAddress,
                   onSaved: (value) => moreaUser.email = value,
                 ),
