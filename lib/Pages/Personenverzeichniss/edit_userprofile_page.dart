@@ -236,18 +236,18 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
   }
 
   void initStrings() {
-    this._vorname = widget.profile['Vorname'];
-    this._nachname = widget.profile['Nachname'];
-    this._pfadinamen = widget.profile['Pfadinamen'];
-    this._adresse = widget.profile['Adresse'];
-    this._plz = widget.profile['PLZ'];
-    this._ort = widget.profile['Ort'];
-    this._email = widget.profile['Email'];
-    this._handynummer = widget.profile['Handynummer'];
-    this._geschlecht = widget.profile['Geschlecht'];
-    this._geburtstag = widget.profile['Geburtstag'];
-    this._stufe = widget.profile['groupID'];
-    this._pos = widget.profile['Pos'];
+    this._vorname = widget.profile[userMapVorName];
+    this._nachname = widget.profile[userMapNachName];
+    this._pfadinamen = widget.profile[userMapPfadiName];
+    this._adresse = widget.profile[userMapAdresse];
+    this._plz = widget.profile[userMapPLZ];
+    this._ort = widget.profile[userMapOrt];
+    this._email = widget.profile[userMapEmail];
+    this._handynummer = widget.profile[userMapHandynummer];
+    this._geschlecht = widget.profile[userMapGeschlecht];
+    this._geburtstag = widget.profile[userMapGeburtstag];
+    this._stufe = widget.profile[userMapGroupIDs];
+    this._pos = widget.profile[userMapPos];
   }
 
   @override
