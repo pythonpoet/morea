@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:morea/Widgets/home/teleblitz.dart';
 import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
-import 'package:morea/services/Event/event_data.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 

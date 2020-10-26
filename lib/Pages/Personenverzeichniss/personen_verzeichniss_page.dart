@@ -38,7 +38,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1 + widget.moreaFire.getGroupIDs.length,
+      length: widget.moreaFire.getGroupIDs.length,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personen'),
@@ -66,9 +66,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
           if (!groupSnap.hasData) return moreaLoading.loading();
-          List<Map<String, Map<String, dynamic>>> person = new List();
-
-          if (groupSnap.data.documents.length > 0) {
+          if (groupSnap.data.docs.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
               child: MoreaShadowContainer(
@@ -85,19 +83,18 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                     ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: person.length,
+                      itemCount: groupSnap.data.docs.length,
                       itemBuilder: (context, int index) {
-                        Map<String, dynamic> person = Map<String, dynamic>.from(
-                            groupSnap.data.docs[index].data());
-                        String name = person[groupMapDisplayName];
+                        String name = groupSnap.data.docs[index]
+                            .data()[groupMapDisplayName];
 
                         return ListTile(
                           title: new Text(
                             name,
                             style: MoreaTextStyle.lable,
                           ),
-                          onTap: () => navigatetoprofile(
-                              person[groupMapPriviledgeEntryCustomInfo]),
+                          onTap: () =>
+                              navigatetoprofile(groupSnap.data.docs[index].id),
                           trailing: Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.black,
@@ -130,9 +127,9 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         });
   }
 
-  navigatetoprofile(Future<DocumentSnapshot> userdata) {
+  navigatetoprofile(String uID) {
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) =>
-            new ViewUserProfilePage(userdata, widget.moreaFire, widget.crud0)));
+            new ViewUserProfilePage(uID, widget.moreaFire, widget.crud0)));
   }
 }

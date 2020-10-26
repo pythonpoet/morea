@@ -4,10 +4,10 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
-import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/user.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 
 abstract class BaseRegister {}
 
@@ -511,6 +511,7 @@ class Register implements BaseRegister {
           border: UnderlineInputBorder(), filled: true, labelText: 'Adresse'),
       keyboardType: TextInputType.text,
       onSaved: (value) => moreaUser.adresse = value,
+      validator: (value) => value.isEmpty ? 'Bitte nicht leer lassen' : null,
     );
   }
 
@@ -523,6 +524,15 @@ class Register implements BaseRegister {
               border: UnderlineInputBorder(), filled: true, labelText: 'PLZ'),
           keyboardType: TextInputType.number,
           onSaved: (value) => moreaUser.plz = value,
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Bitte nicht leer lassen';
+            } else if (!MoreaInputValidator.number(value)) {
+              return 'Bitte gülitge PLZ verwenden';
+            } else {
+              return null;
+            }
+          },
         )),
         Expanded(
           child: new TextFormField(
@@ -530,6 +540,8 @@ class Register implements BaseRegister {
                 border: UnderlineInputBorder(), filled: true, labelText: 'Ort'),
             keyboardType: TextInputType.text,
             onSaved: (value) => moreaUser.ort = value,
+            validator: (value) =>
+                value.isEmpty ? 'Bitte nicht leer lassen' : null,
           ),
         ),
       ],
@@ -541,9 +553,17 @@ class Register implements BaseRegister {
       decoration: new InputDecoration(
           border: UnderlineInputBorder(),
           filled: true,
+          helperText: 'Format "+4179xxxxxxx" oder "004179xxxxxxx"',
           labelText: 'Handynummer'),
-      validator: (value) =>
-          value.isEmpty ? 'Handynummer darf nicht leer sein' : null,
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Bitte nicht leer lassen';
+        } else if (!MoreaInputValidator.phoneNumber(value)) {
+          return 'Bitte gültige Telefonnummer verwenden';
+        } else {
+          return null;
+        }
+      },
       keyboardType: TextInputType.phone,
       onSaved: (value) => moreaUser.handynummer = value,
     );
@@ -552,7 +572,15 @@ class Register implements BaseRegister {
   Widget registerEmail() {
     return new TextFormField(
       decoration: new InputDecoration(filled: true, labelText: 'Email'),
-      validator: (value) => value.isEmpty ? 'Email darf nicht leer sein' : null,
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Bitte nicht leer lassen';
+        } else if (!MoreaInputValidator.email(value)) {
+          return 'Bitte gültige E-Mail verwenden';
+        } else {
+          return null;
+        }
+      },
       keyboardType: TextInputType.emailAddress,
       onSaved: (value) => moreaUser.email = value,
     );

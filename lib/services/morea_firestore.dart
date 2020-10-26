@@ -77,8 +77,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   StreamController<Map<String, GroupData>> sCGroupMaps = BehaviorSubject();
 
-  MoreaFirebase(Firestore FirebaseFirestore, {List groupIDs}) {
-    this.firestore = FirebaseFirestore;
+  MoreaFirebase(FirebaseFirestore firestore, {List groupIDs}) {
+    this.firestore = firestore;
     crud0 = new CrudMedthods(firestore);
     moreaUser = new User(crud0);
     if (groupIDs != null) tbz = new TeleblizFirestore(firestore, groupIDs);
@@ -166,8 +166,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return callFunction(getcallable("updateUserProfile"), param: userInfo);
   }
 
-  Future<HttpsCallableResult> goToNewGroup(
-      String userID, String displayName, String oldGroup, String newGroup) {
+  Future<HttpsCallableResult> goToNewGroup(String userID, String displayName,
+      List<String> oldGroup, List<String> newGroup) {
     return callFunction(getcallable("goToNewGroup"), param: {
       userMapUID: userID,
       "oldGroup": oldGroup,

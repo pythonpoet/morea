@@ -12,7 +12,7 @@ class TeleblitzManager {
 
   MoreaFirebase moreafire;
 
-  TeleblitzManager(Firestore firestore) {
+  TeleblitzManager(FirebaseFirestore firestore) {
     moreafire = new MoreaFirebase(firestore);
   }
 

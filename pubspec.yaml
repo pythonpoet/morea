@@ -20,6 +20,7 @@ dependencies:
     firebase_auth: ^0.18.1+2
     firebase_messaging: any
     firebase_analytics: ^6.0.2
+    firebase_core : ^0.5.0
     cloud_functions: 0.6.0+1
     flutter_html: any
     http: any

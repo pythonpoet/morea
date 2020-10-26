@@ -1,5 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:morea/morea_strings.dart';
@@ -49,7 +50,7 @@ abstract class BaseAuth {
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   DWICore dwiHardware = new DWICore();
-  FirebaseUser _user;
+  firebase.User _user;
 
   String get getUserID => _user != null ? _user.uid : "not loaded";
 
@@ -68,7 +69,7 @@ class Auth implements BaseAuth {
 
   Future<String> createUserWithEmailAndPasswordForChild(
       String email, String password) async {
-    FirebaseUser childUser = (await _firebaseAuth
+    firebase.User childUser = (await _firebaseAuth
             .createUserWithEmailAndPassword(email: email, password: password))
         .user;
     return childUser.uid;
@@ -116,7 +117,7 @@ class Auth implements BaseAuth {
         EmailAuthProvider.credential(email: email, password: password);
     print('got Credential');
     print(email);
-    FirebaseUser user = _firebaseAuth.currentUser;
+    firebase.User user = _firebaseAuth.currentUser;
     print('got current user');
     var result = await user.reauthenticateWithCredential(credential);
     if (result.user == null) {
@@ -259,14 +260,14 @@ class Auth implements BaseAuth {
   }
 
   Future<void> changeEmail(String email) async {
-    FirebaseUser user = await _firebaseAuth.currentUser;
+    firebase.User user = await _firebaseAuth.currentUser;
     await user.reload();
     await user.updateEmail(email);
     return null;
   }
 
   Future<void> changePassword(String password) async {
-    FirebaseUser user = await _firebaseAuth.currentUser;
+    firebase.User user = await _firebaseAuth.currentUser;
     await user.reload();
     await user.updatePassword(password);
     return null;

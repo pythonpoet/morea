@@ -10,7 +10,6 @@ import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
-import 'package:morea/services/Event/event_data.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -678,7 +677,7 @@ class Teleblitz {
                                   return Text('Error');
                                 } else {
                                   List<DocumentSnapshot> documents =
-                                      snapshot.data.documents;
+                                      snapshot.data.docs;
                                   List<String> chunntNoed = [];
                                   for (DocumentSnapshot document in documents) {
                                     if (document.data()['AnmeldeStatus'] ==

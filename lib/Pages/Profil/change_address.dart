@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 
 class ChangeAddress extends StatefulWidget {
   final String address, plz, ort;
@@ -81,9 +82,12 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
-                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -110,13 +114,18 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
-                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'Bitte nicht leer lassen';
+                          } else if (MoreaInputValidator.number(value)) {
+                            return 'Bitte gültige PLZ verwenden';
                           } else {
                             return null;
                           }
@@ -139,9 +148,12 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         style: MoreaTextStyle.textField,
                         cursorColor: MoreaColors.violett,
                         decoration: InputDecoration(
-                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red)),
                           border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: MoreaColors.violett)),
                         ),
                       ),
                     ),

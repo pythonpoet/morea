@@ -59,7 +59,7 @@ class CrudMedthods implements BaseCrudMethods {
     print("get Doc: $path/$document");
     return await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
+        .doc(document)
         .get();
   }
 
@@ -67,7 +67,7 @@ class CrudMedthods implements BaseCrudMethods {
     print("stream doc: $path/$document");
     return FirebaseFirestore.instance
         .collection(path)
-        .document(document)
+        .doc(document)
         .snapshots();
   }
 
@@ -78,7 +78,7 @@ class CrudMedthods implements BaseCrudMethods {
     controller.add(false);
     db
         .collection(path)
-        .document(document)
+        .doc(document)
         .snapshots()
         .distinct()
         .skip(1)
@@ -94,8 +94,8 @@ class CrudMedthods implements BaseCrudMethods {
     path = dwiformat.pathstring(path);
     await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
-        .setData(data)
+        .doc(document)
+        .set(data)
         .catchError((e) {
       print(e);
       print("tried to upload data: " + data.toString());
@@ -105,18 +105,18 @@ class CrudMedthods implements BaseCrudMethods {
   Future<void> runTransaction(
       String path, String document, Map<String, dynamic> data,
       {Map Function(DocumentSnapshot) function}) async {
-    DocumentReference docRef = db.collection(path).document(document);
+    DocumentReference docRef = db.collection(path).doc(document);
 
     try {
       TransactionHandler transactionHandler = (Transaction tran) async {
         await tran.get(docRef).then((DocumentSnapshot snap) async {
           if (snap.exists) {
             if (function != null)
-              await tran.update(docRef, function(snap));
+              tran.update(docRef, function(snap));
             else
-              await tran.update(docRef, data);
+              tran.update(docRef, data);
           } else {
-            await tran.set(docRef, data);
+            tran.set(docRef, data);
           }
         }).catchError((err) => {throw err});
       };
@@ -131,7 +131,7 @@ class CrudMedthods implements BaseCrudMethods {
     path = dwiformat.pathstring(path);
     await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
+        .doc(document)
         .delete()
         .catchError((e) {
       print(e);
@@ -141,11 +141,11 @@ class CrudMedthods implements BaseCrudMethods {
   Future<String> setDataWithoutDocumentName(
       String path, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
-    DocumentReference documentReference = this.db.collection(path).document();
-    await documentReference.setData(data).catchError((e) {
+    DocumentReference documentReference = this.db.collection(path).doc();
+    await documentReference.set(data).catchError((e) {
       print(e);
     });
-    return documentReference.documentID;
+    return documentReference.id;
   }
 
   Future<void> updateMessage(
@@ -153,8 +153,8 @@ class CrudMedthods implements BaseCrudMethods {
     path = dwiformat.pathstring(path);
     await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
-        .setData(data)
+        .doc(document)
+        .set(data)
         .catchError((e) {
       print(e);
     });
@@ -163,7 +163,7 @@ class CrudMedthods implements BaseCrudMethods {
   Future<DocumentSnapshot> getMessage(String path, String document) async {
     return await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
+        .doc(document)
         .get();
   }
 }

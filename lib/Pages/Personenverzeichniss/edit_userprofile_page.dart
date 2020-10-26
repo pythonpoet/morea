@@ -36,13 +36,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   MailChimpAPIManager mailchimpApiManager = MailChimpAPIManager();
 
-  String _email,
-      _pfadinamen = ' ',
-      _vorname,
-      _nachname,
-      _geburtstag,
-      _stufe,
-      _pos;
+  String _email, _pfadinamen = ' ', _vorname, _nachname, _geburtstag, _pos;
   String _adresse,
       _ort,
       _plz,
@@ -50,8 +44,8 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       userId,
       error,
       selectedrolle,
-      _geschlecht,
-      oldGroup;
+      _geschlecht;
+  List _stufe, oldGroup;
   List<Map> _stufenselect = new List();
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
   MoreaLoading moreaLoading;
@@ -434,7 +428,12 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 'Stufe',
                 style: MoreaTextStyle.lable,
               ),
-              subtitle: Text(convMiDatatoWebflow(_stufe)),
+              subtitle: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _stufe.length,
+                  itemBuilder: (context, index) {
+                    return Text(convMiDatatoWebflow(_stufe[index]));
+                  }),
               onTap: () => _selectStufe(),
               trailing: Icon(
                 Icons.arrow_forward_ios,
@@ -550,9 +549,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     child: new Text(group[groupMapgroupNickName]),
                   );
                 }).toList(),
-                hint: Text(convMiDatatoWebflow(_stufe)),
+                hint: Text(convMiDatatoWebflow(_stufe[0])),
                 onChanged: (newVal) {
-                  _stufe = newVal;
+                  _stufe = [newVal];
                   this.setState(() {});
                   Navigator.of(context).pop();
                 }),

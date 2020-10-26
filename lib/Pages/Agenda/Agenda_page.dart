@@ -70,7 +70,7 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  void _getAgenda(List<String> groupIDs) {
+  void _getAgenda(List<dynamic> groupIDs) {
     agenda.getTotalAgendaOverview(groupIDs);
   }
 
@@ -304,7 +304,7 @@ class _AgendaStatePage extends State<AgendaState>
     });
   }
 
-  Widget aAgenda(List<String> groupID) {
+  Widget aAgenda(List<dynamic> groupID) {
     return StreamBuilder(
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
