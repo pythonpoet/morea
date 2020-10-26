@@ -8,7 +8,7 @@ Stream<Map<String, dynamic>> getEventStreamMap(
     CrudMedthods crudMedthods, String eventID) async* {
   await for (DocumentSnapshot dsEventData
       in crudMedthods.streamDocument(pathEvents, eventID)) {
-    yield dsEventData.data;
+    yield dsEventData.data();
   }
 }
 

@@ -6,7 +6,7 @@ class ChildShowsQrCodeState extends StatefulWidget {
   ChildShowsQrCodeState({this.childUID, this.firestore});
 
   final String childUID;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   @override
   State<StatefulWidget> createState() => ChildShowsQrCodeStatePage();

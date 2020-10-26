@@ -21,7 +21,7 @@ class LoginPage extends StatefulWidget {
 
   final BaseAuth auth;
   final Function onSignedIn;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
@@ -105,7 +105,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
-                      .data["Datenschutz"]);
+                      .data()["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
-                      .data["Datenschutz"]);
+                      .data()["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,

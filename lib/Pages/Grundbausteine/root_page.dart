@@ -25,7 +25,7 @@ class RootPage extends StatefulWidget {
   RootPage({this.auth, this.firestore});
 
   final BaseAuth auth;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   @override
   State<StatefulWidget> createState() => _RootPageState();

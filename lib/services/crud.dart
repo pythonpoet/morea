@@ -32,36 +32,43 @@ abstract class BaseCrudMethods {
 
 class CrudMedthods implements BaseCrudMethods {
   DWIFormat dwiformat = new DWIFormat();
-  Firestore db;
+  FirebaseFirestore db;
 
-  CrudMedthods(Firestore firestore) {
-    this.db = firestore;
-  }
+  CrudMedthods(this.db);
 
   Future<QuerySnapshot> getCollection(String path) async {
     path = dwiformat.pathstring(path);
-    return await Firestore.instance.collection(path).getDocuments();
+    return await FirebaseFirestore.instance.collection(path).get();
   }
 
   Stream<QuerySnapshot> streamCollection(String path) {
-    return Firestore.instance.collection(path).snapshots();
+    return FirebaseFirestore.instance.collection(path).snapshots();
   }
 
   Stream<QuerySnapshot> streamOrderCollection(String path, String order) {
     path = dwiformat.pathstring(path);
-    return Firestore.instance.collection(path).orderBy(order).snapshots();
+    return FirebaseFirestore.instance
+        .collection(path)
+        .orderBy(order)
+        .snapshots();
   }
 
   Future<DocumentSnapshot> getDocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
     print("get Doc: $path/$document");
-    return await Firestore.instance.collection(path).document(document).get();
+    return await FirebaseFirestore.instance
+        .collection(path)
+        .document(document)
+        .get();
   }
 
   Stream<DocumentSnapshot> streamDocument(String path, String document) {
     print("stream doc: $path/$document");
-    return Firestore.instance.collection(path).document(document).snapshots();
+    return FirebaseFirestore.instance
+        .collection(path)
+        .document(document)
+        .snapshots();
   }
 
   Future<bool> waitOnDocumentChanged(String path, String document) async {
@@ -85,7 +92,7 @@ class CrudMedthods implements BaseCrudMethods {
       String path, String document, Map<String, dynamic> data) async {
     print("set doc: $path/$document");
     path = dwiformat.pathstring(path);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(path)
         .document(document)
         .setData(data)
@@ -122,7 +129,7 @@ class CrudMedthods implements BaseCrudMethods {
   Future deletedocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(path)
         .document(document)
         .delete()
@@ -144,7 +151,7 @@ class CrudMedthods implements BaseCrudMethods {
   Future<void> updateMessage(
       String path, String document, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(path)
         .document(document)
         .setData(data)
@@ -154,6 +161,9 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
   Future<DocumentSnapshot> getMessage(String path, String document) async {
-    return await Firestore.instance.collection(path).document(document).get();
+    return await FirebaseFirestore.instance
+        .collection(path)
+        .document(document)
+        .get();
   }
 }

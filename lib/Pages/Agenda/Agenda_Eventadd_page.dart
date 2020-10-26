@@ -22,7 +22,7 @@ class EventAddPage extends StatefulWidget {
   final MoreaFirebase moreaFire;
   final Map eventinfo;
   final AgendaModus agendaModus;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Agenda agenda;
 
   @override
@@ -348,7 +348,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, moreaGroupID)).data;
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data();
     this.subgroups =
         new List<Map<dynamic, dynamic>>.from(data[groupMapSubgroup]);
     this.groupCheckboxinit(this.subgroups);

@@ -17,14 +17,14 @@ dependencies:
         sdk: flutter
     flutter:
         sdk: flutter
-    firebase_auth: 0.15.0+1
+    firebase_auth: ^0.18.1+2
     firebase_messaging: any
-    firebase_analytics: ^5.0.16
-    cloud_functions: 
+    firebase_analytics: ^6.0.2
+    cloud_functions: 0.6.0+1
     flutter_html: any
     http: any
     intl: any
-    cloud_firestore: ^0.12.10+2
+    cloud_firestore: ^0.14.1+3
     url_launcher: any
     share: any
     expandable: any
@@ -37,7 +37,7 @@ dependencies:
     flutter_datetime_picker: ^1.4.0
     flip_card: ^0.4.4
     showcaseview: ^0.1.5
-    device_info: ^0.4.1+4
+    device_info: ^0.4.1
 
 
     shared_preferences: any

@@ -21,7 +21,7 @@ class MessagesPage extends StatefulWidget {
       @required this.navigationMap,
       @required this.firestore});
 
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final MoreaFirebase moreaFire;
   final Auth auth;
   final Map navigationMap;
@@ -211,18 +211,20 @@ class _MessagesPageState extends State<MessagesPage>
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: snapshot.data.documents.length,
                                 shrinkWrap: true,
-                                separatorBuilder: (context, index){
+                                separatorBuilder: (context, index) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15.0),
                                     child: MoreaDivider(),
                                   );
                                 },
                                 itemBuilder: (context, index) {
-                                  var document =
-                                      snapshot.data.documents[index];
+                                  var document = snapshot.data.documents[index];
                                   return _buildListItem(context, document);
                                 }),
-                            Padding(padding: EdgeInsets.only(top: 20),)
+                            Padding(
+                              padding: EdgeInsets.only(top: 20),
+                            )
                           ],
                         ),
                       ),
@@ -347,9 +349,10 @@ class _MessagesPageState extends State<MessagesPage>
                               ListView.separated(
                                   physics: NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  separatorBuilder: (context, index){
+                                  separatorBuilder: (context, index) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0),
                                       child: MoreaDivider(),
                                     );
                                   },
@@ -390,7 +393,7 @@ class _MessagesPageState extends State<MessagesPage>
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var message = document;
     List<String> receivers = [];
-    for(String receiver in document['receivers']){
+    for (String receiver in document['receivers']) {
       receivers.add(convMiDatatoWebflow(receiver));
     }
     String receiversString = receivers.join(',');
@@ -406,7 +409,9 @@ class _MessagesPageState extends State<MessagesPage>
                 Text('von: ${document['sender']}',
                     style: MoreaTextStyle.sender),
                 Text(
-                    'für: $receiversString', style: MoreaTextStyle.sender,),
+                  'für: $receiversString',
+                  style: MoreaTextStyle.sender,
+                ),
               ],
             ),
             contentPadding: EdgeInsets.only(),
@@ -435,10 +440,11 @@ class _MessagesPageState extends State<MessagesPage>
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('von: ${document['sender']}',
-                  style: MoreaTextStyle.sender),
+              Text('von: ${document['sender']}', style: MoreaTextStyle.sender),
               Text(
-                'für: $receiversString', style: MoreaTextStyle.sender,),
+                'für: $receiversString',
+                style: MoreaTextStyle.sender,
+              ),
             ],
           ),
           contentPadding: EdgeInsets.only(),

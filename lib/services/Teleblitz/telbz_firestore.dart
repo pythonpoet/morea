@@ -28,7 +28,7 @@ abstract class BaseTeleblitzFirestore {
 
   Future<bool> eventIDExists(String eventID);
 
-  //Returns true if a given eventID exists in the firestore
+  //Returns true if a given eventID exists in the FirebaseFirestore
 
   Future<void> uploadTelbzAkt(String groupID, Map<String, dynamic> data);
 
@@ -56,7 +56,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Stream<Map<String, Map<String, Map<String, dynamic>>>> get getMapofEvents =>
       _mapofEventsController.stream;
 
-  TeleblizFirestore(Firestore firestore, List<String> groupIDs) {
+  TeleblizFirestore(FirebaseFirestore firestore, List<String> groupIDs) {
     crud0 = CrudMedthods(firestore);
     _mapHomeFeedController.addStream(this.streamMapHomeFeed(groupIDs));
     this.streamMapofGroupEvents(groupIDs);
@@ -68,7 +68,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     await for (List<String> homeFeed
         in sDhomeFeed.map((DocumentSnapshot dsHomeFeed) {
       return new List<String>.from(
-          dsHomeFeed.data[groupMapHomeFeed] ?? new List());
+          dsHomeFeed.data()[groupMapHomeFeed] ?? new List());
     })) {
       mapHomeFeed[groupID] = homeFeed;
       yield mapHomeFeed;
@@ -84,7 +84,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
 
   Stream<Map<String, dynamic>> steramTelebliz(eventID) async* {
     yield* crud0.streamDocument(pathEvents, eventID).map((dsEvent) {
-      return dsEvent.data;
+      return dsEvent.data();
     });
   }
 
@@ -151,7 +151,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Future<Map> refeshTelbz(String eventID) async {
     try {
       Map<String, dynamic> tlbz = Map<String, dynamic>.from(
-          (await crud0.getDocument(pathGroups, eventID)).data);
+          (await crud0.getDocument(pathGroups, eventID)).data());
       tlbz["Timestamp"] = DateTime.now();
       this._teleblitze[eventID] = tlbz;
       return tlbz;
@@ -168,7 +168,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
       if (!dSAnmeldung.exists)
         yield "un-initialized";
       else
-        yield dSAnmeldung.data["AnmeldeStatus"];
+        yield dSAnmeldung.data()["AnmeldeStatus"];
     }
   }
 

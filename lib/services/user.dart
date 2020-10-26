@@ -108,8 +108,8 @@ class User {
           '$pathGroups/$groupID/$pathPriviledge', this.userID));
       GroupData groupData = new GroupData(
           groupData: Map<String, dynamic>.from(
-              (await crud0.getDocument(pathGroups, groupID)).data),
-          groupUserData: Map<String, dynamic>.from(someVar.data));
+              (await crud0.getDocument(pathGroups, groupID)).data()),
+          groupUserData: Map<String, dynamic>.from(someVar.data()));
 
       subscribedGroups[groupID] = groupData;
     }
@@ -184,10 +184,10 @@ class User {
       for (String groupID in groupIDs) {
         GroupData groupData = new GroupData(
             groupData: Map<String, dynamic>.from(
-                (await crud0.getDocument(pathGroups, groupID)).data),
+                (await crud0.getDocument(pathGroups, groupID)).data()),
             groupUserData: Map<String, dynamic>.from((await crud0.getDocument(
                     '$pathGroups/$groupID/$pathPriviledge', this.userID))
-                .data));
+                .data()));
 
         subscribedGroups[groupID] = groupData;
       }
@@ -234,7 +234,7 @@ class User {
     Map<String, Map<String, String>> childMap = new Map();
     for (String childUID in childs.keys) {
       Map<String, dynamic> childUserDat = Map<String, dynamic>.from(
-          (await crud0.getDocument(pathUser, childUID)).data);
+          (await crud0.getDocument(pathUser, childUID)).data());
       print(childUserDat);
 
       for (String groupID in childUserDat[userMapGroupIDs]) {
@@ -252,7 +252,7 @@ class User {
     for (String groupID in childMap.keys) {
       GroupData groupData = new GroupData(
           groupData: Map<String, dynamic>.from(
-              (await crud0.getDocument(pathGroups, groupID)).data));
+              (await crud0.getDocument(pathGroups, groupID)).data()));
       if (groupData.groupOption.parentialControl.enabled) {
         if (!this.groupIDs.contains(groupID)) this.groupIDs.add(groupID);
         groupData.setParentPriviledge();

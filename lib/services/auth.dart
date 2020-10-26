@@ -66,8 +66,11 @@ class Auth implements BaseAuth {
     return _user.uid;
   }
 
-  Future<String> createUserWithEmailAndPasswordForChild(String email, String password) async {
-    FirebaseUser childUser = (await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password)).user;
+  Future<String> createUserWithEmailAndPasswordForChild(
+      String email, String password) async {
+    FirebaseUser childUser = (await _firebaseAuth
+            .createUserWithEmailAndPassword(email: email, password: password))
+        .user;
     return childUser.uid;
   }
 
@@ -84,35 +87,36 @@ class Auth implements BaseAuth {
   }
 
   Future<void> createUserInformation(Map userInfo) async {
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(pathUser)
-        .document(_user.uid)
-        .setData(userInfo)
+        .doc(_user.uid)
+        .set(userInfo)
         .catchError((e) {
       print(e);
     });
   }
 
   Future<String> currentUser() async {
-    this._user = await _firebaseAuth.currentUser();
+    this._user = _firebaseAuth.currentUser;
     return _user != null ? _user.uid : null;
   }
 
   Future<String> userEmail() async {
-    this._user = await _firebaseAuth.currentUser();
+    this._user = _firebaseAuth.currentUser;
     return _user != null ? _user.email : null;
   }
-  Future<void> deleteUserID() async{
-    (await FirebaseAuth.instance.currentUser()).delete();
+
+  Future<void> deleteUserID() async {
+    FirebaseAuth.instance.currentUser.delete();
   }
 
   Future<bool> reauthenticate(String email, String password) async {
     bool reAuthenticated;
     AuthCredential credential =
-        EmailAuthProvider.getCredential(email: email, password: password);
+        EmailAuthProvider.credential(email: email, password: password);
     print('got Credential');
     print(email);
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    FirebaseUser user = _firebaseAuth.currentUser;
     print('got current user');
     var result = await user.reauthenticateWithCredential(credential);
     if (result.user == null) {
@@ -255,14 +259,14 @@ class Auth implements BaseAuth {
   }
 
   Future<void> changeEmail(String email) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    FirebaseUser user = await _firebaseAuth.currentUser;
     await user.reload();
     await user.updateEmail(email);
     return null;
   }
 
   Future<void> changePassword(String password) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    FirebaseUser user = await _firebaseAuth.currentUser;
     await user.reload();
     await user.updatePassword(password);
     return null;

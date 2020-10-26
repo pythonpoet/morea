@@ -187,7 +187,7 @@ class Register implements BaseRegister {
         builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap) {
           if (!snap.hasData) return simpleMoreaLoadingIndicator();
           print("type= " + snap.data.data.runtimeType.toString());
-          Map<String, dynamic> groupData2 = snap.data.data;
+          Map<String, dynamic> groupData2 = snap.data.data();
           this.groupdata = new GroupData(groupData: groupData2);
 
           return Container(
@@ -241,7 +241,7 @@ class Register implements BaseRegister {
       future: docSnapAbteilung,
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap) {
         if (!snap.hasData) return simpleMoreaLoadingIndicator();
-        this.groupdata = new GroupData(groupData: snap.data.data);
+        this.groupdata = new GroupData(groupData: snap.data.data());
         return Container(
           child: Column(
             mainAxisSize: MainAxisSize.min,

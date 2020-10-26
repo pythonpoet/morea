@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
       this.tutorial});
 
   final BaseAuth auth;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Map<String, Function> navigationMap;
   final MoreaFirebase moreafire;
   final bool tutorial;

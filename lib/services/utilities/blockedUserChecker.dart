@@ -8,10 +8,12 @@ import 'package:morea/services/group.dart';
 Map<String, RoleEntry> globalConfigRoles = Map<String, RoleEntry>();
 
 Future<AuthStatus> check4BlockedAuthStatus(
-    String userID, Firestore firestore) async {
-  Map<String, dynamic> init =
-      (await Firestore.instance.collection(pathConfig).document(pathInit).get())
-          .data;
+    String userID, FirebaseFirestore firestore) async {
+  Map<String, dynamic> init = (await FirebaseFirestore.instance
+          .collection(pathConfig)
+          .doc(pathInit)
+          .get())
+      .data();
   print(init.runtimeType);
   if (init == null) throw "No init doc exists";
   initGetGroupConfigRoles(data: init);

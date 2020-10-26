@@ -681,9 +681,9 @@ class Teleblitz {
                                       snapshot.data.documents;
                                   List<String> chunntNoed = [];
                                   for (DocumentSnapshot document in documents) {
-                                    if (document.data['AnmeldeStatus'] ==
+                                    if (document.data()['AnmeldeStatus'] ==
                                         eventMapAnmeldeStatusNegativ) {
-                                      chunntNoed.add(document.data['Name']);
+                                      chunntNoed.add(document.data()['Name']);
                                     }
                                   }
                                   return ListView.builder(

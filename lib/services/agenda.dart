@@ -31,14 +31,14 @@ abstract class BaseAgenda {
 class Agenda extends BaseAgenda {
   CrudMedthods crud0;
   DWIFormat dwiFormat = new DWIFormat();
-  Firestore db;
+  FirebaseFirestore db;
   MoreaFirebase moreaFire;
   List<Map> events = new List();
   StreamController<List<Map>> eventStream = new BehaviorSubject();
 
   Stream<List<Map<dynamic, dynamic>>> get eventstream => eventStream.stream;
 
-  Agenda(Firestore firestore, MoreaFirebase moreaFire) {
+  Agenda(FirebaseFirestore firestore, MoreaFirebase moreaFire) {
     this.crud0 = new CrudMedthods(firestore);
     this.db = firestore;
     this.moreaFire = moreaFire;
@@ -51,9 +51,9 @@ class Agenda extends BaseAgenda {
   Stream<List<Map<dynamic, dynamic>>> getAgendaOverview(String groupID) async* {
     await for (DocumentSnapshot groupMap
         in crud0.streamDocument(pathGroups, groupID)) {
-      if (groupMap.data.containsKey('AgendaTitles')) {
-        if (groupMap.data['AgendaTitles'].isNotEmpty) {
-          yield List<Map>.from(groupMap.data["AgendaTitles"]);
+      if (groupMap.data().containsKey('AgendaTitles')) {
+        if (groupMap.data()['AgendaTitles'].isNotEmpty) {
+          yield List<Map>.from(groupMap.data()["AgendaTitles"]);
         } else {
           yield [];
         }
@@ -117,21 +117,22 @@ class Agenda extends BaseAgenda {
   }
 
   Future<void> deleteAgendaOverviewTitle(String groupID, String eventID) async {
-    DocumentReference docRef = db.collection(pathGroups).document(groupID);
+    DocumentReference docRef = db.collection(pathGroups).doc(groupID);
     List<dynamic> agendaOverview;
 
     try {
       TransactionHandler transactionHandler = (Transaction tran) async {
         await tran.get(docRef).then((DocumentSnapshot snap) async {
           if (snap.exists) {
-            Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
+            Map<dynamic, dynamic> test =
+                Map<dynamic, dynamic>.from(snap.data());
             if (test.containsKey("AgendaTitles")) {
               agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
               agendaOverview.removeWhere(
                   (element) => element[groupMapEventID] == eventID);
             }
           }
-          await tran.update(docRef,
+          tran.update(docRef,
               Map<String, dynamic>.from({"AgendaTitles": agendaOverview}));
         }).catchError((err) => {print(err)});
       };
@@ -183,7 +184,7 @@ class Agenda extends BaseAgenda {
 
   Future<void> updateAgendaTitles(
       String groupID, Map<String, dynamic> agendaTitle) async {
-    DocumentReference docRef = db.collection(pathGroups).document(groupID);
+    DocumentReference docRef = db.collection(pathGroups).doc(groupID);
     List<dynamic> agendaOverview = new List();
 
     //DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
@@ -192,7 +193,8 @@ class Agenda extends BaseAgenda {
       TransactionHandler transactionHandler = (Transaction tran) async {
         await tran.get(docRef).then((DocumentSnapshot snap) async {
           if (snap.exists) {
-            Map<dynamic, dynamic> test = Map<dynamic, dynamic>.from(snap.data);
+            Map<dynamic, dynamic> test =
+                Map<dynamic, dynamic>.from(snap.data());
             if (test.containsKey("AgendaTitles")) {
               agendaOverview = new List<dynamic>.from(test["AgendaTitles"]);
               if (agendaOverview.length >= 1) {
@@ -205,7 +207,7 @@ class Agenda extends BaseAgenda {
             } else {
               agendaOverview.add(agendaTitle);
             }
-            await tran.update(docRef,
+            tran.update(docRef,
                 Map<String, dynamic>.from({"AgendaTitles": agendaOverview}));
           }
         }).catchError((err) => {print(err)});

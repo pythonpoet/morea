@@ -17,7 +17,7 @@ class GroupPage extends StatefulWidget {
   final auth;
   final MoreaFirebase moreaFire;
   final Map<String, Function> navigationMap;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   GroupPage(
       {@required this.auth,

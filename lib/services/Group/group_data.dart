@@ -11,7 +11,7 @@ Stream<Map<String, dynamic>> getGroupData(
     CrudMedthods crudMedthods, String groupID) async* {
   await for (DocumentSnapshot dsEventData
       in crudMedthods.streamDocument(pathGroups, groupID)) {
-    yield dsEventData.data;
+    yield dsEventData.data();
   }
 }
 
@@ -140,8 +140,8 @@ class GroupData {
       this.groupID,
       {},
       function: (snap) {
-        snap.data[groupMapHomeFeed] = map;
-        return snap.data;
+        snap.data()[groupMapHomeFeed] = map;
+        return snap.data();
       },
     );
   }

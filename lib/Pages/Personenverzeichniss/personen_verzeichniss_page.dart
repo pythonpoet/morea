@@ -88,10 +88,8 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                       itemCount: person.length,
                       itemBuilder: (context, int index) {
                         Map<String, dynamic> person = Map<String, dynamic>.from(
-                            groupSnap.data.documents[index].data);
+                            groupSnap.data.docs[index].data());
                         String name = person[groupMapDisplayName];
-                        String userUID =
-                            groupSnap.data.documents[index].documentID;
 
                         return ListTile(
                           title: new Text(

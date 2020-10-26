@@ -48,7 +48,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> aSProfile) {
           if (!aSProfile.hasData) return moreaLoading.loading();
-          profile = aSProfile.data.data;
+          profile = aSProfile.data.data();
           print(profile);
 
           return Container(
@@ -205,7 +205,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             if (!aSParent.hasData)
               return simpleMoreaLoadingIndicator();
             else
-              return displayEltern(aSParent.data.data);
+              return displayEltern(aSParent.data.data());
           },
         ),
       ));

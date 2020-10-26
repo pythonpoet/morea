@@ -23,7 +23,7 @@ class AgendaState extends StatefulWidget {
       @required this.navigationMap});
 
   final MoreaFirebase moreaFire;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Auth auth;
   final Map<String, Function> navigationMap;
 
@@ -80,7 +80,7 @@ class _AgendaStatePage extends State<AgendaState>
       DateTime now = DateTime.now();
       if (_agdatum.difference(now).inDays < 0) {
         Map fullevent =
-            (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+            (await agenda.getAgendaTitle(event[groupMapEventID])).data();
         if (fullevent != null)
           agenda.deleteAgendaEvent(fullevent);
         else
@@ -88,7 +88,7 @@ class _AgendaStatePage extends State<AgendaState>
       }
     } else {
       Map fullevent =
-          (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+          (await agenda.getAgendaTitle(event[groupMapEventID])).data();
       if (fullevent != null)
         agenda.deleteAgendaEvent(fullevent);
       else
@@ -275,7 +275,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewLager(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data();
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewLagerPageState(
@@ -290,7 +290,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data();
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewEventPageState(

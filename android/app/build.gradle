@@ -32,17 +32,14 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdkVersion 28
-
-     /*sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }*/
+    
 
     lintOptions {
         disable 'InvalidPackage'
     }
     defaultConfig {
         applicationId "productions.morea.app"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -75,14 +72,11 @@ flutter {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    /*testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    //implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'androidx.multidex:multidex'
-    //implementation 'com.google.firebase:firebase-auth:17.0.0'
-    //implementation 'com.google.firebase:firebase-analytics:16.0.0'
+    implementation 'androidx.multidex:multidex'*/
 }
 apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'kotlin-android'

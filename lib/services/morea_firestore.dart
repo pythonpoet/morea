@@ -71,14 +71,14 @@ class MoreaFirebase extends BaseMoreaFirebase {
   TeleblizFirestore tbz;
   Map<String, dynamic> _userMap;
   Platform platform = Platform();
-  Firestore firestore;
+  FirebaseFirestore firestore;
   FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   User moreaUser;
 
   StreamController<Map<String, GroupData>> sCGroupMaps = BehaviorSubject();
 
-  MoreaFirebase(Firestore firestore, {List groupIDs}) {
-    this.firestore = firestore;
+  MoreaFirebase(Firestore FirebaseFirestore, {List groupIDs}) {
+    this.firestore = FirebaseFirestore;
     crud0 = new CrudMedthods(firestore);
     moreaUser = new User(crud0);
     if (groupIDs != null) tbz = new TeleblizFirestore(firestore, groupIDs);
@@ -119,7 +119,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       return false;
     }
 
-    this._userMap = Map<String, dynamic>.from(userData.data);
+    this._userMap = Map<String, dynamic>.from(userData.data());
     await moreaUser.getUserData(_userMap);
     return true;
   }
@@ -133,13 +133,13 @@ class MoreaFirebase extends BaseMoreaFirebase {
       for (String groupID in this.getGroupIDs) {
         var someVar = (await crud0.getDocument(
                 '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID))
-            .data;
+            .data();
         sCGroupMaps.addStream(crud0
             .streamDocument(pathGroups, groupID)
             .map((DocumentSnapshot dSGroup) {
           return Map<String, GroupData>.of({
-            dSGroup.documentID:
-                GroupData(groupData: dSGroup.data, groupUserData: someVar)
+            dSGroup.id:
+                GroupData(groupData: dSGroup.data(), groupUserData: someVar)
           });
         }));
       }
@@ -182,7 +182,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<Map<String, dynamic>> getGroupInformation(groupID) async =>
       Map<String, dynamic>.from(
-          (await crud0.getDocument(pathGroups, groupID)).data);
+          (await crud0.getDocument(pathGroups, groupID)).data());
 
   Stream<QuerySnapshot> getChildren() {
     return crud0.streamCollection(pathUser);
@@ -263,8 +263,10 @@ class MoreaFirebase extends BaseMoreaFirebase {
       groupID,
       {},
       function: (snap) {
-        snap.data[groupMapHomeFeed].removeWhere((key, value) => key == eventID);
-        return snap.data;
+        snap
+            .data()[groupMapHomeFeed]
+            .removeWhere((key, value) => key == eventID);
+        return snap.data();
       },
     );
   }
@@ -351,12 +353,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
       String userUID, String messageID, String groupnr) async {
     var oldMessage = await crud0.getDocument('messages', messageID);
     List newRead = [];
-    for (String index in oldMessage.data['read']) {
+    for (String index in oldMessage.data()['read']) {
       newRead.add(index);
     }
     newRead.add(userUID);
-    oldMessage.data['read'] = newRead;
-    await crud0.setData('messages', messageID, oldMessage.data);
+    oldMessage.data()['read'] = newRead;
+    await crud0.setData('messages', messageID, oldMessage.data());
     return null;
   }
 
@@ -398,13 +400,13 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<String> getMailChimpApiKey() async {
     DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
-    String result = document.data['mailchimp'];
+    String result = document.data()['mailchimp'];
     return result;
   }
 
   Future<String> getWebflowApiKey() async {
     DocumentSnapshot document = await crud0.getDocument('config', 'apiKeys');
-    String result = document.data['webflow'];
+    String result = document.data()['webflow'];
     return result;
   }
 

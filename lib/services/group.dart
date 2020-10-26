@@ -53,7 +53,7 @@ class MoreaGroup extends BaseMoreGroup {
       _sDSGroupMap = crud0.streamDocument(pathGroups, groupID);
 
       await for (DocumentSnapshot dSGroupMap in _sDSGroupMap)
-        readGroupMap(dSGroupMap.data, groupID, sessionUserID);
+        readGroupMap(dSGroupMap.data(), groupID, sessionUserID);
     }
   }
 
@@ -61,7 +61,7 @@ class MoreaGroup extends BaseMoreGroup {
       String groupID, String userID) async {
     return Map<String, dynamic>.from((await crud0.getDocument(
             '$pathGroups/$groupID/$pathPriviledge', userID))
-        .data);
+        .data());
   }
 
   void readGroupMap(Map<String, dynamic> groupMap, groupID, userID) async {

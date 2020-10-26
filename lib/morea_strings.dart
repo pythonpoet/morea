@@ -18,7 +18,7 @@ final String midatanamewoelf = '3776';
 final String midatanamemeitli = '3779';
 final String midatanamebuebe = '4013';
 
-//collection-paths for Firestore
+//collection-paths for FirebaseFirestore
 final String pathEvents = "events";
 final String pathGroups = "groups";
 final String pathMessages = "messages";

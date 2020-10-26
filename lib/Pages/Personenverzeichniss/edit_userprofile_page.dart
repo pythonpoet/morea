@@ -118,14 +118,14 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     Navigator.of(context).pop();
     if (widget.profile[userMapEltern] != null) {
       for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
-        var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
+        var elternMap = (await crud0.getDocument(pathUser, elternUID)).data();
         elternMap[userMapKinder].remove(widget.profile[userMapUID]);
         await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
       }
     }
     if (widget.profile[userMapKinder] != null) {
       for (var childUID in widget.profile[userMapKinder].keys.toList()) {
-        Map childMap = (await crud0.getDocument(pathUser, childUID)).data;
+        Map childMap = (await crud0.getDocument(pathUser, childUID)).data();
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(widget.profile[userMapUID]);
           await moreafire.updateUserInformation(childMap[userMapUID], childMap);
@@ -236,7 +236,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, moreaGroupID)).data;
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data();
     this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
     setState(() {});
   }

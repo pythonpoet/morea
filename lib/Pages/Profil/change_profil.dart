@@ -654,7 +654,7 @@ class _ChangeProfileState extends State<ChangeProfile>
     if (this.userInfo[userMapEltern] != null) {
       for (var elternUID in this.userInfo[userMapEltern].keys.toList()) {
         var elternMap =
-            (await widget.crud0.getDocument(pathUser, elternUID)).data;
+            (await widget.crud0.getDocument(pathUser, elternUID)).data();
         elternMap[userMapKinder].remove(this.userInfo[userMapUID]);
         await widget.moreaFire
             .updateUserInformation(elternMap[userMapUID], elternMap);
@@ -663,15 +663,17 @@ class _ChangeProfileState extends State<ChangeProfile>
     if (this.userInfo[userMapKinder] != null) {
       for (var childUID in this.userInfo[userMapKinder].keys.toList()) {
         Map childMap =
-            (await widget.crud0.getDocument(pathUser, childUID)).data;
+            (await widget.crud0.getDocument(pathUser, childUID)).data();
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(this.userInfo[userMapUID]);
           await widget.moreaFire
               .updateUserInformation(childMap[userMapUID], childMap);
         } else {
           if (childMap[userMapEltern].length == 1) {
-            await callFunction(getcallable('deleteUserMap'),
-                param: {'UID': childUID, 'groupIDs': childMap[userMapGroupIDs]});
+            await callFunction(getcallable('deleteUserMap'), param: {
+              'UID': childUID,
+              'groupIDs': childMap[userMapGroupIDs]
+            });
           } else {
             childMap[userMapEltern].remove(this.userInfo[userMapUID]);
             await widget.moreaFire.updateUserInformation(childUID, childMap);
