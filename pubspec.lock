@@ -205,7 +205,7 @@ packages:
     source: hosted
     version: "0.3.1+1"
   firebase_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
@@ -566,10 +566,5 @@ packages:
     source: hosted
     version: "2.2.0"
 sdks:
-<<<<<<< HEAD
-  dart: ">=2.9.0-14.0.dev <3.0.0"
-  flutter: ">=1.12.13+hotfix.5 <2.0.0"
-=======
   dart: ">=2.10.0-110 <2.11.0"
-  flutter: ">=1.12.13+hotfix.4 <2.0.0"
->>>>>>> 78ce881daf5171368ba1cb6e2562f26635f0cfba
+  flutter: ">=1.12.13+hotfix.5 <2.0.0"
