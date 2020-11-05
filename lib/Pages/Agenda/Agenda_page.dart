@@ -204,7 +204,8 @@ class _AgendaStatePage extends State<AgendaState>
                     ],
                   ),
                 ),
-                child: aAgenda(moreafire.getUserMap[userMapGroupIDs]))),
+                child:
+                    aAgenda(moreafire.getUserMap[userMapGroupIDs], context))),
         floatingActionButton: Showcase(
           key: _floatingActionButtonKey,
           disableAnimation: true,
@@ -268,7 +269,7 @@ class _AgendaStatePage extends State<AgendaState>
             child: moreaChildBottomAppBar(widget.navigationMap)),
         drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
             moreafire.getEmail, context, moreafire, crud0, _signedOut),
-        body: aAgenda(moreafire.getGroupIDs),
+        body: aAgenda(moreafire.getGroupIDs, context),
       );
     }
   }
@@ -304,12 +305,19 @@ class _AgendaStatePage extends State<AgendaState>
     });
   }
 
-  Widget aAgenda(List<dynamic> groupID) {
+  Widget aAgenda(List<dynamic> groupID, BuildContext context) {
     return StreamBuilder(
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
-            return MoreaBackgroundContainer(child: moreaLoading.loading());
+            return MoreaBackgroundContainer(
+                child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    color: Colors.white,
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width - 40,
+                        maxHeight: MediaQuery.of(context).size.height - 220),
+                    child: moreaLoading.loading()));
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(
               child: MoreaShadowContainer(

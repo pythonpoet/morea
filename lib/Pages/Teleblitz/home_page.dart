@@ -151,7 +151,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, GroupData>> aSData) {
         if (!(aSData.connectionState == ConnectionState.active))
-          return Center(child: moreaLoading.loading());
+          return MoreaShadowContainer(
+              child: Container(
+                  constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height - 220),
+                  child: Center(child: moreaLoading.loading())));
 
         List<String> sortedEvents = sortHomeFeedByStartDate(aSData.data);
         if (sortedEvents.length == 0) return requestPrompttoParent();

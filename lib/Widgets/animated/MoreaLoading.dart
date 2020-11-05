@@ -38,44 +38,43 @@ class MoreaLoading {
   }
 
   Widget loading() {
-    return MoreaShadowContainer(
-        child: new Center(
+    return new Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          AnimatedBuilder(
-            animation: _controller,
-            child: Image(image: AssetImage('assets/icon/logo_loading.png')),
-            builder: (BuildContext context, Widget child) {
-              return Transform.rotate(
-                angle: _animation.value,
-                child: child,
-              );
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 20),
-          ),
-          AnimatedBuilder(
-            animation: _loadingController,
-            child: Text('Loading'),
-            builder: (BuildContext context, Widget child) {
-              return Text(
-                _loadingList[_loadingAnimation.value],
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Raleway',
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.none,
-                ),
-                textAlign: TextAlign.left,
-              );
-            },
-          )
-        ],
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: <Widget>[
+      AnimatedBuilder(
+        animation: _controller,
+        child: Image(image: AssetImage('assets/icon/logo_loading.png')),
+        builder: (BuildContext context, Widget child) {
+          return Transform.rotate(
+            angle: _animation.value,
+            child: child,
+          );
+        },
       ),
-    ));
+      Padding(
+        padding: EdgeInsets.only(top: 20),
+      ),
+      AnimatedBuilder(
+        animation: _loadingController,
+        child: Text('Loading'),
+        builder: (BuildContext context, Widget child) {
+          return Text(
+            _loadingList[_loadingAnimation.value],
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Raleway',
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.none,
+            ),
+            textAlign: TextAlign.left,
+          );
+        },
+      )
+    ],
+      ),
+    );
   }
 
   void dispose() {

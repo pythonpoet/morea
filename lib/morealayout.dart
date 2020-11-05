@@ -36,12 +36,12 @@ class MoreaColors {
 class MoreaShadow {
   static BoxDecoration teleblitz = BoxDecoration(
       color: Color.fromRGBO(255, 255, 255, 0.9),
-//      boxShadow: [
-//        BoxShadow(
-//            color: Color.fromRGBO(0, 0, 0, 0.16),
-//            offset: Offset(3, 3),
-//            blurRadius: 40)
-//      ],
+      boxShadow: [
+        BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            offset: Offset(3, 3),
+            blurRadius: 40)
+      ],
       borderRadius: BorderRadius.all(Radius.circular(10)));
 }
 
@@ -55,7 +55,6 @@ class MoreaShadowContainer extends Container {
   final EdgeInsetsGeometry margin =
       EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 40);
   final Widget child;
-  final Color color = Color.fromRGBO(255, 255, 255, 0.8);
   final BoxConstraints constraints = BoxConstraints(maxWidth: 450);
 }
 
@@ -73,7 +72,6 @@ class MoreaBackgroundContainer extends Container {
   );
   final Widget child;
   final Alignment alignment = Alignment.topCenter;
-  final Color color = Color.fromRGBO(255, 255, 255, 0.8);
 }
 
 const TextStyle MoreaTextStyleTop = TextStyle(

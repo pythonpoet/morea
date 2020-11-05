@@ -127,7 +127,12 @@ class _MessagesPageState extends State<MessagesPage>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return MoreaBackgroundContainer(
-                      child: moreaLoading.loading());
+                      child: Container(
+                    child: moreaLoading.loading(),
+                    color: Colors.white,
+                    margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                    constraints: BoxConstraints.expand(),
+                  ));
                 } else if (!snapshot.hasData) {
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
@@ -272,8 +277,12 @@ class _MessagesPageState extends State<MessagesPage>
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return MoreaBackgroundContainer(
+                    child: Container(
                   child: moreaLoading.loading(),
-                );
+                  color: Colors.white,
+                  margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                  constraints: BoxConstraints.expand(),
+                ));
               } else if (!snapshot.hasData) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
