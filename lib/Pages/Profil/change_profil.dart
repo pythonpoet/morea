@@ -509,13 +509,13 @@ class _ChangeProfileState extends State<ChangeProfile>
                         }
                         await widget.moreaFire
                             .updateUserInformation(userInfo['UID'], userInfo);
-                        await mailChimpAPIManager.updateUserInfo(
-                            userInfo['Email'],
-                            userInfo['Vorname'],
-                            userInfo['Nachname'],
-                            userInfo['Geschlecht'],
-                            userInfo['groupID'],
-                            widget.moreaFire);
+                        // await mailChimpAPIManager.updateUserInfo(
+                        //     userInfo['Email'],
+                        //     userInfo['Vorname'],
+                        //     userInfo['Nachname'],
+                        //     userInfo['Geschlecht'],
+                        //     userInfo['groupID'],
+                        //     widget.moreaFire);
                         if (oldEmail != userInfo['Email'] ||
                             newPassword != null) {
                           _showSignOutInformation().then((onValue) {
@@ -557,13 +557,13 @@ class _ChangeProfileState extends State<ChangeProfile>
       _showReauthenticate(oldEmail);
     } else {
       await widget.moreaFire.updateUserInformation(userInfo['UID'], userInfo);
-      await mailChimpAPIManager.updateUserInfo(
-          userInfo['Email'],
-          userInfo['Vorname'],
-          userInfo['Nachname'],
-          userInfo['Geschlecht'],
-          userInfo['groupID'],
-          widget.moreaFire);
+      // await mailChimpAPIManager.updateUserInfo(
+      //     userInfo['Email'],
+      //     userInfo['Vorname'],
+      //     userInfo['Nachname'],
+      //     userInfo['Geschlecht'],
+      //     userInfo['groupID'],
+      //     widget.moreaFire);
       setState(() {
         loading = false;
       });

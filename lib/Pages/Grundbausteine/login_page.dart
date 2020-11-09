@@ -112,13 +112,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
-                await mailChimpAPIManager.updateUserInfo(
-                    moreaUser.email,
-                    moreaUser.vorName,
-                    moreaUser.nachName,
-                    moreaUser.geschlecht,
-                    moreaUser.groupIDs,
-                    moreafire);
+                // await mailChimpAPIManager.updateUserInfo(
+                //     moreaUser.email,
+                //     moreaUser.vorName,
+                //     moreaUser.nachName,
+                //     moreaUser.geschlecht,
+                //     moreaUser.groupIDs,
+                //     moreafire);
               } else {
                 setState(() {
                   _load = false;

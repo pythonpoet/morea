@@ -67,8 +67,8 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
               oldGroup,
               userdata[userMapGroupIDs])
           .then((onValue) => setState);
-      mailchimpApiManager.updateUserInfo(
-          _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
+      //mailchimpApiManager.updateUserInfo(
+      //    _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
       setState(() {
         loading = false;
       });
