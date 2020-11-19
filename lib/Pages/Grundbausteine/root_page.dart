@@ -14,6 +14,7 @@ import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/morea_strings.dart' as prefix0;
 import 'package:morea/services/auth.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -302,9 +303,8 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
       deviceID = iosDeviceInfo.identifierForVendor;
     }
-    /*
     await callFunction(getcallable("deactivateDeviceNotification"),
-        param: {'uid': (await auth.currentUser()), 'deviceID': deviceID}); */
+        param: {'uid': (auth.getUserID), 'deviceID': deviceID});
     await auth.signOut();
     await firebaseMessaging.deleteInstanceID();
     moreaFire = null;

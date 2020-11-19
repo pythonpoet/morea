@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 
@@ -6,13 +7,13 @@ import '../../morealayout.dart';
 class SingleMessagePage extends StatelessWidget {
   SingleMessagePage(this.message);
 
-  final message;
+  final DocumentSnapshot message;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(message.data['title']),
+        title: Text(message.data()['title']),
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -24,7 +25,7 @@ class SingleMessagePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Text(
-                    'Von: ' + message.data['sender'],
+                    'Von: ' + message.data()['sender'],
                     style: MoreaTextStyle.sender,
                   ),
                   MoreaDivider(),
@@ -32,7 +33,7 @@ class SingleMessagePage extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
-                    message.data['title'],
+                    message.data()['title'],
                     textAlign: TextAlign.center,
                     style: MoreaTextStyle.title,
                   ),
@@ -40,7 +41,7 @@ class SingleMessagePage extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
-                    message.data['body'],
+                    message.data()['body'],
                     style: MoreaTextStyle.normal,
                   ),
                 ],

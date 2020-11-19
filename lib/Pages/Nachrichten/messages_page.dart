@@ -53,6 +53,7 @@ class _MessagesPageState extends State<MessagesPage>
     crud0 = CrudMedthods(widget.firestore);
     messagesManager = MessagesManager(crud0);
     messagesManager.getMessages(moreaFire.getGroupIDs);
+    uid = widget.auth.getUserID;
   }
 
   @override
@@ -428,7 +429,7 @@ class _MessagesPageState extends State<MessagesPage>
             ),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () async {
-              await moreaFire.setMessageRead(this.uid, document.id, this.stufe);
+              await moreaFire.setMessageRead(this.uid, document.id);
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (BuildContext context) {
                 return SingleMessagePage(message);
