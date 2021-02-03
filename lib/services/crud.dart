@@ -111,9 +111,9 @@ class CrudMedthods implements BaseCrudMethods {
       TransactionHandler transactionHandler = (Transaction tran) async {
         await tran.get(docRef).then((DocumentSnapshot snap) async {
           if (snap.exists) {
-            if (function != null)
+            if (function != null) {
               tran.update(docRef, function(snap));
-            else
+            } else
               tran.update(docRef, data);
           } else {
             tran.set(docRef, data);

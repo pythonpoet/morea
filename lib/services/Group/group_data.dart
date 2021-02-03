@@ -130,17 +130,17 @@ class GroupData {
         uploadedTimeStamp: [DateTime.now().toString()],
         eventEndTimeStamp: eventEndTimeStamp,
         eventStartTimeStamp: eventStartTimeStamp);
-    this.homeFeed.homeFeed[eventID] = homeFeedEntry;
+    this.homeFeed.homeFeed = {eventID: homeFeedEntry};
     //Upload the HomeFeed
     Map<String, dynamic> map = homeFeed.pack();
-    print(map);
     return crudMedthods.runTransaction(
       pathGroups,
       this.groupID,
       {},
       function: (snap) {
-        snap.data()[groupMapHomeFeed] = map;
-        return snap.data();
+        Map<String, dynamic> snapData = snap.data();
+        snapData[groupMapHomeFeed] = map;
+        return snapData;
       },
     );
   }

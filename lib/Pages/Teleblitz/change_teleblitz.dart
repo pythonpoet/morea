@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
+import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Event/event_data.dart';
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
@@ -428,6 +429,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     var infos = await teleblitzManager.downloadTeleblitz(this.stufe);
     this.name = infos['name'];
     this.datum = infos['datum'];
+    print(this.datum);
     antreten = infos['antreten'];
     mapAntreten = infos['google-map'];
     abtreten = infos['abtreten'];
@@ -475,13 +477,13 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       '_draft': false,
       '_archived': false,
       'groupIDs': [convWebflowtoMiData(stufe)],
-      'EventType': 'Teleblitz'
+      'EventType': 'Teleblitz',
+      mapTimestamp: DateTime.now().toIso8601String()
     };
     EventData event = EventData(newTeleblitz);
     int hours = int.parse(this.antreten.substring(0, 2));
     int minutes = int.parse(this.antreten.substring(3, 5));
-    //Upload Teleblitz to Website TODO: convert date
-    //teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
+    teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
     DateTime start = (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
         .add(Duration(hours: hours, minutes: minutes));
     hours = int.parse(this.abtreten.substring(0, 2));
@@ -616,6 +618,8 @@ class TeleblitzManager {
     newTeleblitz['ende-ferien'] =
         result[2] + '-' + result[1] + '-' + result[0] + 'T00:00:00.000Z';
     newTeleblitz.remove('groupIDs');
+    newTeleblitz.remove('EventType');
+    newTeleblitz.remove('Timestamp');
     var jsonMap = {"fields": newTeleblitz};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
