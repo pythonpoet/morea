@@ -45,7 +45,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       error,
       selectedrolle,
       _geschlecht;
-  List _stufe, oldGroup;
+  List<String> _stufe, oldGroup;
   List<Map> _stufenselect = new List();
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
   MoreaLoading moreaLoading;
@@ -65,7 +65,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   ? userdata[userMapVorName]
                   : userdata[userMapPfadiName],
               oldGroup,
-              userdata[userMapGroupIDs])
+              _stufe)
           .then((onValue) => setState);
       //mailchimpApiManager.updateUserInfo(
       //    _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
@@ -138,28 +138,23 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       widget.profile['UID'] = widget.profile['childUID'];
     }
     if (widget.profile[userMapGroupIDs] != null) {
-      await callFunction(getcallable('deleteUserMap'), param: {
-        'UID': widget.profile['UID'],
-        'groupID': widget.profile[userMapGroupIDs],
-      });
-    } else if (widget.profile[userMapSubscribedGroups] != null) {
-      if (widget.profile[userMapSubscribedGroups].length == 1) {
+      if (widget.profile[userMapGroupIDs].length == 1) {
         await callFunction(getcallable('deleteUserMap'), param: {
           'UID': widget.profile['UID'],
-          'groupID': widget.profile[userMapSubscribedGroups][0],
+          'groupID': widget.profile[userMapGroupIDs][0],
         });
       } else {
-        for (int i = widget.profile[userMapSubscribedGroups].length - 1;
+        for (int i = widget.profile[userMapGroupIDs].length - 1;
             i < 1;
             i--) {
-          await callFunction(getcallable('desubFromGroup'), param: {
+          await callFunction(getcallable('leafeGroup'), param: {
             'UID': widget.profile[userMapUID],
-            'groupID': widget.profile[userMapSubscribedGroups][i],
+            'groupID': widget.profile[userMapGroupIDs][i],
           });
         }
         await callFunction(getcallable('deleteUserMap'), param: {
           'UID': widget.profile['UID'],
-          'groupID': widget.profile[userMapSubscribedGroups][0],
+          'groupID': widget.profile[userMapGroupIDs][0],
         });
       }
     } else {
@@ -215,7 +210,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     selectedrolle = widget.profile['Pos'];
     moreafire = widget.moreaFire;
     crud0 = widget.crud0;
-    oldGroup = widget.profile[userMapGroupIDs];
+    oldGroup = List<String>.from(widget.profile[userMapGroupIDs]);
     initStrings();
     initSubgoup();
     loading = false;
@@ -231,7 +226,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
   initSubgoup() async {
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, moreaGroupID)).data();
-    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
+    print("test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
+    this._stufenselect = new List<Map>();
+    data[groupMapGroupOption][groupMapGroupLowerClass].forEach((k, value) => this._stufenselect.add({userMapGroupIDs: value['groupID'], groupMapgroupNickName: convMiDatatoWebflow(value['groupID'])}));
     setState(() {});
   }
 
@@ -246,7 +243,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     this._handynummer = widget.profile[userMapHandynummer];
     this._geschlecht = widget.profile[userMapGeschlecht];
     this._geburtstag = widget.profile[userMapGeburtstag];
-    this._stufe = widget.profile[userMapGroupIDs];
+    this._stufe = List<String>.from(widget.profile[userMapGroupIDs]);
     this._pos = widget.profile[userMapPos];
   }
 
