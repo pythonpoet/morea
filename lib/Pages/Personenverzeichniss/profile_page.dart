@@ -16,7 +16,7 @@ class ProfilePageState extends StatefulWidget {
   final CrudMedthods crud0;
   final Function signOut;
 
-  var profile;
+  Map<String, dynamic> profile;
 
   // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
 
@@ -52,13 +52,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
     var newData = await moreaFire.getUserInformation(widget.profile['UID']);
     if (newData.data != widget.profile) {
-      widget.profile = newData.data;
+      widget.profile = newData.data();
       erziungsberechtigte();
     }
   }
 
   Future<void> erziungsberechtigte() async {
-    if ((widget.profile['Eltern'] != null) &&
+    if ((widget.profile.containsKey("Eltern")) &&
         (widget.profile['Eltern'].length != 0)) {
       await getElternMap();
       hatEltern = true;
@@ -142,22 +142,24 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     for (int i = 0; i < elternUID.length; i++) {
       var elternData = await moreaFire.getUserInformation(elternUID[i]);
       if (i == 0) {
-        elternMapList[0] = elternData.data;
+        elternMapList[0] = elternData.data();
       } else {
-        elternMapList.add(elternData.data);
+        elternMapList.add(elternData.data());
       }
     }
     return null;
   }
 
   Future<void> getKindernMap() async {
+    print("kinder: " + widget.profile['Kinder'].toString());
     List kinderUID = List.from(widget.profile['Kinder'].keys);
     for (int i = 0; i < kinderUID.length; i++) {
       var kinderData = await moreaFire.getUserInformation(kinderUID[i]);
       if (i == 0) {
-        kinderMapList[0] = kinderData.data;
+        kinderMapList[0] = kinderData.data();
+        print(kinderMapList.toString());
       } else {
-        kinderMapList.add(kinderData.data);
+        kinderMapList.add(kinderData.data());
       }
     }
     return null;
