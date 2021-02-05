@@ -483,6 +483,7 @@ class _ChangeProfileState extends State<ChangeProfile>
               actions: <Widget>[
                 RaisedButton.icon(
                     onPressed: () {
+                      password.clear();
                       Navigator.of(context).pop();
                     },
                     icon: Icon(
@@ -509,13 +510,14 @@ class _ChangeProfileState extends State<ChangeProfile>
                         }
                         await widget.moreaFire
                             .updateUserInformation(userInfo['UID'], userInfo);
-                        // await mailChimpAPIManager.updateUserInfo(
-                        //     userInfo['Email'],
-                        //     userInfo['Vorname'],
-                        //     userInfo['Nachname'],
-                        //     userInfo['Geschlecht'],
-                        //     userInfo['groupID'],
-                        //     widget.moreaFire);
+                        List<String> groupIDs = List<String>.from(userInfo['groupIDs']);
+                         await mailChimpAPIManager.updateUserInfo(
+                             userInfo['Email'],
+                             userInfo['Vorname'],
+                             userInfo['Nachname'],
+                             userInfo['Geschlecht'],
+                             groupIDs,
+                             widget.moreaFire);
                         if (oldEmail != userInfo['Email'] ||
                             newPassword != null) {
                           _showSignOutInformation().then((onValue) {
@@ -557,13 +559,14 @@ class _ChangeProfileState extends State<ChangeProfile>
       _showReauthenticate(oldEmail);
     } else {
       await widget.moreaFire.updateUserInformation(userInfo['UID'], userInfo);
-      // await mailChimpAPIManager.updateUserInfo(
-      //     userInfo['Email'],
-      //     userInfo['Vorname'],
-      //     userInfo['Nachname'],
-      //     userInfo['Geschlecht'],
-      //     userInfo['groupID'],
-      //     widget.moreaFire);
+      List<String> groupIDs = List<String>.from(userInfo['groupIDs']);
+      await mailChimpAPIManager.updateUserInfo(
+          userInfo['Email'],
+          userInfo['Vorname'],
+          userInfo['Nachname'],
+          userInfo['Geschlecht'],
+          groupIDs,
+          widget.moreaFire);
       setState(() {
         loading = false;
       });

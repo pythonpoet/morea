@@ -413,7 +413,7 @@ class Teleblitz {
     anmeldeStreamController[userID] = new BehaviorSubject();
     anmeldeStreamController[userID].addStream(function(userID, eventID));
     return anmeldeIndicator(userID, eventID, function,
-        "Du hast dich angemolden", "Du hast dich abgemolden");
+        "Du hast dich angemeldet", "Du hast dich abgemeldet");
   }
 
   Widget anmeldeIndicator(

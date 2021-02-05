@@ -6,28 +6,38 @@ import 'package:morea/services/crud.dart';
 class MessagesManager {
   CrudMedthods crud0;
 
-  StreamController<QuerySnapshot> _messagesStreamController =
+  StreamController<List<QueryDocumentSnapshot>> _messagesStreamController =
       StreamController();
+  Stream<List<QueryDocumentSnapshot>> get stream => _messagesStreamController.stream;
 
-  Stream<QuerySnapshot> get stream => _messagesStreamController.stream;
+  StreamSubscription _subscription;
 
   MessagesManager(this.crud0);
 
   dispose() {
     _messagesStreamController.close();
+    _subscription.cancel();
+  }
+
+  pause() {
+    _subscription.pause();
+  }
+
+  resume() {
+    _subscription.resume();
   }
 
   getMessages(List<String> subscribedGroups) {
-    print('starting');
-    print(subscribedGroups);
-    crud0.streamCollection('messages').listen((messages) {
-      messages.docs.retainWhere((document) {
+
+    _subscription = crud0.streamCollection('messages').listen((messages) {
+      List<QueryDocumentSnapshot> messagesDocuments = messages.docs;
+      messagesDocuments.retainWhere((document) {
         return document.data()['receivers'].any((receiver) {
           return subscribedGroups.contains(receiver);
         });
       });
-      print(messages);
-      _messagesStreamController.sink.add(messages);
+      messagesDocuments.sort((a, b) => b.data()['timestamp'].toDate().compareTo(a.data()['timestamp'].toDate()));
+      _messagesStreamController.sink.add(messagesDocuments);
     });
   }
 }

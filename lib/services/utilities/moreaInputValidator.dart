@@ -9,7 +9,7 @@ class MoreaInputValidator {
   }
 
   static bool number(String value) {
-    return RegExp(r'\d').hasMatch(value);
+    return RegExp(r'^\d{4}').hasMatch(value);
   }
 
   static bool letters(String value) {

@@ -58,9 +58,16 @@ class _MessagesPageState extends State<MessagesPage>
 
   @override
   void dispose() {
+    print("disposing message widget");
     moreaLoading.dispose();
     messagesManager.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(MessagesPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print("updating Widget");
   }
 
   @override
@@ -165,7 +172,7 @@ class _MessagesPageState extends State<MessagesPage>
                       ),
                     ),
                   );
-                } else if (snapshot.data.docs.length == 0) {
+                } else if (snapshot.data.length == 0) {
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                       child: MoreaShadowContainer(
@@ -215,7 +222,7 @@ class _MessagesPageState extends State<MessagesPage>
                             ),
                             ListView.separated(
                                 physics: NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data.docs.length,
+                                itemCount: snapshot.data.length,
                                 shrinkWrap: true,
                                 separatorBuilder: (context, index) {
                                   return Padding(
@@ -225,7 +232,7 @@ class _MessagesPageState extends State<MessagesPage>
                                   );
                                 },
                                 itemBuilder: (context, index) {
-                                  var document = snapshot.data.docs[index];
+                                  var document = snapshot.data[index];
                                   return _buildListItem(context, document);
                                 }),
                             Padding(
@@ -312,7 +319,7 @@ class _MessagesPageState extends State<MessagesPage>
                     ),
                   ),
                 );
-              } else if (snapshot.data.docs.length == 0) {
+              } else if (snapshot.data.length == 0) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
                     child: MoreaShadowContainer(
@@ -366,9 +373,9 @@ class _MessagesPageState extends State<MessagesPage>
                                       child: MoreaDivider(),
                                     );
                                   },
-                                  itemCount: snapshot.data.docs.length,
+                                  itemCount: snapshot.data.length,
                                   itemBuilder: (context, index) {
-                                    var document = snapshot.data.docs[index];
+                                    var document = snapshot.data[index];
                                     return _buildListItem(context, document);
                                   }),
                               Padding(
@@ -429,10 +436,9 @@ class _MessagesPageState extends State<MessagesPage>
             ),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () async {
-              await moreaFire.setMessageRead(this.uid, document.id);
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (BuildContext context) {
-                return SingleMessagePage(message);
+                return SingleMessagePage(message, moreaFire, this.uid);
               }));
             },
           ));
@@ -463,7 +469,7 @@ class _MessagesPageState extends State<MessagesPage>
           onTap: () {
             Navigator.of(context)
                 .push(MaterialPageRoute(builder: (BuildContext context) {
-              return SingleMessagePage(message);
+              return SingleMessagePage(message, moreaFire, this.uid);
             }));
           },
         ),

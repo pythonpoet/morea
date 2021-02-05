@@ -124,7 +124,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'Bitte nicht leer lassen';
-                          } else if (MoreaInputValidator.number(value)) {
+                          } else if (!MoreaInputValidator.number(value)) {
                             return 'Bitte gültige PLZ verwenden';
                           } else {
                             return null;
