@@ -12,7 +12,9 @@ class MailChimpAPIManager {
     String hash = generateMd5(email);
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('pfadimorea:$apiKey'));
-    var result = await http.get(urlInfoMailListMembers + hash,
+    var result = await http.get(
+        Uri.https(
+            "us13.api.mailchimp.com", "/3.0/lists/54c3988cea/members/$hash"),
         headers: {'Authorization': basicAuth});
     var decoded = json.decode(result.body);
     print(decoded);
@@ -48,8 +50,11 @@ class MailChimpAPIManager {
       }
     };
     String bodyStr = jsonEncode(bodyMap);
-    var result = await http.put(urlInfoMailListMembers + hash,
-        headers: {'Authorization': basicAuth}, body: bodyStr);
+    var result = await http.put(
+        Uri.https(
+            "us13.api.mailchimp.com", "/3.0/lists/54c3988cea/members/$hash"),
+        headers: {'Authorization': basicAuth},
+        body: bodyStr);
     var decoded = json.decode(result.body);
     print(decoded);
   }

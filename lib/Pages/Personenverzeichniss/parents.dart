@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/Login/register.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/morea_strings.dart';
@@ -247,23 +248,11 @@ class MergeChildParent extends BaseMergeChildParent {
               SizedBox(
                 height: 30,
               ),
-              new RaisedButton(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(Icons.camera_alt),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    new Text('Scannen', style: new TextStyle(fontSize: 20))
-                  ],
-                ),
-                onPressed: () => parentReadsQrCode(
+              moreaRaisedIconButton(
+                'Scannen',
+                () => parentReadsQrCode(
                     userMap, parentaktuallisieren, context, signOut),
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                Icon(Icons.camera_alt)
               ),
               SizedBox(
                 height: 40,

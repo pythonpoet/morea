@@ -569,8 +569,10 @@ class TeleblitzManager {
     String apiKey = await moreaFirebase.getWebflowApiKey();
     var jsonDecode;
     var jsonString;
-    jsonString = await http.get(
-        "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items?api_version=1.0.0&access_token=$apiKey");
+    jsonString = await http.get(Uri.https(
+        "api.webflow.com",
+        "/collections/5be4a9a6dbcc0a24d7cb0ee9/items",
+        {"api_version": "1.0.0", "access_token": apiKey}));
     jsonDecode = json.decode(jsonString.body);
     Map infos;
     for (var u in jsonDecode['items']) {
@@ -628,9 +630,10 @@ class TeleblitzManager {
     header["Content-Type"] = "application/json";
     http
         .put(
-      "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" +
-          id +
-          "?live=true",
+      Uri.https(
+          'api.weblow.com',
+          "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + id,
+          {'live': 'true'}),
       headers: header,
       body: jsonStr,
     )

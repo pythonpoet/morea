@@ -16,26 +16,6 @@ class TeleblitzManager {
     moreafire = new MoreaFirebase(firestore);
   }
 
-  Future<Teleblitz> downloadTeleblitz(String filter) async {
-    var jsonDecode;
-    var jsonString;
-    String _stufe = filter;
-    String webflowApi = await moreafire.getWebflowApiKey();
-    jsonString = await http.get(webflowApi);
-    jsonDecode = json.decode(jsonString.body);
-    Map infos;
-    for (var u in jsonDecode['items']) {
-      if (u['name'] == _stufe) {
-        infos = u;
-      }
-    }
-    Teleblitz teleblitz = Teleblitz.fromJson(infos);
-    this.slug = teleblitz.getSlug();
-    this.name = teleblitz.getName();
-    this.id = teleblitz.getID();
-    return teleblitz;
-  }
-
   Future<bool> uploadTeleblitz(
       String datum,
       String antreten,
@@ -74,9 +54,10 @@ class TeleblitzManager {
     header["Content-Type"] = "application/json";
     await http
         .put(
-      "https://api.webflow.com/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" +
-          this.id +
-          "?live=true",
+      Uri.https(
+          "api.webflow.com",
+          "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + this.id,
+          {'live': 'true'}),
       headers: header,
       body: jsonStr,
     )

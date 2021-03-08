@@ -333,16 +333,6 @@ Drawer moreaDrawer(
             ),
           ),
           new ListTile(
-              title: new Text('Group Page'),
-              trailing: new Icon(Icons.group),
-              onTap: () => Navigator.of(context)
-                  .push(new MaterialPageRoute(
-                      builder: (BuildContext context) => new GroupPage(
-                            moreaFire: moreafire,
-                          )))
-                  .then((onvalue) =>
-                      moreafire.getData(moreafire.getUserMap[userMapUID]))),
-          new ListTile(
               title: new Text('Personen'),
               trailing: new Icon(Icons.people),
               onTap: () => Navigator.of(context)

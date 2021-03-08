@@ -66,7 +66,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
           if (!groupSnap.hasData) return moreaLoading.loading();
-          if (groupSnap.data.docs.length > 0) {
+          else if (groupSnap.data.docs.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
               child: MoreaShadowContainer(

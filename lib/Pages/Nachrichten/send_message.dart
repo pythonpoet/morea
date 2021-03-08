@@ -301,6 +301,9 @@ class _SendMessagesState extends State<SendMessages> {
                     }
                   },
                 ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 60),
+                )
               ],
             ),
           )),

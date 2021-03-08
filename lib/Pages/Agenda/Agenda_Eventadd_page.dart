@@ -57,7 +57,7 @@ class EventAddPageState extends State<EventAddPage> {
       datumbis = 'Datum wählen',
       lagerort = ' ';
   String order;
-  List<Map<String, dynamic>> subgroups = List<Map<String, dynamic>>();
+  List<Map<String, dynamic>> subgroups = <Map<String, dynamic>>[];
 
   Map<String, dynamic> event, lager;
   Map<String, bool> groupCheckbox;
@@ -298,7 +298,7 @@ class EventAddPageState extends State<EventAddPage> {
           child: Text('Lager wirklich löschen?'),
         ),
         actions: <Widget>[
-          new RaisedButton(
+          new ElevatedButton(
               child: Text(
                 'Löschen',
                 style: TextStyle(color: Colors.white),
@@ -327,7 +327,7 @@ class EventAddPageState extends State<EventAddPage> {
           child: Text('Event wirklich löschen?'),
         ),
         actions: <Widget>[
-          new RaisedButton(
+          new ElevatedButton(
               child: Text(
                 'Löschen',
                 style: TextStyle(color: Colors.white),
@@ -389,7 +389,7 @@ class EventAddPageState extends State<EventAddPage> {
           length: 2,
           child: new Scaffold(
             appBar: new AppBar(
-              title: Text('zur Agenda hinzufügen'),
+              title: Text('Zur Agenda hinzufügen'),
               bottom: TabBar(
                 tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
               ),
@@ -556,9 +556,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                 flex: 7,
-                                child: RaisedButton(
-                                  onPressed: () => _selectDatumvon(context),
-                                  child: Text(datumvon),
+                                child: moreaRaisedButton(
+                                  datumvon,
+                                  () => _selectDatumvon(context),
                                 ),
                               )
                             ],
@@ -573,9 +573,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                   flex: 7,
-                                  child: RaisedButton(
-                                    onPressed: () => _selectDatumbis(context),
-                                    child: Text(datumbis),
+                                  child: moreaRaisedButton(
+                                    datumbis,
+                                    () => _selectDatumbis(context),
                                   ))
                             ],
                           )),
@@ -617,9 +617,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                 flex: 3,
-                                child: RaisedButton(
-                                  onPressed: () => _selectAnfangszeit(context),
-                                  child: Text(anfangzeit),
+                                child: moreaRaisedButton(
+                                  anfangzeit,
+                                  () => _selectAnfangszeit(context),
                                 ),
                               ),
                               Expanded(
@@ -651,9 +651,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                 flex: 3,
-                                child: RaisedButton(
-                                  onPressed: () => _selectSchlusszeit(context),
-                                  child: Text(schlusszeit),
+                                child: moreaRaisedButton(
+                                  schlusszeit,
+                                  () => _selectSchlusszeit(context),
                                 ),
                               ),
                               Expanded(
@@ -919,9 +919,9 @@ class EventAddPageState extends State<EventAddPage> {
                         ),
                         Expanded(
                             flex: 7,
-                            child: RaisedButton(
-                              onPressed: () => _selectDatum(context),
-                              child: Text(datum),
+                            child: moreaRaisedButton(
+                              datum,
+                              () => _selectDatum(context),
                             ))
                       ],
                     )),
@@ -935,9 +935,9 @@ class EventAddPageState extends State<EventAddPage> {
                         ),
                         Expanded(
                           flex: 3,
-                          child: RaisedButton(
-                            onPressed: () => _selectAnfangszeit(context),
-                            child: Text(anfangzeit),
+                          child: moreaRaisedButton(
+                            anfangzeit,
+                            () => _selectAnfangszeit(context),
                           ),
                         ),
                         Expanded(
@@ -968,9 +968,9 @@ class EventAddPageState extends State<EventAddPage> {
                         ),
                         Expanded(
                           flex: 3,
-                          child: RaisedButton(
-                            onPressed: () => _selectSchlusszeit(context),
-                            child: Text(schlusszeit),
+                          child: moreaRaisedButton(
+                            schlusszeit,
+                            () => _selectSchlusszeit(context),
                           ),
                         ),
                         Expanded(
@@ -1004,8 +1004,8 @@ class EventAddPageState extends State<EventAddPage> {
                             flex: 7,
                             child: new ListView(
                                 physics: NeverScrollableScrollPhysics(),
-                                children:
-                                    subgroups.map((Map<dynamic, dynamic> group) {
+                                children: subgroups
+                                    .map((Map<dynamic, dynamic> group) {
                                   return CheckboxListTile(
                                     title: Text(group[groupMapgroupNickName]),
                                     value: groupCheckbox[group["groupID"]],

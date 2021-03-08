@@ -14,11 +14,12 @@ Widget moreaEditActionbutton({@required Function route, Key key}) {
 }
 
 Widget moreaRaisedButton(String text, Function action) {
-  return RaisedButton(
-    color: MoreaColors.violett,
+  return ElevatedButton(
+    style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(MoreaColors.violett),
+        shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5))))),
     onPressed: action,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5))),
     child: Text(
       text,
       style: MoreaTextStyle.raisedButton,
@@ -27,11 +28,12 @@ Widget moreaRaisedButton(String text, Function action) {
 }
 
 Widget moreaRaisedIconButton(String text, Function action, Icon icon) {
-  return RaisedButton.icon(
-    color: MoreaColors.violett,
+  return ElevatedButton.icon(
+    style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(MoreaColors.violett),
+        shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5))))),
     onPressed: action,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5))),
     label: Text(
       text,
       style: MoreaTextStyle.raisedButton,
@@ -41,12 +43,13 @@ Widget moreaRaisedIconButton(String text, Function action, Icon icon) {
 }
 
 Widget moreaFlatRedButton(String text, Function action) {
-  return FlatButton(
-    color: Colors.transparent,
+  return TextButton(
+    style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            side: BorderSide(color: Colors.red)))),
     onPressed: action,
-    shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.red),
-        borderRadius: BorderRadius.all(Radius.circular(5))),
     child: Text(
       text,
       style: MoreaTextStyle.warningButton,
@@ -55,7 +58,7 @@ Widget moreaFlatRedButton(String text, Function action) {
 }
 
 Widget moreaFlatIconButton(String text, Function action, Icon icon) {
-  return FlatButton.icon(
+  return TextButton.icon(
     onPressed: action,
     icon: icon,
     label: Padding(
@@ -65,15 +68,16 @@ Widget moreaFlatIconButton(String text, Function action, Icon icon) {
         style: MoreaTextStyle.flatButton,
       ),
     ),
-    color: Colors.transparent,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        side: BorderSide(color: MoreaColors.violett)),
+    style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            side: BorderSide(color: MoreaColors.violett)))),
   );
 }
 
 Widget moreaFlatButton(String text, Function action) {
-  return FlatButton(
+  return TextButton(
     onPressed: action,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -82,10 +86,10 @@ Widget moreaFlatButton(String text, Function action) {
         style: MoreaTextStyle.flatButton,
       ),
     ),
-    color: Colors.transparent,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        side: BorderSide(color: MoreaColors.violett)),
+    style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            side: BorderSide(color: MoreaColors.violett)))),
   );
 }
-

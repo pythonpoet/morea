@@ -17,6 +17,8 @@ import 'package:morea/services/utilities/url_launcher.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
+import '../standart/moreaTextStyle.dart';
+
 enum ElementType { ferien, keineAktivitaet, teleblitz, notImplemented }
 enum HomeScreenType { loading, noElement, info }
 
@@ -249,10 +251,7 @@ class Teleblitz {
                             constraints:
                                 BoxConstraints(maxWidth: 170, minWidth: 170),
                             decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [
-                                  MoreaColors.orange,
-                                  MoreaColors.violett
-                                ]),
+                                color: MoreaColors.violett,
                                 borderRadius: BorderRadius.circular(30)),
                             child: Center(
                                 child: new Text(anmelden,
@@ -304,14 +303,11 @@ class Teleblitz {
                           constraints:
                               BoxConstraints(maxWidth: 170, minWidth: 170),
                           decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [
-                                MoreaColors.orange,
-                                MoreaColors.violett
-                              ]),
+                              color: MoreaColors.violett,
                               borderRadius: BorderRadius.circular(30)),
                           child: Center(
                               child: new Text(anmelden,
-                                  style: MoreaTextStyle.flatButton)),
+                                  style: MoreaTextStyle.raisedButton)),
                           width: 120,
                         ),
                         onPressed: () {
@@ -400,8 +396,8 @@ class Teleblitz {
           uid,
           eventID,
           function,
-          "$vorname ist angemolden",
-          "$vorname ist abgemolden",
+          "$vorname ist angemeldet",
+          "$vorname ist abgemeldet",
         ));
       });
     });
@@ -1248,10 +1244,7 @@ class Info {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(
-                    child: Html(
-                  data: formatedEndeFerien,
-                  defaultTextStyle: MoreaTextStyle.normal,
-                ))
+                    child: Text(formatedEndeFerien, style: MoreaTextStyle.normal,))
               ],
             ),
           ],

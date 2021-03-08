@@ -1,5 +1,4 @@
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_html/rich_text_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_address.dart';
 import 'package:morea/Pages/Profil/change_email.dart';
@@ -16,7 +15,6 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/utilities/MiData.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class EditUserProfilePage extends StatefulWidget {
   EditUserProfilePage({this.profile, this.moreaFire, this.crud0});
@@ -144,9 +142,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'groupID': widget.profile[userMapGroupIDs][0],
         });
       } else {
-        for (int i = widget.profile[userMapGroupIDs].length - 1;
-            i < 1;
-            i--) {
+        for (int i = widget.profile[userMapGroupIDs].length - 1; i < 1; i--) {
           await callFunction(getcallable('leafeGroup'), param: {
             'UID': widget.profile[userMapUID],
             'groupID': widget.profile[userMapGroupIDs][i],
@@ -168,15 +164,8 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 content: RichText(
                   text: TextSpan(
                       text:
-                          'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: ',
-                      style: MoreaTextStyle.normal,
-                      children: [
-                        LinkTextSpan(
-                            text: 'it@morea.ch',
-                            url: 'mailto:<it@morea.ch>',
-                            onLinkTap: (url) => launch(url),
-                            style: MoreaTextStyle.link)
-                      ]),
+                          'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: it@morea.ch',
+                      style: MoreaTextStyle.normal,),
                 ),
                 actions: <Widget>[
                   moreaFlatButton('OK', () => Navigator.of(context).pop()),
@@ -226,9 +215,14 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
   initSubgoup() async {
     Map<String, dynamic> data =
         (await crud0.getDocument(pathGroups, moreaGroupID)).data();
-    print("test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
+    print(
+        "test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
     this._stufenselect = new List<Map>();
-    data[groupMapGroupOption][groupMapGroupLowerClass].forEach((k, value) => this._stufenselect.add({userMapGroupIDs: value['groupID'], groupMapgroupNickName: convMiDatatoWebflow(value['groupID'])}));
+    data[groupMapGroupOption][groupMapGroupLowerClass]
+        .forEach((k, value) => this._stufenselect.add({
+              userMapGroupIDs: value['groupID'],
+              groupMapgroupNickName: convMiDatatoWebflow(value['groupID'])
+            }));
     setState(() {});
   }
 
@@ -512,22 +506,27 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.cancel,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  label: Text(
-                    "Abbrechen",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.cancel,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                label: Text(
+                  "Abbrechen",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(MoreaColors.violett),
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5))))),
+              )
             ],
           );
         });
@@ -553,7 +552,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
+              ElevatedButton.icon(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -566,9 +565,13 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     "Abbrechen",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(MoreaColors.violett),
+                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))))))
             ],
           );
         });
@@ -594,7 +597,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
+              ElevatedButton.icon(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -607,9 +610,13 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     "Abbrechen",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(MoreaColors.violett),
+                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))))))
             ],
           );
         });

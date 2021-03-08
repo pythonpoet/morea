@@ -10,7 +10,6 @@ abstract class BaseChildParendPend {
 }
 
 class ChildParendPend extends BaseChildParendPend {
-  MCloudFunctions cloudFunctions = new MCloudFunctions();
   CrudMedthods crud0;
   MoreaFirebase moreaFirebase;
 

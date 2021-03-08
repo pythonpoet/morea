@@ -72,7 +72,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, dynamic> _userMap;
   Platform platform = Platform();
   FirebaseFirestore firestore;
-  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   User moreaUser;
 
   StreamController<Map<String, GroupData>> sCGroupMaps = BehaviorSubject();
@@ -335,8 +335,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> subscribeToGroup(String groupID) async {
-    await firebaseMessaging.requestNotificationPermissions();
-    firebaseMessaging.configure();
     Map<String, dynamic> tokendata = {
       'devtoken': await firebaseMessaging.getToken()
     };

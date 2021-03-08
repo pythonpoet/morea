@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:morea/morealayout.dart';
 
 // generiert mit https://datenschutz-generator.de/
 abstract class BaseDatenschutz {
@@ -99,12 +100,14 @@ class Datenschutz implements BaseDatenschutz {
                           ),
                           Expanded(
                             flex: 3,
-                            child: new RaisedButton(
+                            child: new ElevatedButton(
                                 child: const Text(
                                   'Akzeptieren',
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                color: Color(0xff7a62ff),
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all<Color>(MoreaColors.violett)
+                                ),
                                 onPressed: () {
                                   akzeptiert = true;
                                   Navigator.pop(context);
