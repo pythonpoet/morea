@@ -20,7 +20,7 @@ Future<AuthStatus> check4BlockedAuthStatus(
   if (!init.containsKey(configMapBlockedDevToken))
     throw "create $configMapBlockedDevToken in config --> init";
   List<String> blockedDevTokens = new List.from(init[configMapBlockedDevToken]);
-  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   if (!init.containsKey(configMapMinAppVerson))
     throw "create $configMapMinAppVerson in config --> init";

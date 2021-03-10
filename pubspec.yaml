@@ -17,15 +17,15 @@ dependencies:
         sdk: flutter
     flutter:
         sdk: flutter
-    firebase_auth: ^0.18.1+2
+    firebase_auth: ^1.0.1
     firebase_messaging: any
-    firebase_analytics: ^6.0.2
-    firebase_core : ^0.5.0
-    cloud_functions: 0.6.0+1
+    firebase_analytics: any
+    firebase_core : ^1.0.0
+    cloud_functions: ^1.0.0
     flutter_html: any
     http: any
-    intl: ^0.16.1
-    cloud_firestore: ^0.14.1+3
+    intl: any
+    cloud_firestore: ^1.0.1
     url_launcher: any
     share: any
     expandable: any

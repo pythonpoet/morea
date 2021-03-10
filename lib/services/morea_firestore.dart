@@ -72,7 +72,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Map<String, dynamic> _userMap;
   Platform platform = Platform();
   FirebaseFirestore firestore;
-  FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   User moreaUser;
 
   StreamController<Map<String, GroupData>> sCGroupMaps = BehaviorSubject();

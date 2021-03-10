@@ -19,6 +19,7 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../Widgets/standart/buttons.dart';
 import '../../morea_strings.dart';
 import '../../morealayout.dart';
 
@@ -49,7 +50,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   AuthStatus authStatus = AuthStatus.loading;
   MoreaFirebase moreaFire;
   Map<String, Function> navigationMap;
-  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
@@ -66,8 +67,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       prefix0.toAgendaPage: this.agendaPage,
       prefix0.toProfilePage: this.profilePage,
     };
-    firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
-        sound: true, badge: true, alert: true, provisional: false));
   }
 
   @override
@@ -83,51 +82,25 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       });
     }
     await this.moreaFire.initTeleblitz();
-    firebaseMessaging.configure(
-        onMessage: (Map<String, dynamic> message) async {
-      print(message);
-      if (message['data']['typeMorea'] == 'Message') {
+    FirebaseMessaging.onMessage.listen((message) {
+      if (message.data['typeMorea'] == 'Message') {
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
               title: Text('Neue Nachricht'),
               actions: <Widget>[
-                RaisedButton(
-                  color: MoreaColors.violett,
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    navigationMap[toMessagePage]();
-                  },
-                  child: Text(
-                    'Ansehen',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                RaisedButton(
-                  color: MoreaColors.violett,
-                  child: Text(
-                    'Später',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
+                moreaRaisedButton('Ansehen', () {
+                  Navigator.of(context).pop();
+                  navigationMap[toMessagePage]();
+                }),
+                moreaRaisedButton('Später', () {
+                  Navigator.of(context).pop();
+                })
               ],
             );
           },
         );
-      }
-    }, onResume: (Map<String, dynamic> message) async {
-      print(message);
-      if (message['data']['typeMorea'] == 'Message') {
-        navigationMap[prefix0.toMessagePage]();
-      }
-    }, onLaunch: (Map<String, dynamic> message) async {
-      print(message);
-      if (message['data']['typeMorea'] == 'Message') {
-        navigationMap[prefix0.toMessagePage]();
       }
     });
     authStatus = AuthStatus.homePage;
@@ -306,7 +279,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     await callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (auth.getUserID), 'deviceID': deviceID});
     await auth.signOut();
-    await firebaseMessaging.deleteInstanceID();
+    await firebaseMessaging.deleteToken();
     moreaFire = null;
     setState(() {
       authStatus = AuthStatus.notSignedIn;

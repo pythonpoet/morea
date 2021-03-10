@@ -2,7 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 
 HttpsCallable getcallable(String functionName) {
-  return CloudFunctions(region: "europe-west1").getHttpsCallable(functionName: functionName);
+  return FirebaseFunctions.instanceFor(region: "europe-west1").httpsCallable(functionName);
 }
 
 Future<HttpsCallableResult> callFunction(HttpsCallable callable,
