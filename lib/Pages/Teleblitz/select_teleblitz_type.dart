@@ -7,7 +7,7 @@ import 'change_teleblitz.dart';
 class SelectTeleblitzType extends StatelessWidget {
   SelectTeleblitzType(this.stufe, this.moreaFire);
 
-  final String stufe;
+  final Map<String, dynamic> stufe;
   final MoreaFirebase moreaFire;
 
   @override

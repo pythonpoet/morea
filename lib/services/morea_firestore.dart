@@ -62,6 +62,10 @@ abstract class BaseMoreaFirebase {
 
   Future<void> upgradeChild(
       Map<String, dynamic> childMap, String oldUID, String password);
+
+  Future<Map<String, dynamic>> getSubgroups();
+
+  Future<Map<String, dynamic>> getHomeFeed(String groupID);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -125,7 +129,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   initTeleblitz() async {
-    List<String> groupIDs = new List<String>();
+    List<String> groupIDs = <String>[];
     tbz = new TeleblizFirestore(firestore, groupIDs);
     if (this.getGroupIDs.length == 0)
       sCGroupMaps.add(Map<String, GroupData>());
@@ -231,6 +235,33 @@ class MoreaFirebase extends BaseMoreaFirebase {
         eventID, groupIDs, eventEndTimeStamp, eventStartTimeStamp, data);
   }
 
+  Future<void> createTeleblitz(List<String> groupIDs, String eventEndTimeStamp,
+      String eventStartTimeStamp, Map<String, dynamic> data,
+      {String eventID}) async {
+    //Upload the Event
+    data['Timestamp'] = DateTime.now().toString();
+    if (eventID == null)
+      eventID = await this.crud0.setDataWithoutDocumentName(pathEvents, data);
+
+    //Upload homeFeed
+    for (String groupID in groupIDs) {
+      DocumentSnapshot groupDoc = await crud0.getDocument(pathGroups, groupID);
+      Map<String, dynamic> homeFeed = {
+        eventID: {
+          'endTimeStamp': eventEndTimeStamp,
+          'startTimeStamp': eventStartTimeStamp,
+          'timeStamp': [DateTime.now().toString()],
+          'userID': [this.moreaUser.userID],
+        }
+      };
+      Map<String, dynamic> groupMap = groupDoc.data();
+      groupMap['homeFeed'] = homeFeed;
+      groupMap['groupOption']['teleblitzID'] = eventID;
+      await crud0.setData(pathGroups, groupID, groupMap);
+      return null;
+    }
+  }
+
   Future<void> uploadHomeFeedEntry(
       String eventID,
       List<String> groupIDs,
@@ -241,6 +272,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       //Upload the HomeFeed
       this.getMapGroupData[groupID].uploadHomeFeedEntry(this.moreaUser.userID,
           eventID, eventEndTimeStamp, eventStartTimeStamp, data, this.crud0);
+    return null;
   }
 
 /*
@@ -347,8 +379,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return null;
   }
 
-  Future<void> setMessageRead(
-      String userUID, String messageID) async {
+  Future<void> setMessageRead(String userUID, String messageID) async {
     var oldMessage = await crud0.getDocument('messages', messageID);
     List newRead = [];
     for (String index in oldMessage.data()['read']) {
@@ -463,4 +494,21 @@ class MoreaFirebase extends BaseMoreaFirebase {
   //
   // ***************************************************************************
 
+  @override
+  Future<Map<String, dynamic>> getSubgroups() async {
+    DocumentSnapshot doc =
+        await crud0.getDocument('/$pathGroups/', 'f7bl3m4GSpvvo7iw5wNd');
+    Map<String, dynamic> groupOption = doc.get(groupMapGroupOption);
+    Map<String, dynamic> lowerClass = {};
+    groupOption[groupMapGroupLowerClass].forEach((k, v) {
+      lowerClass[k] = v;
+    });
+    return lowerClass;
+  }
+
+  @override
+  Future<Map<String, dynamic>> getHomeFeed(String groupID) async {
+    DocumentSnapshot doc = await crud0.getDocument('/$pathGroups', groupID);
+    return Map<String, dynamic>.from(doc.get(groupMapHomeFeed));
+  }
 }

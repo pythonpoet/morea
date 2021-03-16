@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
@@ -17,7 +18,7 @@ import 'change_teleblitz_mitnehmen.dart';
 import 'change_teleblitz_sender.dart';
 
 class ChangeTeleblitz extends StatefulWidget {
-  final String stufe;
+  final Map<String, dynamic> stufe;
   final String formType;
   final MoreaFirebase moreaFire;
 
@@ -31,7 +32,6 @@ enum FormType { keineAktivitaet, ferien, normal }
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     with TickerProviderStateMixin {
-  String stufe;
   FormType formType;
   MoreaFirebase moreaFire;
 
@@ -51,12 +51,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       id,
       slug,
       rawDate;
-  List<String> mitnehmen;
+  Map<String, dynamic> stufe;
+  List<dynamic> mitnehmen;
   bool keineAktivitaet, ferien;
   bool archived = false;
   bool draft = false;
   var oldTeleblitz;
   MoreaLoading moreaLoading;
+  DocumentSnapshot groupDoc;
 
   TeleblitzManager teleblitzManager;
 
@@ -426,10 +428,12 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
   }
 
   Future<Map> downloadTeleblitz() async {
-    var infos = await teleblitzManager.downloadTeleblitz(this.stufe);
+    this.groupDoc =
+        await widget.moreaFire.crud0.getDocument(pathGroups, stufe['groupID']);
+    var infos =
+        await teleblitzManager.downloadTeleblitz(this.stufe, this.groupDoc);
     this.name = infos['name'];
     this.datum = infos['datum'];
-    print(this.datum);
     antreten = infos['antreten'];
     mapAntreten = infos['google-map'];
     abtreten = infos['abtreten'];
@@ -439,8 +443,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     sender = infos['name-des-senders'];
     grund = infos['grund'];
     endeFerien = infos['ende-ferien'];
-    id = infos['_id'];
-    slug = infos['slug'];
     switch (widget.formType) {
       case 'keineAktivitaet':
         keineAktivitaet = true;
@@ -459,41 +461,61 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
   }
 
   void uploadTeleblitz() async {
-    Map<String, dynamic> newTeleblitz = {
-      'name': this.name,
-      'datum': this.datum,
-      'antreten': this.antreten,
-      'google-map': this.mapAntreten,
-      'abtreten': this.abtreten,
-      'map-abtreten': this.mapAbtreten,
-      'mitnehmen-test': this.mitnehmen,
-      'bemerkung': this.bemerkung,
-      'name-des-senders': this.sender,
-      'grund': this.grund,
-      'ende-ferien': this.endeFerien,
-      'slug': this.slug,
-      'ferien': this.ferien,
-      'keine-aktivitat': this.keineAktivitaet,
-      '_draft': false,
-      '_archived': false,
-      'groupIDs': [convWebflowtoMiData(stufe)],
-      'EventType': 'Teleblitz',
-      mapTimestamp: DateTime.now().toIso8601String()
-    };
-    EventData event = EventData(newTeleblitz);
-    int hours = int.parse(this.antreten.substring(0, 2));
-    int minutes = int.parse(this.antreten.substring(3, 5));
-    teleblitzManager.uploadTeleblitz(newTeleblitz, this.id);
-    DateTime start = (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
-        .add(Duration(hours: hours, minutes: minutes));
-    hours = int.parse(this.abtreten.substring(0, 2));
-    minutes = int.parse(this.abtreten.substring(3, 5));
-    DateTime end = (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
-        .add(Duration(hours: hours, minutes: minutes));
-    await widget.moreaFire.createEvent([convWebflowtoMiData(stufe)],
-        start.toIso8601String(), end.toIso8601String(), newTeleblitz);
+    if (this.datum != 'Bitte wählen') {
+      Map<String, dynamic> newTeleblitz = {
+        'name': this.name,
+        'datum': this.datum,
+        'antreten': this.antreten,
+        'google-map': this.mapAntreten,
+        'abtreten': this.abtreten,
+        'map-abtreten': this.mapAbtreten,
+        'mitnehmen-test': this.mitnehmen,
+        'bemerkung': this.bemerkung,
+        'name-des-senders': this.sender,
+        'grund': this.grund,
+        'ende-ferien': this.endeFerien,
+        'ferien': this.ferien,
+        'keine-aktivitat': this.keineAktivitaet,
+        '_draft': false,
+        '_archived': false,
+        'groupIDs': [stufe['groupID']],
+        'EventType': 'Teleblitz',
+        mapTimestamp: DateTime.now().toIso8601String()
+      };
+      int hours = int.parse(this.antreten.substring(0, 2));
+      int minutes = int.parse(this.antreten.substring(3, 5));
+      if (this.groupDoc.get(groupMapGroupOption)['webflowCMSID'] != null) {
+        teleblitzManager.uploadTeleblitz(newTeleblitz,
+            this.groupDoc.get(groupMapGroupOption)['webflowCMSID']);
+      }
+      DateTime start =
+          (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
+              .add(Duration(hours: hours, minutes: minutes));
+      hours = int.parse(this.abtreten.substring(0, 2));
+      minutes = int.parse(this.abtreten.substring(3, 5));
+      DateTime end = (DateFormat("dd.MM.yyyy").parse(this.datum.split(', ')[1]))
+          .add(Duration(hours: hours, minutes: minutes));
+      if (groupDoc.get('groupOption')['teleblitzID'] != null) {
+        await widget.moreaFire.createTeleblitz([stufe['groupID']],
+            start.toIso8601String(), end.toIso8601String(), newTeleblitz,
+            eventID: groupDoc.get('groupOption')['teleblitzID']);
+      } else {
+        await widget.moreaFire.createTeleblitz([stufe['groupID']],
+            start.toIso8601String(), end.toIso8601String(), newTeleblitz);
+      }
 
-    Navigator.of(context).popUntil(ModalRoute.withName('/'));
+      Navigator.of(context).popUntil(ModalRoute.withName('/'));
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                content: Text(
+              'Bitte Datum wählen',
+              style: MoreaTextStyle.warningButton,
+            ));
+          });
+    }
   }
 
   Future<Null> _selectDatum(BuildContext context) async {
@@ -560,30 +582,42 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 
 class TeleblitzManager {
   MoreaFirebase moreaFirebase;
+  DocumentSnapshot groupDoc;
 
   TeleblitzManager(MoreaFirebase moreaFirebase) {
     this.moreaFirebase = moreaFirebase;
   }
 
-  Future<Map> downloadTeleblitz(String stufe) async {
-    String apiKey = await moreaFirebase.getWebflowApiKey();
-    var jsonDecode;
-    var jsonString;
-    jsonString = await http.get(Uri.https(
-        "api.webflow.com",
-        "/collections/5be4a9a6dbcc0a24d7cb0ee9/items",
-        {"api_version": "1.0.0", "access_token": apiKey}));
-    jsonDecode = json.decode(jsonString.body);
-    Map infos;
-    for (var u in jsonDecode['items']) {
-      if (u["name"] == stufe) {
-        infos = u;
-      }
+  Future<Map> downloadTeleblitz(
+      Map<String, dynamic> stufe, DocumentSnapshot groupDoc) async {
+    this.groupDoc = groupDoc;
+    if (groupDoc.get(groupMapGroupOption)['teleblitzID'] != null) {
+      DocumentSnapshot teleblitzDoc = await this
+          .moreaFirebase
+          .crud0
+          .getDocument(
+              pathEvents, groupDoc.get(groupMapGroupOption)['teleblitzID']);
+      return teleblitzDoc.data();
+    } else {
+      Map<String, dynamic> teleblitz = {
+        '_archived': false,
+        '_draft': false,
+        'abtreten': '00:00 Uhr, Lokal',
+        'antreten': '00:00 Uhr, Lokal',
+        'bemerkung': 'Bitte definieren',
+        'datum': 'Bitte wählen',
+        'ende-ferien': '22.01.2021',
+        'ferien': false,
+        'google-map': "Bitte definieren",
+        'grund': 'Bitte definieren',
+        'keine-aktivitat': false,
+        'map-abtreten': 'Bitte definieren',
+        'mitnehmen-test': ['Bitte definieren'],
+        'name': stufe['groupNickName'],
+        'name-des-senders': 'Bitte definieren'
+      };
+      return teleblitz;
     }
-    String newDate = _formatDate(infos['ende-ferien']);
-    infos['ende-ferien'] = newDate;
-    infos['mitnehmen-test'] = _formatMitnehmen(infos['mitnehmen-test']);
-    return infos;
   }
 
   String _formatDate(String date) {
@@ -609,37 +643,42 @@ class TeleblitzManager {
   }
 
   void uploadTeleblitz(Map newTeleblitz, String id) async {
-    String apiKey = await moreaFirebase.getWebflowApiKey();
-    String formatedMitnehmen = '<ul>';
-    for (String u in newTeleblitz['mitnehmen-test']) {
-      formatedMitnehmen = formatedMitnehmen + '<li>' + u + '</li>';
+    if (this.groupDoc.get(groupMapGroupOption)['webflowCMSID'] != null) {
+      String apiKey = await moreaFirebase.getWebflowApiKey();
+      String formatedMitnehmen = '<ul>';
+      for (String u in newTeleblitz['mitnehmen-test']) {
+        formatedMitnehmen = formatedMitnehmen + '<li>' + u + '</li>';
+      }
+      formatedMitnehmen = formatedMitnehmen + '</ul>';
+      newTeleblitz['mitnehmen-test'] = formatedMitnehmen;
+      var result = newTeleblitz['ende-ferien'].split('.');
+      newTeleblitz['ende-ferien'] =
+          result[2] + '-' + result[1] + '-' + result[0] + 'T00:00:00.000Z';
+      newTeleblitz.remove('groupIDs');
+      newTeleblitz.remove('EventType');
+      newTeleblitz.remove('Timestamp');
+      newTeleblitz.remove('_draft');
+      newTeleblitz.remove('_archived');
+      print(id);
+      var jsonMap = {'fields': newTeleblitz};
+      String jsonStr = jsonEncode(jsonMap);
+      print(jsonStr);
+      Map<String, String> header = Map();
+      header["Authorization"] = "Bearer $apiKey";
+      header["accept-version"] = "1.0.0";
+      header["Content-Type"] = "application/json";
+      http
+          .patch(
+        Uri.https(
+            'api.webflow.com',
+            "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + id,
+            {'live': 'true'}),
+        headers: header,
+        body: jsonStr,
+      )
+          .then((http.Response result) {
+        print(result.body);
+      });
     }
-    formatedMitnehmen = formatedMitnehmen + '</ul>';
-    newTeleblitz['mitnehmen-test'] = formatedMitnehmen;
-    var result = newTeleblitz['ende-ferien'].split('.');
-    newTeleblitz['ende-ferien'] =
-        result[2] + '-' + result[1] + '-' + result[0] + 'T00:00:00.000Z';
-    newTeleblitz.remove('groupIDs');
-    newTeleblitz.remove('EventType');
-    newTeleblitz.remove('Timestamp');
-    var jsonMap = {"fields": newTeleblitz};
-    String jsonStr = jsonEncode(jsonMap);
-    Map<String, String> header = Map();
-    header["Authorization"] = "Bearer $apiKey";
-    header["accept-version"] = "1.0.0";
-    header["Content-Type"] = "application/json";
-    http
-        .put(
-      Uri.https(
-          'api.weblow.com',
-          "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + id,
-          {'live': 'true'}),
-      headers: header,
-      body: jsonStr,
-    )
-        .then((result) {
-      print(result.statusCode);
-      print(result.body);
-    });
   }
 }
