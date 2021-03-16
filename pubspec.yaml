@@ -57,7 +57,7 @@ dev_dependencies:
 flutter_icons:
     android: false
     ios: true
-    image_path: "assets/images/logo.jpeg"
+    image_path: "assets/images/logo_app_ios.png"
     adaptive_icon_background: "#fff000"
 
 
@@ -97,6 +97,7 @@ flutter:
         - assets/images/logo.jpeg
         - assets/images/background.png
         - assets/icon/logo_loading.png
+        - assets/images/logo_app_ios.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.io/assets-and-images/#resolution-aware.

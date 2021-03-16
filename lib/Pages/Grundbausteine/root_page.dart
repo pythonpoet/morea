@@ -83,6 +83,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     }
     await this.moreaFire.initTeleblitz();
     FirebaseMessaging.onMessage.listen((message) {
+      print("message recieved");
       if (message.data['typeMorea'] == 'Message') {
         showDialog(
           context: context,
@@ -269,7 +270,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     });
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceID;
-    if (Platform.isAndroid) if (Platform.isAndroid) {
+    if (Platform.isAndroid) {
       AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
       deviceID = androidDeviceInfo.androidId;
     } else if (Platform.isIOS) {

@@ -403,6 +403,7 @@ class _MessagesPageState extends State<MessagesPage>
         builder: (BuildContext context) => SendMessages(
               moreaFire: moreaFire,
               auth: widget.auth,
+              crudMedthods: this.crud0,
             )));
   }
 

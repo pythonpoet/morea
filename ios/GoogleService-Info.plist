@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>891584307361-se6f91bh9nmg94bets6og93qrlcd5r76.apps.googleusercontent.com</string>
+	<string>891584307361-eg7gmf0975qnufrkgmsita1uh4jnf8ij.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.891584307361-se6f91bh9nmg94bets6og93qrlcd5r76</string>
+	<string>com.googleusercontent.apps.891584307361-eg7gmf0975qnufrkgmsita1uh4jnf8ij</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDaNCEZXwSgJgugD5FnCD-OcoN5FvdjLsI</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>ch.productions.morea.app</string>
+	<string>productions.morea.app</string>
 	<key>PROJECT_ID</key>
 	<string>morea-8f840</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:891584307361:ios:1030edf66ba87a4ed010e0</string>
+	<string>1:891584307361:ios:d9a90621eaab64ead010e0</string>
 	<key>DATABASE_URL</key>
 	<string>https://morea-8f840.firebaseio.com</string>
 </dict>

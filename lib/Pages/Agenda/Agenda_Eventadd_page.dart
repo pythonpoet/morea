@@ -70,6 +70,8 @@ class EventAddPageState extends State<EventAddPage> {
     'Pios': false,
   };
 
+  bool initDone = false;
+
   @override
   void dispose() {
     for (TextEditingController controller in mitnehmenController) {
@@ -352,6 +354,7 @@ class EventAddPageState extends State<EventAddPage> {
     data[groupMapGroupOption][groupMapGroupLowerClass]
         .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
+    this.initDone = true;
     setState(() {});
   }
 
@@ -376,7 +379,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (subgroups == null)
+    if (subgroups == null || !this.initDone)
       return Card(
         child: Container(
           padding: EdgeInsets.all(100),
