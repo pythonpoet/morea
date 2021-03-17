@@ -665,10 +665,14 @@ class MergeChildParent extends BaseMergeChildParent {
         } else {
           moreaUser.displayName = moreaUser.pfadiName;
         }
-        moreaUser.groupIDs.forEach((String groupID) async {
+        print(moreaUser.groupIDs);
+        print(childUID);
+        print(moreaUser.displayName);
+        print(moreaUser.generateAndValitateUserMap().toString());
+        for (var groupID in moreaUser.groupIDs) {
           await moreafire.groupPriviledgeTN(groupID, childUID,
               moreaUser.displayName, moreaUser.generateAndValitateUserMap());
-        });
+        }
 
         return true;
       }

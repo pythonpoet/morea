@@ -215,13 +215,14 @@ class Teleblitz {
                       Flexible(
                         child: ElevatedButton(
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all<OutlinedBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30))),
-                            padding: MaterialStateProperty.all<EdgeInsets>(
-                                EdgeInsets.all(0)),
-                            elevation: MaterialStateProperty.all<double>(0),
-                          ),
+                              shape: MaterialStateProperty.all<OutlinedBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30))),
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.all(0)),
+                              elevation: MaterialStateProperty.all<double>(0),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black12)),
                           child: Container(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 0, vertical: 15),

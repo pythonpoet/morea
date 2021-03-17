@@ -56,7 +56,7 @@ class AboutThisApp extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: moreaRaisedButton('it@morea.ch', () {
-                    launch("mailto:<it@morea.ch>");
+                    Urllauncher().openMail('it@morea.ch');
                   }),
                 ),
                 Padding(

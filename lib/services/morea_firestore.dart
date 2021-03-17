@@ -163,10 +163,25 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   //Vorschlag an Maxi
   Future<void> updateUserInformation(
-      String userUID, Map<String, dynamic> userInfo) {
+      String userUID, Map<String, dynamic> userInfo) async {
     if (userInfo[userMapAccountCreated] is Timestamp)
       userInfo[userMapAccountCreated] =
           userInfo[userMapAccountCreated].toString();
+    if (userInfo[userMapPfadiName] != null) {
+      userInfo[groupMapDisplayName] = userInfo[userMapPfadiName];
+    } else {
+      userInfo[groupMapDisplayName] = userInfo[userMapVorName];
+    }
+    if (userInfo['groupIDs'] != null) {
+      for (var groupID in userInfo['groupIDs']) {
+        await callFunction(getcallable('updatePriviledgeEntry'), param: {
+          'UID': userUID,
+          'groupID': groupID,
+          groupMapDisplayName: userInfo[groupMapDisplayName],
+          'customInfo': userInfo
+        });
+      }
+    }
     return callFunction(getcallable("updateUserProfile"), param: userInfo);
   }
 
@@ -417,15 +432,15 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> groupPriviledgeTN(String groupID, String userID,
       String displayName, Map<String, dynamic> customInfo) async {
-    return callFunction(getcallable("priviledgeTN"),
-        param: Map<String, dynamic>.from({
-          "groupID": groupID,
-          userMapUID: userID,
-          groupMapDisplayName: displayName,
-          groupMapPriviledgeEntryType: "Teilnehmer",
-          groupMapPriviledgeEntryLocation: "local",
-          groupMapPriviledgeEntryCustomInfo: customInfo
-        }));
+    await callFunction(getcallable("createPriviledgeEntry"), param: {
+      "groupID": groupID,
+      userMapUID: userID,
+      groupMapDisplayName: displayName,
+      groupMapPriviledgeEntryType: "Teilnehmer",
+      groupMapPriviledgeEntryLocation: "local",
+      groupMapPriviledgeEntryCustomInfo: customInfo
+    });
+    return null;
   }
 
   Future<String> getMailChimpApiKey() async {
@@ -471,20 +486,21 @@ class MoreaFirebase extends BaseMoreaFirebase {
       'oldChildUID': oldChildUID,
     };
     await callFunction(getcallable('upgradeChildMap'), param: payload);
+    for (var groupID in childMap[userMapGroupIDs]) {
+      await callFunction(getcallable('leafeGroup'),
+          param: {'UID': oldChildUID, 'groupID': groupID});
+      await callFunction(getcallable('joinGroup'), param: {
+        'UID': uid,
+        'groupID': groupID,
+        'displayName': displayname,
+        'customInfo': childMap
+      });
+    }
 
     Map<String, dynamic> deletePayload = {
       'UID': oldChildUID,
     };
     await callFunction(getcallable('deleteChildMap'), param: deletePayload);
-
-    Map<String, dynamic> updatePriviledgePayload = <String, dynamic>{
-      'UID': uid,
-      'groupIDs': childMap[userMapGroupIDs],
-      'DisplayName': displayname,
-      'oldUID': oldChildUID
-    };
-    await callFunction(getcallable('updatePriviledge'),
-        param: updatePriviledgePayload);
     return uid;
   }
   // ***************************************************************************
