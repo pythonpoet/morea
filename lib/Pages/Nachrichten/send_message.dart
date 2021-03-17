@@ -113,7 +113,7 @@ class _SendMessagesState extends State<SendMessages> {
                       'title': titleController.text,
                       'body': inhaltController.text,
                       'sender': moreaFire.getPfandiName,
-                      'read': List<String>(),
+                      'read': <String>[],
                       'receivers': receivers,
                     },
                     'receivers': receivers,

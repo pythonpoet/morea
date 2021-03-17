@@ -490,53 +490,58 @@ class _ChangeProfileState extends State<ChangeProfile>
                       color: Colors.white,
                       size: 16,
                     )),
-                RaisedButton.icon(
-                    onPressed: () async {
-                      var result = await _validateAndSave(email);
-                      if (result) {
-                        if (oldEmail != userInfo['Email']) {
-                          await auth0.changeEmail(userInfo['Email']);
-                        }
-                        if (newPassword != null) {
-                          await auth0.changePassword(newPassword);
-                        }
-                        await widget.moreaFire
-                            .updateUserInformation(userInfo['UID'], userInfo);
-                        List<String> groupIDs =
-                            List<String>.from(userInfo['groupIDs']);
-                        await mailChimpAPIManager.updateUserInfo(
-                            userInfo['Email'],
-                            userInfo['Vorname'],
-                            userInfo['Nachname'],
-                            userInfo['Geschlecht'],
-                            groupIDs,
-                            widget.moreaFire);
-                        if (oldEmail != userInfo['Email'] ||
-                            newPassword != null) {
-                          _showSignOutInformation().then((onValue) {
-                            Navigator.of(context).pop();
-                            _signedOut();
-                          });
-                        } else {
-                          widget.updateProfile();
-                          Navigator.of(context).pop();
-                        }
-                      } else {
-                        _showReauthenticateError();
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    var result = await _validateAndSave(email);
+                    if (result) {
+                      if (oldEmail != userInfo['Email']) {
+                        await auth0.changeEmail(userInfo['Email']);
                       }
-                    },
-                    icon: Icon(
-                      Icons.input,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    label: Text(
-                      "Anmelden",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+                      if (newPassword != null) {
+                        await auth0.changePassword(newPassword);
+                      }
+                      await widget.moreaFire
+                          .updateUserInformation(userInfo['UID'], userInfo);
+                      List<String> groupIDs =
+                          List<String>.from(userInfo['groupIDs']);
+                      await mailChimpAPIManager.updateUserInfo(
+                          userInfo['Email'],
+                          userInfo['Vorname'],
+                          userInfo['Nachname'],
+                          userInfo['Geschlecht'],
+                          groupIDs,
+                          widget.moreaFire);
+                      if (oldEmail != userInfo['Email'] ||
+                          newPassword != null) {
+                        _showSignOutInformation().then((onValue) {
+                          Navigator.of(context).pop();
+                          _signedOut();
+                        });
+                      } else {
+                        widget.updateProfile();
+                        Navigator.of(context).pop();
+                      }
+                    } else {
+                      _showReauthenticateError();
+                    }
+                  },
+                  icon: Icon(
+                    Icons.input,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  label: Text(
+                    "Anmelden",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  ),
+                ),
               ],
             ));
   }
@@ -579,17 +584,22 @@ class _ChangeProfileState extends State<ChangeProfile>
               content: Text(
                   'Leider hat etwas mit dem Neuanmelden nicht geklappt. Überprüfen sie das Password nochmals.'),
               actions: <Widget>[
-                RaisedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Ok',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Ok',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  ),
+                ),
               ],
             ));
   }
@@ -605,17 +615,22 @@ class _ChangeProfileState extends State<ChangeProfile>
               content: Text(
                   'Weil sie ihre E-Mail oder das Passwort geändert haben, werden sie nun ausgeloggt.'),
               actions: <Widget>[
-                RaisedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Ok',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Ok',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  ),
+                ),
               ],
             )).then((onValue) {
       return null;

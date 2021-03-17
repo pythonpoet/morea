@@ -43,7 +43,6 @@ class EventWidgetState extends State<EventWidget> {
                     function: widget.function);
                 break;
 
-              //TODO implement New Events here!
               default:
                 return Container(
                     child: Text("Upgrade to App to Display Event"));

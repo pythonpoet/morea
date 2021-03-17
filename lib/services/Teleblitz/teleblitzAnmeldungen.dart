@@ -39,8 +39,8 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
     sDSAnAbmeldungen =
         crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
     Map<String, dynamic> mAnmdeldungen;
-    List<DocumentSnapshot> dsAnmeldungen = new List<DocumentSnapshot>();
-    List<String> lSAnmeldungen = new List<String>();
+    List<DocumentSnapshot> dsAnmeldungen = <DocumentSnapshot>[];
+    List<String> lSAnmeldungen = <String>[];
 
     yield* sDSAnAbmeldungen.map((QuerySnapshot qSAnmeldungen) {
       dsAnmeldungen = qSAnmeldungen.docs;
@@ -58,8 +58,8 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
     sDSAnAbmeldungen =
         crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
     Map<String, dynamic> mAnmdeldungen;
-    List<DocumentSnapshot> dsAnmeldungen = new List<DocumentSnapshot>();
-    List<String> lSAnmeldungen = new List<String>();
+    List<DocumentSnapshot> dsAnmeldungen = <DocumentSnapshot>[];
+    List<String> lSAnmeldungen = <String>[];
 
     yield* sDSAnAbmeldungen.map((QuerySnapshot qSAnmeldungen) {
       dsAnmeldungen = qSAnmeldungen.docs;

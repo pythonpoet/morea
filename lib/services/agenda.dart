@@ -33,7 +33,7 @@ class Agenda extends BaseAgenda {
   DWIFormat dwiFormat = new DWIFormat();
   FirebaseFirestore db;
   MoreaFirebase moreaFire;
-  List<Map> events = new List();
+  List<Map> events = [];
   StreamController<List<Map>> eventStream = new BehaviorSubject();
 
   Stream<List<Map<dynamic, dynamic>>> get eventstream => eventStream.stream;
@@ -185,7 +185,7 @@ class Agenda extends BaseAgenda {
   Future<void> updateAgendaTitles(
       String groupID, Map<String, dynamic> agendaTitle) async {
     DocumentReference docRef = db.collection(pathGroups).doc(groupID);
-    List<dynamic> agendaOverview = new List();
+    List<dynamic> agendaOverview = [];
 
     //DateTime newDate = DateTime.parse(agendaTitle["Datum"]);
 
@@ -221,8 +221,8 @@ class Agenda extends BaseAgenda {
 
   List<String> check4EventgroupIDsChanged(
       Map<String, dynamic> eventOld, Map<String, dynamic> eventNew) {
-    List<String> oldGroupIDs = new List<String>();
-    List<String> newGroupIDs = new List<String>();
+    List<String> oldGroupIDs = <String>[];
+    List<String> newGroupIDs = <String>[];
     if (eventOld.containsKey("groupIDs"))
       oldGroupIDs.addAll(List<String>.from(eventOld['groupIDs']));
     if (eventNew.containsKey('groupIDs'))

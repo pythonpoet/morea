@@ -44,7 +44,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       selectedrolle,
       _geschlecht;
   List<String> _stufe, oldGroup;
-  List<Map> _stufenselect = new List();
+  List<Map> _stufenselect = [];
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
   MoreaLoading moreaLoading;
   bool loading = true;
@@ -92,7 +92,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           child: Text('Du bist dabei einen User zu löschen.'),
         ),
         actions: <Widget>[
-          new FlatButton(
+          TextButton(
               child: const Text('ABBRECHEN'),
               onPressed: () {
                 Navigator.pop(context);
@@ -163,9 +163,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 ),
                 content: RichText(
                   text: TextSpan(
-                      text:
-                          'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: it@morea.ch',
-                      style: MoreaTextStyle.normal,),
+                    text:
+                        'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: it@morea.ch',
+                    style: MoreaTextStyle.normal,
+                  ),
                 ),
                 actions: <Widget>[
                   moreaFlatButton('OK', () => Navigator.of(context).pop()),
@@ -217,12 +218,12 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
         (await crud0.getDocument(pathGroups, moreaGroupID)).data();
     print(
         "test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
-    this._stufenselect = new List<Map>();
-    data[groupMapGroupOption][groupMapGroupLowerClass]
-        .forEach((k, value) => this._stufenselect.add({
-              userMapGroupIDs: value['groupID'],
-              groupMapgroupNickName: convMiDatatoWebflow(value['groupID'])
-            }));
+    this._stufenselect = <Map>[];
+    data[groupMapGroupOption][groupMapGroupLowerClass].forEach((k, value) =>
+        this._stufenselect.add({
+          userMapGroupIDs: value['groupID'],
+          groupMapgroupNickName: value['groupNickName']
+        }));
     setState(() {});
   }
 

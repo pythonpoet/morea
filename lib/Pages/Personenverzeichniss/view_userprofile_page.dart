@@ -199,7 +199,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
   }
 
   List<Widget> parentWidget() {
-    List<Widget> elternWidget = new List();
+    List<Widget> elternWidget = [];
     for (Future<DocumentSnapshot> dSParent in getParentMap()) {
       elternWidget.add(Container(
         child: FutureBuilder(
@@ -353,9 +353,9 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
   }
 
   List<Future<DocumentSnapshot>> getParentMap() {
-    List<Future<DocumentSnapshot>> elternMap = new List();
+    List<Future<DocumentSnapshot>> elternMap = [];
     Map<String, String> elt = Map<String, String>.from(profile[userMapEltern]);
-    List<String> elternUID = new List();
+    List<String> elternUID = [];
     elternUID.addAll(elt.values);
     elternUID.forEach(
         (uid) => elternMap.add(widget.moreaFire.getUserInformation(uid)));

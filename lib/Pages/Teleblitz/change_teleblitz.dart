@@ -4,12 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
-import 'package:morea/services/Event/event_data.dart';
 import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
 import 'package:intl/intl.dart';
-import 'package:morea/services/utilities/MiData.dart';
 import 'change_teleblitz_abtreten.dart';
 import 'change_teleblitz_antreten.dart';
 import 'change_teleblitz_bemerkung.dart';
@@ -618,28 +616,6 @@ class TeleblitzManager {
       };
       return teleblitz;
     }
-  }
-
-  String _formatDate(String date) {
-    if (date != '') {
-      String rawDate = date.split('T')[0];
-      List<String> dates = rawDate.split('-');
-      String formatedDate = dates[2] + '.' + dates[1] + '.' + dates[0];
-      return formatedDate;
-    } else {
-      return '29.10.2019';
-    }
-  }
-
-  List _formatMitnehmen(String mitnehmen) {
-    List newMitnehmen = mitnehmen
-        .replaceFirst("<ul>", "")
-        .replaceFirst('<' + '/' + 'ul>', "")
-        .replaceAll("</li><li>", ";")
-        .replaceFirst("<li>", "")
-        .replaceFirst("</li>", "")
-        .split(';');
-    return newMitnehmen;
   }
 
   void uploadTeleblitz(Map newTeleblitz, String id) async {

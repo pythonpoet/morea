@@ -313,7 +313,6 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> uploadteleblitz(String groupID, Map data) async {
-    //TODO fix weird groupIDs disappearing problem
     List groupIDs = data['groupIDs'];
     String eventID =
         groupID + data['datum'].toString().replaceAll('Samstag, ', '');

@@ -40,21 +40,21 @@ class GroupFaceState extends State<GroupFace> {
             Padding(
               padding: EdgeInsets.only(left: 15, right: 15, bottom: 15),
               child: Column(children: <Widget>[
-                RaisedButton(
+                ElevatedButton(
                     child: Text("Edit Roles"),
                     onPressed: () {
                       setState(() {
                         groupFaceStateTypes = GroupFaceStateTypes.priviledge;
                       });
                     }),
-                RaisedButton(
+                ElevatedButton(
                     child: Text("Edit users"),
                     onPressed: () => {
                           setState(() {
                             groupFaceStateTypes = GroupFaceStateTypes.users;
                           })
                         }),
-                RaisedButton(
+                ElevatedButton(
                     child: Text("Edit GroupFace"),
                     onPressed: () => setState(() {
                           groupFaceStateTypes = GroupFaceStateTypes.priviledge;

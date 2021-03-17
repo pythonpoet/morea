@@ -18,8 +18,7 @@ class ChangeMitnehmen extends StatefulWidget {
 
 class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
   List<String> mitnehmen;
-  List<TextEditingController> mitnehmenController =
-      List<TextEditingController>();
+  List<TextEditingController> mitnehmenController = <TextEditingController>[];
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -50,7 +49,7 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
         child: Icon(Icons.check),
         onPressed: () {
           if (saveAndSubmit()) {
-            List<String> neuMitnehmen = List<String>();
+            List<String> neuMitnehmen = <String>[];
             for (TextEditingController u in mitnehmenController) {
               neuMitnehmen.add(u.text);
             }
@@ -148,9 +147,11 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
           style: MoreaTextStyle.textField,
           cursorColor: MoreaColors.violett,
           decoration: InputDecoration(
-            errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+            errorBorder:
+                OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
             border: OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: MoreaColors.violett)),
           ),
           validator: (value) {
             if (value.isEmpty) {

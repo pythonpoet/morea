@@ -67,8 +67,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
         crud0.streamDocument(pathGroups, groupID);
     await for (List<String> homeFeed
         in sDhomeFeed.map((DocumentSnapshot dsHomeFeed) {
-      return new List<String>.from(
-          dsHomeFeed.data()[groupMapHomeFeed] ?? new List());
+      return new List<String>.from(dsHomeFeed.data()[groupMapHomeFeed] ?? []);
     })) {
       mapHomeFeed[groupID] = homeFeed;
       yield mapHomeFeed;
@@ -99,7 +98,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   Stream<Map<String, Map<String, dynamic>>> steamMapofEvents(
       List<String> eventIDs) {
     Map<String, Map<String, dynamic>> mapOfEvents = new Map();
-    List<Stream<Map<String, Map<String, dynamic>>>> listStream = new List();
+    List<Stream<Map<String, Map<String, dynamic>>>> listStream = [];
     for (String eventID in eventIDs) {
       listStream.add(steamMapofEventshelper(eventID, mapOfEvents));
     }
@@ -117,8 +116,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
   }
 
   void helper(Map<String, List<String>> listHomeFeed) async {
-    List<Stream<Map<String, Map<String, Map<String, dynamic>>>>> list =
-        new List();
+    List<Stream<Map<String, Map<String, Map<String, dynamic>>>>> list = [];
     for (MapEntry<String, List<String>> homeFeed in listHomeFeed.entries) {
       list.add(streamMapofGroupEventsHelper(homeFeed).asBroadcastStream());
     }

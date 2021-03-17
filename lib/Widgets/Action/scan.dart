@@ -33,7 +33,7 @@ Future<Widget> makeLeiterWidget(
         if (!buttonPressed)
           return Column(
             children: <Widget>[
-              new RaisedButton(
+              new ElevatedButton(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -59,20 +59,30 @@ Future<Widget> makeLeiterWidget(
                   else
                     buttonPressed = false
                 },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
-              new RaisedButton(
+              ElevatedButton(
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () async =>
                     {stream.close(), Navigator.of(context).pop()},
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
             ],
           );
@@ -95,15 +105,20 @@ Future<Widget> makeLeiterWidget(
               SizedBox(
                 height: 200,
               ),
-              new RaisedButton(
+              ElevatedButton(
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () async =>
                     {stream.close(), Navigator.of(context).pop()},
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
             ],
           );

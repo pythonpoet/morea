@@ -15,7 +15,7 @@ Stream<Map<String, dynamic>> getGroupData(
 }
 
 List<String> sortHomeFeedByStartDate(Map<String, GroupData> mapGroupData) {
-  List<String> sort = new List<String>();
+  List<String> sort = <String>[];
   Map<String, String> unsorted = Map<String, String>();
   mapGroupData.forEach((String groupID, GroupData groupData) {
     if (groupData.homeFeed.homeFeed != null)
@@ -283,13 +283,13 @@ class GroupOption {
       chatEnable = data[groupMapChatEnable];
   }
   List<String> getLowerGroupsNickNames() {
-    List<String> list = new List<String>();
+    List<String> list = <String>[];
     this.groupLowerClass.forEach((key, value) => list.add(value.groupNickName));
     return list;
   }
 
   List<String> getLowerGroupsIDs() {
-    List<String> list = new List<String>();
+    List<String> list = <String>[];
     this.groupLowerClass.forEach((key, value) => list.add(value.groupID));
     return list;
   }

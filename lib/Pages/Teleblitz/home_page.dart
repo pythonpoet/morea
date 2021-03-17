@@ -44,7 +44,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   GlobalKey _changeTeleblitzKey = GlobalKey();
   GlobalKey _bottomAppBarLeiterKey = GlobalKey();
   GlobalKey _drawerKey = GlobalKey();
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey _bottomAppBarTNKey = GlobalKey();
 
   static final ScrollController homeScreenScrollController =

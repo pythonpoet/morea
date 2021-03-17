@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:morea/Pages/Group/group_page.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 
@@ -114,8 +113,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toMessagePage],
               child: Column(
                 children: <Widget>[
@@ -134,8 +135,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toAgendaPage],
               child: Column(
                 children: <Widget>[
@@ -154,8 +157,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toHomePage],
               child: Column(
                 children: <Widget>[
@@ -174,8 +179,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toProfilePage],
               child: Column(
                 children: <Widget>[
@@ -211,8 +218,10 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toMessagePage],
               child: Column(
                 children: <Widget>[
@@ -231,8 +240,10 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toAgendaPage],
               child: Column(
                 children: <Widget>[
@@ -265,8 +276,10 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toHomePage],
               child: Column(
                 children: <Widget>[
@@ -285,8 +298,10 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toProfilePage],
               child: Column(
                 children: <Widget>[

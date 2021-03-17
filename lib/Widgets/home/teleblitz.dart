@@ -12,7 +12,6 @@ import 'package:morea/morealayout.dart';
 import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
@@ -139,7 +138,7 @@ class Teleblitz {
   }
 
   Widget parentAnmeldeButton(List<String> groupIDs, String eventID) {
-    List<Widget> anmeldebuttons = new List();
+    List<Widget> anmeldebuttons = [];
 
     groupIDs.forEach((String groupID) {
       moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
@@ -214,9 +213,15 @@ class Teleblitz {
                         ),
                       ),
                       Flexible(
-                        child: RaisedButton(
-                          elevation: 0,
-                          padding: EdgeInsets.all(0),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.all(0)),
+                            elevation: MaterialStateProperty.all<double>(0),
+                          ),
                           child: Container(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 0, vertical: 15),
@@ -235,16 +240,24 @@ class Teleblitz {
                                   name: name);
                             }
                           },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(right: 5),
                       ),
                       Flexible(
-                        child: RaisedButton(
-                          padding: EdgeInsets.all(0),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Colors.transparent),
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.all(0)),
+                          ),
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 0, vertical: 15),
@@ -268,10 +281,6 @@ class Teleblitz {
                                   name: name);
                             }
                           },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          color: Colors.transparent,
-                          textColor: Colors.white,
                         ),
                       )
                     ],
@@ -295,8 +304,18 @@ class Teleblitz {
                       padding: EdgeInsets.only(right: 5),
                     ),
                     Flexible(
-                      child: new RaisedButton(
-                        padding: EdgeInsets.all(0),
+                      child: new ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.transparent),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          padding: MaterialStateProperty.all<EdgeInsets>(
+                              EdgeInsets.all(0)),
+                        ),
                         child: Container(
                           padding:
                               EdgeInsets.symmetric(horizontal: 0, vertical: 15),
@@ -320,10 +339,6 @@ class Teleblitz {
                                 name: name);
                           }
                         },
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        color: Colors.transparent,
-                        textColor: Colors.white,
                       ),
                     ),
                   ],
@@ -341,9 +356,16 @@ class Teleblitz {
                       ),
                     ),
                     Flexible(
-                      child: new RaisedButton(
-                        elevation: 0,
-                        padding: EdgeInsets.all(0),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.all(0)),
+                            elevation: MaterialStateProperty.all<double>(0),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Colors.black12)),
                         child: Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 0, vertical: 15),
@@ -362,8 +384,6 @@ class Teleblitz {
                                 name: name);
                           }
                         },
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
                       ),
                     ),
                     Padding(
@@ -387,7 +407,7 @@ class Teleblitz {
 
   Widget parentAnmeldeIndicator(List<String> groupIDs, String eventID,
       Stream<String> Function(String userID, String eventID) function) {
-    List<Widget> anmeldebuttons = new List();
+    List<Widget> anmeldebuttons = [];
     groupIDs.forEach((String groupID) {
       moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
         anmeldeStreamController[uid] = new BehaviorSubject();
@@ -1244,7 +1264,10 @@ class Info {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(
-                    child: Text(formatedEndeFerien, style: MoreaTextStyle.normal,))
+                    child: Text(
+                  formatedEndeFerien,
+                  style: MoreaTextStyle.normal,
+                ))
               ],
             ),
           ],

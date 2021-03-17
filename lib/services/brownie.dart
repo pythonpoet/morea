@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+
 /*
 This class stores Brownie (Cookie) of downloaded files
 and stores it at """brownie/{userID}""".
@@ -14,24 +15,18 @@ Map =
 "path" contains the full path of the accessed data.
 "location" contains the page witch accessed the data.
 */
-abstract class BaseBrownie{
+abstract class BaseBrownie {
   void crudList(String path, BuildContext context);
   Future<void> uploadCrudList(List crudList);
 }
 
-class Brownie extends BaseBrownie{
+class Brownie extends BaseBrownie {
   String uid;
   Timestamp loadeTime;
 
-  Brownie(){
+  Brownie();
 
-  }
+  void crudList(String path, BuildContext context) {}
 
-  void crudList(String path, BuildContext context){
-  
-  }
-
-  Future<void> uploadCrudList(List crudList){
-
-  }
+  Future<void> uploadCrudList(List crudList) {}
 }

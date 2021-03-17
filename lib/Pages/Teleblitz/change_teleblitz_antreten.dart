@@ -86,7 +86,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                             style: MoreaTextStyle.caption,
                           ),
                         ),
-                        FlatButton(
+                        TextButton(
                           child: Container(
                             constraints: BoxConstraints(
                                 minWidth: viewportConstraints.maxWidth,
@@ -99,15 +99,25 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                               ),
                             ),
                           ),
-                          focusColor: MoreaColors.violett,
-                          padding: EdgeInsets.only(
-                              top: 10, bottom: 10, left: 5, right: 5),
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all<OutlinedBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      side: BorderSide(color: Colors.black45))),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black),
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.only(
+                                      top: 10, bottom: 10, left: 5, right: 5)),
+                              overlayColor: MaterialStateProperty.resolveWith(
+                                  (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.focused))
+                                  return MoreaColors.violett;
+                                return null;
+                              })),
                           onPressed: () {
                             _selectTime(context);
                           },
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              side: BorderSide(color: Colors.black45)),
                         ),
                         Padding(
                           padding: EdgeInsets.only(top: 20),

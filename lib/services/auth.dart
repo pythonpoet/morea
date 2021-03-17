@@ -7,6 +7,8 @@ import 'package:morea/morea_strings.dart';
 import 'dart:async';
 import 'package:morea/services/utilities/dwi_core.dart';
 
+import '../morealayout.dart';
+
 //enum PlatformType { isAndroid, isIOS }
 enum AuthProblems {
   userNotFound,
@@ -244,12 +246,15 @@ class Auth implements BaseAuth {
                       ),
                       new Divider(),
                       Container(
-                        child: RaisedButton(
+                        child: ElevatedButton(
                             child: new Text(
                               'Ok',
                               style: TextStyle(color: Colors.white),
                             ),
-                            color: Color(0xff7a62ff),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        MoreaColors.violett)),
                             onPressed: () => {Navigator.pop(context)}),
                       )
                     ],
@@ -260,14 +265,14 @@ class Auth implements BaseAuth {
   }
 
   Future<void> changeEmail(String email) async {
-    firebase.User user = await _firebaseAuth.currentUser;
+    firebase.User user = _firebaseAuth.currentUser;
     await user.reload();
     await user.updateEmail(email);
     return null;
   }
 
   Future<void> changePassword(String password) async {
-    firebase.User user = await _firebaseAuth.currentUser;
+    firebase.User user = _firebaseAuth.currentUser;
     await user.reload();
     await user.updatePassword(password);
     return null;

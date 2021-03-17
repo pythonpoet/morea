@@ -90,7 +90,7 @@ class Datenschutz implements BaseDatenschutz {
                           ),
                           Expanded(
                             flex: 3,
-                            child: new FlatButton(
+                            child: new TextButton(
                                 child: const Text('Ablehnen',
                                     style: TextStyle(color: Color(0xff7a62ff))),
                                 onPressed: () {
@@ -106,8 +106,9 @@ class Datenschutz implements BaseDatenschutz {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(MoreaColors.violett)
-                                ),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            MoreaColors.violett)),
                                 onPressed: () {
                                   akzeptiert = true;
                                   Navigator.pop(context);
@@ -122,4 +123,3 @@ class Datenschutz implements BaseDatenschutz {
             ));
   }
 }
-

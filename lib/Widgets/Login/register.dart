@@ -39,15 +39,15 @@ class Register implements BaseRegister {
         return await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title:
-                  new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
-            ));
+                  title: new Text(
+                      "Passwort muss aus mindistens 6 Zeichen bestehen"),
+                ));
       else if (_password != _passwordneu)
         return await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: new Text("Passwörter sind nicht identisch"),
-            ));
+                  title: new Text("Passwörter sind nicht identisch"),
+                ));
       else if (_geschlecht == 'Bitte wählen')
         return await showDialog(
             context: context,
@@ -60,8 +60,8 @@ class Register implements BaseRegister {
         return await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: new Text("Bitte eine Stufe wählen!"),
-            ));
+                  title: new Text("Bitte eine Stufe wählen!"),
+                ));
       else
         return moreaUser;
     } catch (e) {
@@ -74,14 +74,15 @@ class Register implements BaseRegister {
       return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
-          ));
+                title:
+                    new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
+              ));
     else if (_password != _passwordneu)
       return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: new Text("Passwörter sind nicht identisch"),
-          ));
+                title: new Text("Passwörter sind nicht identisch"),
+              ));
     else if (_geschlecht == 'Bitte wählen')
       return await showDialog(
           context: context,
@@ -94,8 +95,8 @@ class Register implements BaseRegister {
       return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: new Text("Bitte eine Stufe wählen!"),
-          ));
+                title: new Text("Bitte eine Stufe wählen!"),
+              ));
     else
       return moreaUser;
   }
@@ -113,8 +114,8 @@ class Register implements BaseRegister {
       return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: new Text("Bitte eine Stufe wählen!"),
-          ));
+                title: new Text("Bitte eine Stufe wählen!"),
+              ));
     else
       return moreaUser;
   }
@@ -124,14 +125,15 @@ class Register implements BaseRegister {
       return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
-          ));
+                title:
+                    new Text("Passwort muss aus mindistens 6 Zeichen bestehen"),
+              ));
     else if (_password != _passwordneu)
       return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: new Text("Passwörter sind nicht identisch"),
-          ));
+                title: new Text("Passwörter sind nicht identisch"),
+              ));
     else
       return moreaUser;
   }
@@ -400,7 +402,7 @@ class Register implements BaseRegister {
             ),
             Expanded(
               flex: 1,
-              child: new FlatButton(
+              child: TextButton(
                 child: Text(_alter,
                     style: TextStyle(color: Colors.grey[500], fontSize: 16)),
                 onPressed: () async {

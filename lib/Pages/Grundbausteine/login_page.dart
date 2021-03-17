@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
@@ -207,21 +206,21 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           ],
         ),
         actions: <Widget>[
-          new FlatButton(
+          new TextButton(
               child: const Text('Abbrechen'),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new FlatButton(
+          new TextButton(
               child: const Text('Zurücksetzen'),
               onPressed: () {
                 Navigator.pop(context);
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: new Text(
-                          'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
-                    ));
+                          title: new Text(
+                              'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
+                        ));
                 widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
         ],
@@ -303,9 +302,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           children: <Widget>[
             Flexible(
               fit: FlexFit.loose,
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
+              child: TextButton(
+                style: ButtonStyle(overlayColor:
+                    MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.pressed))
+                    return Colors.transparent;
+                  return null;
+                })),
                 onPressed: _registerAsTeilnehmer,
                 child: Text('Teilnehmer',
                     style: TextStyle(color: left, fontSize: 16.0)),
@@ -313,9 +317,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             ),
             Flexible(
               fit: FlexFit.loose,
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
+              child: TextButton(
+                style: ButtonStyle(overlayColor:
+                    MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.pressed))
+                    return Colors.transparent;
+                  return null;
+                })),
                 onPressed: _registerAsElternteil,
                 child: Text('Elternteil',
                     style: TextStyle(color: right, fontSize: 16.0)),
@@ -448,7 +457,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               Icons.create,
               color: MoreaColors.violett,
             )),
-        new FlatButton(
+        TextButton(
           child: new Text(
             'PASSWORT VERGESSEN',
             style: MoreaTextStyle.flatButton,
