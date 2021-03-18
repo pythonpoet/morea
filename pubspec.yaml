@@ -54,8 +54,11 @@ dev_dependencies:
 flutter_icons:
     android: "launcher_icon"
     ios: true
-    image_path: "assets/icon/Logo_morea_productions_icon_dark.png"
-    adaptive_icon_background: "#fff000"
+    image_path_ios: "assets/icon/Logo_morea_productions_icon_dark.png"
+    image_path_android: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
+
+    adaptive_icon_background: "#323232"
+    adaptive_icon_foreground: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
 
 
 
@@ -95,6 +98,7 @@ flutter:
         - assets/images/background.png
         - assets/icon/logo_loading.png
         - assets/icon/logo_app_ios.png
+        - assets/icon/Logo_morea_productions_icon_dark_spacing.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.io/assets-and-images/#resolution-aware.

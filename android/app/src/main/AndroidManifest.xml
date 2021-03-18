@@ -15,8 +15,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:icon="@mipmap/launcher_icon"
-        android:label="Morea"
-        android:roundIcon="@mipmap/ic_morea_launcher_round">
+        android:label="Morea">
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
