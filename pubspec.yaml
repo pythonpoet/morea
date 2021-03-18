@@ -55,7 +55,7 @@ dev_dependencies:
         sdk: flutter
 
 flutter_icons:
-    android: false
+    android: "launcher_icon"
     ios: true
     image_path: "assets/icon/Logo_morea_productions_icon_dark.png"
     adaptive_icon_background: "#fff000"
