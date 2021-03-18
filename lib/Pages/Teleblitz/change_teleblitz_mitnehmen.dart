@@ -4,7 +4,7 @@ import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
 class ChangeMitnehmen extends StatefulWidget {
-  final List<String> mitnehmen;
+  final List<dynamic> mitnehmen;
 
   final Function speichern;
 
@@ -17,7 +17,7 @@ class ChangeMitnehmen extends StatefulWidget {
 }
 
 class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
-  List<String> mitnehmen;
+  List<dynamic> mitnehmen;
   List<TextEditingController> mitnehmenController = <TextEditingController>[];
   final _formKey = GlobalKey<FormState>();
 

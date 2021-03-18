@@ -26,16 +26,20 @@ String convWebflowtoMiData(String stufe) {
 
 String convMiDatatoWebflow(String groupID) {
   switch (groupID) {
-    case '3775':
+    case 'hjZL6PT8t8MCfxf5GOko':
       return 'Biber';
-    case '3776':
-      return 'Wombat (Wölfe)';
-    case '3779':
+    case 'TJNO3BHaPnBZE33anezc':
+      return 'Wölfe 1';
+    case 'VVy3DAlQLmbw9oGuRwvZ':
       return 'Nahani (Meitli)';
     case '4013':
       return 'Drason (Buebe)';
     case 'Op3qqioWs36MCeoWgDYL':
       return 'Drason (Buebe)';
+    case 'UisNaofVTp924gvx6Kcf':
+      return 'Wölfe 2';
+    case 'iRHtWXGhstTpMwmceqaF':
+      return 'Pio';
     default:
       throw "convMiDatatoWebflow Error groupID given was: " +
           groupID.toString();
