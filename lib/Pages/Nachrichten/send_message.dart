@@ -34,11 +34,6 @@ class _SendMessagesState extends State<SendMessages> {
   TextEditingController vorschauController = TextEditingController();
   FocusNode vorschauFocus = FocusNode();
   List<Map<String, dynamic>> subgroups = <Map<String, dynamic>>[];
-
-  bool biberCheckBox = false;
-  bool woelfeCheckBox = false;
-  bool meitliCheckBox = false;
-  bool buebeCheckBox = false;
   bool initDone = false;
 
   Map<String, bool> groupCheckbox;
@@ -102,12 +97,14 @@ class _SendMessagesState extends State<SendMessages> {
       return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            if (biberCheckBox ||
-                woelfeCheckBox ||
-                meitliCheckBox ||
-                buebeCheckBox) {
+            if (groupCheckbox.containsValue(true)) {
               setState(() {
                 if (_formKey.currentState.validate()) {
+                  groupCheckbox.forEach((key, value) {
+                    if (value) {
+                      this.receivers.add(key);
+                    }
+                  });
                   Map<String, dynamic> data = {
                     'message': {
                       'title': titleController.text,
@@ -167,78 +164,6 @@ class _SendMessagesState extends State<SendMessages> {
                           },
                         );
                       }).toList()),
-                  CheckboxListTile(
-                    value: biberCheckBox,
-                    onChanged: (bool val) {
-                      setState(() {
-                        if (val) {
-                          receivers.add(midatanamebiber);
-                        } else {
-                          receivers.remove(midatanamebiber);
-                        }
-                        biberCheckBox = val;
-                      });
-                    },
-                    title: Text(
-                      'Biber',
-                      style: MoreaTextStyle.normal,
-                    ),
-                    controlAffinity: ListTileControlAffinity.platform,
-                  ),
-                  CheckboxListTile(
-                    value: woelfeCheckBox,
-                    onChanged: (bool val) {
-                      setState(() {
-                        if (val) {
-                          receivers.add(midatanamewoelf);
-                        } else {
-                          receivers.remove(midatanamewoelf);
-                        }
-                        woelfeCheckBox = val;
-                      });
-                    },
-                    title: Text(
-                      'Wölfe',
-                      style: MoreaTextStyle.normal,
-                    ),
-                    controlAffinity: ListTileControlAffinity.platform,
-                  ),
-                  CheckboxListTile(
-                    value: meitliCheckBox,
-                    onChanged: (bool val) {
-                      setState(() {
-                        if (val) {
-                          receivers.add(midatanamemeitli);
-                        } else {
-                          receivers.remove(midatanamemeitli);
-                        }
-                        meitliCheckBox = val;
-                      });
-                    },
-                    title: Text(
-                      'Meitli',
-                      style: MoreaTextStyle.normal,
-                    ),
-                    controlAffinity: ListTileControlAffinity.platform,
-                  ),
-                  CheckboxListTile(
-                    value: buebeCheckBox,
-                    onChanged: (bool val) {
-                      setState(() {
-                        if (val) {
-                          receivers.add(midatanamebuebe);
-                        } else {
-                          receivers.remove(midatanamebuebe);
-                        }
-                        buebeCheckBox = val;
-                      });
-                    },
-                    title: Text(
-                      'Buebe',
-                      style: MoreaTextStyle.normal,
-                    ),
-                    controlAffinity: ListTileControlAffinity.platform,
-                  ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 20),
                   ),

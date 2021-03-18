@@ -99,10 +99,7 @@ class TeleblitzData extends EventData {
     else
       throw "$tlbzMapNameDesSenders has to be non-null";
 
-    if (eventData.containsKey(tlbzMapSlug))
-      this.slug = eventData[tlbzMapSlug];
-    else
-      throw "$tlbzMapSlug has to be non-null";
+    if (eventData.containsKey(tlbzMapSlug)) this.slug = eventData[tlbzMapSlug];
   }
 
   TeleblitzType readTeleblitzType(Map<String, dynamic> tlbz) {

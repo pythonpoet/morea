@@ -545,7 +545,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     }
   }
 
-  void setBeginn(String ort, String zeit, String map, String zeitRaw) {
+  void setBeginn(String ort, String zeit, String map) {
     this.antreten = zeit + ' Uhr, ' + ort;
     this.mapAntreten = map;
     this.startTime = zeit;

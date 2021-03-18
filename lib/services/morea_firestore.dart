@@ -255,8 +255,12 @@ class MoreaFirebase extends BaseMoreaFirebase {
       {String eventID}) async {
     //Upload the Event
     data['Timestamp'] = DateTime.now().toString();
-    if (eventID == null)
+    if (eventID == null) {
+      print('eventID == null');
       eventID = await this.crud0.setDataWithoutDocumentName(pathEvents, data);
+    } else {
+      await this.crud0.setData(pathEvents, eventID, data);
+    }
 
     //Upload homeFeed
     for (String groupID in groupIDs) {

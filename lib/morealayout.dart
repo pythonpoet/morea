@@ -366,11 +366,6 @@ Drawer moreaDrawer(
             onTap: () => makeLeiterWidget(context,
                 moreafire.getUserMap[userMapUID], moreafire.getGroupIDs[0]),
           ),
-          ListTile(
-              title: Text("Gruppe erstellen"),
-              trailing: Icon(Icons.group),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => AddGroup()))),
           new Divider(),
           new ListTile(
               title: new Text("Über dieses App"),
