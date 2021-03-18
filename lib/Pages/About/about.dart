@@ -49,16 +49,14 @@ class AboutThisApp extends StatelessWidget {
                           style: MoreaTextStyle.normal,
                           children: <TextSpan>[
                         TextSpan(
-                            text: '.\nAzb Jarvis und Roran',
+                            text: '.\nAzb Jarvis, Sunny und Roran',
                             style: MoreaTextStyle.normal)
                       ])),
                 ),
                 Padding(
                   padding: EdgeInsets.all(20),
-                  child: moreaRaisedButton('it@morea.ch', () async {
-                    String url = 'mailto:it@morea.ch';
-                    print(url);
-                      await launch(url);
+                  child: moreaRaisedButton('it@morea.ch', () {
+                    Urllauncher().openMail('it@morea.ch');
                   }),
                 ),
                 Padding(
