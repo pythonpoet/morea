@@ -58,10 +58,10 @@ class _AgendaStatePage extends State<AgendaState>
     'Eventname': '',
     'Datum': 'Datum wählen',
     'Datum bis': 'Datum wählen',
-    'Anfangszeit': 'von',
+    'Anfangszeit': 'Zeit wählen',
     'Anfangsort': '',
     'Schlussort': '',
-    'Schlusszeit': 'bis',
+    'Schlusszeit': 'Zeit wählen',
     'Stufen': '',
     'Beschreiben': '',
     'Kontakt': '',
@@ -239,7 +239,7 @@ class _AgendaStatePage extends State<AgendaState>
                 ],
               ),
             ),
-            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen')),
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen', MoreaBottomAppBarActivePage.agenda)),
       );
     } else {
       return Scaffold(

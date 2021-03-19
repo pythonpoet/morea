@@ -208,7 +208,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              child: moreaLeiterBottomAppBar(widget.navigationMap, "Ändern"))
+              child: moreaLeiterBottomAppBar(widget.navigationMap, "Ändern", MoreaBottomAppBarActivePage.teleblitz))
           : Showcase.withWidget(
               key: _bottomAppBarTNKey,
               height: 300,

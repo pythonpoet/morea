@@ -285,7 +285,7 @@ class _ProfileState extends State<Profile> {
 
   BottomAppBar _bottomAppBarBuilder() {
     if (widget.moreaFire.getPos == "Leiter") {
-      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern');
+      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.profile);
     } else {
       return moreaChildBottomAppBar(widget.navigationMap);
     }

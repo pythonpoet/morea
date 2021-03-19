@@ -125,7 +125,7 @@ class _MessagesPageState extends State<MessagesPage>
                 ],
               ),
             ),
-            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen')),
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen', MoreaBottomAppBarActivePage.messages)),
         body: Showcase(
           disableAnimation: true,
           key: _messagesKeyLeiter,

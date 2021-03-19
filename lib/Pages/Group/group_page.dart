@@ -99,7 +99,7 @@ class GroupPageState extends State<GroupPage> {
 
   BottomAppBar _bottomAppBarBuilder() {
     if (widget.moreaFire.getPos == "Leiter") {
-      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern');
+      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.none);
     } else {
       return moreaChildBottomAppBar(widget.navigationMap);
     }
