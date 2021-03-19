@@ -52,7 +52,7 @@ class _AgendaStatePage extends State<AgendaState>
     'Wombat (Wölfe)': false,
   };
   Map kontakt = {'Email': '', 'Pfadiname': ''};
-  List mitnehmen = ['Pfadihämpt'];
+  List<dynamic> mitnehmen = ['Pfadihämpt'];
 
   Map<String, dynamic> quickfix = {
     'Eventname': '',

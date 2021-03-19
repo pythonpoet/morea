@@ -37,11 +37,10 @@ class EventAddPageState extends State<EventAddPage> {
   Agenda agenda;
   MoreaFirebase moreafire;
   int value = 2;
-  List<String> mitnehmen = [];
-  final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
+  List<dynamic> mitnehmen = [];
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
   final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
-  List<TextEditingController> mitnehmenController = [TextEditingController()];
+  List<TextEditingController> mitnehmenController = [];
 
   String eventname = ' ',
       datum = 'Datum wählen',
@@ -62,14 +61,6 @@ class EventAddPageState extends State<EventAddPage> {
   Map<String, dynamic> event, lager;
   Map<String, bool> groupCheckbox;
 
-  Map<String, bool> stufen = {
-    'Biber': false,
-    'Wombat (Wölfe)': false,
-    'Nahani (Meitli)': false,
-    'Drason (Buebe)': false,
-    'Pios': false,
-  };
-
   bool initDone = false;
 
   @override
@@ -80,13 +71,55 @@ class EventAddPageState extends State<EventAddPage> {
     super.dispose();
   }
 
-  bool validateAndSave(_key) {
+  bool validateAndSave(_key, BuildContext context) {
     final form = _key.currentState;
-    if (form.validate()) {
-      form.save();
-      return true;
-    } else {
+    if (datum == 'Datum wählen') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white,
+            ),
+            Padding(padding: EdgeInsets.only(right: 10)),
+            Text(
+              'Bitte Datum wählen!',
+              style: MoreaTextStyle.warningSnackbar,
+            ),
+          ],
+        ),
+        duration: Duration(seconds: 5),
+        backgroundColor: Colors.red,
+      ));
       return false;
+    } else {
+      if (!groupCheckbox.values.any((element){return element;})) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                color: Colors.white,
+              ),
+              Padding(padding: EdgeInsets.only(right: 10)),
+              Text(
+                'Bitte Fähnli auswählen!',
+                style: MoreaTextStyle.warningSnackbar,
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red,
+        ));
+        return false;
+      } else {
+        if (form.validate()) {
+          form.save();
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   }
 
@@ -98,7 +131,7 @@ class EventAddPageState extends State<EventAddPage> {
       }
     } else {
       for (Map groupMap in subgroups) {
-        if (widget.eventinfo['groupIDs'].contains(groupMap[userMapGroupIDs])) {
+        if (widget.eventinfo['groupIDs'].contains(groupMap[groupMapGroupID])) {
           this.groupCheckbox[groupMap['groupID']] = true;
         } else {
           this.groupCheckbox[groupMap['groupID']] = false;
@@ -107,8 +140,8 @@ class EventAddPageState extends State<EventAddPage> {
     }
   }
 
-  void eventHinzufuegen() {
-    if (validateAndSave(_addEvent)) {
+  void eventHinzufuegen(BuildContext context) {
+    if (validateAndSave(_addEvent, context)) {
       for (TextEditingController controller in mitnehmenController) {
         mitnehmen.add(controller.text);
       }
@@ -148,8 +181,8 @@ class EventAddPageState extends State<EventAddPage> {
     }
   }
 
-  void lagerHinzufuegen() {
-    if (validateAndSave(_addLager)) {
+  void lagerHinzufuegen(BuildContext context) {
+    if (validateAndSave(_addLager, context)) {
       for (TextEditingController controller in mitnehmenController) {
         mitnehmen.add(controller.text);
       }
@@ -367,9 +400,11 @@ class EventAddPageState extends State<EventAddPage> {
 
     anfangzeit = widget.eventinfo['Anfangszeit'];
     schlusszeit = widget.eventinfo['Schlusszeit'];
-    if (widget.eventinfo.containsKey("Stufen"))
-      stufen = Map<String, bool>.from(widget.eventinfo['Stufen']);
-    mitnehmen = List<String>.from(widget.eventinfo['Mitnehmen']);
+    mitnehmen = widget.eventinfo['Mitnehmen'];
+    for (var mitnehmenTile in mitnehmen) {
+      mitnehmenController.add(TextEditingController.fromValue(
+          TextEditingValue(text: mitnehmenTile)));
+    }
     order = widget.eventinfo['Order'];
     moreafire = widget.moreaFire;
     crud0 = new CrudMedthods(widget.firestore);
@@ -422,45 +457,6 @@ class EventAddPageState extends State<EventAddPage> {
       default:
         return null;
     }
-  }
-
-  void changemitnehmen(int index) {
-    showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => new Form(
-              key: _changekey,
-              child: new AlertDialog(
-                contentPadding: const EdgeInsets.all(16.0),
-                content: new Row(
-                  children: <Widget>[
-                    new Expanded(
-                      child: new TextFormField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        decoration:
-                            new InputDecoration(hintText: mitnehmen[index]),
-                        onSaved: (value) => mitnehmen[index] = value,
-                      ),
-                    )
-                  ],
-                ),
-                actions: <Widget>[
-                  moreaRaisedIconButton(
-                      'OK',
-                      validateMitnehmen,
-                      Icon(
-                        Icons.check,
-                        size: 14,
-                        color: Colors.white,
-                      )),
-                ],
-              ),
-            ));
-  }
-
-  validateMitnehmen() {
-    validateAndSave(_changekey);
-    Navigator.pop(context);
   }
 
   List<Widget> buildMitnehmen() {
@@ -862,7 +858,7 @@ class EventAddPageState extends State<EventAddPage> {
                             Expanded(
                               child: moreaRaisedButton(
                                 'Speichern',
-                                this.lagerHinzufuegen,
+                                () => {this.lagerHinzufuegen(context)},
                               ),
                             ),
                           ],
@@ -908,6 +904,13 @@ class EventAddPageState extends State<EventAddPage> {
                               filled: false,
                             ),
                             onSaved: (value) => eventname = value,
+                            validator: (val) {
+                              if (val.isEmpty) {
+                                return 'Bitte nicht leer lassen';
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                         )
                       ],
@@ -1167,7 +1170,7 @@ class EventAddPageState extends State<EventAddPage> {
                       Expanded(
                         child: moreaRaisedButton(
                           'Speichern',
-                          this.eventHinzufuegen,
+                          () => {this.eventHinzufuegen(context)},
                         ),
                       ),
                     ],

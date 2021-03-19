@@ -65,6 +65,7 @@ final String userMapChildUID = 'childUID';
 //groupMap
 final String groupMapEventID = "eventID";
 final String groupMapgroupNickName = "groupNickName";
+final String groupMapGroupID = "groupID";
 final String groupMapSubgroup = "subgroups";
 final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";

@@ -81,7 +81,14 @@ class ViewEventPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
+              (info['Anfangszeit'] == 'Zeit wählen'
+                  ? 'Zeitpunkt noch nicht entschieden'
+                  : info['Anfangszeit'] + ' Uhr') +
+                  ', ' +
+                  (info['Anfangsort'] ==
+                      ''
+                      ? 'Ort noch nicht entschieden'
+                      : info['Anfangsort']),
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -98,7 +105,14 @@ class ViewEventPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
+              (info['Schlusszeit'] == 'Zeit wählen'
+                              ? 'Zeitpunkt noch nicht entschieden'
+                              : info['Schlusszeit'] + ' Uhr') +
+                          ', ' +
+                          (info['Schlussort'] ==
+                      ''
+                  ? 'Ort noch nicht entschieden'
+                  : info['Schlussort']),
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -125,7 +139,8 @@ class ViewEventPageState extends StatelessWidget {
           child: MoreaDivider(),
         ),
         ListTile(
-          contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+          contentPadding:
+              EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
           title: Text(
             'Mitnehmen',
             style: MoreaTextStyle.lable,

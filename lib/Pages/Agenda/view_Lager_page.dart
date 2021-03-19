@@ -50,11 +50,15 @@ class ViewLagerPageState extends StatelessWidget {
             info['Eventname'],
             style: MoreaTextStyle.title,
           ),
-          trailing: Text('Lager', style: MoreaTextStyle.sender,),
+          trailing: Text(
+            'Lager',
+            style: MoreaTextStyle.sender,
+          ),
           contentPadding: EdgeInsets.all(20),
         ),
         ListTile(
-          contentPadding: EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 10),
+            contentPadding:
+                EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 10),
             title: Text(
               'Datum',
               style: MoreaTextStyle.lable,
@@ -108,7 +112,13 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Anfangszeit'] + ' Uhr, ' + info['Anfangsort'],
+              (info['Anfangszeit'] == 'Zeit wählen'
+                      ? 'Zeitpunkt noch nicht entschieden'
+                      : info['Anfangszeit'] + ' Uhr') +
+                  ', ' +
+                  (info['Anfangsort'] == ''
+                      ? 'Ort noch nicht entschieden'
+                      : info['Anfangsort']),
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -125,7 +135,13 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Schlusszeit'] + ' Uhr, ' + info['Schlussort'],
+              (info['Schlusszeit'] == 'Zeit wählen'
+                      ? 'Zeitpunkt noch nicht entschieden'
+                      : info['Schlusszeit'] + ' Uhr') +
+                  ', ' +
+                  (info['Schlussort'] == ''
+                      ? 'Ort noch nicht entschieden'
+                      : info['Schlussort']),
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -156,7 +172,8 @@ class ViewLagerPageState extends StatelessWidget {
             'Mitnehmen',
             style: MoreaTextStyle.lable,
           ),
-          contentPadding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
+          contentPadding:
+              EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
           subtitle: ListView.builder(
               itemCount: info['Mitnehmen'].length,
               shrinkWrap: true,
