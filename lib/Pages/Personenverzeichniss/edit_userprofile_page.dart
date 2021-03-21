@@ -108,6 +108,18 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       loading = true;
     });
     Navigator.of(context).pop();
+    // if(widget.profile['Pos'] == 'Teilnehmer'){
+    //   if(widget.profile[userMapEltern] != null && widget.profile[userMapEltern].isNotEmpty()){
+    //     for(var elternUID in widget.profile[userMapEltern].keys.toList()){
+    //       var elternMap = (await crud0.getDocument(pathUser, elternUID)).data();
+    //       elternMap[userMapKinder].remove(widget.profile[userMapUID]);
+    //     }
+    //   }
+    // }
+
+    if (widget.profile['UID'] == null) {
+      widget.profile['UID'] = widget.profile['childUID'];
+    }
     if (widget.profile[userMapEltern] != null) {
       for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
         var elternMap = (await crud0.getDocument(pathUser, elternUID)).data();
@@ -131,9 +143,6 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           }
         }
       }
-    }
-    if (widget.profile['UID'] == null) {
-      widget.profile['UID'] = widget.profile['childUID'];
     }
     if (widget.profile[userMapGroupIDs] != null) {
       if (widget.profile[userMapGroupIDs].length == 1) {

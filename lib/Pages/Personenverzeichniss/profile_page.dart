@@ -69,6 +69,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getkinder() async {
+    widget.profile = (await crud0.getDocument(pathUser, widget.profile[userMapUID])).data();
     if ((widget.profile['Kinder'] != null) &&
         (widget.profile['Kinder'].length != 0)) {
       await getKindernMap();

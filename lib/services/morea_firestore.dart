@@ -39,6 +39,7 @@ abstract class BaseMoreaFirebase {
   Map<String, dynamic> get getUserMap;
 
   Map<String, Map<String, String>> get getChildMap;
+
   Stream<Map<String, GroupData>> get getGroupDataStream;
 
   Future<void> createUserInformation(Map userInfo);
@@ -133,20 +134,19 @@ class MoreaFirebase extends BaseMoreaFirebase {
     tbz = new TeleblizFirestore(firestore, groupIDs);
     if (this.getGroupIDs.length == 0)
       sCGroupMaps.add(Map<String, GroupData>());
-    else
+    else {
+      Map<String, GroupData> mapGroupsData = <String, GroupData>{};
       for (String groupID in this.getGroupIDs) {
         var someVar = (await crud0.getDocument(
                 '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID))
             .data();
-        sCGroupMaps.addStream(crud0
-            .streamDocument(pathGroups, groupID)
-            .map((DocumentSnapshot dSGroup) {
-          return Map<String, GroupData>.of({
-            dSGroup.id:
-                GroupData(groupData: dSGroup.data(), groupUserData: someVar)
-          });
-        }));
+        crud0.streamDocument(pathGroups, groupID).listen((docSnap) {
+          mapGroupsData[groupID] =
+              GroupData(groupData: docSnap.data(), groupUserData: someVar);
+          sCGroupMaps.add(mapGroupsData);
+        });
       }
+    }
   }
 
   Future<void> createUserInformation(Map userInfo) async {
@@ -507,6 +507,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
     await callFunction(getcallable('deleteChildMap'), param: deletePayload);
     return uid;
   }
+
   // ***************************************************************************
   //
   //  Function section: Group
