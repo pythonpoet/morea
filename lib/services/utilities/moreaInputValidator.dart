@@ -15,4 +15,8 @@ class MoreaInputValidator {
   static bool letters(String value) {
     return RegExp(r'\D').hasMatch(value);
   }
+
+  static bool url(String value) {
+    return RegExp(r"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").hasMatch(value);
+  }
 }

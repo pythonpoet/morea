@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_place_picker/google_maps_place_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 
 class ChangeAntreten extends StatefulWidget {
   final String antreten, mapAntreten;
@@ -18,10 +22,10 @@ class ChangeAntreten extends StatefulWidget {
 class _ChangeAntretenState extends State<ChangeAntreten> {
   String ortAntreten;
   String zeitAntreten;
-  String mapAntreten;
+  String urlMapAntreten;
+  String nameMapAntreten;
   final _formKey = GlobalKey<FormState>();
   TextEditingController ortAntretenController = TextEditingController();
-  TextEditingController mapAntretenController = TextEditingController();
 
   @override
   void initState() {
@@ -29,15 +33,14 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
     var splitAntreten = widget.antreten.split(', ');
     this.ortAntreten = splitAntreten[1];
     this.zeitAntreten = splitAntreten[0].split(' ')[0];
-    this.mapAntreten = widget.mapAntreten;
+    this.urlMapAntreten = widget.mapAntreten;
+    this.nameMapAntreten = this.urlMapAntreten;
     ortAntretenController.text = ortAntreten;
-    mapAntretenController.text = mapAntreten;
   }
 
   @override
   void dispose() {
     ortAntretenController.dispose();
-    mapAntretenController.dispose();
     super.dispose();
   }
 
@@ -53,7 +56,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
         onPressed: () {
           if (saveAndSubmit()) {
             widget.speichern(this.ortAntretenController.text, this.zeitAntreten,
-                this.mapAntretenController.text);
+                this.urlMapAntreten);
             Navigator.of(context).pop();
           }
         },
@@ -160,29 +163,25 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: TextFormField(
-                            controller: mapAntretenController,
-                            maxLines: 10,
-                            minLines: 1,
-                            keyboardType: TextInputType.text,
-                            style: MoreaTextStyle.textField,
-                            cursorColor: MoreaColors.violett,
-                            decoration: InputDecoration(
-                              errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.red)),
-                              border: OutlineInputBorder(),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: MoreaColors.violett)),
-                            ),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Bitte nicht leer lassen';
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
+                          child: moreaRaisedButton(this.nameMapAntreten, (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlacePicker(apiKey: "AIzaSyBFvIWmgunjzx7l8TytZg4vPQ7Tgg2k6V0", initialPosition: LatLng(47.40548228527181, 8.559394673386825),
+                                  onPlacePicked: (result) {
+                                    this.urlMapAntreten = result.url;
+                                    this.nameMapAntreten = result.name;
+                                    Navigator.of(context).pop();
+                                    setState(() {
+
+                                    });
+                                  },
+                                  usePlaceDetailSearch: true,
+                                  useCurrentLocation: false,
+                                )
+                              )
+                            );
+                          })
                         ),
                       ],
                     ),
@@ -231,8 +230,30 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
   bool saveAndSubmit() {
     final form = _formKey.currentState;
     if (form.validate()) {
-      form.save();
-      return true;
+      if (MoreaInputValidator.url(this.urlMapAntreten)) {
+        form.save();
+        return true;
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                color: Colors.white,
+              ),
+              Padding(padding: EdgeInsets.only(right: 10)),
+              Text(
+                'Bitte Google Maps Ort wählen!',
+                style: MoreaTextStyle.warningSnackbar,
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red,
+        ));
+        return false;
+      }
     } else {
       return false;
     }

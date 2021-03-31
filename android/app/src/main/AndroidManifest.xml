@@ -28,6 +28,10 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorCustomNotification" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBFvIWmgunjzx7l8TytZg4vPQ7Tgg2k6V0" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
