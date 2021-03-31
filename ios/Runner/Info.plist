@@ -29,14 +29,28 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app needs access to the media library when open.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app need access to bluetooth when open and in the background.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app needs access to bluetooth when open.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app needs access to calendars when open.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission is required for qr-code scanning.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app needs access to contacts when open.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open and in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app needs access motion when open.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app needs access to speech recognition when open.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
