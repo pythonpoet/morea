@@ -30,17 +30,17 @@
 		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>This app needs access to the media library when open.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>This app need access to bluetooth when open and in the background.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>This app needs access to bluetooth when open.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>This app needs access to calendars when open.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission is required for qr-code scanning.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>This app needs access to contacts when open.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open and in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -48,9 +48,9 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>This app needs access motion when open.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>This app needs access to speech recognition when open.</string>
+	<string>This app uses a third party library that needs access, but the app doesn&apos;s use or save the information.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
