@@ -162,27 +162,31 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: moreaRaisedButton(this.nameMapAntreten, (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlacePicker(apiKey: "AIzaSyBFvIWmgunjzx7l8TytZg4vPQ7Tgg2k6V0", initialPosition: LatLng(47.40548228527181, 8.559394673386825),
-                                  onPlacePicked: (result) {
-                                    this.urlMapAntreten = result.url;
-                                    this.nameMapAntreten = result.name;
-                                    Navigator.of(context).pop();
-                                    setState(() {
-
-                                    });
-                                  },
-                                  usePlaceDetailSearch: true,
-                                  useCurrentLocation: false,
-                                )
-                              )
-                            );
-                          })
-                        ),
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: moreaRaisedButton(this.nameMapAntreten, () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PlacePicker(
+                                            apiKey:
+                                                "AIzaSyBFvIWmgunjzx7l8TytZg4vPQ7Tgg2k6V0",
+                                            initialPosition: LatLng(
+                                                47.40548228527181,
+                                                8.559394673386825),
+                                            onPlacePicked: (result) {
+                                              this.urlMapAntreten = result.url;
+                                              this.nameMapAntreten =
+                                                  result.name;
+                                              Navigator.of(context).pop();
+                                              setState(() {});
+                                            },
+                                            usePlaceDetailSearch: true,
+                                            useCurrentLocation: false,
+                                            onAutoCompleteFailed: (val) {
+                                              print(val);
+                                            },
+                                          )));
+                            })),
                       ],
                     ),
                   ),
@@ -233,8 +237,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
       if (MoreaInputValidator.url(this.urlMapAntreten)) {
         form.save();
         return true;
-      }
-      else {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(
             children: [
