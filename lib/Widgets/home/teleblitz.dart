@@ -1243,9 +1243,7 @@ class Info {
   }
 
   Container getEndeFerien() {
-    List<String> listEndeFerien = this.endeferien.split("T")[0].split("-");
-    String formatedEndeFerien =
-        listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
+    String endeFerien = this.endeferien;
     return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Column(
@@ -1266,7 +1264,7 @@ class Info {
               children: <Widget>[
                 Expanded(
                     child: Text(
-                  formatedEndeFerien,
+                  endeFerien,
                   style: MoreaTextStyle.normal,
                 ))
               ],
