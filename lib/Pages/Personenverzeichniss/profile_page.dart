@@ -16,7 +16,7 @@ class ProfilePageState extends StatefulWidget {
   final CrudMedthods crud0;
   final Function signOut;
 
-  var profile;
+  Map<String, dynamic> profile;
 
   // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
 
@@ -44,7 +44,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   var controller = new StreamController<bool>();
   Future<String> qrCodeString;
   List elternMapList = ['Liam Bebecho'], kinderMapList = ['Walter'];
-  Map <String, dynamic> childToUpgradeMap;
+  Map<String, dynamic> childToUpgradeMap;
 
   void reload() async {
     value = controller.stream;
@@ -52,13 +52,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
     var newData = await moreaFire.getUserInformation(widget.profile['UID']);
     if (newData.data != widget.profile) {
-      widget.profile = newData.data;
+      widget.profile = newData.data();
       erziungsberechtigte();
     }
   }
 
   Future<void> erziungsberechtigte() async {
-    if ((widget.profile['Eltern'] != null) &&
+    if ((widget.profile.containsKey("Eltern")) &&
         (widget.profile['Eltern'].length != 0)) {
       await getElternMap();
       hatEltern = true;
@@ -69,6 +69,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getkinder() async {
+    widget.profile = (await crud0.getDocument(pathUser, widget.profile[userMapUID])).data();
     if ((widget.profile['Kinder'] != null) &&
         (widget.profile['Kinder'].length != 0)) {
       await getKindernMap();
@@ -101,10 +102,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              content: Text(
-                  'Du wurdest mit deinem Elternteil verbunden.'),
+              content: Text('Du wurdest mit deinem Elternteil verbunden.'),
             )).then((onvalue) => RestartWidget.restartApp(context));
-       
   }
 
   void parentaktuallisieren() {
@@ -142,22 +141,24 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     for (int i = 0; i < elternUID.length; i++) {
       var elternData = await moreaFire.getUserInformation(elternUID[i]);
       if (i == 0) {
-        elternMapList[0] = elternData.data;
+        elternMapList[0] = elternData.data();
       } else {
-        elternMapList.add(elternData.data);
+        elternMapList.add(elternData.data());
       }
     }
     return null;
   }
 
   Future<void> getKindernMap() async {
+    print("kinder: " + widget.profile['Kinder'].toString());
     List kinderUID = List.from(widget.profile['Kinder'].keys);
     for (int i = 0; i < kinderUID.length; i++) {
       var kinderData = await moreaFire.getUserInformation(kinderUID[i]);
       if (i == 0) {
-        kinderMapList[0] = kinderData.data;
+        kinderMapList[0] = kinderData.data();
+        print(kinderMapList.toString());
       } else {
-        kinderMapList.add(kinderData.data);
+        kinderMapList.add(kinderData.data());
       }
     }
     return null;
@@ -249,7 +250,10 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   Align(
                       child: upgradeKidDisplay
                           ? mergeChildParent.upgradeChild(
-                              context, this.upgradeKid, this.childToUpgradeMap, widget.signOut)
+                              context,
+                              this.upgradeKid,
+                              this.childToUpgradeMap,
+                              widget.signOut)
                           : Container()),
                 ],
               )));
@@ -276,16 +280,21 @@ class ProfilePageStatePage extends State<ProfilePageState> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text(
                   'Mit Eltern Koppeln',
                   style: TextStyle(fontSize: 20),
                 ),
                 onPressed: () => {childaktuallisieren()},
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
             ],
           ),
@@ -317,32 +326,42 @@ class ProfilePageStatePage extends State<ProfilePageState> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text(
                   'MIT KIND VERBINDEN',
                   style: MoreaTextStyle.raisedButton,
                 ),
                 onPressed: () => parentaktuallisieren(),
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text(
                   'NEUES KIND REGISTRIEREN',
                   style: MoreaTextStyle.raisedButton,
                 ),
                 onPressed: () => this.newKidakt(),
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
             ],
           ),
@@ -445,17 +464,21 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                       )
                     : Padding(
                         padding: const EdgeInsets.only(left: 15, bottom: 20),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           child: Text(
                             'ACCOUNT ERSTELLEN',
                             style: MoreaTextStyle.raisedButton,
                           ),
-                          onPressed: () =>
-                              showUpgradeWarning(kinderMap),
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          color: Color(0xff7a62ff),
-                          textColor: Colors.white,
+                          onPressed: () => showUpgradeWarning(kinderMap),
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Color(0xff7a62ff)),
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                          ),
                         ),
                       ),
               ],
@@ -495,16 +518,18 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                 ],
               ),
               actions: <Widget>[
-                RaisedButton(
+                ElevatedButton(
                   child: Text(
                     'Abbrechen',
                     style: MoreaTextStyle.flatButton,
                   ),
                   onPressed: () => Navigator.of(context).pop(),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
+                  style: ButtonStyle(
+                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)))),
                 ),
-                RaisedButton(
+                ElevatedButton(
                   child: Text(
                     'Account erstellen',
                     style: MoreaTextStyle.raisedButton,
@@ -513,10 +538,15 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                     this.upgradeKid(childMap);
                     Navigator.of(context).pop();
                   },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
-                  textColor: Colors.white,
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(right: 5),

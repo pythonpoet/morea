@@ -21,7 +21,7 @@ class MessagesPage extends StatefulWidget {
       @required this.navigationMap,
       @required this.firestore});
 
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final MoreaFirebase moreaFire;
   final Auth auth;
   final Map navigationMap;
@@ -52,17 +52,22 @@ class _MessagesPageState extends State<MessagesPage>
     this.moreaFire = widget.moreaFire;
     crud0 = CrudMedthods(widget.firestore);
     messagesManager = MessagesManager(crud0);
-    List<String> groups = [];
-    groups.add(moreaFire.getGroupID);
-    groups.addAll(moreaFire.getSubscribedGroups);
-    messagesManager.getMessages(groups);
+    messagesManager.getMessages(moreaFire.getGroupIDs);
+    uid = widget.auth.getUserID;
   }
 
   @override
   void dispose() {
+    print("disposing message widget");
     moreaLoading.dispose();
     messagesManager.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(MessagesPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print("updating Widget");
   }
 
   @override
@@ -120,7 +125,7 @@ class _MessagesPageState extends State<MessagesPage>
                 ],
               ),
             ),
-            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen')),
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen', MoreaBottomAppBarActivePage.messages)),
         body: Showcase(
           disableAnimation: true,
           key: _messagesKeyLeiter,
@@ -130,7 +135,12 @@ class _MessagesPageState extends State<MessagesPage>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return MoreaBackgroundContainer(
-                      child: moreaLoading.loading());
+                      child: Container(
+                    child: moreaLoading.loading(),
+                    color: Colors.white,
+                    margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                    constraints: BoxConstraints.expand(),
+                  ));
                 } else if (!snapshot.hasData) {
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
@@ -162,7 +172,7 @@ class _MessagesPageState extends State<MessagesPage>
                       ),
                     ),
                   );
-                } else if (snapshot.data.documents.length == 0) {
+                } else if (snapshot.data.length == 0) {
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                       child: MoreaShadowContainer(
@@ -212,20 +222,22 @@ class _MessagesPageState extends State<MessagesPage>
                             ),
                             ListView.separated(
                                 physics: NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data.documents.length,
+                                itemCount: snapshot.data.length,
                                 shrinkWrap: true,
-                                separatorBuilder: (context, index){
+                                separatorBuilder: (context, index) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15.0),
                                     child: MoreaDivider(),
                                   );
                                 },
                                 itemBuilder: (context, index) {
-                                  var document =
-                                      snapshot.data.documents[index];
+                                  var document = snapshot.data[index];
                                   return _buildListItem(context, document);
                                 }),
-                            Padding(padding: EdgeInsets.only(top: 20),)
+                            Padding(
+                              padding: EdgeInsets.only(top: 20),
+                            )
                           ],
                         ),
                       ),
@@ -273,8 +285,12 @@ class _MessagesPageState extends State<MessagesPage>
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return MoreaBackgroundContainer(
+                    child: Container(
                   child: moreaLoading.loading(),
-                );
+                  color: Colors.white,
+                  margin: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                  constraints: BoxConstraints.expand(),
+                ));
               } else if (!snapshot.hasData) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
@@ -303,7 +319,7 @@ class _MessagesPageState extends State<MessagesPage>
                     ),
                   ),
                 );
-              } else if (snapshot.data.documents.length == 0) {
+              } else if (snapshot.data.length == 0) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
                     child: MoreaShadowContainer(
@@ -350,16 +366,16 @@ class _MessagesPageState extends State<MessagesPage>
                               ListView.separated(
                                   physics: NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  separatorBuilder: (context, index){
+                                  separatorBuilder: (context, index) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0),
                                       child: MoreaDivider(),
                                     );
                                   },
-                                  itemCount: snapshot.data.documents.length,
+                                  itemCount: snapshot.data.length,
                                   itemBuilder: (context, index) {
-                                    var document =
-                                        snapshot.data.documents[index];
+                                    var document = snapshot.data[index];
                                     return _buildListItem(context, document);
                                   }),
                               Padding(
@@ -387,13 +403,14 @@ class _MessagesPageState extends State<MessagesPage>
         builder: (BuildContext context) => SendMessages(
               moreaFire: moreaFire,
               auth: widget.auth,
+              crudMedthods: this.crud0,
             )));
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var message = document;
     List<String> receivers = [];
-    for(String receiver in document['receivers']){
+    for (String receiver in document['receivers']) {
       receivers.add(convMiDatatoWebflow(receiver));
     }
     String receiversString = receivers.join(',');
@@ -409,7 +426,9 @@ class _MessagesPageState extends State<MessagesPage>
                 Text('von: ${document['sender']}',
                     style: MoreaTextStyle.sender),
                 Text(
-                    'für: $receiversString', style: MoreaTextStyle.sender,),
+                  'für: $receiversString',
+                  style: MoreaTextStyle.sender,
+                ),
               ],
             ),
             contentPadding: EdgeInsets.only(),
@@ -418,11 +437,9 @@ class _MessagesPageState extends State<MessagesPage>
             ),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () async {
-              await moreaFire.setMessageRead(
-                  this.uid, document.documentID, this.stufe);
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (BuildContext context) {
-                return SingleMessagePage(message);
+                return SingleMessagePage(message, moreaFire, this.uid);
               }));
             },
           ));
@@ -438,10 +455,11 @@ class _MessagesPageState extends State<MessagesPage>
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('von: ${document['sender']}',
-                  style: MoreaTextStyle.sender),
+              Text('von: ${document['sender']}', style: MoreaTextStyle.sender),
               Text(
-                'für: $receiversString', style: MoreaTextStyle.sender,),
+                'für: $receiversString',
+                style: MoreaTextStyle.sender,
+              ),
             ],
           ),
           contentPadding: EdgeInsets.only(),
@@ -452,7 +470,7 @@ class _MessagesPageState extends State<MessagesPage>
           onTap: () {
             Navigator.of(context)
                 .push(MaterialPageRoute(builder: (BuildContext context) {
-              return SingleMessagePage(message);
+              return SingleMessagePage(message, moreaFire, this.uid);
             }));
           },
         ),

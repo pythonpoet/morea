@@ -32,36 +32,43 @@ abstract class BaseCrudMethods {
 
 class CrudMedthods implements BaseCrudMethods {
   DWIFormat dwiformat = new DWIFormat();
-  Firestore db;
+  FirebaseFirestore db;
 
-  CrudMedthods(Firestore firestore) {
-    this.db = firestore;
-  }
+  CrudMedthods(this.db);
 
   Future<QuerySnapshot> getCollection(String path) async {
     path = dwiformat.pathstring(path);
-    return await Firestore.instance.collection(path).getDocuments();
+    return await FirebaseFirestore.instance.collection(path).get();
   }
 
   Stream<QuerySnapshot> streamCollection(String path) {
-    return Firestore.instance.collection(path).snapshots();
+    return FirebaseFirestore.instance.collection(path).snapshots();
   }
 
   Stream<QuerySnapshot> streamOrderCollection(String path, String order) {
     path = dwiformat.pathstring(path);
-    return Firestore.instance.collection(path).orderBy(order).snapshots();
+    return FirebaseFirestore.instance
+        .collection(path)
+        .orderBy(order)
+        .snapshots();
   }
 
   Future<DocumentSnapshot> getDocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
     print("get Doc: $path/$document");
-    return await Firestore.instance.collection(path).document(document).get();
+    return await FirebaseFirestore.instance
+        .collection(path)
+        .doc(document)
+        .get();
   }
 
   Stream<DocumentSnapshot> streamDocument(String path, String document) {
     print("stream doc: $path/$document");
-    return Firestore.instance.collection(path).document(document).snapshots();
+    return FirebaseFirestore.instance
+        .collection(path)
+        .doc(document)
+        .snapshots();
   }
 
   Future<bool> waitOnDocumentChanged(String path, String document) async {
@@ -69,7 +76,13 @@ class CrudMedthods implements BaseCrudMethods {
     StreamController<bool> controller = new BehaviorSubject();
     value = controller.stream;
     controller.add(false);
-    db.collection(path).document(document).snapshots().distinct().skip(1).listen((onData)=> controller.add(true));
+    db
+        .collection(path)
+        .doc(document)
+        .snapshots()
+        .distinct()
+        .skip(1)
+        .listen((onData) => controller.add(true));
     await value.firstWhere((bool item) => item);
     controller.close();
     return true;
@@ -79,10 +92,10 @@ class CrudMedthods implements BaseCrudMethods {
       String path, String document, Map<String, dynamic> data) async {
     print("set doc: $path/$document");
     path = dwiformat.pathstring(path);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
-        .setData(data)
+        .doc(document)
+        .set(data)
         .catchError((e) {
       print(e);
       print("tried to upload data: " + data.toString());
@@ -90,16 +103,20 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
   Future<void> runTransaction(
-      String path, String document, Map<String, dynamic> data) async {
-    DocumentReference docRef = db.collection(path).document(document);
+      String path, String document, Map<String, dynamic> data,
+      {Map Function(DocumentSnapshot) function}) async {
+    DocumentReference docRef = db.collection(path).doc(document);
 
     try {
       TransactionHandler transactionHandler = (Transaction tran) async {
         await tran.get(docRef).then((DocumentSnapshot snap) async {
           if (snap.exists) {
-            await tran.update(docRef, data);
+            if (function != null) {
+              tran.update(docRef, function(snap));
+            } else
+              tran.update(docRef, data);
           } else {
-            await tran.set(docRef, data);
+            tran.set(docRef, data);
           }
         }).catchError((err) => {throw err});
       };
@@ -112,40 +129,41 @@ class CrudMedthods implements BaseCrudMethods {
   Future deletedocument(String path, String document) async {
     document = dwiformat.simplestring(document);
     path = dwiformat.pathstring(path);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
+        .doc(document)
         .delete()
         .catchError((e) {
       print(e);
     });
   }
 
-  Future<void> setDataWithoutDocumentName(
+  Future<String> setDataWithoutDocumentName(
       String path, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
-    await Firestore.instance
-        .collection(path)
-        .document()
-        .setData(data)
-        .catchError((e) {
+    DocumentReference documentReference = this.db.collection(path).doc();
+    await documentReference.set(data).catchError((e) {
       print(e);
     });
+    return documentReference.id;
   }
 
   Future<void> updateMessage(
       String path, String document, Map<dynamic, dynamic> data) async {
     path = dwiformat.pathstring(path);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(path)
-        .document(document)
-        .setData(data)
+        .doc(document)
+        .set(data)
         .catchError((e) {
       print(e);
     });
   }
 
   Future<DocumentSnapshot> getMessage(String path, String document) async {
-    return await Firestore.instance.collection(path).document(document).get();
+    return await FirebaseFirestore.instance
+        .collection(path)
+        .doc(document)
+        .get();
   }
 }

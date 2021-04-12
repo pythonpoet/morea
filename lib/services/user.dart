@@ -1,14 +1,17 @@
+import 'dart:core';
 import 'dart:developer';
-
 import 'package:morea/morea_strings.dart';
+import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/group.dart';
 import 'package:morea/services/morea_firestore.dart';
+
+String sessionUserID, sessionUserName;
 
 class User {
   String displayName,
       pfadiName,
-      groupID,
       vorName,
       nachName,
       pos,
@@ -20,23 +23,28 @@ class User {
       plz,
       geschlecht,
       userID;
-  List<String> subscribedGroups = new List<String>();
-  Map<String, int> groupPrivilege = new Map();
+  //List<String> subscribedGroups = new List<String>();
+  List<String> groupIDs = <String>[];
+  Map<String, RoleEntry> groupPrivilege = new Map();
   Map<String, Map<String, String>> childMap;
   Map<String, dynamic> _userMap, groupMap, elternMap;
   CrudMedthods crud0;
+  Map<String, GroupData> subscribedGroups = new Map<String, GroupData>();
 
   User(this.crud0);
 
   getTeilnehmer() async {
-    if (_userMap.containsKey(userMapgroupID))
-      groupID = _userMap[userMapgroupID];
-    else
-      throw "$userMapgroupID has to be non-null";
+    if (_userMap.containsKey("groupID")) throw "groupID is a depricaded key.";
 
-    if (_userMap.containsKey(userMapVorName))
-      vorName = _userMap[userMapVorName];
+    if (_userMap.containsKey(userMapGroupIDs))
+      groupIDs = new List<String>.from(_userMap[userMapGroupIDs]);
     else
+      throw "$userMapGroupIDs has to be non-null";
+
+    if (_userMap.containsKey(userMapVorName)) {
+      vorName = _userMap[userMapVorName];
+      sessionUserName = vorName;
+    } else
       throw "$userMapVorName has to be non-null";
 
     if (_userMap.containsKey(userMapNachName))
@@ -69,9 +77,10 @@ class User {
     else
       throw "$userMapPLZ has to be non-null";
 
-    if (_userMap.containsKey(userMapUID))
+    if (_userMap.containsKey(userMapUID)) {
       userID = _userMap[userMapUID];
-    else
+      sessionUserID = userID;
+    } else
       throw "$userMapUID has to be non-null";
 
     if (_userMap.containsKey(userMapGeschlecht))
@@ -82,10 +91,6 @@ class User {
     if (_userMap.containsKey(userMapHandynummer))
       handynummer = _userMap[userMapHandynummer];
     //Handynummer can be empty (Because children without a Mobilephone are able to register).
-
-    if (_userMap.containsKey(userMapSubscribedGroups))
-      subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]);
-    //SubscribedGroups can be empty (Because Children are asigned to a single group by default).
 
     if (_userMap.containsKey(userMapPfadiName)) {
       if (_userMap[userMapPfadiName] != '' &&
@@ -98,13 +103,16 @@ class User {
     } else {
       displayName = vorName;
     }
-    groupMap =
-        (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-    if (groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
-      groupPrivilege[groupID] =
-          groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
-    else
-      groupPrivilege[groupID] = 0;
+    for (String groupID in groupIDs) {
+      var someVar = (await crud0.getDocument(
+          '$pathGroups/$groupID/$pathPriviledge', this.userID));
+      GroupData groupData = new GroupData(
+          groupData: Map<String, dynamic>.from(
+              (await crud0.getDocument(pathGroups, groupID)).data()),
+          groupUserData: Map<String, dynamic>.from(someVar.data()));
+
+      subscribedGroups[groupID] = groupData;
+    }
   }
 
   getElterData() async {
@@ -148,12 +156,8 @@ class User {
     else
       throw "$userMapHandynummer has to be non-null";
 
-    if (_userMap.containsKey(userMapSubscribedGroups))
-      subscribedGroups = List<String>.from(_userMap[userMapSubscribedGroups]);
-    //Subscribedgroup can be null (Because parents are not initialized with their children).
-
-    if (_userMap.containsKey(userMapgroupID))
-      groupID = _userMap[userMapgroupID];
+    if (_userMap.containsKey(userMapGroupIDs))
+      groupIDs = List<String>.from(_userMap[userMapGroupIDs]);
     //groupID can be null (Because parents don't have to be asigned to a group).
 
     if (_userMap.containsKey(userMapGeburtstag))
@@ -175,22 +179,24 @@ class User {
     } else {
       displayName = vorName;
     }
+    // Add parents groups to subscribedgroups
+    if (this.groupIDs.length > 0) {
+      for (String groupID in groupIDs) {
+        GroupData groupData = new GroupData(
+            groupData: Map<String, dynamic>.from(
+                (await crud0.getDocument(pathGroups, groupID)).data()),
+            groupUserData: Map<String, dynamic>.from((await crud0.getDocument(
+                    '$pathGroups/$groupID/$pathPriviledge', this.userID))
+                .data()));
 
+        subscribedGroups[groupID] = groupData;
+      }
+    }
+    // Add childs groups to subscribedgroups
     if (_userMap.containsKey(userMapKinder)) {
       Map<String, String> kinderMap =
           Map<String, String>.from(_userMap[userMapKinder]);
       childMap = await createChildMap(kinderMap);
-    }
-    if (_userMap[userMapgroupID] == null) {
-      groupMap = null;
-    } else {
-      groupMap =
-          (await crud0.getDocument(pathGroups, _userMap[userMapgroupID])).data;
-      if (groupMap["Priviledge"].containsKey(_userMap[userMapUID]))
-        groupPrivilege[groupID] =
-            groupMap["Priviledge"][_userMap[userMapUID]]["Priviledge"];
-      else
-        groupPrivilege[groupID] = 0;
     }
   }
 
@@ -227,21 +233,32 @@ class User {
       Map<String, String> childs) async {
     Map<String, Map<String, String>> childMap = new Map();
     for (String childUID in childs.keys) {
-      Map<String, dynamic> childUserDat =
-          (await crud0.getDocument(pathUser, childUID)).data;
-      if (childMap.containsKey(childUserDat[userMapgroupID]))
-        childMap[childUserDat[userMapgroupID]][childUID] = childs[childUID];
-      else
-        childMap[childUserDat[userMapgroupID]] = {childUID: childs[childUID]};
-      if (!subscribedGroups.contains(childUserDat[userMapgroupID]))
-        subscribedGroups.add(childUserDat[userMapgroupID]);
+      Map<String, dynamic> childUserDat = Map<String, dynamic>.from(
+          (await crud0.getDocument(pathUser, childUID)).data());
+      print(childUserDat);
+
+      for (String groupID in childUserDat[userMapGroupIDs]) {
+        if (childMap.containsKey(groupID))
+          childMap[groupID][childUID] = childs[childUID];
+        else
+          childMap[groupID] = {childUID: childs[childUID]};
+      }
     }
-    parentGroupPrivilege(childMap);
+    await parentGroupPrivilege(childMap);
     return childMap;
   }
 
-  parentGroupPrivilege(Map<String, Map<String, String>> childMap) {
-    for (String groupID in childMap.keys) groupPrivilege[groupID] = 2;
+  parentGroupPrivilege(Map<String, Map<String, String>> childMap) async {
+    for (String groupID in childMap.keys) {
+      GroupData groupData = new GroupData(
+          groupData: Map<String, dynamic>.from(
+              (await crud0.getDocument(pathGroups, groupID)).data()));
+      if (groupData.groupOption.parentialControl.enabled) {
+        if (!this.groupIDs.contains(groupID)) this.groupIDs.add(groupID);
+        groupData.setParentPriviledge();
+        this.subscribedGroups[groupID] = groupData;
+      }
+    }
   }
 
   Map<String, dynamic> generateAndValitateUserMap() {
@@ -298,10 +315,10 @@ class User {
         else
           throw "$userMapGeschlecht has to be non-null";
 
-        if (groupID != null)
-          userMap[userMapgroupID] = groupID;
+        if (groupIDs != null)
+          userMap[userMapGroupIDs] = groupIDs;
         else
-          throw "$userMapgroupID has to be non-null";
+          throw "$userMapGroupIDs has to be non-null";
 
         if (pfadiName != null) userMap[userMapPfadiName] = pfadiName;
         //Pfadiname can be empty
@@ -364,7 +381,8 @@ class User {
   }
 
   Future<dynamic> createMoreaUser(
-      Auth auth, String _password, MoreaFirebase moreafire, onSignedIn, {bool tutorial}) async {
+      Auth auth, String _password, MoreaFirebase moreafire, onSignedIn,
+      {bool tutorial}) async {
     try {
       userID = await auth.createUserWithEmailAndPassword(email, _password);
       print('Registered user: $userID');
@@ -372,17 +390,22 @@ class User {
         //Creates userMap
         await moreafire.createUserInformation(generateAndValitateUserMap());
         //writes Devicetoken to collection of groupID
-        if (groupID != null) {
+        if (groupIDs != null) {
           //Writes tn rights to groupMap
-          await moreafire.groupPriviledgeTN(
-              groupID, userID, (pfadiName == '' ? vorName : pfadiName));
+          for (String groupID in groupIDs) {
+            await moreafire.groupPriviledgeTN(
+                groupID,
+                userID,
+                (pfadiName == '' ? vorName : pfadiName),
+                generateAndValitateUserMap());
+          }
         }
 
         //uploads devtoken to userMap
         await moreafire.uploadDevTocken(userID);
 
         //sends user to rootpage
-        if(tutorial){
+        if (tutorial) {
           onSignedIn(tutorialautostart: true);
         } else {
           onSignedIn();

@@ -23,7 +23,7 @@ class AgendaState extends StatefulWidget {
       @required this.navigationMap});
 
   final MoreaFirebase moreaFire;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Auth auth;
   final Map<String, Function> navigationMap;
 
@@ -52,16 +52,16 @@ class _AgendaStatePage extends State<AgendaState>
     'Wombat (Wölfe)': false,
   };
   Map kontakt = {'Email': '', 'Pfadiname': ''};
-  List mitnehmen = ['Pfadihämpt'];
+  List<dynamic> mitnehmen = ['Pfadihämpt'];
 
   Map<String, dynamic> quickfix = {
     'Eventname': '',
     'Datum': 'Datum wählen',
     'Datum bis': 'Datum wählen',
-    'Anfangszeit': 'von',
+    'Anfangszeit': 'Zeit wählen',
     'Anfangsort': '',
     'Schlussort': '',
-    'Schlusszeit': 'bis',
+    'Schlusszeit': 'Zeit wählen',
     'Stufen': '',
     'Beschreiben': '',
     'Kontakt': '',
@@ -70,10 +70,7 @@ class _AgendaStatePage extends State<AgendaState>
   };
   MoreaLoading moreaLoading;
 
-  void _getAgenda(groupID) {
-    List<String> groupIDs = [];
-    if (groupID != null) groupIDs.add(groupID);
-    groupIDs.addAll(widget.moreaFire.getSubscribedGroups);
+  void _getAgenda(List<dynamic> groupIDs) {
     agenda.getTotalAgendaOverview(groupIDs);
   }
 
@@ -83,7 +80,7 @@ class _AgendaStatePage extends State<AgendaState>
       DateTime now = DateTime.now();
       if (_agdatum.difference(now).inDays < 0) {
         Map fullevent =
-            (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+            (await agenda.getAgendaTitle(event[groupMapEventID])).data();
         if (fullevent != null)
           agenda.deleteAgendaEvent(fullevent);
         else
@@ -91,7 +88,7 @@ class _AgendaStatePage extends State<AgendaState>
       }
     } else {
       Map fullevent =
-          (await agenda.getAgendaTitle(event[groupMapEventID])).data;
+          (await agenda.getAgendaTitle(event[groupMapEventID])).data();
       if (fullevent != null)
         agenda.deleteAgendaEvent(fullevent);
       else
@@ -152,7 +149,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
-    _getAgenda(moreafire.getUserMap[userMapgroupID]);
+    _getAgenda(moreafire.getGroupIDs);
   }
 
   @override
@@ -207,7 +204,8 @@ class _AgendaStatePage extends State<AgendaState>
                     ],
                   ),
                 ),
-                child: aAgenda(moreafire.getUserMap[userMapgroupID]))),
+                child:
+                    aAgenda(moreafire.getUserMap[userMapGroupIDs], context))),
         floatingActionButton: Showcase(
           key: _floatingActionButtonKey,
           disableAnimation: true,
@@ -241,7 +239,7 @@ class _AgendaStatePage extends State<AgendaState>
                 ],
               ),
             ),
-            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen')),
+            child: moreaLeiterBottomAppBar(widget.navigationMap, 'Hinzufügen', MoreaBottomAppBarActivePage.agenda)),
       );
     } else {
       return Scaffold(
@@ -271,14 +269,14 @@ class _AgendaStatePage extends State<AgendaState>
             child: moreaChildBottomAppBar(widget.navigationMap)),
         drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
             moreafire.getEmail, context, moreafire, crud0, _signedOut),
-        body: aAgenda(moreafire.getUserMap[userMapgroupID]),
+        body: aAgenda(moreafire.getGroupIDs, context),
       );
     }
   }
 
   viewLager(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data();
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewLagerPageState(
@@ -293,7 +291,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data;
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data();
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewEventPageState(
@@ -307,13 +305,19 @@ class _AgendaStatePage extends State<AgendaState>
     });
   }
 
-  Widget aAgenda(String groupID) {
+  Widget aAgenda(List<dynamic> groupID, BuildContext context) {
     return StreamBuilder(
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
           if (slagenda.connectionState == ConnectionState.waiting) {
             return MoreaBackgroundContainer(
-                child: moreaLoading.loading());
+                child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    color: Colors.white,
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width - 40,
+                        maxHeight: MediaQuery.of(context).size.height - 220),
+                    child: moreaLoading.loading()));
           } else if (!slagenda.hasData)
             return MoreaBackgroundContainer(
               child: MoreaShadowContainer(
@@ -386,7 +390,8 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+                                  contentPadding: EdgeInsets.only(
+                                      left: 15, right: 15, bottom: 10, top: 10),
                                   title: Text(
                                     _info['Eventname'].toString(),
                                     style: MoreaTextStyle.lable,
@@ -425,7 +430,8 @@ class _AgendaStatePage extends State<AgendaState>
                                       )
                                     ],
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 15, right: 15, bottom: 10, top: 10),
+                                  contentPadding: EdgeInsets.only(
+                                      left: 15, right: 15, bottom: 10, top: 10),
                                   trailing: _info['groupID'] == null
                                       ? Text('Error')
                                       : Text(

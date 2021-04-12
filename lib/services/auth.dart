@@ -1,10 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:morea/morea_strings.dart';
 import 'dart:async';
 import 'package:morea/services/utilities/dwi_core.dart';
+
+import '../morealayout.dart';
 
 //enum PlatformType { isAndroid, isIOS }
 enum AuthProblems {
@@ -49,7 +52,7 @@ abstract class BaseAuth {
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   DWICore dwiHardware = new DWICore();
-  FirebaseUser _user;
+  firebase.User _user;
 
   String get getUserID => _user != null ? _user.uid : "not loaded";
 
@@ -66,8 +69,11 @@ class Auth implements BaseAuth {
     return _user.uid;
   }
 
-  Future<String> createUserWithEmailAndPasswordForChild(String email, String password) async {
-    FirebaseUser childUser = (await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password)).user;
+  Future<String> createUserWithEmailAndPasswordForChild(
+      String email, String password) async {
+    firebase.User childUser = (await _firebaseAuth
+            .createUserWithEmailAndPassword(email: email, password: password))
+        .user;
     return childUser.uid;
   }
 
@@ -84,32 +90,36 @@ class Auth implements BaseAuth {
   }
 
   Future<void> createUserInformation(Map userInfo) async {
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection(pathUser)
-        .document(_user.uid)
-        .setData(userInfo)
+        .doc(_user.uid)
+        .set(userInfo)
         .catchError((e) {
       print(e);
     });
   }
 
   Future<String> currentUser() async {
-    this._user = await _firebaseAuth.currentUser();
+    this._user = _firebaseAuth.currentUser;
     return _user != null ? _user.uid : null;
   }
 
   Future<String> userEmail() async {
-    this._user = await _firebaseAuth.currentUser();
+    this._user = _firebaseAuth.currentUser;
     return _user != null ? _user.email : null;
+  }
+
+  Future<void> deleteUserID() async {
+    FirebaseAuth.instance.currentUser.delete();
   }
 
   Future<bool> reauthenticate(String email, String password) async {
     bool reAuthenticated;
     AuthCredential credential =
-        EmailAuthProvider.getCredential(email: email, password: password);
+        EmailAuthProvider.credential(email: email, password: password);
     print('got Credential');
     print(email);
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    firebase.User user = _firebaseAuth.currentUser;
     print('got current user');
     var result = await user.reauthenticateWithCredential(credential);
     if (result.user == null) {
@@ -236,12 +246,15 @@ class Auth implements BaseAuth {
                       ),
                       new Divider(),
                       Container(
-                        child: RaisedButton(
+                        child: ElevatedButton(
                             child: new Text(
                               'Ok',
                               style: TextStyle(color: Colors.white),
                             ),
-                            color: Color(0xff7a62ff),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        MoreaColors.violett)),
                             onPressed: () => {Navigator.pop(context)}),
                       )
                     ],
@@ -252,14 +265,14 @@ class Auth implements BaseAuth {
   }
 
   Future<void> changeEmail(String email) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    firebase.User user = _firebaseAuth.currentUser;
     await user.reload();
     await user.updateEmail(email);
     return null;
   }
 
   Future<void> changePassword(String password) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    firebase.User user = _firebaseAuth.currentUser;
     await user.reload();
     await user.updatePassword(password);
     return null;

@@ -1,5 +1,4 @@
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_html/rich_text_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_address.dart';
 import 'package:morea/Pages/Profil/change_email.dart';
@@ -16,7 +15,6 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/services/utilities/MiData.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class EditUserProfilePage extends StatefulWidget {
   EditUserProfilePage({this.profile, this.moreaFire, this.crud0});
@@ -36,13 +34,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   MailChimpAPIManager mailchimpApiManager = MailChimpAPIManager();
 
-  String _email,
-      _pfadinamen = ' ',
-      _vorname,
-      _nachname,
-      _geburtstag,
-      _stufe,
-      _pos;
+  String _email, _pfadinamen = ' ', _vorname, _nachname, _geburtstag, _pos;
   String _adresse,
       _ort,
       _plz,
@@ -50,9 +42,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       userId,
       error,
       selectedrolle,
-      _geschlecht,
-      oldGroup;
-  List<Map> _stufenselect = new List();
+      _geschlecht;
+  List<String> _stufe, oldGroup;
+  List<Map> _stufenselect = [];
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
   MoreaLoading moreaLoading;
   bool loading = true;
@@ -71,10 +63,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   ? userdata[userMapVorName]
                   : userdata[userMapPfadiName],
               oldGroup,
-              userdata[userMapgroupID])
+              _stufe)
           .then((onValue) => setState);
-      mailchimpApiManager.updateUserInfo(
-          _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
+      //mailchimpApiManager.updateUserInfo(
+      //    _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
       setState(() {
         loading = false;
       });
@@ -100,7 +92,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           child: Text('Du bist dabei einen User zu löschen.'),
         ),
         actions: <Widget>[
-          new FlatButton(
+          TextButton(
               child: const Text('ABBRECHEN'),
               onPressed: () {
                 Navigator.pop(context);
@@ -116,23 +108,35 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       loading = true;
     });
     Navigator.of(context).pop();
+    // if(widget.profile['Pos'] == 'Teilnehmer'){
+    //   if(widget.profile[userMapEltern] != null && widget.profile[userMapEltern].isNotEmpty()){
+    //     for(var elternUID in widget.profile[userMapEltern].keys.toList()){
+    //       var elternMap = (await crud0.getDocument(pathUser, elternUID)).data();
+    //       elternMap[userMapKinder].remove(widget.profile[userMapUID]);
+    //     }
+    //   }
+    // }
+
+    if (widget.profile['UID'] == null) {
+      widget.profile['UID'] = widget.profile['childUID'];
+    }
     if (widget.profile[userMapEltern] != null) {
       for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
-        var elternMap = (await crud0.getDocument(pathUser, elternUID)).data;
+        var elternMap = (await crud0.getDocument(pathUser, elternUID)).data();
         elternMap[userMapKinder].remove(widget.profile[userMapUID]);
         await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
       }
     }
     if (widget.profile[userMapKinder] != null) {
       for (var childUID in widget.profile[userMapKinder].keys.toList()) {
-        Map childMap = (await crud0.getDocument(pathUser, childUID)).data;
+        Map childMap = (await crud0.getDocument(pathUser, childUID)).data();
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(widget.profile[userMapUID]);
           await moreafire.updateUserInformation(childMap[userMapUID], childMap);
         } else {
           if (childMap[userMapEltern].length == 1) {
             await callFunction(getcallable('deleteUserMap'),
-                param: {'UID': childUID, 'groupID': childMap[userMapgroupID]});
+                param: {'UID': childUID, 'groupID': childMap[userMapGroupIDs]});
           } else {
             childMap[userMapEltern].remove(widget.profile[userMapUID]);
             await moreafire.updateUserInformation(childUID, childMap);
@@ -140,32 +144,22 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
         }
       }
     }
-    if (widget.profile['UID'] == null) {
-      widget.profile['UID'] = widget.profile['childUID'];
-    }
-    if (widget.profile[userMapgroupID] != null) {
-      await callFunction(getcallable('deleteUserMap'), param: {
-        'UID': widget.profile['UID'],
-        'groupID': widget.profile[userMapgroupID],
-      });
-    } else if (widget.profile[userMapSubscribedGroups] != null) {
-      if (widget.profile[userMapSubscribedGroups].length == 1) {
+    if (widget.profile[userMapGroupIDs] != null) {
+      if (widget.profile[userMapGroupIDs].length == 1) {
         await callFunction(getcallable('deleteUserMap'), param: {
           'UID': widget.profile['UID'],
-          'groupID': widget.profile[userMapSubscribedGroups][0],
+          'groupID': widget.profile[userMapGroupIDs][0],
         });
       } else {
-        for (int i = widget.profile[userMapSubscribedGroups].length - 1;
-            i < 1;
-            i--) {
-          await callFunction(getcallable('desubFromGroup'), param: {
+        for (int i = widget.profile[userMapGroupIDs].length - 1; i < 1; i--) {
+          await callFunction(getcallable('leafeGroup'), param: {
             'UID': widget.profile[userMapUID],
-            'groupID': widget.profile[userMapSubscribedGroups][i],
+            'groupID': widget.profile[userMapGroupIDs][i],
           });
         }
         await callFunction(getcallable('deleteUserMap'), param: {
           'UID': widget.profile['UID'],
-          'groupID': widget.profile[userMapSubscribedGroups][0],
+          'groupID': widget.profile[userMapGroupIDs][0],
         });
       }
     } else {
@@ -178,16 +172,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 ),
                 content: RichText(
                   text: TextSpan(
-                      text:
-                          'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: ',
-                      style: MoreaTextStyle.normal,
-                      children: [
-                        LinkTextSpan(
-                            text: 'it@morea.ch',
-                            url: 'mailto:<it@morea.ch>',
-                            onLinkTap: (url) => launch(url),
-                            style: MoreaTextStyle.link)
-                      ]),
+                    text:
+                        'Etwas ist schiefgelaufen. Der Account konnte nicht gelöscht werden. Bitte schreibe eine E-Mail an: it@morea.ch',
+                    style: MoreaTextStyle.normal,
+                  ),
                 ),
                 actions: <Widget>[
                   moreaFlatButton('OK', () => Navigator.of(context).pop()),
@@ -210,7 +198,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     userInfo[userMapHandynummer] = this._handynummer;
     userInfo[userMapGeschlecht] = this._geschlecht;
     userInfo[userMapAlter] = this._geburtstag;
-    userInfo[userMapgroupID] = _stufe;
+    userInfo[userMapGroupIDs] = _stufe;
     userInfo[userMapPos] = _pos;
     return userInfo;
   }
@@ -221,7 +209,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     selectedrolle = widget.profile['Pos'];
     moreafire = widget.moreaFire;
     crud0 = widget.crud0;
-    oldGroup = widget.profile[userMapgroupID];
+    oldGroup = List<String>.from(widget.profile[userMapGroupIDs]);
     initStrings();
     initSubgoup();
     loading = false;
@@ -236,24 +224,31 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, "1165")).data;
-    this._stufenselect = new List<Map>.from(data[groupMapSubgroup]);
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data();
+    print(
+        "test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
+    this._stufenselect = <Map>[];
+    data[groupMapGroupOption][groupMapGroupLowerClass].forEach((k, value) =>
+        this._stufenselect.add({
+          userMapGroupIDs: value['groupID'],
+          groupMapgroupNickName: value['groupNickName']
+        }));
     setState(() {});
   }
 
   void initStrings() {
-    this._vorname = widget.profile['Vorname'];
-    this._nachname = widget.profile['Nachname'];
-    this._pfadinamen = widget.profile['Pfadinamen'];
-    this._adresse = widget.profile['Adresse'];
-    this._plz = widget.profile['PLZ'];
-    this._ort = widget.profile['Ort'];
-    this._email = widget.profile['Email'];
-    this._handynummer = widget.profile['Handynummer'];
-    this._geschlecht = widget.profile['Geschlecht'];
-    this._geburtstag = widget.profile['Geburtstag'];
-    this._stufe = widget.profile['groupID'];
-    this._pos = widget.profile['Pos'];
+    this._vorname = widget.profile[userMapVorName];
+    this._nachname = widget.profile[userMapNachName];
+    this._pfadinamen = widget.profile[userMapPfadiName];
+    this._adresse = widget.profile[userMapAdresse];
+    this._plz = widget.profile[userMapPLZ];
+    this._ort = widget.profile[userMapOrt];
+    this._email = widget.profile[userMapEmail];
+    this._handynummer = widget.profile[userMapHandynummer];
+    this._geschlecht = widget.profile[userMapGeschlecht];
+    this._geburtstag = widget.profile[userMapGeburtstag];
+    this._stufe = List<String>.from(widget.profile[userMapGroupIDs]);
+    this._pos = widget.profile[userMapPos];
   }
 
   @override
@@ -434,7 +429,12 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                 'Stufe',
                 style: MoreaTextStyle.lable,
               ),
-              subtitle: Text(convMiDatatoWebflow(_stufe)),
+              subtitle: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _stufe.length,
+                  itemBuilder: (context, index) {
+                    return Text(convMiDatatoWebflow(_stufe[index]));
+                  }),
               onTap: () => _selectStufe(),
               trailing: Icon(
                 Icons.arrow_forward_ios,
@@ -516,22 +516,27 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.cancel,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                  label: Text(
-                    "Abbrechen",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.cancel,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                label: Text(
+                  "Abbrechen",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(MoreaColors.violett),
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5))))),
+              )
             ],
           );
         });
@@ -546,18 +551,18 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
             content: DropdownButton<String>(
                 items: _stufenselect.map((Map group) {
                   return new DropdownMenuItem<String>(
-                    value: group[userMapgroupID],
+                    value: group[userMapGroupIDs],
                     child: new Text(group[groupMapgroupNickName]),
                   );
                 }).toList(),
-                hint: Text(convMiDatatoWebflow(_stufe)),
+                hint: Text(convMiDatatoWebflow(_stufe[0])),
                 onChanged: (newVal) {
-                  _stufe = newVal;
+                  _stufe = [newVal];
                   this.setState(() {});
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
+              ElevatedButton.icon(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -570,9 +575,13 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     "Abbrechen",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(MoreaColors.violett),
+                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))))))
             ],
           );
         });
@@ -598,7 +607,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   Navigator.of(context).pop();
                 }),
             actions: <Widget>[
-              RaisedButton.icon(
+              ElevatedButton.icon(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -611,9 +620,13 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     "Abbrechen",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
-                  color: MoreaColors.violett,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))))
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(MoreaColors.violett),
+                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))))))
             ],
           );
         });

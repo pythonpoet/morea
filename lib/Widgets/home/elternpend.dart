@@ -22,4 +22,4 @@ Widget requestPrompttoParent() {
 }
 
 final String message =
-    "Wir können dir noch keine Inhalte anzeigen, da dein Account noch nicht mit deinem Kind verbunden ist. In deinem Profil kannst du deine Kinder verwalten.";
+    "Wir können dir noch keine Inhalte anzeigen, da dein Account noch nicht mit deinem Kind verbunden ist. Wenn du oben links auf das Menu drückst, kannst du deine Kinder verwalten.";

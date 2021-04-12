@@ -12,23 +12,25 @@ class MailChimpAPIManager {
     String hash = generateMd5(email);
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('pfadimorea:$apiKey'));
-    var result = await http.get(urlInfoMailListMembers + hash,
+    var result = await http.get(
+        Uri.https(
+            "us13.api.mailchimp.com", "/3.0/lists/54c3988cea/members/$hash"),
         headers: {'Authorization': basicAuth});
     var decoded = json.decode(result.body);
     print(decoded);
   }
 
   updateUserInfo(String email, String vorname, String nachname,
-      String geschlecht, String stufe, MoreaFirebase moreafire) async {
+      String geschlecht, List<String> stufe, MoreaFirebase moreafire) async {
     String apiKey = await moreafire.getMailChimpApiKey();
     String biber = 'Nein', woelfe = 'Nein', meitli = 'Nein', buebe = 'Nein';
-    if (stufe == midatanamebiber) {
+    if (stufe.contains(midatanamebiber)) {
       biber = 'Ja';
-    } else if (stufe == midatanamewoelf) {
+    } else if (stufe.contains(midatanamewoelf)) {
       woelfe = 'Ja';
-    } else if (stufe == midatanamemeitli) {
+    } else if (stufe.contains(midatanamemeitli)) {
       meitli = 'Ja';
-    } else if (stufe == midatanamebuebe) {
+    } else if (stufe.contains(midatanamebuebe)) {
       buebe = 'Ja';
     }
     String hash = generateMd5(email);
@@ -48,8 +50,11 @@ class MailChimpAPIManager {
       }
     };
     String bodyStr = jsonEncode(bodyMap);
-    var result = await http.put(urlInfoMailListMembers + hash,
-        headers: {'Authorization': basicAuth}, body: bodyStr);
+    var result = await http.put(
+        Uri.https(
+            "us13.api.mailchimp.com", "/3.0/lists/54c3988cea/members/$hash"),
+        headers: {'Authorization': basicAuth},
+        body: bodyStr);
     var decoded = json.decode(result.body);
     print(decoded);
   }

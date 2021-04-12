@@ -46,17 +46,20 @@ class MoreaTextStyle {
     letterSpacing: 0.25,
   );
 
-  static TextStyle sender =
-      TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.normal, letterSpacing: 1.5);
+  static TextStyle sender = TextStyle(
+      color: Colors.black,
+      fontSize: 10,
+      fontWeight: FontWeight.normal,
+      letterSpacing: 1.5);
 
-  static TextStyle raisedButton = TextStyle(
-      fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white);
+  static TextStyle raisedButton =
+      TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white);
 
   static TextStyle flatButton = TextStyle(
       fontSize: 14, fontWeight: FontWeight.w700, color: MoreaColors.violett);
 
-  static TextStyle warningButton = TextStyle(
-      fontSize: 14, fontWeight: FontWeight.w700, color: Colors.red);
+  static TextStyle warningButton =
+      TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.red);
 
   static TextStyle warningTitle =
       TextStyle(fontSize: 34, fontWeight: FontWeight.w700, color: Colors.red);
@@ -66,4 +69,10 @@ class MoreaTextStyle {
       color: MoreaColors.violett,
       letterSpacing: 0.5,
       fontWeight: FontWeight.w700);
+
+  static TextStyle warningSnackbar = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    color: Colors.white,
+  );
 }

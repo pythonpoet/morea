@@ -25,12 +25,12 @@ class WerChunnt {
     moreaFire.streamCollectionWerChunnt(eventID).listen((data) {
       List<String> chunnt = [];
       List<String> chunntNoed = [];
-      List<DocumentSnapshot> documents = data.documents;
+      List<DocumentSnapshot> documents = data.docs;
       for (DocumentSnapshot document in documents) {
-        if (document.data['AnmeldeStatus'] == eventMapAnmeldeStatusPositiv) {
-          chunnt.add(document.data['Name']);
+        if (document.data()['AnmeldeStatus'] == eventMapAnmeldeStatusPositiv) {
+          chunnt.add(document.data()['Name']);
         } else {
-          chunntNoed.add(document.data['Name']);
+          chunntNoed.add(document.data()['Name']);
         }
       }
       _controller.add([chunnt, chunntNoed]);

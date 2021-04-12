@@ -3,19 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/Event/data_types/Teleblitz_data.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
-import 'package:morea/services/utilities/MiData.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:morea/services/utilities/url_launcher.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
+
+import '../standart/moreaTextStyle.dart';
 
 enum ElementType { ferien, keineAktivitaet, teleblitz, notImplemented }
 enum HomeScreenType { loading, noElement, info }
@@ -28,7 +29,6 @@ class Teleblitz {
   CrudMedthods crud0;
   Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
-  final ScrollController _clickController = new ScrollController();
   Map<String, Stream<String>> anmeldeStream = new Map();
   Map<String, StreamController<String>> anmeldeStreamController = new Map();
 
@@ -36,10 +36,29 @@ class Teleblitz {
     this.moreaFire = moreaFire;
     this.crud0 = crud0;
   }
+  int getHighestEventPriviledge(List<String> groupIDs) {
+    if (groupIDs == null) return 0;
+    int returnValue = 0;
+    for (int i = 0; i < groupIDs.length; i++) {
+      if (moreaFire.getGroupIDs.contains(groupIDs[i])) {
+        if (moreaFire.getMapGroupData[groupIDs[i]].priviledge.role
+                .teleblitzPriviledge ==
+            null)
+          throw 'Teleblitz Priviledge cant be null';
+        else if (moreaFire.getMapGroupData[groupIDs[i]].priviledge.role
+                .teleblitzPriviledge >
+            returnValue)
+          returnValue = moreaFire
+              .getMapGroupData[groupIDs[i]].priviledge.role.teleblitzPriviledge;
+      }
+    }
+    return returnValue;
+  }
 
-  void submit(String anabmelden, String groupnr, String eventID, String uid,
+  void submit(
+      String anabmelden, List<String> groupIDs, String eventID, String uid,
       {String name}) {
-    _clickController.animateTo(0.0,
+    HomePageState.homeScreenScrollController.animateTo(0.0,
         curve: Curves.easeOut, duration: const Duration(milliseconds: 400));
 
     if (anabmelden == 'Chunt') {
@@ -50,7 +69,7 @@ class Teleblitz {
     if (name == null) {
       name = moreaFire.getDisplayName;
     }
-    if (moreaFire.getGroupPrivilege[groupnr] < 2) {
+    if (this.getHighestEventPriviledge(groupIDs) < 2) {
       moreaFire.childAnmelden(eventID, moreaFire.getUserMap[userMapUID],
           moreaFire.getUserMap[userMapUID], anabmelden, name);
     } else {
@@ -59,20 +78,20 @@ class Teleblitz {
     }
   }
 
-  void defineInfo(Map<String, dynamic> tlbz, groupID) {
-    info.setTitel(convMiDatatoWebflow(groupID));
-    info.setDatum(tlbz["datum"]);
-    info.setAntreten(tlbz["antreten"]);
-    info.setAntretenMaps(tlbz["google-map"]);
-    info.setAbtreten(tlbz["abtreten"]);
-    info.setAbtretenMaps(tlbz["map-abtreten"]);
-    info.setBemerkung(tlbz["bemerkung"]);
-    info.setSender(tlbz["name-des-senders"]);
-    info.setMitnehmen(tlbz['mitnehmen-test']);
-    info.setkeineAktivitat(tlbz['keine-aktivitat'].toString());
-    info.setGrund(tlbz['grund']);
-    info.setFerien(tlbz['ferien'].toString());
-    info.setEndeFerien(tlbz['ende-ferien']);
+  void defineInfo(TeleblitzData eventData) {
+    info.setTitel(eventData.name);
+    info.setDatum(eventData.datum);
+    info.setAntreten(eventData.antreten);
+    info.setAntretenMaps(eventData.googleMap);
+    info.setAbtreten(eventData.abtreten);
+    info.setAbtretenMaps(eventData.mapAbtreten);
+    info.setBemerkung(eventData.bemerkung);
+    info.setSender(eventData.nameDesSenders);
+    info.setMitnehmen(eventData.mitnehmenTest);
+    info.setkeineAktivitat(eventData.keineAktivitaet);
+    info.setGrund(eventData.grund);
+    info.setFerien(eventData.ferien.toString());
+    info.setEndeFerien(eventData.endeFerien);
   }
 
   Widget loadingScreen(Function navigation, Widget moreaLoading) {
@@ -118,18 +137,22 @@ class Teleblitz {
     );
   }
 
-  Widget parentAnmeldeButton(String groupID, String eventID) {
-    List<Widget> anmeldebuttons = new List();
-    moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
-      anmeldebuttons.add(
-          anmeldebutton(groupID, eventID, uid, "ja", "nein", name: vorname));
+  Widget parentAnmeldeButton(List<String> groupIDs, String eventID) {
+    List<Widget> anmeldebuttons = [];
+
+    groupIDs.forEach((String groupID) {
+      moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
+        anmeldebuttons.add(
+            anmeldebutton(groupIDs, eventID, uid, "ja", "nein", name: vorname));
+      });
     });
+
     return Column(children: anmeldebuttons);
   }
 
-  Widget childAnmeldeButton(String groupID, String eventID) {
+  Widget childAnmeldeButton(List<String> groupIDs, String eventID) {
     return anmeldebutton(
-      moreaFire.getGroupID,
+      groupIDs,
       eventID,
       moreaFire.getUserMap[userMapUID],
       'Chume',
@@ -169,8 +192,8 @@ class Teleblitz {
         ));
   }
 
-  Widget anmeldebutton(
-      String groupID, String eventID, String uid, String anmelden, abmelden,
+  Widget anmeldebutton(List<String> groupIDs, String eventID, String uid,
+      String anmelden, abmelden,
       {String name}) {
     return StreamBuilder(
       stream: anmeldeStreamController[uid].stream,
@@ -190,9 +213,16 @@ class Teleblitz {
                         ),
                       ),
                       Flexible(
-                        child: RaisedButton(
-                          elevation: 0,
-                          padding: EdgeInsets.all(0),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all<OutlinedBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30))),
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.all(0)),
+                              elevation: MaterialStateProperty.all<double>(0),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black12)),
                           child: Container(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 0, vertical: 15),
@@ -203,34 +233,39 @@ class Teleblitz {
                                       style: MoreaTextStyle.flatButton))),
                           onPressed: () {
                             if (name == null) {
-                              submit(eventMapAnmeldeStatusNegativ, groupID,
+                              submit(eventMapAnmeldeStatusNegativ, groupIDs,
                                   eventID, uid);
                             } else {
-                              submit(eventMapAnmeldeStatusNegativ, groupID,
+                              submit(eventMapAnmeldeStatusNegativ, groupIDs,
                                   eventID, uid,
                                   name: name);
                             }
                           },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(right: 5),
                       ),
                       Flexible(
-                        child: RaisedButton(
-                          padding: EdgeInsets.all(0),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Colors.transparent),
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.all(0)),
+                          ),
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 0, vertical: 15),
                             constraints:
                                 BoxConstraints(maxWidth: 170, minWidth: 170),
                             decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [
-                                  MoreaColors.orange,
-                                  MoreaColors.violett
-                                ]),
+                                color: MoreaColors.violett,
                                 borderRadius: BorderRadius.circular(30)),
                             child: Center(
                                 child: new Text(anmelden,
@@ -239,18 +274,14 @@ class Teleblitz {
                           ),
                           onPressed: () {
                             if (name == null) {
-                              submit(eventMapAnmeldeStatusPositiv, groupID,
+                              submit(eventMapAnmeldeStatusPositiv, groupIDs,
                                   eventID, uid);
                             } else {
-                              submit(eventMapAnmeldeStatusPositiv, groupID,
+                              submit(eventMapAnmeldeStatusPositiv, groupIDs,
                                   eventID, uid,
                                   name: name);
                             }
                           },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          color: Colors.transparent,
-                          textColor: Colors.white,
                         ),
                       )
                     ],
@@ -274,38 +305,41 @@ class Teleblitz {
                       padding: EdgeInsets.only(right: 5),
                     ),
                     Flexible(
-                      child: new RaisedButton(
-                        padding: EdgeInsets.all(0),
+                      child: new ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.transparent),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          padding: MaterialStateProperty.all<EdgeInsets>(
+                              EdgeInsets.all(0)),
+                        ),
                         child: Container(
                           padding:
                               EdgeInsets.symmetric(horizontal: 0, vertical: 15),
                           constraints:
                               BoxConstraints(maxWidth: 170, minWidth: 170),
                           decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [
-                                MoreaColors.orange,
-                                MoreaColors.violett
-                              ]),
+                              color: MoreaColors.violett,
                               borderRadius: BorderRadius.circular(30)),
                           child: Center(
                               child: new Text(anmelden,
-                                  style: MoreaTextStyle.flatButton)),
+                                  style: MoreaTextStyle.raisedButton)),
                           width: 120,
                         ),
                         onPressed: () {
                           if (name == null) {
-                            submit(eventMapAnmeldeStatusPositiv, groupID,
+                            submit(eventMapAnmeldeStatusPositiv, groupIDs,
                                 eventID, uid);
                           } else {
-                            submit(eventMapAnmeldeStatusPositiv, groupID,
+                            submit(eventMapAnmeldeStatusPositiv, groupIDs,
                                 eventID, uid,
                                 name: name);
                           }
                         },
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        color: Colors.transparent,
-                        textColor: Colors.white,
                       ),
                     ),
                   ],
@@ -323,9 +357,16 @@ class Teleblitz {
                       ),
                     ),
                     Flexible(
-                      child: new RaisedButton(
-                        elevation: 0,
-                        padding: EdgeInsets.all(0),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30))),
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.all(0)),
+                            elevation: MaterialStateProperty.all<double>(0),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Colors.black12)),
                         child: Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 0, vertical: 15),
@@ -336,16 +377,14 @@ class Teleblitz {
                                     style: MoreaTextStyle.flatButton))),
                         onPressed: () {
                           if (name == null) {
-                            submit(eventMapAnmeldeStatusNegativ, groupID,
+                            submit(eventMapAnmeldeStatusNegativ, groupIDs,
                                 eventID, uid);
                           } else {
-                            submit(eventMapAnmeldeStatusNegativ, groupID,
+                            submit(eventMapAnmeldeStatusNegativ, groupIDs,
                                 eventID, uid,
                                 name: name);
                           }
                         },
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
                       ),
                     ),
                     Padding(
@@ -367,19 +406,21 @@ class Teleblitz {
     );
   }
 
-  Widget parentAnmeldeIndicator(String groupID, String eventID,
+  Widget parentAnmeldeIndicator(List<String> groupIDs, String eventID,
       Stream<String> Function(String userID, String eventID) function) {
-    List<Widget> anmeldebuttons = new List();
-    moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
-      anmeldeStreamController[uid] = new BehaviorSubject();
-      anmeldeStreamController[uid].addStream(function(uid, eventID));
-      anmeldebuttons.add(anmeldeIndicator(
-        uid,
-        eventID,
-        function,
-        "$vorname ist angemolden",
-        "$vorname ist abgemolden",
-      ));
+    List<Widget> anmeldebuttons = [];
+    groupIDs.forEach((String groupID) {
+      moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
+        anmeldeStreamController[uid] = new BehaviorSubject();
+        anmeldeStreamController[uid].addStream(function(uid, eventID));
+        anmeldebuttons.add(anmeldeIndicator(
+          uid,
+          eventID,
+          function,
+          "$vorname ist angemeldet",
+          "$vorname ist abgemeldet",
+        ));
+      });
     });
     return Column(children: anmeldebuttons);
   }
@@ -389,7 +430,7 @@ class Teleblitz {
     anmeldeStreamController[userID] = new BehaviorSubject();
     anmeldeStreamController[userID].addStream(function(userID, eventID));
     return anmeldeIndicator(userID, eventID, function,
-        "Du hast dich angemolden", "Du hast dich abgemolden");
+        "Du hast dich angemeldet", "Du hast dich abgemeldet");
   }
 
   Widget anmeldeIndicator(
@@ -445,7 +486,7 @@ class Teleblitz {
     );
   }
 
-  Widget parentShare(String groupID) {
+  Widget parentShare(String name) {
     return Container(
         child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -458,16 +499,16 @@ class Teleblitz {
           icon: Icon(Icons.share, color: Colors.grey[600]),
           onPressed: () => {
             Share.share(
-                "Lust auf Pfadi? Komm mal bei den ${convMiDatatoWebflow(groupID)} vorbei: https://www.morea.ch/teleblitz")
+                "Lust auf Pfadi? Komm mal bei den $name vorbei: https://www.morea.ch/teleblitz")
           },
         )
       ],
     ));
   }
 
-  Widget teleblitz(String groupID, String eventID,
+  Widget teleblitz(String name, List<String> groupIDs, String eventID,
       Stream<String> Function(String userID, String eventID) function) {
-    switch (moreaFire.getGroupPrivilege[groupID]) {
+    switch (this.getHighestEventPriviledge(groupIDs)) {
       case 0:
         return MoreaShadowContainer(
           child: Padding(
@@ -481,7 +522,7 @@ class Teleblitz {
                 info.getMitnehmen(),
                 info.getBemerkung(),
                 info.getSender(),
-                parentShare(groupID)
+                parentShare(name)
               ],
             ),
           ),
@@ -502,8 +543,8 @@ class Teleblitz {
                 info.getBemerkung(),
                 info.getSender(),
                 childListTitle(moreaFire.getDisplayName),
-                childAnmeldeButton(groupID, eventID),
-                parentShare(groupID),
+                childAnmeldeButton(groupIDs, eventID),
+                parentShare(name),
               ],
             ),
           ),
@@ -514,7 +555,7 @@ class Teleblitz {
             padding: const EdgeInsets.all(15),
             child: Column(
               children: <Widget>[
-                parentAnmeldeIndicator(groupID, eventID, function),
+                parentAnmeldeIndicator(groupIDs, eventID, function),
                 info.getTitel(),
                 info.getDatum(),
                 info.getAntreten(),
@@ -523,8 +564,8 @@ class Teleblitz {
                 info.getBemerkung(),
                 info.getSender(),
                 parentListTitle(),
-                parentAnmeldeButton(groupID, eventID),
-                parentShare(groupID)
+                parentAnmeldeButton(groupIDs, eventID),
+                parentShare(name)
               ],
             ),
           ),
@@ -553,7 +594,7 @@ class Teleblitz {
                   info.getMitnehmen(),
                   info.getBemerkung(),
                   info.getSender(),
-                  parentShare(groupID)
+                  parentShare(name)
                 ],
               ),
             ),
@@ -653,12 +694,12 @@ class Teleblitz {
                                   return Text('Error');
                                 } else {
                                   List<DocumentSnapshot> documents =
-                                      snapshot.data.documents;
+                                      snapshot.data.docs;
                                   List<String> chunntNoed = [];
                                   for (DocumentSnapshot document in documents) {
-                                    if (document.data['AnmeldeStatus'] ==
+                                    if (document.data()['AnmeldeStatus'] ==
                                         eventMapAnmeldeStatusNegativ) {
-                                      chunntNoed.add(document.data['Name']);
+                                      chunntNoed.add(document.data()['Name']);
                                     }
                                   }
                                   return ListView.builder(
@@ -807,65 +848,26 @@ class Teleblitz {
     }
   }
 
-  Map<String, Widget> anzeigen(
-      String groupID,
-      AsyncSnapshot snapshot,
-      moreaLoading,
-      Stream<String> Function(String userID, String eventID) function) {
-    Map<String, Widget> returnTelebliz = new Map();
-    switch (getHomeScreenType(snapshot)) {
-      case HomeScreenType.loading:
-        returnTelebliz[tlbzMapLoading] = moreaLoading();
-        return returnTelebliz;
-      case HomeScreenType.noElement:
-        returnTelebliz[tlbzMapNoElement] = noElement();
-        return returnTelebliz;
-      case HomeScreenType.info:
-        if (snapshot.data[groupID].values.contains(null)) {
-          returnTelebliz[tlbzMapLoading] = moreaLoading();
-        } else {
-          snapshot.data[groupID]
-              .forEach((String eventID, Map<String, dynamic> tlbz) {
-            switch (getElementType(tlbz)) {
-              case ElementType.notImplemented:
-                returnTelebliz[eventID] = notImplemented();
-                break;
-              case ElementType.ferien:
-                defineInfo(tlbz, groupID);
-                returnTelebliz[eventID] = ferien();
-                break;
-              case ElementType.keineAktivitaet:
-                defineInfo(tlbz, groupID);
-                returnTelebliz[eventID] = keineAktivitat();
-                break;
-              case ElementType.teleblitz:
-                defineInfo(tlbz, groupID);
-                returnTelebliz[eventID] = teleblitz(groupID, eventID, function);
-            }
-          });
-        }
+  Widget simpleTeleblitz(TeleblitzData eventData, String eventID,
+      Stream<String> Function(String, String) function) {
+    switch (eventData.teleblitzType) {
+      case TeleblitzType.notImplemented:
+        return notImplemented();
+        break;
+      case TeleblitzType.ferien:
+        defineInfo(eventData);
+        return ferien();
+        break;
+      case TeleblitzType.keineAktivitaet:
+        defineInfo(eventData);
+        return keineAktivitat();
+        break;
+      case TeleblitzType.teleblitz:
+        defineInfo(eventData);
+        return teleblitz(eventData.name, eventData.groupIDs, eventID, function);
+      default:
+        return notImplemented();
     }
-    return returnTelebliz;
-  }
-
-  Widget displayContent(loading, groupID) {
-    return StreamBuilder(
-      stream: moreaFire.tbz.getMapofEvents,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        List<Widget> anzeige = new List();
-        this
-            .anzeigen(groupID, snapshot, loading, moreaFire.tbz.anmeldeStatus)
-            .forEach((String eventID, tlbz) {
-          anzeige.add(tlbz);
-        });
-        return MoreaBackgroundContainer(
-          child: SingleChildScrollView(
-            controller: _clickController,
-            child: Column(children: anzeige),
-          ),
-        );
-      },
-    );
   }
 }
 
@@ -886,7 +888,7 @@ class Info {
   String datum;
   String bemerkung;
   String sender;
-  String mitnehmen;
+  List<String> mitnehmen;
   String keineaktivitat;
   String grund;
   String ferien;
@@ -1136,9 +1138,6 @@ class Info {
   }
 
   Container getMitnehmen() {
-    String stringMitnehmen = this.mitnehmen.split('<ul><li>')[1];
-    stringMitnehmen = stringMitnehmen.split("</li></ul>")[0];
-    List<String> listMitnehmen = stringMitnehmen.split('</li><li>');
     if (this?.antreten?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
@@ -1158,10 +1157,13 @@ class Info {
               ListView.builder(
                 padding: EdgeInsets.only(left: 15),
                 shrinkWrap: true,
-                itemCount: listMitnehmen.length,
+                itemCount: this.mitnehmen.length,
                 physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index){
-                  return Text('- ' + listMitnehmen[index], style: MoreaTextStyle.normal,);
+                itemBuilder: (context, index) {
+                  return Text(
+                    '- ' + this.mitnehmen[index],
+                    style: MoreaTextStyle.normal,
+                  );
                 },
               ),
             ],
@@ -1241,9 +1243,7 @@ class Info {
   }
 
   Container getEndeFerien() {
-    List<String> listEndeFerien = this.endeferien.split("T")[0].split("-");
-    String formatedEndeFerien =
-        listEndeFerien[2] + "." + listEndeFerien[1] + "." + listEndeFerien[0];
+    String endeFerien = this.endeferien;
     return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Column(
@@ -1263,9 +1263,9 @@ class Info {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(
-                    child: Html(
-                  data: formatedEndeFerien,
-                  defaultTextStyle: MoreaTextStyle.normal,
+                    child: Text(
+                  endeFerien,
+                  style: MoreaTextStyle.normal,
                 ))
               ],
             ),

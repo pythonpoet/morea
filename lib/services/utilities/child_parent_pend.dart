@@ -10,7 +10,6 @@ abstract class BaseChildParendPend {
 }
 
 class ChildParendPend extends BaseChildParendPend {
-  MCloudFunctions cloudFunctions = new MCloudFunctions();
   CrudMedthods crud0;
   MoreaFirebase moreaFirebase;
 
@@ -18,12 +17,12 @@ class ChildParendPend extends BaseChildParendPend {
 
   Future<String> childGenerateRequestString(
       Map<String, dynamic> userMap) async {
-    var someData = (await cloudFunctions.callFunction(
-            cloudFunctions.getcallable("childPendRequest"),
-            param: Map.from({
+    var someData = (await callFunction(
+            getcallable("childPendRequest"),
+            param: Map<String, dynamic>.from({
               userMapPos: userMap[userMapPos],
               userMapUID: userMap[userMapUID],
-              userMapgroupID: userMap[userMapgroupID],
+              userMapGroupIDs: userMap[userMapGroupIDs],
               mapTimestamp: DateTime.now().toIso8601String()
             })))
         .data;
@@ -40,8 +39,8 @@ class ChildParendPend extends BaseChildParendPend {
 
   Future<void> parentSendsRequestString(
       String requestStr, Map<String, dynamic> userMap) async {
-    return (await cloudFunctions.callFunction(
-        cloudFunctions.getcallable("parendPendAccept"),
+    return (await callFunction(
+        getcallable("parendPendAccept"),
         param: Map.from({
           userMapPos: userMap[userMapPos],
           userMapUID: userMap[userMapUID],
@@ -51,8 +50,8 @@ class ChildParendPend extends BaseChildParendPend {
   }
 
   Future<String> parentCreatesUser(String _email, String _password) async {
-    return (await cloudFunctions.callFunction(
-            cloudFunctions.getcallable("createAccount"),
+    return (await callFunction(
+            getcallable("createAccount"),
             param: Map.from({"email": _email, "password": _password})))
         .data;
   }
@@ -69,13 +68,16 @@ class ChildParendPend extends BaseChildParendPend {
           await this.parentCreatesUser(_childEmail, _childPasswort);
       childData[userMapUID] = childUID;
       await crud0.setData(pathUser, childUID, childData);
-      moreaFirebase.groupPriviledgeTN(
-          childData[userMapgroupID],
-          childUID,
-          (childData[userMapPfadiName] == ' '
-              ? childData[userMapVorName]
-              : childData[userMapPfadiName]));
-      moreaFirebase.subscribeToGroup(childData[userMapgroupID]);
+      (childData[userMapGroupIDs] as List<String>).forEach((groupID) {
+        moreaFirebase.groupPriviledgeTN(
+            groupID,
+            childUID,
+            (childData[userMapPfadiName] == ' '
+                ? childData[userMapVorName]
+                : childData[userMapPfadiName]),
+            childData);
+      });
+      moreaFirebase.subscribeToGroup(childData[userMapGroupIDs]);
       String requestStr = await this.childGenerateRequestString(childData);
       return parentSendsRequestString(requestStr, parentData);
     } catch (error) {

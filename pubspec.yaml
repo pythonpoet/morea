@@ -7,55 +7,60 @@ description: Teleblitz app
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.0+3
+version: 1.0.3+9
 
 environment:
-    sdk: ">=2.3.0 <3.0.0"
+    sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
     flutter_localizations:
         sdk: flutter
     flutter:
         sdk: flutter
-    firebase_auth: 0.15.0+1
+    firebase_auth: ^1.0.1
     firebase_messaging: any
-    cloud_functions: ^0.4.1+4
+    firebase_analytics: any
+    firebase_core : ^1.0.0
+    chewie: ^1.0.0
+    cloud_functions: ^1.0.0
     flutter_html: any
     http: any
     intl: any
-    cloud_firestore: ^0.12.10+2
-    url_launcher: any
+    cloud_firestore: ^1.0.1
+    url_launcher: ^6.0.2
     share: any
     expandable: any
     qr_flutter: any
-    qrcode_reader: any
     random_string: any
     barcode_scan: ^1.0.0
     flutter_masked_text: ^0.8.0
     rxdart: ^0.22.4
-    flutter_datetime_picker: ^1.2.8
+    flutter_datetime_picker: ^1.4.0
     flip_card: ^0.4.4
     showcaseview: ^0.1.5
-    device_info: ^0.4.1+4
-
-
+    device_info: ^0.4.1
     shared_preferences: any
+    google_maps_place_picker: ^2.0.0-nullsafety.3
+
 
     # The following adds the Cupertino Icons font to your application.
     # Use with the CupertinoIcons class for iOS style icons.
-    cupertino_icons: ^0.1.2
+    cupertino_icons: ^1.0.2
 
 
 dev_dependencies:
-    flutter_launcher_icons: "^0.7.0"
+    flutter_launcher_icons: "^0.9.0"
     flutter_test:
         sdk: flutter
 
 flutter_icons:
-    android: false
+    android: "launcher_icon"
     ios: true
-    image_path: "assets/images/logo.jpeg"
-    adaptive_icon_background: "#fff000"
+    image_path_ios: "assets/icon/Logo_morea_productions_icon_dark.png"
+    image_path_android: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
+
+    adaptive_icon_background: "#323232"
+    adaptive_icon_foreground: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
 
 
 
@@ -94,6 +99,8 @@ flutter:
         - assets/images/logo.jpeg
         - assets/images/background.png
         - assets/icon/logo_loading.png
+        - assets/icon/logo_app_ios.png
+        - assets/icon/Logo_morea_productions_icon_dark_spacing.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.io/assets-and-images/#resolution-aware.

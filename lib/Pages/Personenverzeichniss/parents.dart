@@ -1,17 +1,22 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/Login/register.dart';
+import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/restartWidget.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/mailchimp_api_manager.dart';
+
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/crud.dart';
+import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/child_parent_pend.dart';
 import 'package:morea/services/utilities/qr_code.dart';
-import 'package:morea/services/utilities/user.dart';
+
 import 'package:rxdart/rxdart.dart';
 
 abstract class BaseMergeChildParent {
@@ -33,8 +38,10 @@ class MergeChildParent extends BaseMergeChildParent {
   final formKey = new GlobalKey<FormState>();
   StreamController<bool> streamRegisterStatus = new BehaviorSubject();
   bool loading = false;
-
+  Widget widget = new Container();
   String userId, error;
+  List someList;
+  MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   BuildContext showDialogcontext;
 
@@ -47,7 +54,7 @@ class MergeChildParent extends BaseMergeChildParent {
     moreaUser = User(crud0);
     register = Register(
         moreaUser: moreaUser,
-        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+        docSnapAbteilung: crud0.getDocument(pathGroups, moreaGroupID));
   }
 
   Widget registernewChild(Map<String, dynamic> parentData, BuildContext context,
@@ -155,17 +162,22 @@ class MergeChildParent extends BaseMergeChildParent {
               ),
               Expanded(
                 flex: 2,
-                child: new RaisedButton(
+                child: new ElevatedButton(
                   child:
                       new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                   onPressed: () async => {
                     childaktuallisieren(),
                     deleteRequest(await qrCodeString)
                   },
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  color: Color(0xff7a62ff),
-                  textColor: Colors.white,
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                  ),
                 ),
               )
             ],
@@ -184,16 +196,35 @@ class MergeChildParent extends BaseMergeChildParent {
     if (qrCode.germanError ==
         'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
       showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context){
-          return AlertDialog(
-            title: Text('Kind wird verbunden...'),
-            content: Center(child: simpleMoreaLoadingIndicator(),),
-          );
-        }
-      );
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Kind wird verbunden...'),
+              content: Center(
+                child: simpleMoreaLoadingIndicator(),
+              ),
+            );
+          });
       await childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
+      DocumentSnapshot userSnap = await moreafire.firestore
+          .collection(pathUser)
+          .doc(userMap[userMapUID])
+          .get();
+      List<String> groupIDs = <String>[];
+      print(userSnap.data().toString());
+      userSnap.data()[userMapKinder].forEach((key, value) async {
+        DocumentSnapshot childSnap =
+            await moreafire.firestore.collection(pathUser).doc(key).get();
+        groupIDs.add(childSnap[userMapGroupIDs][0]);
+      });
+      mailChimpAPIManager.updateUserInfo(
+          userMap[userMapEmail],
+          userMap[userMapVorName],
+          userMap[userMapNachName],
+          userMap[userMapGeschlecht],
+          groupIDs,
+          moreafire);
       Navigator.of(context).pop();
       allowScanner = false;
       parentReaderror = false;
@@ -232,36 +263,28 @@ class MergeChildParent extends BaseMergeChildParent {
               SizedBox(
                 height: 30,
               ),
-              new RaisedButton(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(Icons.camera_alt),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    new Text('Scannen', style: new TextStyle(fontSize: 20))
-                  ],
-                ),
-                onPressed: () => parentReadsQrCode(
-                    userMap, parentaktuallisieren, context, signOut),
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
-              ),
+              moreaRaisedIconButton(
+                  'Scannen',
+                  () => parentReadsQrCode(
+                      userMap, parentaktuallisieren, context, signOut),
+                  Icon(Icons.camera_alt)),
               SizedBox(
                 height: 40,
               ),
-              new RaisedButton(
+              ElevatedButton(
                 child:
                     new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () =>
                     {parentReaderror = false, parentaktuallisieren()},
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Color(0xff7a62ff),
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
               ),
             ],
           ),
@@ -282,7 +305,7 @@ class MergeChildParent extends BaseMergeChildParent {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             register.parentRegisterNewChild(setProfileState),
-            new RaisedButton(
+            ElevatedButton(
               child:
                   new Text('Registrieren', style: new TextStyle(fontSize: 20)),
               onPressed: () => {
@@ -369,12 +392,17 @@ class MergeChildParent extends BaseMergeChildParent {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: <Widget>[
-                                            RaisedButton(
-                                                child: Text("Ok"),
-                                                onPressed: () =>
-                                                    RestartWidget.restartApp(
-                                                        context),
-                                                color: MoreaColors.violett)
+                                            ElevatedButton(
+                                              child: Text("Ok"),
+                                              onPressed: () =>
+                                                  RestartWidget.restartApp(
+                                                      context),
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                              Color>(
+                                                          MoreaColors.violett)),
+                                            )
                                           ],
                                         ))
                                   ]),
@@ -387,7 +415,7 @@ class MergeChildParent extends BaseMergeChildParent {
                                 content: Text(
                                     'Etwas hat nicht funktioniert. Bitte versuche es erneut.'),
                                 actions: <Widget>[
-                                  RaisedButton(
+                                  ElevatedButton(
                                     child: Text('Ok'),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
@@ -397,20 +425,28 @@ class MergeChildParent extends BaseMergeChildParent {
                           });
                     }),
               },
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+              ),
             ),
-            RaisedButton(
+            ElevatedButton(
               child: new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
               onPressed: () async => {
                 newKidakt(),
               },
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+              ),
             )
           ],
         ),
@@ -426,7 +462,7 @@ class MergeChildParent extends BaseMergeChildParent {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             register.parentUpgradeChild(),
-            new RaisedButton(
+            ElevatedButton(
               child: new Text('Upgraden', style: new TextStyle(fontSize: 20)),
               onPressed: () => {
                 upgradeKidExecution(context, upgradeKid, childToUpgradeMap)
@@ -522,16 +558,19 @@ class MergeChildParent extends BaseMergeChildParent {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: <Widget>[
-                                            RaisedButton(
-                                                child: Text("Ok"),
-                                                onPressed: () {
-                                                  Navigator.of(context)
-                                                      .popUntil(
-                                                          ModalRoute.withName(
-                                                              '/'));
-                                                  signOut();
-                                                },
-                                                color: MoreaColors.violett)
+                                            ElevatedButton(
+                                              child: Text("Ok"),
+                                              onPressed: () {
+                                                Navigator.of(context).popUntil(
+                                                    ModalRoute.withName('/'));
+                                                signOut();
+                                              },
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                              Color>(
+                                                          MoreaColors.violett)),
+                                            )
                                           ],
                                         ))
                                   ]),
@@ -544,7 +583,7 @@ class MergeChildParent extends BaseMergeChildParent {
                                 content: Text(
                                     'Etwas hat nicht funktioniert. Bitte versuche es erneut.'),
                                 actions: <Widget>[
-                                  RaisedButton(
+                                  ElevatedButton(
                                     child: Text('Ok'),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
@@ -554,20 +593,28 @@ class MergeChildParent extends BaseMergeChildParent {
                           });
                     }),
               },
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+              ),
             ),
-            RaisedButton(
+            ElevatedButton(
               child: new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
               onPressed: () async => {
                 upgradeKid(Map<String, dynamic>()),
               },
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Color(0xff7a62ff),
-              textColor: Colors.white,
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+              ),
             )
           ],
         ),
@@ -618,8 +665,14 @@ class MergeChildParent extends BaseMergeChildParent {
         } else {
           moreaUser.displayName = moreaUser.pfadiName;
         }
-        await moreafire.groupPriviledgeTN(
-            moreaUser.groupID, childUID, moreaUser.displayName);
+        print(moreaUser.groupIDs);
+        print(childUID);
+        print(moreaUser.displayName);
+        print(moreaUser.generateAndValitateUserMap().toString());
+        for (var groupID in moreaUser.groupIDs) {
+          await moreafire.groupPriviledgeTN(groupID, childUID,
+              moreaUser.displayName, moreaUser.generateAndValitateUserMap());
+        }
 
         return true;
       }

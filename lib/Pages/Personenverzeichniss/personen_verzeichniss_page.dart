@@ -38,16 +38,13 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1 + widget.moreaFire.getSubscribedGroups.length,
+      length: widget.moreaFire.getGroupIDs.length,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personen'),
           bottom: TabBar(
             tabs: <Widget>[
-              Tab(
-                text: convMiDatatoWebflow(widget.moreaFire.getGroupID),
-              ),
-              ...widget.moreaFire.getSubscribedGroups.map((groupID) => Tab(
+              ...widget.moreaFire.getGroupIDs.map((groupID) => Tab(
                     text: convMiDatatoWebflow(groupID),
                   ))
             ],
@@ -55,9 +52,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         ),
         body: TabBarView(
           children: <Widget>[
-            personen(widget.moreaFire.getGroupID),
-            ...widget.moreaFire.getSubscribedGroups
-                .map((groupID) => personen(groupID))
+            ...widget.moreaFire.getGroupIDs.map((groupID) => personen(groupID))
           ],
         ),
       ),
@@ -66,21 +61,12 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
 
   Widget personen(String groupID) {
     return FutureBuilder(
-        future: widget.crud0.getDocument(pathGroups, groupID),
+        future:
+            widget.crud0.getCollection('$pathGroups/$groupID/$pathPriviledge'),
         builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> groupSnap) {
+            (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
           if (!groupSnap.hasData) return moreaLoading.loading();
-          List<Map<String, Map<String, dynamic>>> person = new List();
-          if (groupSnap.data.data.containsKey(groupMapPriviledge)) if (groupSnap
-                  .data[groupMapPriviledge].length >
-              0) {
-            Map<String, dynamic>.from(groupSnap.data[groupMapPriviledge])
-                .forEach((k, v) => {
-                      if (k != 'groupID')
-                        {
-                          person.add({k: Map<String, dynamic>.from(v)})
-                        }
-                    });
+          else if (groupSnap.data.docs.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
               child: MoreaShadowContainer(
@@ -97,20 +83,18 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                     ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: person.length,
+                      itemCount: groupSnap.data.docs.length,
                       itemBuilder: (context, int index) {
-                        String name, userUID;
-                        person[index].forEach((k, v) {
-                          name = v[groupMapDisplayName];
-                          userUID = k;
-                        });
+                        String name = groupSnap.data.docs[index]
+                            .data()[groupMapDisplayName];
+
                         return ListTile(
                           title: new Text(
                             name,
                             style: MoreaTextStyle.lable,
                           ),
-                          onTap: () => navigatetoprofile(
-                              widget.moreaFire.getUserInformation(userUID)),
+                          onTap: () =>
+                              navigatetoprofile(groupSnap.data.docs[index].id),
                           trailing: Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.black,
@@ -143,9 +127,9 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         });
   }
 
-  navigatetoprofile(Future<DocumentSnapshot> userdata) {
+  navigatetoprofile(String uID) {
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) =>
-            new ViewUserProfilePage(userdata, widget.moreaFire, widget.crud0)));
+            new ViewUserProfilePage(uID, widget.moreaFire, widget.crud0)));
   }
 }

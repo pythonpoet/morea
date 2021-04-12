@@ -481,67 +481,67 @@ class _ChangeProfileState extends State<ChangeProfile>
                 ],
               ),
               actions: <Widget>[
-                RaisedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
+                moreaRaisedIconButton("Abbrechen", () {
+                  password.clear();
+                  Navigator.of(context).pop();
+                },
+                    Icon(
                       Icons.cancel,
                       color: Colors.white,
                       size: 16,
-                    ),
-                    label: Text(
-                      "Abbrechen",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
-                RaisedButton.icon(
-                    onPressed: () async {
-                      var result = await _validateAndSave(email);
-                      if (result) {
-                        if (oldEmail != userInfo['Email']) {
-                          await auth0.changeEmail(userInfo['Email']);
-                        }
-                        if (newPassword != null) {
-                          await auth0.changePassword(newPassword);
-                        }
-                        await widget.moreaFire
-                            .updateUserInformation(userInfo['UID'], userInfo);
-                        await mailChimpAPIManager.updateUserInfo(
-                            userInfo['Email'],
-                            userInfo['Vorname'],
-                            userInfo['Nachname'],
-                            userInfo['Geschlecht'],
-                            userInfo['groupID'],
-                            widget.moreaFire);
-                        if (oldEmail != userInfo['Email'] ||
-                            newPassword != null) {
-                          _showSignOutInformation().then((onValue) {
-                            Navigator.of(context).pop();
-                            _signedOut();
-                          });
-                        } else {
-                          widget.updateProfile();
-                          Navigator.of(context).pop();
-                        }
-                      } else {
-                        _showReauthenticateError();
+                    )),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    var result = await _validateAndSave(email);
+                    if (result) {
+                      if (oldEmail != userInfo['Email']) {
+                        await auth0.changeEmail(userInfo['Email']);
                       }
-                    },
-                    icon: Icon(
-                      Icons.input,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    label: Text(
-                      "Anmelden",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+                      if (newPassword != null) {
+                        await auth0.changePassword(newPassword);
+                      }
+                      await widget.moreaFire
+                          .updateUserInformation(userInfo['UID'], userInfo);
+                      List<String> groupIDs =
+                          List<String>.from(userInfo['groupIDs']);
+                      await mailChimpAPIManager.updateUserInfo(
+                          userInfo['Email'],
+                          userInfo['Vorname'],
+                          userInfo['Nachname'],
+                          userInfo['Geschlecht'],
+                          groupIDs,
+                          widget.moreaFire);
+                      if (oldEmail != userInfo['Email'] ||
+                          newPassword != null) {
+                        _showSignOutInformation().then((onValue) {
+                          Navigator.of(context).pop();
+                          _signedOut();
+                        });
+                      } else {
+                        widget.updateProfile();
+                        Navigator.of(context).pop();
+                      }
+                    } else {
+                      _showReauthenticateError();
+                    }
+                  },
+                  icon: Icon(
+                    Icons.input,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  label: Text(
+                    "Anmelden",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  ),
+                ),
               ],
             ));
   }
@@ -557,12 +557,13 @@ class _ChangeProfileState extends State<ChangeProfile>
       _showReauthenticate(oldEmail);
     } else {
       await widget.moreaFire.updateUserInformation(userInfo['UID'], userInfo);
+      List<String> groupIDs = List<String>.from(userInfo['groupIDs']);
       await mailChimpAPIManager.updateUserInfo(
           userInfo['Email'],
           userInfo['Vorname'],
           userInfo['Nachname'],
           userInfo['Geschlecht'],
-          userInfo['groupID'],
+          groupIDs,
           widget.moreaFire);
       setState(() {
         loading = false;
@@ -583,17 +584,22 @@ class _ChangeProfileState extends State<ChangeProfile>
               content: Text(
                   'Leider hat etwas mit dem Neuanmelden nicht geklappt. Überprüfen sie das Password nochmals.'),
               actions: <Widget>[
-                RaisedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Ok',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Ok',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  ),
+                ),
               ],
             ));
   }
@@ -609,17 +615,22 @@ class _ChangeProfileState extends State<ChangeProfile>
               content: Text(
                   'Weil sie ihre E-Mail oder das Passwort geändert haben, werden sie nun ausgeloggt.'),
               actions: <Widget>[
-                RaisedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Ok',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    color: MoreaColors.violett,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)))),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Ok',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                  ),
+                ),
               ],
             )).then((onValue) {
       return null;
@@ -654,7 +665,7 @@ class _ChangeProfileState extends State<ChangeProfile>
     if (this.userInfo[userMapEltern] != null) {
       for (var elternUID in this.userInfo[userMapEltern].keys.toList()) {
         var elternMap =
-            (await widget.crud0.getDocument(pathUser, elternUID)).data;
+            (await widget.crud0.getDocument(pathUser, elternUID)).data();
         elternMap[userMapKinder].remove(this.userInfo[userMapUID]);
         await widget.moreaFire
             .updateUserInformation(elternMap[userMapUID], elternMap);
@@ -663,15 +674,17 @@ class _ChangeProfileState extends State<ChangeProfile>
     if (this.userInfo[userMapKinder] != null) {
       for (var childUID in this.userInfo[userMapKinder].keys.toList()) {
         Map childMap =
-            (await widget.crud0.getDocument(pathUser, childUID)).data;
+            (await widget.crud0.getDocument(pathUser, childUID)).data();
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(this.userInfo[userMapUID]);
           await widget.moreaFire
               .updateUserInformation(childMap[userMapUID], childMap);
         } else {
           if (childMap[userMapEltern].length == 1) {
-            await callFunction(getcallable('deleteUserMap'),
-                param: {'UID': childUID, 'groupID': childMap[userMapgroupID]});
+            await callFunction(getcallable('deleteUserMap'), param: {
+              'UID': childUID,
+              'groupIDs': childMap[userMapGroupIDs]
+            });
           } else {
             childMap[userMapEltern].remove(this.userInfo[userMapUID]);
             await widget.moreaFire.updateUserInformation(childUID, childMap);
@@ -684,10 +697,10 @@ class _ChangeProfileState extends State<ChangeProfile>
     }
     Navigator.of(context).popUntil(ModalRoute.withName('/'));
     await widget.navigationMap[signedOut]();
-    if (this.userInfo[userMapgroupID] != null) {
+    if (this.userInfo[userMapGroupIDs] != null) {
       await callFunction(getcallable('deleteUserMap'), param: {
         'UID': this.userInfo['UID'],
-        'groupID': this.userInfo[userMapgroupID],
+        'groupID': this.userInfo[userMapGroupIDs],
       });
     } else if (this.userInfo[userMapSubscribedGroups] != null) {
       if (this.userInfo[userMapSubscribedGroups].length == 1) {

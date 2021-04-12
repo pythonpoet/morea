@@ -22,7 +22,7 @@ class EventAddPage extends StatefulWidget {
   final MoreaFirebase moreaFire;
   final Map eventinfo;
   final AgendaModus agendaModus;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Agenda agenda;
 
   @override
@@ -37,11 +37,10 @@ class EventAddPageState extends State<EventAddPage> {
   Agenda agenda;
   MoreaFirebase moreafire;
   int value = 2;
-  List<String> mitnehmen = [];
-  final _changekey = new GlobalKey<FormState>(debugLabel: "_changekey");
+  List<dynamic> mitnehmen = [];
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
   final _addLager = new GlobalKey<FormState>(debugLabel: "_addLager");
-  List<TextEditingController> mitnehmenController = [TextEditingController()];
+  List<TextEditingController> mitnehmenController = [];
 
   String eventname = ' ',
       datum = 'Datum wählen',
@@ -57,34 +56,70 @@ class EventAddPageState extends State<EventAddPage> {
       datumbis = 'Datum wählen',
       lagerort = ' ';
   String order;
-  List<Map<dynamic, dynamic>> subgroups;
+  List<Map<String, dynamic>> subgroups = <Map<String, dynamic>>[];
 
   Map<String, dynamic> event, lager;
   Map<String, bool> groupCheckbox;
 
-  Map<String, bool> stufen = {
-    'Biber': false,
-    'Wombat (Wölfe)': false,
-    'Nahani (Meitli)': false,
-    'Drason (Buebe)': false,
-    'Pios': false,
-  };
+  bool initDone = false;
 
   @override
-  void dispose(){
-    for(TextEditingController controller in mitnehmenController){
+  void dispose() {
+    for (TextEditingController controller in mitnehmenController) {
       controller.dispose();
     }
     super.dispose();
   }
 
-  bool validateAndSave(_key) {
+  bool validateAndSave(_key, BuildContext context) {
     final form = _key.currentState;
-    if (form.validate()) {
-      form.save();
-      return true;
-    } else {
+    if (datum == 'Datum wählen') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white,
+            ),
+            Padding(padding: EdgeInsets.only(right: 10)),
+            Text(
+              'Bitte Datum wählen!',
+              style: MoreaTextStyle.warningSnackbar,
+            ),
+          ],
+        ),
+        duration: Duration(seconds: 5),
+        backgroundColor: Colors.red,
+      ));
       return false;
+    } else {
+      if (!groupCheckbox.values.any((element){return element;})) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                color: Colors.white,
+              ),
+              Padding(padding: EdgeInsets.only(right: 10)),
+              Text(
+                'Bitte Fähnli auswählen!',
+                style: MoreaTextStyle.warningSnackbar,
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red,
+        ));
+        return false;
+      } else {
+        if (form.validate()) {
+          form.save();
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   }
 
@@ -92,21 +127,21 @@ class EventAddPageState extends State<EventAddPage> {
     groupCheckbox = Map<String, bool>();
     if (widget.eventinfo['eventID'] == null) {
       for (Map groupMap in subgroups) {
-        this.groupCheckbox[groupMap[userMapgroupID]] = false;
+        this.groupCheckbox[groupMap['groupID']] = false;
       }
     } else {
       for (Map groupMap in subgroups) {
-        if (widget.eventinfo['groupIDs'].contains(groupMap[userMapgroupID])) {
-          this.groupCheckbox[groupMap[userMapgroupID]] = true;
+        if (widget.eventinfo['groupIDs'].contains(groupMap[groupMapGroupID])) {
+          this.groupCheckbox[groupMap['groupID']] = true;
         } else {
-          this.groupCheckbox[groupMap[userMapgroupID]] = false;
+          this.groupCheckbox[groupMap['groupID']] = false;
         }
       }
     }
   }
 
-  void eventHinzufuegen() {
-    if (validateAndSave(_addEvent)) {
+  void eventHinzufuegen(BuildContext context) {
+    if (validateAndSave(_addEvent, context)) {
       for (TextEditingController controller in mitnehmenController) {
         mitnehmen.add(controller.text);
       }
@@ -146,8 +181,8 @@ class EventAddPageState extends State<EventAddPage> {
     }
   }
 
-  void lagerHinzufuegen() {
-    if (validateAndSave(_addLager)) {
+  void lagerHinzufuegen(BuildContext context) {
+    if (validateAndSave(_addLager, context)) {
       for (TextEditingController controller in mitnehmenController) {
         mitnehmen.add(controller.text);
       }
@@ -298,7 +333,7 @@ class EventAddPageState extends State<EventAddPage> {
           child: Text('Lager wirklich löschen?'),
         ),
         actions: <Widget>[
-          new RaisedButton(
+          new ElevatedButton(
               child: Text(
                 'Löschen',
                 style: TextStyle(color: Colors.white),
@@ -327,7 +362,7 @@ class EventAddPageState extends State<EventAddPage> {
           child: Text('Event wirklich löschen?'),
         ),
         actions: <Widget>[
-          new RaisedButton(
+          new ElevatedButton(
               child: Text(
                 'Löschen',
                 style: TextStyle(color: Colors.white),
@@ -348,10 +383,11 @@ class EventAddPageState extends State<EventAddPage> {
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, "1165")).data;
-    this.subgroups =
-        new List<Map<dynamic, dynamic>>.from(data[groupMapSubgroup]);
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data();
+    data[groupMapGroupOption][groupMapGroupLowerClass]
+        .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
+    this.initDone = true;
     setState(() {});
   }
 
@@ -364,9 +400,11 @@ class EventAddPageState extends State<EventAddPage> {
 
     anfangzeit = widget.eventinfo['Anfangszeit'];
     schlusszeit = widget.eventinfo['Schlusszeit'];
-    if (widget.eventinfo.containsKey("Stufen"))
-      stufen = Map<String, bool>.from(widget.eventinfo['Stufen']);
-    mitnehmen = List<String>.from(widget.eventinfo['Mitnehmen']);
+    mitnehmen = widget.eventinfo['Mitnehmen'];
+    for (var mitnehmenTile in mitnehmen) {
+      mitnehmenController.add(TextEditingController.fromValue(
+          TextEditingValue(text: mitnehmenTile)));
+    }
     order = widget.eventinfo['Order'];
     moreafire = widget.moreaFire;
     crud0 = new CrudMedthods(widget.firestore);
@@ -376,7 +414,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (subgroups == null)
+    if (subgroups == null || !this.initDone)
       return Card(
         child: Container(
           padding: EdgeInsets.all(100),
@@ -389,7 +427,7 @@ class EventAddPageState extends State<EventAddPage> {
           length: 2,
           child: new Scaffold(
             appBar: new AppBar(
-              title: Text('zur Agenda hinzufügen'),
+              title: Text('Zur Agenda hinzufügen'),
               bottom: TabBar(
                 tabs: <Widget>[Tab(text: 'Event'), Tab(text: 'Lager')],
               ),
@@ -405,21 +443,7 @@ class EventAddPageState extends State<EventAddPage> {
           appBar: new AppBar(
             title: Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
           ),
-          body: LayoutBuilder(
-            builder:
-                (BuildContext context, BoxConstraints viewportConstraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: viewportConstraints.maxHeight,
-                    ),
-                    child: SingleChildScrollView(
-                        child: Column(
-                      children: <Widget>[eventWidget()],
-                    ))),
-              );
-            },
-          ),
+          body: eventWidget(),
         );
 
         break;
@@ -433,45 +457,6 @@ class EventAddPageState extends State<EventAddPage> {
       default:
         return null;
     }
-  }
-
-  void changemitnehmen(int index) {
-    showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => new Form(
-              key: _changekey,
-              child: new AlertDialog(
-                contentPadding: const EdgeInsets.all(16.0),
-                content: new Row(
-                  children: <Widget>[
-                    new Expanded(
-                      child: new TextFormField(
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        decoration:
-                            new InputDecoration(hintText: mitnehmen[index]),
-                        onSaved: (value) => mitnehmen[index] = value,
-                      ),
-                    )
-                  ],
-                ),
-                actions: <Widget>[
-                  moreaRaisedIconButton(
-                      'OK',
-                      validateMitnehmen,
-                      Icon(
-                        Icons.check,
-                        size: 14,
-                        color: Colors.white,
-                      )),
-                ],
-              ),
-            ));
-  }
-
-  validateMitnehmen() {
-    validateAndSave(_changekey);
-    Navigator.pop(context);
   }
 
   List<Widget> buildMitnehmen() {
@@ -514,8 +499,8 @@ class EventAddPageState extends State<EventAddPage> {
   void removeElement() {
     if (mitnehmenController.length != 0) {
       this.setState(() {
-            mitnehmenController.removeLast();
-          });
+        mitnehmenController.removeLast();
+      });
     }
   }
 
@@ -570,9 +555,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                 flex: 7,
-                                child: RaisedButton(
-                                  onPressed: () => _selectDatumvon(context),
-                                  child: Text(datumvon),
+                                child: moreaRaisedButton(
+                                  datumvon,
+                                  () => _selectDatumvon(context),
                                 ),
                               )
                             ],
@@ -587,9 +572,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                   flex: 7,
-                                  child: RaisedButton(
-                                    onPressed: () => _selectDatumbis(context),
-                                    child: Text(datumbis),
+                                  child: moreaRaisedButton(
+                                    datumbis,
+                                    () => _selectDatumbis(context),
                                   ))
                             ],
                           )),
@@ -631,9 +616,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                 flex: 3,
-                                child: RaisedButton(
-                                  onPressed: () => _selectAnfangszeit(context),
-                                  child: Text(anfangzeit),
+                                child: moreaRaisedButton(
+                                  anfangzeit,
+                                  () => _selectAnfangszeit(context),
                                 ),
                               ),
                               Expanded(
@@ -665,9 +650,9 @@ class EventAddPageState extends State<EventAddPage> {
                               ),
                               Expanded(
                                 flex: 3,
-                                child: RaisedButton(
-                                  onPressed: () => _selectSchlusszeit(context),
-                                  child: Text(schlusszeit),
+                                child: moreaRaisedButton(
+                                  schlusszeit,
+                                  () => _selectSchlusszeit(context),
                                 ),
                               ),
                               Expanded(
@@ -707,12 +692,11 @@ class EventAddPageState extends State<EventAddPage> {
                                         return new CheckboxListTile(
                                           title: new Text(
                                               group[groupMapgroupNickName]),
-                                          value: groupCheckbox[
-                                              group[userMapgroupID]],
+                                          value:
+                                              groupCheckbox[group['groupID']],
                                           onChanged: (bool value) {
                                             setState(() {
-                                              groupCheckbox[
-                                                      group[userMapgroupID]] =
+                                              groupCheckbox[group['groupID']] =
                                                   value;
                                             });
                                           },
@@ -815,7 +799,9 @@ class EventAddPageState extends State<EventAddPage> {
                                     children: buildMitnehmen(),
                                   ),
                                   Container(
-                                    margin: EdgeInsets.only(top: 0,),
+                                    margin: EdgeInsets.only(
+                                      top: 0,
+                                    ),
                                     child: FractionallySizedBox(
                                       widthFactor: 1,
                                       child: Row(
@@ -872,7 +858,7 @@ class EventAddPageState extends State<EventAddPage> {
                             Expanded(
                               child: moreaRaisedButton(
                                 'Speichern',
-                                this.lagerHinzufuegen,
+                                () => {this.lagerHinzufuegen(context)},
                               ),
                             ),
                           ],
@@ -887,332 +873,315 @@ class EventAddPageState extends State<EventAddPage> {
   }
 
   Widget eventWidget() {
-    return new Container(
-        height: 700,
-        child: LayoutBuilder(builder:
-            (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-              child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: viewportConstraints.maxHeight,
+    return SingleChildScrollView(
+      child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return Form(
+            key: _addEvent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Event Name'),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: new TextFormField(
+                            initialValue: widget.eventinfo['Eventname'],
+                            decoration: new InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: MoreaColors.violett)),
+                              filled: false,
+                            ),
+                            onSaved: (value) => eventname = value,
+                            validator: (val) {
+                              if (val.isEmpty) {
+                                return 'Bitte nicht leer lassen';
+                              } else {
+                                return null;
+                              }
+                            },
+                          ),
+                        )
+                      ],
+                    )),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Datum'),
+                        ),
+                        Expanded(
+                            flex: 7,
+                            child: moreaRaisedButton(
+                              datum,
+                              () => _selectDatum(context),
+                            ))
+                      ],
+                    )),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Beginn'),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: moreaRaisedButton(
+                            anfangzeit,
+                            () => _selectAnfangszeit(context),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: new TextFormField(
+                            initialValue: widget.eventinfo['Anfangsort'],
+                            decoration: new InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.red)),
+                                border: OutlineInputBorder(),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: MoreaColors.violett)),
+                                filled: false,
+                                hintText: 'Ort'),
+                            onSaved: (value) => anfangort = value,
+                          ),
+                        )
+                      ],
+                    )),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Schluss'),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: moreaRaisedButton(
+                            schlusszeit,
+                            () => _selectSchlusszeit(context),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: new TextFormField(
+                            initialValue: widget.eventinfo['Schlussort'],
+                            decoration: new InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.red)),
+                                border: OutlineInputBorder(),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: MoreaColors.violett)),
+                                filled: false,
+                                hintText: 'Ort'),
+                            onSaved: (value) => schlussort = value,
+                          ),
+                        )
+                      ],
+                    )),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    height: (60 * groupCheckbox.length).toDouble(),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Betrifft'),
+                        ),
+                        Expanded(
+                            flex: 7,
+                            child: new ListView(
+                                physics: NeverScrollableScrollPhysics(),
+                                children: subgroups
+                                    .map((Map<dynamic, dynamic> group) {
+                                  return CheckboxListTile(
+                                    title: Text(group[groupMapgroupNickName]),
+                                    value: groupCheckbox[group["groupID"]],
+                                    onChanged: (bool value) {
+                                      setState(() {
+                                        groupCheckbox[group["groupID"]] = value;
+                                      });
+                                    },
+                                  );
+                                }).toList()))
+                      ],
+                    )),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Beschreibung'),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: new TextFormField(
+                            initialValue: widget.eventinfo['Beschreibung'],
+                            decoration: new InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: MoreaColors.violett)),
+                              filled: false,
+                            ),
+                            maxLines: 10,
+                            onSaved: (value) => beschreibung = value,
+                          ),
+                        )
+                      ],
+                    )),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: Text('Kontakt'),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: new TextFormField(
+                            initialValue: widget.eventinfo['Kontakt']
+                                ['Pfadiname'],
+                            decoration: new InputDecoration(
+                              hintText: 'Pfadiname',
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: MoreaColors.violett)),
+                              filled: false,
+                            ),
+                            onSaved: (value) => pfadiname = value,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 4,
+                          child: new TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            initialValue: widget.eventinfo['Kontakt']['Email'],
+                            decoration: new InputDecoration(
+                              hintText: 'Email',
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: MoreaColors.violett)),
+                              filled: false,
+                            ),
+                            onSaved: (value) => email = value,
+                          ),
+                        )
+                      ],
+                    )),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 3,
+                        child: Text('Mitnehmen'),
+                      ),
+                      Expanded(
+                        flex: 7,
+                        child: Column(
+                          children: <Widget>[
+                            Column(
+                              children: buildMitnehmen(),
+                            ),
+                            Container(
+                              child: FractionallySizedBox(
+                                widthFactor: 1,
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 7,
+                                      child: moreaFlatIconButton(
+                                          'ELEMENT',
+                                          this.removeElement,
+                                          Icon(
+                                            Icons.remove,
+                                            size: 15,
+                                            color: MoreaColors.violett,
+                                          )),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(),
+                                    ),
+                                    Expanded(
+                                      flex: 7,
+                                      child: moreaFlatIconButton(
+                                          'ELEMENT',
+                                          this.addElement,
+                                          Icon(
+                                            Icons.add,
+                                            size: 14,
+                                            color: MoreaColors.violett,
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                  child: Form(
-                      key: _addEvent,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Event Name'),
-                                  ),
-                                  Expanded(
-                                    flex: 7,
-                                    child: new TextFormField(
-                                      initialValue:
-                                          widget.eventinfo['Eventname'],
-                                      decoration: new InputDecoration(
-                                        errorBorder: OutlineInputBorder(
-                                            borderSide:
-                                                BorderSide(color: Colors.red)),
-                                        border: OutlineInputBorder(),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: MoreaColors.violett)),
-                                        filled: false,
-                                      ),
-                                      onSaved: (value) => eventname = value,
-                                    ),
-                                  )
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Datum'),
-                                  ),
-                                  Expanded(
-                                      flex: 7,
-                                      child: RaisedButton(
-                                        onPressed: () => _selectDatum(context),
-                                        child: Text(datum),
-                                      ))
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Beginn'),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: RaisedButton(
-                                      onPressed: () =>
-                                          _selectAnfangszeit(context),
-                                      child: Text(anfangzeit),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: new TextFormField(
-                                      initialValue:
-                                          widget.eventinfo['Anfangsort'],
-                                      decoration: new InputDecoration(
-                                          errorBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.red)),
-                                          border: OutlineInputBorder(),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: MoreaColors.violett)),
-                                          filled: false,
-                                          hintText: 'Ort'),
-                                      onSaved: (value) => anfangort = value,
-                                    ),
-                                  )
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Schluss'),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: RaisedButton(
-                                      onPressed: () =>
-                                          _selectSchlusszeit(context),
-                                      child: Text(schlusszeit),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: new TextFormField(
-                                      initialValue:
-                                          widget.eventinfo['Schlussort'],
-                                      decoration: new InputDecoration(
-                                          errorBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.red)),
-                                          border: OutlineInputBorder(),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: MoreaColors.violett)),
-                                          filled: false,
-                                          hintText: 'Ort'),
-                                      onSaved: (value) => schlussort = value,
-                                    ),
-                                  )
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              height: (60 * groupCheckbox.length).toDouble(),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Betrifft'),
-                                  ),
-                                  Expanded(
-                                      flex: 7,
-                                      child: new ListView(
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          children: subgroups.map(
-                                              (Map<dynamic, dynamic> group) {
-                                            return new CheckboxListTile(
-                                              title: new Text(
-                                                  group[groupMapgroupNickName]),
-                                              value: groupCheckbox[
-                                                  group[userMapgroupID]],
-                                              onChanged: (bool value) {
-                                                setState(() {
-                                                  groupCheckbox[group[
-                                                      userMapgroupID]] = value;
-                                                });
-                                              },
-                                            );
-                                          }).toList()))
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Beschreibung'),
-                                  ),
-                                  Expanded(
-                                    flex: 7,
-                                    child: new TextFormField(
-                                      initialValue:
-                                          widget.eventinfo['Beschreibung'],
-                                      decoration: new InputDecoration(
-                                        errorBorder: OutlineInputBorder(
-                                            borderSide:
-                                                BorderSide(color: Colors.red)),
-                                        border: OutlineInputBorder(),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: MoreaColors.violett)),
-                                        filled: false,
-                                      ),
-                                      maxLines: 10,
-                                      onSaved: (value) => beschreibung = value,
-                                    ),
-                                  )
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('Kontakt'),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: new TextFormField(
-                                      initialValue: widget.eventinfo['Kontakt']
-                                          ['Pfadiname'],
-                                      decoration: new InputDecoration(
-                                        hintText: 'Pfadiname',
-                                        errorBorder: OutlineInputBorder(
-                                            borderSide:
-                                                BorderSide(color: Colors.red)),
-                                        border: OutlineInputBorder(),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: MoreaColors.violett)),
-                                        filled: false,
-                                      ),
-                                      onSaved: (value) => pfadiname = value,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: new TextFormField(
-                                      keyboardType: TextInputType.emailAddress,
-                                      initialValue: widget.eventinfo['Kontakt']
-                                          ['Email'],
-                                      decoration: new InputDecoration(
-                                        hintText: 'Email',
-                                        errorBorder: OutlineInputBorder(
-                                            borderSide:
-                                                BorderSide(color: Colors.red)),
-                                        border: OutlineInputBorder(),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: MoreaColors.violett)),
-                                        filled: false,
-                                      ),
-                                      onSaved: (value) => email = value,
-                                    ),
-                                  )
-                                ],
-                              )),
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Expanded(
-                                  flex: 3,
-                                  child: Text('Mitnehmen'),
-                                ),
-                                Expanded(
-                                  flex: 7,
-                                  child: Column(
-                                    children: <Widget>[
-                                      Column(
-                                        children: buildMitnehmen(),
-                                      ),
-                                      Container(
-                                        child: FractionallySizedBox(
-                                          widthFactor: 1,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                flex: 7,
-                                                child: moreaFlatIconButton(
-                                                    'ELEMENT',
-                                                    this.removeElement,
-                                                    Icon(
-                                                      Icons.remove,
-                                                      size: 15,
-                                                      color:
-                                                          MoreaColors.violett,
-                                                    )),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Container(),
-                                              ),
-                                              Expanded(
-                                                flex: 7,
-                                                child: moreaFlatIconButton(
-                                                    'ELEMENT',
-                                                    this.addElement,
-                                                    Icon(
-                                                      Icons.add,
-                                                      size: 14,
-                                                      color:
-                                                          MoreaColors.violett,
-                                                    )),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.all(10),
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: moreaFlatRedButton(
-                                    'Löschen',
-                                    this.eventdelete,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 20),
-                                ),
-                                Expanded(
-                                  child: moreaRaisedButton(
-                                    'Speichern',
-                                    this.eventHinzufuegen,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 20),
-                          )
-                        ],
-                      ))));
-        }));
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: moreaFlatRedButton(
+                          'Löschen',
+                          this.eventdelete,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 20),
+                      ),
+                      Expanded(
+                        child: moreaRaisedButton(
+                          'Speichern',
+                          () => {this.eventHinzufuegen(context)},
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 20),
+                )
+              ],
+            ));
+      }),
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 
 class ChangeEmail extends StatefulWidget {
   final String email;
@@ -79,8 +80,10 @@ class _ChangeEmailState extends State<ChangeEmail> {
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if(value.isEmpty){
                             return 'Bitte nicht leer lassen';
+                          } else if (!MoreaInputValidator.email(value)){
+                            return 'Bitte gültige E-Mail verwenden';
                           } else {
                             return null;
                           }

@@ -22,6 +22,7 @@ if (flutterVersionName == null) {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystoreProperties = new Properties()
@@ -31,23 +32,17 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 28
-
-     /*sourceSets {
+    compileSdkVersion 30
+    
+    sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-    }*/
-
-    lintOptions {
-        disable 'InvalidPackage'
     }
     defaultConfig {
-        applicationId "ch.morea.morea"
-        minSdkVersion 16
-        targetSdkVersion 29
+        applicationId "productions.morea.app"
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
     signingConfigs {
         release {
@@ -75,14 +70,11 @@ flutter {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    /*testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    //implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'androidx.multidex:multidex'
-    //implementation 'com.google.firebase:firebase-auth:17.0.0'
-    //implementation 'com.google.firebase:firebase-analytics:16.0.0'
+    implementation 'androidx.multidex:multidex'*/
 }
 apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'kotlin-android'

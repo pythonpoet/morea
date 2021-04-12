@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.morea.morea">
+    package="productions.morea.app">
 
     <!-- The INTERNET permission is required for development. Specifically,
          flutter needs it to communicate with the running application
@@ -14,10 +14,11 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Pfadi Morea"
-        android:roundIcon="@mipmap/ic_morea_launcher_round">
+        android:icon="@mipmap/launcher_icon"
+        android:label="Morea">
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_ic_notification" />
@@ -27,10 +28,15 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorCustomNotification" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBFvIWmgunjzx7l8TytZg4vPQ7Tgg2k6V0" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize">

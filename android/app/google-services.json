@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "782312393773",
-    "firebase_url": "https://pfadi-morea.firebaseio.com",
-    "project_id": "pfadi-morea",
-    "storage_bucket": "pfadi-morea.appspot.com"
+    "project_number": "891584307361",
+    "firebase_url": "https://morea-8f840.firebaseio.com",
+    "project_id": "morea-8f840",
+    "storage_bucket": "morea-8f840.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:782312393773:android:c10f471f8f449c59373ca4",
+        "mobilesdk_app_id": "1:891584307361:android:7d2290de7384810ed010e0",
         "android_client_info": {
-          "package_name": "ch.morea.morea"
+          "package_name": "productions.morea.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "782312393773-s4133bc25e5j1afsqon6d8rdpjs1pg5s.apps.googleusercontent.com",
+          "client_id": "891584307361-pskmvh6daubc7jtl1boe1i2gcr4qc6r1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDHVCZ-RGqcuvKXQqtXZivnEcYLbFcNZPk"
+          "current_key": "AIzaSyBXKlAMZwb8l2A863s0Odh_nAW4IHF2kso"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "782312393773-s4133bc25e5j1afsqon6d8rdpjs1pg5s.apps.googleusercontent.com",
+              "client_id": "891584307361-pskmvh6daubc7jtl1boe1i2gcr4qc6r1.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "782312393773-j08q5fos63cl88m2iuaogr89else5uhi.apps.googleusercontent.com",
+              "client_id": "891584307361-eg7gmf0975qnufrkgmsita1uh4jnf8ij.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "ch.morea.app"
+                "bundle_id": "productions.morea.app"
               }
             }
           ]

@@ -16,9 +16,9 @@ final String buebewebflowname = 'Drason (Buebe)';
 final String midatanamebiber = '3775';
 final String midatanamewoelf = '3776';
 final String midatanamemeitli = '3779';
-final String midatanamebuebe = '4013';
+final String midatanamebuebe = 'Op3qqioWs36MCeoWgDYL';
 
-//collection-paths for Firestore
+//collection-paths for FirebaseFirestore
 final String pathEvents = "events";
 final String pathGroups = "groups";
 final String pathMessages = "messages";
@@ -28,12 +28,16 @@ final String pathAnmeldungen = "Anmeldungen";
 final String pathRequest = "request";
 final String pathInit = "init";
 final String pathChildren = "children";
+final String pathPriviledge = "priviledge";
+
+final String moreaGroupID = 'f7bl3m4GSpvvo7iw5wNd';
 
 //Maps
 final String mapTimestamp = "Timestamp";
 //userMap
 final String userMapUID = "UID";
 final String userMapgroupID = "groupID";
+final String userMapGroupIDs = "groupIDs";
 final String userMapGroupEdditingAllow = "groupEdditingAllow";
 final String userMapPfadiName = "Pfadinamen";
 final String userMapNachName = "Nachname";
@@ -61,20 +65,79 @@ final String userMapChildUID = 'childUID';
 //groupMap
 final String groupMapEventID = "eventID";
 final String groupMapgroupNickName = "groupNickName";
+final String groupMapGroupID = "groupID";
 final String groupMapSubgroup = "subgroups";
 final String groupMapAktuellerTeleblitz = "AktuellerTeleblitz";
 final String groupMapHomeFeed = "homeFeed";
-final String groupMapPriviledge = "Priviledge";
-final String groupMapDisplayName = "DisplayName";
+
+final String groupMapUploadeByUserID = "userID";
+final String groupMapUploadedTimeStamp = "timeStamp";
+final String groupMapParticipatingGroups = "groupID";
+final String groupMapEventStartTimeStamp = "startTimeStamp";
+final String groupMapEventEndTimeStamp = "endTimeStamp";
+final String groupMapGroupOption = "groupOption";
+final String groupMapParentalControl = "parentalControl";
+final String groupMapGroupUpperClass = "groupMapGroupUpperClass";
+final String groupMapGroupLowerClass = "groupMapLowerClass";
+final String groupMapGroupLicence = "groupLicence";
+final String groupMapGroupLicenceType = "groupMapGroupLicenceType";
+final String groupMapGroupLienceTypePremium = "groupMapGroupLienceTypePremium";
+final String groupMapGroupLienceTypeStandart =
+    "groupMapGroupLienceTypeStandart";
+final String groupMapGroupLienceTypeAnarchy = "groupMapGroupLienceTypeAnarchy";
+final String groupMapAdminGroupMemberBrowser =
+    "groupMapAdminGroupMemberBrowser";
+final String groupMapgroupPriviledge = "groupPriviledge";
+final String groupMapEnableDisplayName = "groupMapEnableDisplayName";
+final String groupMapEventTeleblitzEnable = "groupMapEventTeleblitzEnable";
+final String groupMapChatEnable = "groupMapChatEnable";
+final String groupMapGroupLicencePath = "groupMapGroupLicencePath";
+final String groupMapGroupLicenceDocument = "groupMapGroupLicenceDocument";
+
+// GroupMap -> PriviledgeEntry
+final String groupMapPriviledgeEntryCustomInfo = 'customInfo';
+final String groupMapPriviledgeEntryType = "roleType";
+final String groupMapDisplayName = "displayName";
+final String groupMapGroupJoinDate = "groupJoinDate";
+
+//GroupMap -> Roles
+final String groupMapRolesRoleName = 'roleName';
+final String groupMapRolesCustomInfoTypes = 'customInfoTypes';
+final String groupMapPriviledgeEntrySeeMembers =
+    "groupMapPriviledgeEntrySeeMembers";
+final String groupMapPriviledgeEntrySeeMembersDetails =
+    "groupMapPriviledgeEntrySeeMembersDetails";
+final String eventTeleblitzPriviledge = 'teleblitzPriviledge';
+final String groupMapPriviledgeEntryLocation = "roleLocation";
+final String groupMapRoles = "roles";
 
 //eventMap
 final String eventMapAnmeldeStatusNegativ = "ChuntNoed";
 final String eventMapAnmeldeStatusPositiv = "Chunt";
 final String eventMapAnmeldeUID = "AnmeldeUID";
+final String eventMapType = "EventType";
 
-//Teleblitz-local Map
+//Teleblitz
 final String tlbzMapLoading = "Loading";
 final String tlbzMapNoElement = "noElement";
+final String tlbzMapTeleblitzType = "TeleblitzType";
+final String tlbzMapArchived = "_archived";
+final String tlbzMapDraft = "_draft";
+final String tlbzMapAntreten = "antreten";
+final String tlbzMapAbtreten = "abtreten";
+final String tlbzMapBemerkung = "bemerkung";
+final String tlbzMapDatum = "datum";
+final String tlbzMapEndeFerien = "ende-ferien";
+final String tlbzMapFerien = "ferien";
+final String tlbzMapGoogleMaps = "google-map";
+final String tlbzMapGrund = "grund";
+final String tlbzMapKeineAktivitaet = "keine-aktivitat";
+final String tlbzMapMapAbtreten = "map-abtreten";
+final String tlbzMapMitnehmenTest = "mitnehmen-test";
+final String tlbzMapName = "name";
+final String tlbzMapNameDesSenders = "name-des-senders";
+final String tlbzMapSlug = "slug";
+final String tlbzMapGroupIDs = "groupIDs";
 
 //Keys der Map der Navigation
 final String signedOut = 'signedOut';

@@ -3,6 +3,7 @@ import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 import 'Pages/About/about.dart';
+import 'Pages/Group/add_group.dart';
 import 'Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'Pages/Personenverzeichniss/profile_page.dart';
 import 'Widgets/Action/scan.dart';
@@ -15,6 +16,7 @@ class MoreaColors {
   static int orangeInt = 0xffff9262;
   static int appBarInt = 0xffFF9B70;
   static Color bottomAppBar = Color.fromRGBO(43, 16, 42, 1);
+  static Color bottomAppBarHighlight = Color.fromRGBO(78, 17, 75, 1.0);
   static Color greyButton = Color.fromRGBO(230, 230, 230, 1);
 
   //306bac 3626A7
@@ -35,12 +37,12 @@ class MoreaColors {
 class MoreaShadow {
   static BoxDecoration teleblitz = BoxDecoration(
       color: Color.fromRGBO(255, 255, 255, 0.9),
-//      boxShadow: [
-//        BoxShadow(
-//            color: Color.fromRGBO(0, 0, 0, 0.16),
-//            offset: Offset(3, 3),
-//            blurRadius: 40)
-//      ],
+      boxShadow: [
+        BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            offset: Offset(3, 3),
+            blurRadius: 40)
+      ],
       borderRadius: BorderRadius.all(Radius.circular(10)));
 }
 
@@ -54,7 +56,6 @@ class MoreaShadowContainer extends Container {
   final EdgeInsetsGeometry margin =
       EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 40);
   final Widget child;
-  final Color color = Color.fromRGBO(255, 255, 255, 0.8);
   final BoxConstraints constraints = BoxConstraints(maxWidth: 450);
 }
 
@@ -72,7 +73,6 @@ class MoreaBackgroundContainer extends Container {
   );
   final Widget child;
   final Alignment alignment = Alignment.topCenter;
-  final Color color = Color.fromRGBO(255, 255, 255, 0.8);
 }
 
 const TextStyle MoreaTextStyleTop = TextStyle(
@@ -101,8 +101,6 @@ Widget moreaLoadingIndicator(
   );
 }
 
-
-
 class MoreaDivider extends Divider {
   final double thickness = 1;
   final Color color = Colors.black26;
@@ -116,8 +114,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toMessagePage],
               child: Column(
                 children: <Widget>[
@@ -136,8 +136,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toAgendaPage],
               child: Column(
                 children: <Widget>[
@@ -156,8 +158,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toHomePage],
               child: Column(
                 children: <Widget>[
@@ -176,8 +180,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15))),
               onPressed: navigationMap[toProfilePage],
               child: Column(
                 children: <Widget>[
@@ -205,7 +211,10 @@ BottomAppBar moreaChildBottomAppBar(Map navigationMap) {
   );
 }
 
-BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
+enum MoreaBottomAppBarActivePage { messages, agenda, teleblitz, profile, none }
+
+BottomAppBar moreaLeiterBottomAppBar(
+    Map navigationMap, String centerText, MoreaBottomAppBarActivePage active) {
   return BottomAppBar(
     elevation: 0,
     color: MoreaColors.bottomAppBar,
@@ -213,8 +222,15 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all<EdgeInsets>(
+                    EdgeInsets.symmetric(vertical: 15)),
+                backgroundColor: active == MoreaBottomAppBarActivePage.messages
+                    ? MaterialStateProperty.all<Color>(
+                        MoreaColors.bottomAppBarHighlight)
+                    : null,
+              ),
               onPressed: navigationMap[toMessagePage],
               child: Column(
                 children: <Widget>[
@@ -233,8 +249,15 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all<EdgeInsets>(
+                    EdgeInsets.symmetric(vertical: 15)),
+                backgroundColor: active == MoreaBottomAppBarActivePage.agenda
+                    ? MaterialStateProperty.all<Color>(
+                        MoreaColors.bottomAppBarHighlight)
+                    : null,
+              ),
               onPressed: navigationMap[toAgendaPage],
               child: Column(
                 children: <Widget>[
@@ -267,8 +290,11 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15)),
+                backgroundColor: active == MoreaBottomAppBarActivePage.teleblitz ? MaterialStateProperty.all<Color>(MoreaColors.bottomAppBarHighlight) : null,),
               onPressed: navigationMap[toHomePage],
               child: Column(
                 children: <Widget>[
@@ -287,8 +313,11 @@ BottomAppBar moreaLeiterBottomAppBar(Map navigationMap, String centerText) {
             flex: 1,
           ),
           Expanded(
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
+            child: TextButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 15)),
+                backgroundColor: active == MoreaBottomAppBarActivePage.profile ? MaterialStateProperty.all<Color>(MoreaColors.bottomAppBarHighlight) : null,),
               onPressed: navigationMap[toProfilePage],
               child: Column(
                 children: <Widget>[
@@ -351,7 +380,7 @@ Drawer moreaDrawer(
             title: new Text("TN zu Leiter machen"),
             trailing: new Icon(Icons.enhanced_encryption),
             onTap: () => makeLeiterWidget(context,
-                moreafire.getUserMap[userMapUID], moreafire.getGroupID),
+                moreafire.getUserMap[userMapUID], moreafire.getGroupIDs[0]),
           ),
           new Divider(),
           new ListTile(
@@ -363,7 +392,7 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: (){
+            onTap: () {
               Navigator.of(context).pop();
               signedOut();
             },
@@ -403,7 +432,7 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: (){
+            onTap: () {
               Navigator.of(context).pop();
               signedOut();
             },
@@ -446,7 +475,7 @@ Drawer moreaDrawer(
           new ListTile(
             title: new Text('Logout'),
             trailing: new Icon(Icons.cancel),
-            onTap: (){
+            onTap: () {
               Navigator.of(context).pop();
               signedOut();
             },

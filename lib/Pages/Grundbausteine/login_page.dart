@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
@@ -11,9 +10,10 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/mailchimp_api_manager.dart';
 import 'package:morea/services/morea_firestore.dart';
+import 'package:morea/services/user.dart';
 import 'package:morea/services/utilities/bubble_indication_painter.dart';
 import 'package:morea/services/utilities/dwi_format.dart';
-import 'package:morea/services/utilities/user.dart';
+import 'package:morea/services/utilities/moreaInputValidator.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,7 +21,7 @@ class LoginPage extends StatefulWidget {
 
   final BaseAuth auth;
   final Function onSignedIn;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
@@ -33,7 +33,6 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   DWIFormat dwiFormat = new DWIFormat();
   MoreaFirebase moreafire;
-  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   Datenschutz datenschutz = new Datenschutz();
   User moreaUser;
   Register register;
@@ -75,7 +74,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         switch (_formType) {
           //Login
           case FormType.login:
-          //Sets Login indicator
+            //Sets Login indicator
             setState(() {
               _load = true;
             });
@@ -105,7 +104,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
-                      .data["Datenschutz"]);
+                      .data()["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
@@ -116,7 +115,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     moreaUser.vorName,
                     moreaUser.nachName,
                     moreaUser.geschlecht,
-                    moreaUser.groupID,
+                    moreaUser.groupIDs,
                     moreafire);
               } else {
                 setState(() {
@@ -143,18 +142,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
-                      .data["Datenschutz"]);
+                      .data()["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
-                await mailChimpAPIManager.updateUserInfo(
-                    moreaUser.email,
-                    moreaUser.vorName,
-                    moreaUser.nachName,
-                    moreaUser.geschlecht,
-                    moreaUser.groupID,
-                    moreafire);
               } else {
                 setState(() {
                   _load = false;
@@ -214,21 +206,21 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           ],
         ),
         actions: <Widget>[
-          new FlatButton(
+          new TextButton(
               child: const Text('Abbrechen'),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new FlatButton(
+          new TextButton(
               child: const Text('Zurücksetzen'),
               onPressed: () {
                 Navigator.pop(context);
                 showDialog(
                     context: context,
-                    child: new AlertDialog(
-                      title: new Text(
-                          'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
-                    ));
+                    builder: (context) => AlertDialog(
+                          title: new Text(
+                              'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
+                        ));
                 widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
         ],
@@ -250,7 +242,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     moreaUser = new User(crud0);
     register = new Register(
         moreaUser: moreaUser,
-        docSnapAbteilung: crud0.getDocument(pathGroups, "1165"));
+        docSnapAbteilung: crud0.getDocument(pathGroups, moreaGroupID));
   }
 
   @override
@@ -310,9 +302,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           children: <Widget>[
             Flexible(
               fit: FlexFit.loose,
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
+              child: TextButton(
+                style: ButtonStyle(overlayColor:
+                    MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.pressed))
+                    return Colors.transparent;
+                  return null;
+                })),
                 onPressed: _registerAsTeilnehmer,
                 child: Text('Teilnehmer',
                     style: TextStyle(color: left, fontSize: 16.0)),
@@ -320,9 +317,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             ),
             Flexible(
               fit: FlexFit.loose,
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
+              child: TextButton(
+                style: ButtonStyle(overlayColor:
+                    MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.pressed))
+                    return Colors.transparent;
+                  return null;
+                })),
                 onPressed: _registerAsElternteil,
                 child: Text('Elternteil',
                     style: TextStyle(color: right, fontSize: 16.0)),
@@ -355,8 +357,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       borderSide: new BorderSide(width: 4, color: Colors.black),
                     ),
                   ),
-                  validator: (value) =>
-                      value.isEmpty ? 'Email darf nicht leer sein' : null,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Bitte nicht leer lassen';
+                    } else if (!MoreaInputValidator.email(value)) {
+                      return 'Bitte gültige E-Mail verwenden';
+                    } else {
+                      return null;
+                    }
+                  },
                   keyboardType: TextInputType.emailAddress,
                   onSaved: (value) => moreaUser.email = value,
                 ),
@@ -448,7 +457,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               Icons.create,
               color: MoreaColors.violett,
             )),
-        new FlatButton(
+        TextButton(
           child: new Text(
             'PASSWORT VERGESSEN',
             style: MoreaTextStyle.flatButton,

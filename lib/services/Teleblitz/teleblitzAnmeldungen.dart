@@ -24,7 +24,7 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
 
   Stream<List<String>> get getAbmeldungen => _abmeldeController.stream;
 
-  TeleblitzAnmeldungen(Firestore firestore, String eventID) {
+  TeleblitzAnmeldungen(FirebaseFirestore firestore, String eventID) {
     crud0 = new CrudMedthods(firestore);
     _anmeldeController.addStream(this.getTNAngemolden(eventID));
     _abmeldeController.addStream(this.getTNAbgemolden(eventID));
@@ -39,16 +39,16 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
     sDSAnAbmeldungen =
         crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
     Map<String, dynamic> mAnmdeldungen;
-    List<DocumentSnapshot> dsAnmeldungen = new List<DocumentSnapshot>();
-    List<String> lSAnmeldungen = new List<String>();
+    List<DocumentSnapshot> dsAnmeldungen = <DocumentSnapshot>[];
+    List<String> lSAnmeldungen = <String>[];
 
     yield* sDSAnAbmeldungen.map((QuerySnapshot qSAnmeldungen) {
-      dsAnmeldungen = qSAnmeldungen.documents;
+      dsAnmeldungen = qSAnmeldungen.docs;
       lSAnmeldungen.removeRange(0, lSAnmeldungen.length);
       for (DocumentSnapshot dSAnmeldung in dsAnmeldungen) {
-        mAnmdeldungen = dSAnmeldung.data;
+        mAnmdeldungen = dSAnmeldung.data();
         if (mAnmdeldungen.containsValue(eventMapAnmeldeStatusPositiv))
-          lSAnmeldungen.add(dSAnmeldung.data[eventMapAnmeldeUID]);
+          lSAnmeldungen.add(dSAnmeldung.data()[eventMapAnmeldeUID]);
       }
       return lSAnmeldungen;
     });
@@ -58,16 +58,16 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
     sDSAnAbmeldungen =
         crud0.streamCollection("$pathEvents/$eventID/$pathAnmeldungen");
     Map<String, dynamic> mAnmdeldungen;
-    List<DocumentSnapshot> dsAnmeldungen = new List<DocumentSnapshot>();
-    List<String> lSAnmeldungen = new List<String>();
+    List<DocumentSnapshot> dsAnmeldungen = <DocumentSnapshot>[];
+    List<String> lSAnmeldungen = <String>[];
 
     yield* sDSAnAbmeldungen.map((QuerySnapshot qSAnmeldungen) {
-      dsAnmeldungen = qSAnmeldungen.documents;
+      dsAnmeldungen = qSAnmeldungen.docs;
       lSAnmeldungen.removeRange(0, lSAnmeldungen.length);
       for (DocumentSnapshot dSAnmeldung in dsAnmeldungen) {
-        mAnmdeldungen = dSAnmeldung.data;
+        mAnmdeldungen = dSAnmeldung.data();
         if (mAnmdeldungen.containsValue(eventMapAnmeldeStatusNegativ))
-          lSAnmeldungen.add(dSAnmeldung.data[eventMapAnmeldeUID]);
+          lSAnmeldungen.add(dSAnmeldung.data()[eventMapAnmeldeUID]);
       }
       return lSAnmeldungen;
     });

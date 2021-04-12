@@ -5,5 +5,5 @@ import 'package:morea/services/cloud_functions.dart';
 Future<HttpsCallableResult> makeLeiter(
     String editUID, String request, String groupID) {
   return callFunction(getcallable("makeLeiter"),
-      param: {userMapgroupID: groupID, "editUID": editUID, "request": request});
+      param: {userMapGroupIDs: groupID, "editUID": editUID, "request": request});
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:morea/morealayout.dart';
 import 'dart:math' as math;
 
 class MoreaLoading {
@@ -38,8 +37,7 @@ class MoreaLoading {
   }
 
   Widget loading() {
-    return MoreaShadowContainer(
-        child: new Center(
+    return new Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -75,7 +73,7 @@ class MoreaLoading {
           )
         ],
       ),
-    ));
+    );
   }
 
   void dispose() {
@@ -123,7 +121,7 @@ class _MoreaLoadingWidgetState extends State<MoreaLoadingWidget>
           ),
           Expanded(
               flex: 1,
-              child: FlatButton(
+              child: TextButton(
                 child: Row(
                   children: <Widget>[
                     Icon(

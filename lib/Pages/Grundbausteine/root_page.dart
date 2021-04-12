@@ -19,14 +19,14 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../Widgets/standart/buttons.dart';
 import '../../morea_strings.dart';
-import '../../morealayout.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({this.auth, this.firestore});
 
   final BaseAuth auth;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   @override
   State<StatefulWidget> createState() => _RootPageState();
@@ -49,7 +49,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   AuthStatus authStatus = AuthStatus.loading;
   MoreaFirebase moreaFire;
   Map<String, Function> navigationMap;
-  FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
@@ -66,65 +66,41 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       prefix0.toAgendaPage: this.agendaPage,
       prefix0.toProfilePage: this.profilePage,
     };
-    firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
-        sound: true, badge: true, alert: true, provisional: false));
   }
 
   @override
   void dispose() {
-    print('disposing root');
     super.dispose();
   }
 
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
-    await this.moreaFire.getData(await auth.currentUser());
+    if (await this.moreaFire.getData(await auth.currentUser()) == false) {
+      setState(() {
+        this.signedOut();
+      });
+    }
     await this.moreaFire.initTeleblitz();
-    firebaseMessaging.configure(
-        onMessage: (Map<String, dynamic> message) async {
-      print(message);
-      if (message['data']['typeMorea'] == 'Message') {
+    FirebaseMessaging.onMessage.listen((message) {
+      print("message recieved");
+      if (message.data['typeMorea'] == 'Message') {
         showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('Neue Nachricht'),
-                    actions: <Widget>[
-                      RaisedButton(
-                        color: MoreaColors.violett,
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          navigationMap[toMessagePage]();
-                        },
-                        child: Text(
-                          'Ansehen',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      RaisedButton(
-                        color: MoreaColors.violett,
-                        child: Text(
-                          'Später',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      )
-                    ],
-                  );
-                },
-              );
-      }
-    }, onResume: (Map<String, dynamic> message) async {
-      print(message);
-      if(message['data']['typeMorea'] == 'Message'){
-        navigationMap[prefix0.toMessagePage]();
-      }
-    }, onLaunch: (Map<String, dynamic> message) async {
-      print(message);
-      if(message['data']['typeMorea'] == 'Message'){
-        navigationMap[prefix0.toMessagePage]();
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Neue Nachricht'),
+              actions: <Widget>[
+                moreaRaisedButton('Ansehen', () {
+                  Navigator.of(context).pop();
+                  navigationMap[toMessagePage]();
+                }),
+                moreaRaisedButton('Später', () {
+                  Navigator.of(context).pop();
+                })
+              ],
+            );
+          },
+        );
       }
     });
     authStatus = AuthStatus.homePage;
@@ -169,14 +145,13 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       case AuthStatus.homePageTutorial:
         return ShowCaseWidget(
           builder: Builder(
-            builder: (contex) => HomePage(
-              auth: auth,
-              firestore: widget.firestore,
-              navigationMap: navigationMap,
-              moreafire: moreaFire,
-              tutorial: true,
-          )
-          ),
+              builder: (contex) => HomePage(
+                    auth: auth,
+                    firestore: widget.firestore,
+                    navigationMap: navigationMap,
+                    moreafire: moreaFire,
+                    tutorial: true,
+                  )),
         );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
@@ -238,7 +213,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   void signedIn({bool tutorialautostart}) async {
     await initMoreaFire();
     setState(() {
-      if(tutorialautostart){
+      if (tutorialautostart) {
         authStatus = AuthStatus.homePageTutorial;
       } else {
         authStatus = AuthStatus.homePage;
@@ -294,7 +269,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     });
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceID;
-    if (Platform.isAndroid) if (Platform.isAndroid) {
+    if (Platform.isAndroid) {
       AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
       deviceID = androidDeviceInfo.androidId;
     } else if (Platform.isIOS) {
@@ -302,9 +277,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
       deviceID = iosDeviceInfo.identifierForVendor;
     }
     await callFunction(getcallable("deactivateDeviceNotification"),
-        param: {'uid': (await auth.currentUser()), 'deviceID': deviceID});
+        param: {'uid': (auth.getUserID), 'deviceID': deviceID});
     await auth.signOut();
-    await firebaseMessaging.deleteInstanceID();
+    await firebaseMessaging.deleteToken();
     moreaFire = null;
     setState(() {
       authStatus = AuthStatus.notSignedIn;
