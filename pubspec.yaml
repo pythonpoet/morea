@@ -10,17 +10,13 @@ description: Teleblitz app
 version: 1.0.3+9
 
 environment:
-    sdk: ">=2.7.0 <3.0.0"
+    sdk: ^3.1.1
 
 dependencies:
     flutter_localizations:
         sdk: flutter
     flutter:
         sdk: flutter
-    firebase_auth: ^1.0.1
-    firebase_messaging: any
-    firebase_analytics: any
-    firebase_core : ^1.0.0
     chewie: ^1.0.0
     cloud_functions: ^1.0.0
     flutter_html: any
@@ -32,20 +28,21 @@ dependencies:
     expandable: any
     qr_flutter: any
     random_string: any
-    barcode_scan: ^1.0.0
-    flutter_masked_text: ^0.8.0
-    rxdart: ^0.22.4
+    barcode_scan2: ^4.3.0
+    rxdart: ^0.27.7
     flutter_datetime_picker: ^1.4.0
-    flip_card: ^0.4.4
-    showcaseview: ^0.1.5
-    device_info: ^0.4.1
+    flip_card: ^0.7.0
+    showcaseview: ^2.0.3
+    device_information: ^0.0.4
     shared_preferences: any
     google_maps_place_picker: ^2.0.0-nullsafety.3
+    flutter_masked_text2: ^0.9.1
 
 
     # The following adds the Cupertino Icons font to your application.
     # Use with the CupertinoIcons class for iOS style icons.
     cupertino_icons: ^1.0.2
+    firebase_core: ^1.24.0
 
 
 dev_dependencies:
