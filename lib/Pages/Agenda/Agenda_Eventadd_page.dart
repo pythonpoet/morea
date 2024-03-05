@@ -13,11 +13,11 @@ import 'package:morea/services/utilities/dwi_format.dart';
 
 class EventAddPage extends StatefulWidget {
   EventAddPage(
-      {this.eventinfo,
-      this.agendaModus,
-      this.firestore,
-      this.agenda,
-      this.moreaFire});
+      {required this.eventinfo,
+      required this.agendaModus,
+      required this.firestore,
+      required this.agenda,
+      required this.moreaFire});
 
   final MoreaFirebase moreaFire;
   final Map eventinfo;
@@ -33,9 +33,9 @@ enum AgendaModus { lager, event, beides }
 
 class EventAddPageState extends State<EventAddPage> {
   DWIFormat dwiFormat = new DWIFormat();
-  CrudMedthods crud0;
-  Agenda agenda;
-  MoreaFirebase moreafire;
+  CrudMedthods? crud0;
+  Agenda? agenda;
+  MoreaFirebase? moreafire;
   int value = 2;
   List<dynamic> mitnehmen = [];
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
@@ -55,11 +55,11 @@ class EventAddPageState extends State<EventAddPage> {
       datumvon = 'Datum wählen',
       datumbis = 'Datum wählen',
       lagerort = ' ';
-  String order;
+  String? order;
   List<Map<String, dynamic>> subgroups = <Map<String, dynamic>>[];
 
-  Map<String, dynamic> event, lager;
-  Map<String, bool> groupCheckbox;
+  Map<String, dynamic>? event, lager;
+  Map<String, bool>? groupCheckbox;
 
   bool initDone = false;
 
