@@ -3,7 +3,6 @@ import 'package:morea/services/crud.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 import 'Pages/About/about.dart';
-import 'Pages/Group/add_group.dart';
 import 'Pages/Personenverzeichniss/personen_verzeichniss_page.dart';
 import 'Pages/Personenverzeichniss/profile_page.dart';
 import 'Widgets/Action/scan.dart';
@@ -48,7 +47,7 @@ class MoreaShadow {
 
 class MoreaShadowContainer extends Container {
   MoreaShadowContainer({
-    this.child,
+    required this.child,
   });
 
   @override
@@ -60,10 +59,10 @@ class MoreaShadowContainer extends Container {
 }
 
 class MoreaBackgroundContainer extends Container {
-  MoreaBackgroundContainer({this.child, this.constraints});
+  MoreaBackgroundContainer({required this.child, this.constraints});
 
   @override
-  final BoxConstraints constraints;
+  final BoxConstraints? constraints;
   final Decoration decoration = BoxDecoration(
     color: MoreaColors.orange,
     image: DecorationImage(
@@ -91,7 +90,7 @@ Widget moreaLoadingIndicator(
     child: AnimatedBuilder(
       animation: _controller,
       child: Image(image: AssetImage('assets/icon/logo_loading.png')),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Transform.rotate(
           angle: animation.value,
           child: child,
