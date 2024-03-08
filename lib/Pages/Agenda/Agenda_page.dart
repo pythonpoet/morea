@@ -17,10 +17,10 @@ import 'package:morea/services/morea_firestore.dart';
 
 class AgendaState extends StatefulWidget {
   AgendaState(
-      {@required this.firestore,
-      @required this.moreaFire,
-      @required this.auth,
-      @required this.navigationMap});
+      {required this.firestore,
+      required this.moreaFire,
+      required this.auth,
+      required this.navigationMap});
 
   final MoreaFirebase moreaFire;
   final FirebaseFirestore firestore;
