@@ -9,9 +9,9 @@ abstract class BaseDatenschutz {
 }
 
 class Datenschutz implements BaseDatenschutz {
-  static Datenschutz _instance;
+  static late Datenschutz _instance;
 
-  factory Datenschutz() => _instance ??= new Datenschutz._();
+  factory Datenschutz() => _instance = new Datenschutz._();
 
   Datenschutz._();
 
