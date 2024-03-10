@@ -32,7 +32,7 @@ class _AddGroupState extends State<AddGroup> {
                   TextFormField(
                     controller: _nickNameController,
                     validator: (val) {
-                      if (val.isEmpty) {
+                      if (val!.isEmpty) {
                         return "Bitte nicht leer lassen";
                       } else {
                         return null;
@@ -40,7 +40,7 @@ class _AddGroupState extends State<AddGroup> {
                     },
                   ),
                   moreaRaisedButton("ERSTELLEN", () async {
-                    if (_formKey.currentState.validate()) {
+                    if (_formKey.currentState!.validate()) {
                       await callFunction(getcallable("createGroup"), param: {
                         "nickName": _nickNameController.text,
                         "upperClass": ["f7bl3m4GSpvvo7iw5wNd"]

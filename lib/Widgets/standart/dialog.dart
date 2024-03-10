@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<Widget> scanDialog(BuildContext context, List<Widget> widgets) {
+Future<dynamic> scanDialog(BuildContext context, List<Widget> widgets) {
   return showDialog(
       context: context,
       builder: (context) {

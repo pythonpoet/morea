@@ -18,24 +18,24 @@ class GroupPage extends StatefulWidget {
   final FirebaseFirestore firestore;
 
   GroupPage(
-      {@required this.auth,
-      @required this.moreaFire,
-      @required this.navigationMap,
-      @required this.firestore});
+      {required this.auth,
+      required this.moreaFire,
+      required this.navigationMap,
+      required this.firestore});
 
   @override
   GroupPageState createState() => GroupPageState();
 }
 
 class GroupPageState extends State<GroupPage> {
-  Map userInfo;
+  Map? userInfo;
   List nachrichtenGruppen = [];
   Auth auth0 = Auth();
   TextEditingController password = TextEditingController();
-  String oldEmail;
-  String newPassword;
+  String? oldEmail;
+  String? newPassword;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
-  CrudMedthods crud0;
+  late CrudMedthods crud0;
   GlobalKey _floatingActionButtonKey = GlobalKey();
   GlobalKey _floatingActionButtonKey2 = GlobalKey();
 
@@ -50,8 +50,8 @@ class GroupPageState extends State<GroupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MoreaColors.bottomAppBar,
-      drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName,
-          this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
+      drawer: moreaDrawer(this.userInfo!['Pos'], widget.moreaFire.getDisplayName,
+          this.userInfo!['Email'], context, widget.moreaFire, crud0, _signedOut),
       body: MoreaBackgroundContainer(
           child: Column(
         children: [
@@ -61,7 +61,7 @@ class GroupPageState extends State<GroupPage> {
             builder: (context, AsyncSnapshot<String> aSGroupID) {
               if (!aSGroupID.hasData) return simpleMoreaLoadingIndicator();
               return GroupFace(
-                groupID: aSGroupID.data,
+                groupID: aSGroupID.data!,
                 moreaFire: widget.moreaFire,
               );
             },
@@ -81,11 +81,11 @@ class GroupPageState extends State<GroupPage> {
   }
 
   void _signedOut() {
-    widget.navigationMap[signedOut]();
+    widget.navigationMap[signedOut]!();
   }
 
   void updateProfile() async {
-    await widget.moreaFire.getData(userInfo['UID']);
+    await widget.moreaFire.getData(userInfo!['UID']);
     this.userInfo = widget.moreaFire.getUserMap;
   }
 

@@ -23,7 +23,7 @@ import '../../Widgets/standart/buttons.dart';
 import '../../morea_strings.dart';
 
 class RootPage extends StatefulWidget {
-  RootPage({this.auth, this.firestore});
+  RootPage({required this.auth, required this.firestore});
 
   final BaseAuth auth;
   final FirebaseFirestore firestore;
@@ -47,8 +47,8 @@ enum AuthStatus {
 class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   Auth auth = Auth();
   AuthStatus authStatus = AuthStatus.loading;
-  MoreaFirebase moreaFire;
-  Map<String, Function> navigationMap;
+  MoreaFirebase? moreaFire;
+  late Map<String, Function> navigationMap;
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   @override
@@ -92,7 +92,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
               actions: <Widget>[
                 moreaRaisedButton('Ansehen', () {
                   Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
+                  navigationMap[toMessagePage]!();
                 }),
                 moreaRaisedButton('Später', () {
                   Navigator.of(context).pop();
@@ -126,6 +126,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         return new LoginPage(
           auth: auth,
           onSignedIn: this.signedIn,
+          firestore: widget.firestore,
         );
         break;
 
@@ -136,7 +137,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
               auth: auth,
               firestore: widget.firestore,
               navigationMap: navigationMap,
-              moreafire: moreaFire,
+              moreafire: moreaFire!,
               tutorial: false,
             ),
           ),
@@ -149,7 +150,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
                     auth: auth,
                     firestore: widget.firestore,
                     navigationMap: navigationMap,
-                    moreafire: moreaFire,
+                    moreafire: moreaFire!,
                     tutorial: true,
                   )),
         );
@@ -166,7 +167,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           builder: Builder(
             builder: (context) => MessagesPage(
               auth: auth,
-              moreaFire: moreaFire,
+              moreaFire: moreaFire!,
               navigationMap: this.navigationMap,
               firestore: widget.firestore,
             ),
@@ -180,7 +181,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             builder: (context) => AgendaState(
               auth: auth,
               navigationMap: navigationMap,
-              moreaFire: moreaFire,
+              moreaFire: moreaFire!,
               firestore: widget.firestore,
             ),
           ),
@@ -192,7 +193,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           builder: Builder(
             builder: (context) => Profile(
               auth: auth,
-              moreaFire: moreaFire,
+              moreaFire: moreaFire!,
               navigationMap: navigationMap,
               firestore: widget.firestore,
             ),

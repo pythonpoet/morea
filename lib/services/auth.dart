@@ -139,11 +139,11 @@ class Auth implements BaseAuth {
   }
 
   AuthProblems checkForAuthErrors(
-      BuildContext context, PlatformException error) {
+      BuildContext context, PlatformException? error) {
     PlatformType platform = dwiHardware.getDevicePlatform();
     AuthProblems errorType;
     if (platform == PlatformType.isAndroid) {
-      switch (error.message) {
+      switch (error!.message) {
         case 'There is no user record corresponding to this identifier. The user may have been deleted.':
           errorType = AuthProblems.userNotFound;
           break;
@@ -166,7 +166,7 @@ class Auth implements BaseAuth {
           break;
       }
     } else if (platform == PlatformType.isIOS) {
-      switch (error.code) {
+      switch (error!.code) {
         case 'Error 17011':
           errorType = AuthProblems.userNotFound;
           break;
@@ -181,6 +181,8 @@ class Auth implements BaseAuth {
           errorType = AuthProblems.undefinedError;
           print('Case ${error.message} is not jet implemented');
       }
+    } else {
+      errorType = AuthProblems.undefinedError;
     }
     return errorType;
   }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
@@ -17,9 +18,9 @@ import 'package:morea/services/utilities/moreaInputValidator.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({this.auth, this.onSignedIn, this.firestore});
+  LoginPage({required this.auth, required this.onSignedIn, required this.firestore});
 
-  final BaseAuth auth;
+  final Auth auth;
   final Function onSignedIn;
   final FirebaseFirestore firestore;
 
@@ -32,22 +33,21 @@ enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   DWIFormat dwiFormat = new DWIFormat();
-  MoreaFirebase moreafire;
+  late MoreaFirebase moreafire;
   Datenschutz datenschutz = new Datenschutz();
-  User moreaUser;
-  Register register;
-  CrudMedthods crud0;
-  MoreaLoading moreaLoading;
+  late User moreaUser;
+  late Register register;
+  late CrudMedthods crud0;
+  late MoreaLoading moreaLoading;
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String _password;
-  String error;
+  String? _password;
   FormType _formType = FormType.login;
   bool _load = false;
   bool _mailchimp = false;
 
-  PageController pageController;
+  late PageController pageController;
   Color left = Colors.black;
   Color right = Colors.white;
 
@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   bool validateAndSave() {
-    final form = formKey.currentState;
+    final form = formKey.currentState!;
     if (form.validate()) {
       form.save();
       return true;
@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             });
             //login firebase user
             moreaUser.userID = await widget.auth
-                .signInWithEmailAndPassword(moreaUser.email, _password);
+                .signInWithEmailAndPassword(moreaUser.email, _password!);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               //upload deviceToken
@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
-                      .data()["Datenschutz"]);
+                      .data()!["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
@@ -142,7 +142,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
                   (await crud.getDocument(pathConfig, "init"))
-                      .data()["Datenschutz"]);
+                      .data()!["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           _load = false;
         });
         widget.auth.displayAuthError(
-            widget.auth.checkForAuthErrors(context, e), context);
+            widget.auth.checkForAuthErrors(context, (e is PlatformException)?e:null), context);
         print(e);
       }
     }
