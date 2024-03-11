@@ -379,7 +379,7 @@ Drawer moreaDrawer(
             title: new Text("TN zu Leiter machen"),
             trailing: new Icon(Icons.enhanced_encryption),
             onTap: () => makeLeiterWidget(context,
-                moreafire.getUserMap[userMapUID], moreafire.getGroupIDs[0]),
+                moreafire.getUserMap[userMapUID], moreafire.getGroupIDs![0]),
           ),
           new Divider(),
           new ListTile(
