@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   updatedevtoken() async {
-    moreafire.uploadDevTocken(moreaUser.userID);
+    moreafire.uploadDevTocken(moreaUser.userID!);
   }
 
   void validateAndSubmit() async {
@@ -80,11 +80,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             });
             //login firebase user
             moreaUser.userID = await widget.auth
-                .signInWithEmailAndPassword(moreaUser.email, _password!);
+                .signInWithEmailAndPassword(moreaUser.email!, _password!);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               //upload deviceToken
-              moreafire.uploadDevTocken(moreaUser.userID);
+              moreafire.uploadDevTocken(moreaUser.userID!);
               widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
@@ -111,11 +111,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
                 await mailChimpAPIManager.updateUserInfo(
-                    moreaUser.email,
-                    moreaUser.vorName,
-                    moreaUser.nachName,
-                    moreaUser.geschlecht,
-                    moreaUser.groupIDs,
+                    moreaUser.email!,
+                    moreaUser.vorName!,
+                    moreaUser.nachName!,
+                    moreaUser.geschlecht!,
+                    moreaUser.groupIDs!,
                     moreafire);
               } else {
                 setState(() {
@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                           title: new Text(
                               'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
                         ));
-                widget.auth.sendPasswordResetEmail(moreaUser.email);
+                widget.auth.sendPasswordResetEmail(moreaUser.email!);
               })
         ],
       ),
@@ -308,7 +308,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed))
                     return Colors.transparent;
-                  return null;
+                  return Colors.transparent;
                 })),
                 onPressed: _registerAsTeilnehmer,
                 child: Text('Teilnehmer',
@@ -323,7 +323,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed))
                     return Colors.transparent;
-                  return null;
+                  return Colors.transparent;
                 })),
                 onPressed: _registerAsElternteil,
                 child: Text('Elternteil',
@@ -358,7 +358,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     ),
                   ),
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return 'Bitte nicht leer lassen';
                     } else if (!MoreaInputValidator.email(value)) {
                       return 'Bitte gültige E-Mail verwenden';
@@ -376,7 +376,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         borderSide: new BorderSide(color: Colors.black)),
                   ),
                   validator: (value) =>
-                      value.isEmpty ? 'Passwort darf nicht leer sein' : null,
+                      value!.isEmpty ? 'Passwort darf nicht leer sein' : null,
                   obscureText: true,
                   onSaved: (value) => _password = value,
                 ),
@@ -480,7 +480,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   void _registerAsElternteil() {
-    pageController?.animateToPage(1,
+    pageController.animateToPage(1,
         duration: Duration(milliseconds: 700), curve: Curves.decelerate);
     _formType = FormType.registereltern;
   }

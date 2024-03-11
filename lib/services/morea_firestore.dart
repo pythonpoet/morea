@@ -18,29 +18,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:random_string/random_string.dart' as random;
 
 abstract class BaseMoreaFirebase {
-  String get getDisplayName;
+  String? get getDisplayName;
 
-  String get getPfandiName;
+  String? get getPfandiName;
 
-  List<String> get getGroupIDs;
+  List<String>? get getGroupIDs;
 
-  String get getVorName;
+  String? get getVorName;
 
-  String get getNachName;
+  String? get getNachName;
 
-  String get getPos;
+  String? get getPos;
 
   //String get getHomeFeedMainEventID;
 
-  String get getEmail;
+  String? get getEmail;
 
-  Map<String, dynamic> get getGroupMap;
+  Map<String, dynamic>? get getGroupMap;
 
-  Map<String, dynamic> get getUserMap;
+  Map<String, dynamic>? get getUserMap;
 
-  Map<String, Map<String, String>> get getChildMap;
+  Map<String, Map<String, String>>? get getChildMap;
 
-  Stream<Map<String, GroupData>> get getGroupDataStream;
+  Stream<Map<String, GroupData>>? get getGroupDataStream;
 
   Future<void> createUserInformation(Map userInfo);
 
@@ -89,31 +89,31 @@ class MoreaFirebase extends BaseMoreaFirebase {
     if (groupIDs != null) tbz = new TeleblizFirestore(firestore, groupIDs);
   }
 
-  String get getDisplayName => moreaUser.displayName;
+  String? get getDisplayName => moreaUser.displayName;
 
-  String get getPfandiName => moreaUser.pfadiName;
+  String? get getPfandiName => moreaUser.pfadiName;
 
-  List<String> get getGroupIDs => moreaUser.groupIDs;
+  List<String>? get getGroupIDs => moreaUser.groupIDs;
 
-  String get getVorName => moreaUser.vorName;
+  String? get getVorName => moreaUser.vorName;
 
-  String get getNachName => moreaUser.nachName;
+  String? get getNachName => moreaUser.nachName;
 
-  String get getPos => moreaUser.pos;
+  String? get getPos => moreaUser.pos;
 
-  String get getEmail => moreaUser.email;
+  String? get getEmail => moreaUser.email;
 
-  String get getGeschlecht => moreaUser.geschlecht;
+  String? get getGeschlecht => moreaUser.geschlecht;
 
-  Map<String, GroupData> get getMapGroupData => moreaUser.subscribedGroups;
+  Map<String, GroupData>? get getMapGroupData => moreaUser.subscribedGroups;
 
-  Map<String, dynamic> get getGroupMap => moreaUser.groupMap;
+  Map<String, dynamic>? get getGroupMap => moreaUser.groupMap;
 
   Map<String, dynamic> get getUserMap => _userMap;
 
-  Map<String, Map<String, String>> get getChildMap => moreaUser.childMap;
+  Map<String, Map<String, String>>? get getChildMap => moreaUser.childMap;
 
-  Map<String, RoleEntry> get getGroupPrivilege => moreaUser.groupPrivilege;
+  Map<String, RoleEntry>? get getGroupPrivilege => moreaUser.groupPrivilege;
 
   Stream<Map<String, GroupData>> get getGroupDataStream => sCGroupMaps.stream;
 
@@ -124,7 +124,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
       return false;
     }
 
-    this._userMap = Map<String, dynamic>.from(userData.data());
+    this._userMap = Map<String, dynamic>.from(userData.data()!);
     await moreaUser.getUserData(_userMap);
     return true;
   }

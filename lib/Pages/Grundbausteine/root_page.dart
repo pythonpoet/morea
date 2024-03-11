@@ -1,7 +1,6 @@
-import 'package:device_info/device_info.dart';
 import 'dart:io' show Platform;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Grundbausteine/blockedByAppVersion_page.dart';
@@ -18,6 +17,7 @@ import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../Widgets/standart/buttons.dart';
 import '../../morea_strings.dart';
@@ -75,12 +75,12 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
-    if (await this.moreaFire.getData(await auth.currentUser()) == false) {
+    if (await this.moreaFire!.getData(await auth.currentUser()) == false) {
       setState(() {
         this.signedOut();
       });
     }
-    await this.moreaFire.initTeleblitz();
+    await this.moreaFire!.initTeleblitz();
     FirebaseMessaging.onMessage.listen((message) {
       print("message recieved");
       if (message.data['typeMorea'] == 'Message') {
@@ -105,7 +105,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     });
     authStatus = AuthStatus.homePage;
     setState(() {});
-    return true;
+    return null;
   }
 
   Future authStatusInit() async {
@@ -128,7 +128,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
           onSignedIn: this.signedIn,
           firestore: widget.firestore,
         );
-        break;
 
       case AuthStatus.homePage:
         return ShowCaseWidget(
@@ -142,7 +141,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             ),
           ),
         );
-        break;
       case AuthStatus.homePageTutorial:
         return ShowCaseWidget(
           builder: Builder(
@@ -156,11 +154,9 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
-        break;
 
       case AuthStatus.blockedByDevToken:
         return new BlockedByDevToken();
-        break;
 
       case AuthStatus.messagePage:
         return ShowCaseWidget(
@@ -173,7 +169,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             ),
           ),
         );
-        break;
 
       case AuthStatus.agendaPage:
         return ShowCaseWidget(
@@ -186,7 +181,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             ),
           ),
         );
-        break;
 
       case AuthStatus.profilePage:
         return ShowCaseWidget(
@@ -199,10 +193,8 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             ),
           ),
         );
-        break;
       case AuthStatus.loading:
         return MoreaLoadingWidget(this.signedOut);
-        break;
       default:
         return MoreaLoadingWidget(this.signedOut);
     }
@@ -211,7 +203,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   //Functions for the Navigation
   //Switches authStatus and rebuilds RootPage
 
-  void signedIn({bool tutorialautostart}) async {
+  void signedIn({bool tutorialautostart = false}) async {
     await initMoreaFire();
     setState(() {
       if (tutorialautostart) {
@@ -272,10 +264,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     String deviceID;
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
-      deviceID = androidDeviceInfo.androidId;
-    } else if (Platform.isIOS) {
+      deviceID = androidDeviceInfo.id;
+    } else {
       IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
-      deviceID = iosDeviceInfo.identifierForVendor;
+      deviceID = iosDeviceInfo.identifierForVendor!;
     }
     await callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (auth.getUserID), 'deviceID': deviceID});
