@@ -7,7 +7,7 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/morealayout.dart';
 
 class SendMessages extends StatefulWidget {
-  SendMessages({this.moreaFire, this.auth, this.crudMedthods});
+  SendMessages({required this.moreaFire, required this.auth, required this.crudMedthods});
 
   final MoreaFirebase moreaFire;
   final Auth auth;
@@ -20,9 +20,9 @@ class SendMessages extends StatefulWidget {
 }
 
 class _SendMessagesState extends State<SendMessages> {
-  MoreaFirebase moreaFire;
-  CrudMedthods crudMedthods;
-  String uid;
+  late MoreaFirebase moreaFire;
+  late CrudMedthods crudMedthods;
+  late String uid;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   UniqueKey dropdownKey = UniqueKey();
@@ -36,7 +36,7 @@ class _SendMessagesState extends State<SendMessages> {
   List<Map<String, dynamic>> subgroups = <Map<String, dynamic>>[];
   bool initDone = false;
 
-  Map<String, bool> groupCheckbox;
+  Map<String, bool> groupCheckbox = Map<String, bool>();
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _SendMessagesState extends State<SendMessages> {
 
   void initSubgroups() async {
     Map<String, dynamic> data =
-        (await this.crudMedthods.getDocument(pathGroups, moreaGroupID)).data();
+        (await this.crudMedthods.getDocument(pathGroups, moreaGroupID)).data()!;
     data[groupMapGroupOption][groupMapGroupLowerClass]
         .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
@@ -58,7 +58,6 @@ class _SendMessagesState extends State<SendMessages> {
   }
 
   void groupCheckboxinit(List<Map<String, dynamic>> subgroups) {
-    this.groupCheckbox = Map<String, bool>();
     for (Map<String, dynamic> groupMap in subgroups) {
       this.groupCheckbox[groupMap['groupID']] = false;
     }
@@ -99,7 +98,7 @@ class _SendMessagesState extends State<SendMessages> {
           onPressed: () {
             if (groupCheckbox.containsValue(true)) {
               setState(() {
-                if (_formKey.currentState.validate()) {
+                if (_formKey.currentState!.validate()) {
                   groupCheckbox.forEach((key, value) {
                     if (value) {
                       this.receivers.add(key);
@@ -157,9 +156,9 @@ class _SendMessagesState extends State<SendMessages> {
                             style: MoreaTextStyle.normal,
                           ),
                           value: groupCheckbox[group["groupID"]],
-                          onChanged: (bool value) {
+                          onChanged: (bool? value) {
                             setState(() {
-                              groupCheckbox[group["groupID"]] = value;
+                              groupCheckbox[group["groupID"]] = value!;
                             });
                           },
                         );
@@ -184,14 +183,14 @@ class _SendMessagesState extends State<SendMessages> {
                     ),
                     onSaved: (newValue) {
                       setState(() {
-                        titleController.text = newValue;
+                        titleController.text = newValue!;
                       });
                     },
                     onEditingComplete: () {
                       FocusScope.of(context).requestFocus(vorschauFocus);
                     },
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Bitte nicht leer lassen';
                       } else {
                         return null;
@@ -222,14 +221,14 @@ class _SendMessagesState extends State<SendMessages> {
                     ),
                     onSaved: (newValue) {
                       setState(() {
-                        vorschauController.text = newValue;
+                        vorschauController.text = newValue!;
                       });
                     },
                     onEditingComplete: () {
                       FocusScope.of(context).requestFocus(inhaltFocus);
                     },
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Bitte nicht leer lassen';
                       } else {
                         return null;
@@ -261,11 +260,11 @@ class _SendMessagesState extends State<SendMessages> {
                     ),
                     onSaved: (newValue) {
                       setState(() {
-                        inhaltController.text = newValue;
+                        inhaltController.text = newValue!;
                       });
                     },
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Bitte nicht leer lassen';
                       } else {
                         return null;
