@@ -18,7 +18,6 @@ dependencies:
     flutter:
         sdk: flutter
     chewie: ^1.0.0
-    cloud_functions: ^1.0.0
     flutter_html: any
     http: any
     intl: any
@@ -33,7 +32,7 @@ dependencies:
     flutter_datetime_picker: ^1.4.0
     flip_card: ^0.7.0
     showcaseview: ^2.0.3
-    device_information: ^0.0.4
+    device_info_plus: ^9.1.2
     shared_preferences: any
     google_maps_place_picker: ^2.0.0-nullsafety.3
     flutter_masked_text2: ^0.9.1
@@ -43,6 +42,7 @@ dependencies:
     # Use with the CupertinoIcons class for iOS style icons.
     cupertino_icons: ^1.0.2
     firebase_core: ^1.24.0
+    firebase_messaging: ^13.0.3
 
 
 dev_dependencies:
