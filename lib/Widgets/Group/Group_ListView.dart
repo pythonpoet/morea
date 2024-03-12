@@ -10,7 +10,7 @@ class GroupListView extends SingleChildScrollView {
   @override
   final Axis scrollDirection = Axis.horizontal;
   @override
-  Widget child;
+  late Widget child;
 
   GroupListView(Map<String, GroupData> mapGroupData) {
     if (!GroupListView.selectedGroupID.hasListener)

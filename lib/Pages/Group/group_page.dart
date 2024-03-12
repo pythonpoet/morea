@@ -50,12 +50,12 @@ class GroupPageState extends State<GroupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MoreaColors.bottomAppBar,
-      drawer: moreaDrawer(this.userInfo!['Pos'], widget.moreaFire.getDisplayName,
+      drawer: moreaDrawer(this.userInfo!['Pos'], widget.moreaFire.getDisplayName!,
           this.userInfo!['Email'], context, widget.moreaFire, crud0, _signedOut),
       body: MoreaBackgroundContainer(
           child: Column(
         children: [
-          GroupListView(widget.moreaFire.getMapGroupData),
+          GroupListView(widget.moreaFire.getMapGroupData!),
           StreamBuilder(
             stream: GroupListView.selectedGroupID.stream,
             builder: (context, AsyncSnapshot<String> aSGroupID) {
@@ -87,22 +87,6 @@ class GroupPageState extends State<GroupPage> {
   void updateProfile() async {
     await widget.moreaFire.getData(userInfo!['UID']);
     this.userInfo = widget.moreaFire.getUserMap;
-  }
-
-  FloatingActionButtonLocation _locationFloatingActionButton() {
-    if (widget.moreaFire.getPos == "Leiter") {
-      return FloatingActionButtonLocation.centerDocked;
-    } else {
-      return FloatingActionButtonLocation.endFloat;
-    }
-  }
-
-  BottomAppBar _bottomAppBarBuilder() {
-    if (widget.moreaFire.getPos == "Leiter") {
-      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.none);
-    } else {
-      return moreaChildBottomAppBar(widget.navigationMap);
-    }
   }
 
   void tutorial() {

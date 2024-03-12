@@ -80,16 +80,16 @@ class _AgendaStatePage extends State<AgendaState>
       DateTime now = DateTime.now();
       if (_agdatum.difference(now).inDays < 0) {
         Map<String, dynamic>? fullevent =
-            (await agenda.getAgendaTitle(event[groupMapEventID])).data();
-        if (fullevent != null)
+            (await agenda.getAgendaTitle(event[groupMapEventID])).data() as Map<String, dynamic>;
+        if (!(fullevent.isEmpty))
           agenda.deleteAgendaEvent(fullevent);
         else
           agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
       }
     } else {
       Map<String, dynamic>? fullevent =
-          (await agenda.getAgendaTitle(event[groupMapEventID])).data();
-      if (fullevent != null)
+          (await agenda.getAgendaTitle(event[groupMapEventID])).data() as Map<String, dynamic>;
+      if (!fullevent.isEmpty)
         agenda.deleteAgendaEvent(fullevent);
       else
         agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
@@ -149,7 +149,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
-    _getAgenda(moreafire.getGroupIDs);
+    _getAgenda(moreafire.getGroupIDs!);
   }
 
   @override
@@ -219,7 +219,7 @@ class _AgendaStatePage extends State<AgendaState>
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
+        drawer: moreaDrawer(pos, moreafire.getDisplayName!, moreafire.getEmail!,
             context, moreafire, crud0, _signedOut),
         bottomNavigationBar: Showcase.withWidget(
             key: _bottomAppBarLeiterKey,
@@ -267,8 +267,8 @@ class _AgendaStatePage extends State<AgendaState>
               ),
             ),
             child: moreaChildBottomAppBar(widget.navigationMap)),
-        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
-            moreafire.getEmail, context, moreafire, crud0, _signedOut),
+        drawer: moreaDrawer(moreafire.getPos!, moreafire.getDisplayName!,
+            moreafire.getEmail!, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getGroupIDs, context),
       );
     }
@@ -276,7 +276,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewLager(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data()!;
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data() as Map<String, dynamic>;
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewLagerPageState(
@@ -292,7 +292,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data()!;
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data() as Map<String, dynamic>;
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewEventPageState(
@@ -307,7 +307,7 @@ class _AgendaStatePage extends State<AgendaState>
     });
   }
 
-  Widget aAgenda(List<dynamic> groupID, BuildContext context) {
+  Widget aAgenda(List<dynamic>? groupID, BuildContext context) {
     return StreamBuilder(
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {

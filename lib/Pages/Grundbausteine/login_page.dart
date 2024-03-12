@@ -103,8 +103,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
-                  (await crud.getDocument(pathConfig, "init"))
-                      .data()!["Datenschutz"]);
+                  ((await crud.getDocument(pathConfig, "init"))
+                      .data()! as Map<String, dynamic>)["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
@@ -141,8 +141,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
-                  (await crud.getDocument(pathConfig, "init"))
-                      .data()!["Datenschutz"]);
+                  ((await crud.getDocument(pathConfig, "init"))
+                      .data()! as Map<String, dynamic>)["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,

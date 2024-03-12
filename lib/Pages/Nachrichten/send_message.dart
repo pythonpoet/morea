@@ -49,7 +49,7 @@ class _SendMessagesState extends State<SendMessages> {
 
   void initSubgroups() async {
     Map<String, dynamic> data =
-        (await this.crudMedthods.getDocument(pathGroups, moreaGroupID)).data()!;
+        (await this.crudMedthods.getDocument(pathGroups, moreaGroupID)).data()! as Map<String, dynamic>;
     data[groupMapGroupOption][groupMapGroupLowerClass]
         .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
