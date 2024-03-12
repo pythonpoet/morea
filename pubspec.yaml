@@ -28,7 +28,6 @@ dependencies:
     random_string: any
     barcode_scan2: ^4.3.0
     rxdart: ^0.27.7
-    flutter_datetime_picker: ^1.4.0
     flip_card: ^0.7.0
     showcaseview: ^2.0.3
     device_info_plus: ^9.1.2
@@ -45,6 +44,7 @@ dependencies:
     cloud_firestore: ^4.15.8
     cloud_functions: ^4.6.8
     firebase_messaging: ^14.7.19
+    flutter_datetime_picker_plus: ^2.1.0
 
 
 dev_dependencies:
