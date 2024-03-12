@@ -383,8 +383,8 @@ class EventAddPageState extends State<EventAddPage> {
 
   initSubgoup() async {
     Map<String, dynamic>? data =
-        (await crud0?.getDocument(pathGroups, moreaGroupID))?.data();
-    data?[groupMapGroupOption][groupMapGroupLowerClass]
+        (await crud0?.getDocument(pathGroups, moreaGroupID))?.data() as Map<String, dynamic>;
+    data[groupMapGroupOption][groupMapGroupLowerClass]
         .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
     this.initDone = true;
@@ -862,7 +862,7 @@ class EventAddPageState extends State<EventAddPage> {
                             Expanded(
                               child: moreaRaisedButton(
                                 'Speichern',
-                                () => {this.lagerHinzufuegen(context)},
+                                () => this.lagerHinzufuegen(context),
                               ),
                             ),
                           ],
@@ -1179,7 +1179,7 @@ class EventAddPageState extends State<EventAddPage> {
                       Expanded(
                         child: moreaRaisedButton(
                           'Speichern',
-                          () => {this.eventHinzufuegen(context)},
+                          () => this.eventHinzufuegen(context),
                         ),
                       ),
                     ],
