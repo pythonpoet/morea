@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 class EditUserProfilePage extends StatefulWidget {
-  EditUserProfilePage(this.profile, this.moreaFire, this.crud0);
+  EditUserProfilePage({required this.profile, required this.moreaFire, required this.crud0});
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;

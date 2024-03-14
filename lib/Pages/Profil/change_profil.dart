@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart' as picker;
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_phone_number.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
@@ -26,11 +26,11 @@ class ChangeProfile extends StatefulWidget {
   final CrudMedthods crud0;
 
   ChangeProfile(
-      {@required this.auth,
-      @required this.moreaFire,
-      @required this.navigationMap,
-      @required this.updateProfile,
-      @required this.crud0});
+      {required this.auth,
+      required this.moreaFire,
+      required this.navigationMap,
+      required this.updateProfile,
+      required this.crud0});
 
   @override
   _ChangeProfileState createState() => _ChangeProfileState();
@@ -38,15 +38,15 @@ class ChangeProfile extends StatefulWidget {
 
 class _ChangeProfileState extends State<ChangeProfile>
     with TickerProviderStateMixin {
-  Map userInfo;
+  late Map<String, dynamic> userInfo;
   List nachrichtenGruppen = [];
   Auth auth0 = Auth();
   TextEditingController password = TextEditingController();
   final _passwordKey = GlobalKey<FormState>();
-  String oldEmail;
-  String newPassword;
+  late String oldEmail;
+  String? newPassword;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
-  MoreaLoading moreaLoading;
+  late MoreaLoading moreaLoading;
   bool loading = true;
 
   _ChangeProfileState();
@@ -333,7 +333,7 @@ class _ChangeProfileState extends State<ChangeProfile>
     try {
       await widget.auth.signOut();
       Navigator.of(context).pop();
-      widget.navigationMap[signedOut]();
+      widget.navigationMap[signedOut]!();
     } catch (e) {
       print(e);
     }
@@ -410,9 +410,9 @@ class _ChangeProfileState extends State<ChangeProfile>
   }
 
   void _changeGeburtstag() async {
-    await DatePicker.showDatePicker(context,
+    await picker.DatePicker.showDatePicker(context,
         showTitleActions: true,
-        theme: DatePickerTheme(
+        theme: picker.DatePickerTheme(
             doneStyle: TextStyle(
                 color: MoreaColors.violett,
                 fontSize: 16,
@@ -424,14 +424,14 @@ class _ChangeProfileState extends State<ChangeProfile>
           DateFormat('dd.MM.yyy', 'de').format(date).toString();
     },
         currentTime: DateTime.now().add(Duration(days: -365 * 4)),
-        locale: LocaleType.de);
+        locale: picker.LocaleType.de);
 
     setState(() {});
   }
 
   Future<bool> _validateAndSave(String email) async {
     final form = _passwordKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       var result = await auth0.reauthenticate(email, password.text);
       print(result);
       if (result) {
@@ -470,7 +470,7 @@ class _ChangeProfileState extends State<ChangeProfile>
                       ),
                       obscureText: true,
                       validator: (value) {
-                        if (value.isEmpty) {
+                        if (value!.isEmpty) {
                           return 'Bitte nicht leer lassen';
                         } else {
                           return null;
@@ -498,7 +498,7 @@ class _ChangeProfileState extends State<ChangeProfile>
                         await auth0.changeEmail(userInfo['Email']);
                       }
                       if (newPassword != null) {
-                        await auth0.changePassword(newPassword);
+                        await auth0.changePassword(newPassword!);
                       }
                       await widget.moreaFire
                           .updateUserInformation(userInfo['UID'], userInfo);
@@ -664,8 +664,8 @@ class _ChangeProfileState extends State<ChangeProfile>
     });
     if (this.userInfo[userMapEltern] != null) {
       for (var elternUID in this.userInfo[userMapEltern].keys.toList()) {
-        var elternMap =
-            (await widget.crud0.getDocument(pathUser, elternUID)).data();
+        Map<String, dynamic> elternMap =
+            (await widget.crud0.getDocument(pathUser, elternUID)).data() as Map<String, dynamic>;
         elternMap[userMapKinder].remove(this.userInfo[userMapUID]);
         await widget.moreaFire
             .updateUserInformation(elternMap[userMapUID], elternMap);
@@ -673,8 +673,8 @@ class _ChangeProfileState extends State<ChangeProfile>
     }
     if (this.userInfo[userMapKinder] != null) {
       for (var childUID in this.userInfo[userMapKinder].keys.toList()) {
-        Map childMap =
-            (await widget.crud0.getDocument(pathUser, childUID)).data();
+        Map<String, dynamic> childMap =
+            (await widget.crud0.getDocument(pathUser, childUID)).data() as Map<String, dynamic>;
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(this.userInfo[userMapUID]);
           await widget.moreaFire
@@ -696,7 +696,7 @@ class _ChangeProfileState extends State<ChangeProfile>
       this.userInfo['UID'] = this.userInfo['childUID'];
     }
     Navigator.of(context).popUntil(ModalRoute.withName('/'));
-    await widget.navigationMap[signedOut]();
+    await widget.navigationMap[signedOut]!();
     if (this.userInfo[userMapGroupIDs] != null) {
       await callFunction(getcallable('deleteUserMap'), param: {
         'UID': this.userInfo['UID'],
