@@ -65,7 +65,8 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
             widget.crud0.getCollection('$pathGroups/$groupID/$pathPriviledge'),
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
-          if (!groupSnap.hasData) return moreaLoading.loading();
+          if (!groupSnap.hasData)
+            return moreaLoading.loading();
           else if (groupSnap.data!.docs.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
@@ -85,8 +86,8 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                       shrinkWrap: true,
                       itemCount: groupSnap.data!.docs.length,
                       itemBuilder: (context, int index) {
-                        String name = (groupSnap.data!.docs[index]
-                            .data() as Map<String, dynamic>)[groupMapDisplayName];
+                        String name = (groupSnap.data!.docs[index].data()
+                            as Map<String, dynamic>)[groupMapDisplayName];
 
                         return ListTile(
                           title: new Text(
