@@ -23,8 +23,8 @@ class ViewUserProfilePage extends StatefulWidget {
 
 class _ViewUserProfilePageState extends State<ViewUserProfilePage>
     with TickerProviderStateMixin {
-  Map<String, dynamic> profile;
-  MoreaLoading moreaLoading;
+  late Map<String, dynamic> profile;
+  late MoreaLoading moreaLoading;
 
   final Urllauncher urllauncher = new Urllauncher();
 
@@ -56,7 +56,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
                       ),
                     );
                   } else {
-                    this.profile = snapshot.data.data();
+                    this.profile = snapshot.data!.data() as Map<String, dynamic>;
                     return Scaffold(
                         appBar: AppBar(
                           title: Text(this.profile[userMapVorName]),
@@ -209,7 +209,7 @@ class _ViewUserProfilePageState extends State<ViewUserProfilePage>
             if (!aSParent.hasData)
               return simpleMoreaLoadingIndicator();
             else
-              return displayEltern(aSParent.data.data());
+              return displayEltern(aSParent.data!.data() as Map<String, dynamic>);
           },
         ),
       ));

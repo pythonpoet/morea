@@ -90,7 +90,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                                   BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else {
                             return null;
@@ -122,7 +122,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
                                   BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else if (!MoreaInputValidator.number(value)) {
                             return 'Bitte gültige PLZ verwenden';
@@ -169,7 +169,7 @@ class _ChangeAddressState extends State<ChangeAddress> {
 
   bool _validateAndSave() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {
