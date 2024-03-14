@@ -20,10 +20,10 @@ class ChangeAbtreten extends StatefulWidget {
 }
 
 class _ChangeAbtretenState extends State<ChangeAbtreten> {
-  String ortAbtreten;
-  String zeitAbtreten;
-  String urlMapAbtreten;
-  String nameMapAbtreten;
+  late String ortAbtreten;
+  late String zeitAbtreten;
+  late String urlMapAbtreten;
+  late String nameMapAbtreten;
   final _formKey = GlobalKey<FormState>();
   TextEditingController ortAbtretenController = TextEditingController();
 
@@ -146,7 +146,7 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                                       BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
-                              if (value.isEmpty) {
+                              if (value!.isEmpty) {
                                 return 'Bitte nicht leer lassen';
                               } else {
                                 return null;
@@ -174,9 +174,9 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
                                                 47.40548228527181,
                                                 8.559394673386825),
                                             onPlacePicked: (result) {
-                                              this.urlMapAbtreten = result.url;
+                                              this.urlMapAbtreten = result.url!;
                                               this.nameMapAbtreten =
-                                                  result.name;
+                                                  result.name!;
                                               Navigator.of(context).pop();
                                               setState(() {});
                                             },
@@ -199,7 +199,7 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
   Future<Null> _selectTime(BuildContext context) async {
     String hour = zeitAbtreten.split(':')[0];
     String minute = zeitAbtreten.split(':')[1];
-    final TimeOfDay picked = await showTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: int.parse(hour), minute: int.parse(minute)),
     );
@@ -230,12 +230,11 @@ class _ChangeAbtretenState extends State<ChangeAbtreten> {
 
   bool saveAndSubmit() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       if (MoreaInputValidator.url(this.urlMapAbtreten)) {
         form.save();
         return true;
-      }
-      else {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(
             children: [

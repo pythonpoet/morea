@@ -2,7 +2,6 @@ import 'dart:async';
 //import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -34,9 +33,10 @@ class MyApp extends StatelessWidget {
       title: 'Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
-        backgroundColor: Colors.white,
-        primarySwatch: MaterialColor(
-            MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
+        colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: MaterialColor(
+                MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
+            backgroundColor: Colors.white),
         fontFamily: 'Raleway',
       ),
       initialRoute: '/',
