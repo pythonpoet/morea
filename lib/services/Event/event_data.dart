@@ -8,17 +8,17 @@ Stream<Map<String, dynamic>> getEventStreamMap(
     CrudMedthods crudMedthods, String eventID) async* {
   await for (DocumentSnapshot dsEventData
       in crudMedthods.streamDocument(pathEvents, eventID)) {
-    yield dsEventData.data();
+    yield dsEventData.data() as Map<String, dynamic>;
   }
 }
 
 enum EventType { teleblitz, notImplemented }
 
 class EventData {
-  String eventID, timestamp;
-  List<String> groupIDs, changelog;
-  Map<String, dynamic> eventData;
-  EventType eventType;
+  late String eventID, timestamp;
+  late List<String> groupIDs, changelog;
+  late Map<String, dynamic> eventData;
+  late EventType eventType;
 
   EventData.init(this.eventData) {
     validate(this.eventData);
@@ -30,7 +30,6 @@ class EventData {
       switch (eventData[eventMapType]) {
         case "Teleblitz":
           return TeleblitzData(eventData);
-          break;
         default:
           throw "${eventData[eventMapType]} is not implemented";
       }

@@ -30,7 +30,7 @@ abstract class BaseAuth {
 
   Future<void> sendPasswordResetEmail(String email);
 
-  Future<String> currentUser();
+  String? currentUser();
 
   Future<void> signOut();
 
@@ -52,11 +52,11 @@ abstract class BaseAuth {
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   DWICore dwiHardware = new DWICore();
-  firebase.User _user;
+  firebase.User? _user;
 
-  String get getUserID => _user != null ? _user.uid : "not loaded";
+  String get getUserID => _user != null ? _user!.uid : "not loaded";
 
-  String get getUserEmail => _user != null ? _user.email : "nod loaded";
+  String get getUserEmail => _user != null ? _user!.email! : "nod loaded";
 
   Future<String> signInWithEmailAndPassword(
       String email, String password) async {
@@ -66,14 +66,14 @@ class Auth implements BaseAuth {
       throw onError;
     }))
         .user;
-    return _user.uid;
+    return _user!.uid;
   }
 
   Future<String> createUserWithEmailAndPasswordForChild(
       String email, String password) async {
     firebase.User childUser = (await _firebaseAuth
             .createUserWithEmailAndPassword(email: email, password: password))
-        .user;
+        .user!;
     return childUser.uid;
   }
 
@@ -82,51 +82,46 @@ class Auth implements BaseAuth {
     this._user = (await _firebaseAuth.createUserWithEmailAndPassword(
             email: email, password: password))
         .user;
-    return this._user.uid;
+    return this._user!.uid;
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
     return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
-  Future<void> createUserInformation(Map userInfo) async {
+  Future<void> createUserInformation(Map<String, dynamic> userInfo) async {
     await FirebaseFirestore.instance
         .collection(pathUser)
-        .doc(_user.uid)
+        .doc(_user!.uid)
         .set(userInfo)
         .catchError((e) {
       print(e);
     });
   }
 
-  Future<String> currentUser() async {
+  String? currentUser() {
     this._user = _firebaseAuth.currentUser;
-    return _user != null ? _user.uid : null;
+    return _user != null ? _user!.uid : null;
   }
 
-  Future<String> userEmail() async {
+  String? userEmail() {
     this._user = _firebaseAuth.currentUser;
-    return _user != null ? _user.email : null;
+    return _user != null ? _user!.email : null;
   }
 
   Future<void> deleteUserID() async {
-    FirebaseAuth.instance.currentUser.delete();
+    FirebaseAuth.instance.currentUser!.delete();
   }
 
   Future<bool> reauthenticate(String email, String password) async {
     bool reAuthenticated;
     AuthCredential credential =
         EmailAuthProvider.credential(email: email, password: password);
-    print('got Credential');
-    print(email);
-    firebase.User user = _firebaseAuth.currentUser;
-    print('got current user');
+    firebase.User user = _firebaseAuth.currentUser!;
     var result = await user.reauthenticateWithCredential(credential);
     if (result.user == null) {
-      print(false);
       reAuthenticated = false;
     } else {
-      print(true);
       reAuthenticated = true;
     }
     print('reauthenticated');
@@ -267,14 +262,14 @@ class Auth implements BaseAuth {
   }
 
   Future<void> changeEmail(String email) async {
-    firebase.User user = _firebaseAuth.currentUser;
+    firebase.User user = _firebaseAuth.currentUser!;
     await user.reload();
-    await user.updateEmail(email);
+    await user.verifyBeforeUpdateEmail(email);
     return null;
   }
 
   Future<void> changePassword(String password) async {
-    firebase.User user = _firebaseAuth.currentUser;
+    firebase.User user = _firebaseAuth.currentUser!;
     await user.reload();
     await user.updatePassword(password);
     return null;

@@ -42,7 +42,7 @@ class _SelectStufeState extends State<SelectStufe> {
                           style: MoreaTextStyle.normal,
                         );
                       } else {
-                        this.initSubgroups(snapshot.data);
+                        this.initSubgroups(snapshot.data!);
                         return ListView.separated(
                             shrinkWrap: true,
                             itemCount: this.subgroups.length,
@@ -57,7 +57,10 @@ class _SelectStufeState extends State<SelectStufe> {
                                       color: Colors.black26,
                                     ));
                               } else {
-                                return null;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                );
                               }
                             },
                             itemBuilder: (BuildContext context, int index) {

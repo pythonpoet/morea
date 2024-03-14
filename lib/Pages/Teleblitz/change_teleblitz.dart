@@ -30,13 +30,11 @@ enum FormType { keineAktivitaet, ferien, normal }
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     with TickerProviderStateMixin {
-  FormType formType;
-  MoreaFirebase moreaFire;
+  late FormType formType;
+  late MoreaFirebase moreaFire;
 
   //Variabeln vom Teleblitz
-  String name,
-      startTime,
-      endTime,
+  late String name,
       datum,
       antreten,
       mapAntreten,
@@ -45,20 +43,18 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       bemerkung,
       sender,
       grund,
-      endeFerien,
-      id,
-      slug,
-      rawDate;
-  Map<String, dynamic> stufe;
-  List<dynamic> mitnehmen;
-  bool keineAktivitaet, ferien;
+      endeFerien;
+  String? startTime, endTime, rawDate;
+  late Map<String, dynamic> stufe;
+  late List<dynamic> mitnehmen;
+  late bool keineAktivitaet, ferien;
   bool archived = false;
   bool draft = false;
-  var oldTeleblitz;
-  MoreaLoading moreaLoading;
-  DocumentSnapshot groupDoc;
+  late Future<Map<String, dynamic>> oldTeleblitz;
+  late MoreaLoading moreaLoading;
+  late DocumentSnapshot groupDoc;
 
-  TeleblitzManager teleblitzManager;
+  late TeleblitzManager teleblitzManager;
 
   @override
   void initState() {
@@ -175,7 +171,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                   },
                 ),
               );
-              break;
             case FormType.ferien:
               return Scaffold(
                 appBar: AppBar(
@@ -224,7 +219,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                   },
                 ),
               );
-              break;
             case FormType.normal:
               return Scaffold(
                 appBar: AppBar(
@@ -417,18 +411,25 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                   },
                 ),
               );
-              break;
           }
+        } else {
+          return Scaffold(
+              appBar: AppBar(
+                title: Text('Fehler'),
+              ),
+              body: MoreaBackgroundContainer(
+                  child: Center(
+                child: Text('Fehler'),
+              )));
         }
-        return null;
       },
     );
   }
 
-  Future<Map> downloadTeleblitz() async {
+  Future<Map<String, dynamic>> downloadTeleblitz() async {
     this.groupDoc =
         await widget.moreaFire.crud0.getDocument(pathGroups, stufe['groupID']);
-    var infos =
+    Map<String, dynamic> infos =
         await teleblitzManager.downloadTeleblitz(this.stufe, this.groupDoc);
     this.name = infos['name'];
     this.datum = infos['datum'];
@@ -518,7 +519,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 
   Future<Null> _selectDatum(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: now,
         firstDate: now,
@@ -533,7 +534,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 
   Future<Null> _selectDatumEndeFerien(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: now,
         firstDate: now,
@@ -579,14 +580,14 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 }
 
 class TeleblitzManager {
-  MoreaFirebase moreaFirebase;
-  DocumentSnapshot groupDoc;
+  late MoreaFirebase moreaFirebase;
+  DocumentSnapshot? groupDoc;
 
   TeleblitzManager(MoreaFirebase moreaFirebase) {
     this.moreaFirebase = moreaFirebase;
   }
 
-  Future<Map> downloadTeleblitz(
+  Future<Map<String, dynamic>> downloadTeleblitz(
       Map<String, dynamic> stufe, DocumentSnapshot groupDoc) async {
     this.groupDoc = groupDoc;
     if (groupDoc.get(groupMapGroupOption)['teleblitzID'] != null) {
@@ -595,7 +596,7 @@ class TeleblitzManager {
           .crud0
           .getDocument(
               pathEvents, groupDoc.get(groupMapGroupOption)['teleblitzID']);
-      return teleblitzDoc.data();
+      return teleblitzDoc.data() as Map<String, dynamic>;
     } else {
       Map<String, dynamic> teleblitz = {
         '_archived': false,
@@ -619,7 +620,7 @@ class TeleblitzManager {
   }
 
   void uploadTeleblitz(Map newTeleblitz, String id) async {
-    if (this.groupDoc.get(groupMapGroupOption)['webflowCMSID'] != null) {
+    if (this.groupDoc!.get(groupMapGroupOption)['webflowCMSID'] != null) {
       String apiKey = await moreaFirebase.getWebflowApiKey();
       String formatedMitnehmen = '<ul>';
       for (String u in newTeleblitz['mitnehmen-test']) {
