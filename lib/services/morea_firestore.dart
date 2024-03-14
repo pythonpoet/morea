@@ -121,7 +121,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
       return false;
     }
 
-    this._userMap = Map<String, dynamic>.from(userData.data()! as Map<String, dynamic>);
+    this._userMap =
+        Map<String, dynamic>.from(userData.data()! as Map<String, dynamic>);
     await moreaUser.getUserData(_userMap);
     return true;
   }
@@ -138,8 +139,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
                 '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID!))
             .data();
         crud0.streamDocument(pathGroups, groupID).listen((docSnap) {
-          mapGroupsData[groupID] =
-              GroupData(groupData: docSnap.data()! as Map<String, dynamic>, groupUserData: someVar! as Map<String, dynamic>);
+          mapGroupsData[groupID] = GroupData(
+              groupData: docSnap.data()! as Map<String, dynamic>,
+              groupUserData: someVar! as Map<String, dynamic>);
           sCGroupMaps.add(mapGroupsData);
         });
       }
@@ -148,7 +150,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Future<void> createUserInformation(Map userInfo) async {
     try {
-      String userUID = await auth0.currentUser();
+      String userUID = await auth0.currentUser()!;
       Map<String, dynamic> payload = {'UID': userUID, 'content': userInfo};
       await callFunction(getcallable('createUserMap'), param: payload);
       return null;
@@ -197,8 +199,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<Map<String, dynamic>> getGroupInformation(groupID) async =>
-      Map<String, dynamic>.from(
-          (await crud0.getDocument(pathGroups, groupID)).data()! as Map<String, dynamic>);
+      Map<String, dynamic>.from((await crud0.getDocument(pathGroups, groupID))
+          .data()! as Map<String, dynamic>);
 
   Stream<QuerySnapshot> getChildren() {
     return crud0.streamCollection(pathUser);
@@ -286,8 +288,13 @@ class MoreaFirebase extends BaseMoreaFirebase {
       Map<String, dynamic> data) async {
     for (String groupID in groupIDs)
       //Upload the HomeFeed
-      await this.getMapGroupData![groupID]!.uploadHomeFeedEntry(this.moreaUser.userID!,
-          eventID, eventEndTimeStamp, eventStartTimeStamp, data, this.crud0);
+      await this.getMapGroupData![groupID]!.uploadHomeFeedEntry(
+          this.moreaUser.userID!,
+          eventID,
+          eventEndTimeStamp,
+          eventStartTimeStamp,
+          data,
+          this.crud0);
   }
 
 /*
@@ -311,7 +318,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
       {},
       function: (snap) {
         Map<String, dynamic> dataMap = snap.data()! as Map<String, dynamic>;
-        return dataMap[groupMapHomeFeed].removeWhere((key, value) => key == eventID);
+        return dataMap[groupMapHomeFeed]
+            .removeWhere((key, value) => key == eventID);
       },
     );
   }
@@ -325,7 +333,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return this.crud0.deletedocument(pathEvents, eventID);
   }
 
-  Future<void> uploadteleblitz(String groupID, Map<String, dynamic> data) async {
+  Future<void> uploadteleblitz(
+      String groupID, Map<String, dynamic> data) async {
     List groupIDs = data['groupIDs'];
     String eventID =
         groupID + data['datum'].toString().replaceAll('Samstag, ', '');
@@ -372,7 +381,8 @@ class MoreaFirebase extends BaseMoreaFirebase {
     return crud0.streamOrderCollection('groups/$groupnr/Agenda', 'Order');
   }
 
-  Future<void> uploadtoAgenda(String groupnr, String name, Map<String, dynamic> data) async {
+  Future<void> uploadtoAgenda(
+      String groupnr, String name, Map<String, dynamic> data) async {
     name = dwiformat.simplestring(name);
     crud0.runTransaction('groups/$groupnr/Agenda', name, data);
     return null;
@@ -392,7 +402,9 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<void> setMessageRead(String userUID, String messageID) async {
-    Map<String, dynamic> oldMessageData  = await crud0.getDocument('messages', messageID).then((value) => value.data() as Map<String, dynamic>);
+    Map<String, dynamic> oldMessageData = await crud0
+        .getDocument('messages', messageID)
+        .then((value) => value.data() as Map<String, dynamic>);
     List newRead = [];
     for (String index in oldMessageData['read']) {
       newRead.add(index);
@@ -441,12 +453,16 @@ class MoreaFirebase extends BaseMoreaFirebase {
   }
 
   Future<String> getMailChimpApiKey() async {
-    Map<String, dynamic> documentData = await crud0.getDocument('config', 'apiKeys').then((value) => value.data() as Map<String, dynamic>);
+    Map<String, dynamic> documentData = await crud0
+        .getDocument('config', 'apiKeys')
+        .then((value) => value.data() as Map<String, dynamic>);
     return documentData['mailchimp'];
   }
 
   Future<String> getWebflowApiKey() async {
-    Map<String, dynamic> documentData = await crud0.getDocument('config', 'apiKeys').then((value) => value.data() as Map<String,dynamic>);
+    Map<String, dynamic> documentData = await crud0
+        .getDocument('config', 'apiKeys')
+        .then((value) => value.data() as Map<String, dynamic>);
     return documentData['webflow'];
   }
 

@@ -1,6 +1,6 @@
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 
 abstract class BaseQrCode {
@@ -10,12 +10,12 @@ abstract class BaseQrCode {
 }
 
 class QrCode implements BaseQrCode {
-  String qrResult,
+  String? qrResult,
       germanError =
           'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.';
 
   Widget generate(String str) {
-    return new QrImage(
+    return QrImageView(
       data: str,
       size: 200,
     );
@@ -23,10 +23,10 @@ class QrCode implements BaseQrCode {
 
   Future<void> germanScanQR() async {
     try {
-      qrResult = await BarcodeScanner.scan();
+      qrResult = await BarcodeScanner.scan().toString();
       return;
     } on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
+      if (e.code == BarcodeScanner.cameraAccessDenied) {
         germanError = 'Erlaube uns deine Kamera zu benutzen';
       } else {
         germanError = "Etwas ist schief gelaufen: $e";
