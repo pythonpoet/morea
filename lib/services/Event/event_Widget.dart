@@ -8,10 +8,10 @@ import 'package:morea/services/morea_firestore.dart';
 
 class EventWidget extends StatefulWidget {
   EventWidget(
-      {@required this.moreaFirebase,
-      @required this.crudMedthods,
-      @required this.eventID,
-      @required this.function});
+      {required this.moreaFirebase,
+      required this.crudMedthods,
+      required this.eventID,
+      required this.function});
 
   final MoreaFirebase moreaFirebase;
   final CrudMedthods crudMedthods;
@@ -30,7 +30,7 @@ class EventWidgetState extends State<EventWidget> {
           builder:
               (BuildContext context, AsyncSnapshot<Map<String, dynamic>> data) {
             if (!data.hasData) return Container(child: Text("Loading"));
-            EventData eventData = EventData(data.data);
+            EventData eventData = EventData(data.data!);
             eventData.setEventID(widget.eventID);
 
             switch (eventData.eventType) {
@@ -41,8 +41,6 @@ class EventWidgetState extends State<EventWidget> {
                     crudMedthods: widget.crudMedthods,
                     eventID: widget.eventID,
                     function: widget.function);
-                break;
-
               default:
                 return Container(
                     child: Text("Upgrade to App to Display Event"));

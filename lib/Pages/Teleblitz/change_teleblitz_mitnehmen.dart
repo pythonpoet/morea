@@ -17,7 +17,7 @@ class ChangeMitnehmen extends StatefulWidget {
 }
 
 class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
-  List<dynamic> mitnehmen;
+  late List<dynamic> mitnehmen;
   List<TextEditingController> mitnehmenController = <TextEditingController>[];
   final _formKey = GlobalKey<FormState>();
 
@@ -154,7 +154,7 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
                 borderSide: BorderSide(color: MoreaColors.violett)),
           ),
           validator: (value) {
-            if (value.isEmpty) {
+            if (value!.isEmpty) {
               return 'Bitte nicht leer lassen';
             } else {
               return null;
@@ -180,7 +180,7 @@ class _ChangeMitnehmenState extends State<ChangeMitnehmen> {
 
   bool saveAndSubmit() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {

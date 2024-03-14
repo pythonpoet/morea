@@ -7,7 +7,10 @@ import 'package:morea/services/auth.dart';
 import 'package:morea/morealayout.dart';
 
 class SendMessages extends StatefulWidget {
-  SendMessages({required this.moreaFire, required this.auth, required this.crudMedthods});
+  SendMessages(
+      {required this.moreaFire,
+      required this.auth,
+      required this.crudMedthods});
 
   final MoreaFirebase moreaFire;
   final Auth auth;
@@ -49,7 +52,8 @@ class _SendMessagesState extends State<SendMessages> {
 
   void initSubgroups() async {
     Map<String, dynamic> data =
-        (await this.crudMedthods.getDocument(pathGroups, moreaGroupID)).data()! as Map<String, dynamic>;
+        (await this.crudMedthods.getDocument(pathGroups, moreaGroupID)).data()!
+            as Map<String, dynamic>;
     data[groupMapGroupOption][groupMapGroupLowerClass]
         .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
@@ -64,7 +68,7 @@ class _SendMessagesState extends State<SendMessages> {
   }
 
   void getUID() async {
-    uid = await widget.auth.currentUser();
+    uid = await widget.auth.currentUser()!;
   }
 
   @override
