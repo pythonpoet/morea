@@ -107,9 +107,9 @@ class User {
       var someVar = (await crud0.getDocument(
           '$pathGroups/$groupID/$pathPriviledge', this.userID!));
       GroupData groupData = new GroupData(
-          groupData: Map<String, dynamic>.from(
-              (await crud0.getDocument(pathGroups, groupID)).data()!),
-          groupUserData: Map<String, dynamic>.from(someVar.data()!));
+          groupData: (await crud0.getDocument(pathGroups, groupID)).data()!
+              as Map<String, dynamic>,
+          groupUserData: someVar.data()! as Map<String, dynamic>);
 
       subscribedGroups![groupID] = groupData;
     }
@@ -183,11 +183,11 @@ class User {
     if (this.groupIDs!.length > 0) {
       for (String groupID in groupIDs!) {
         GroupData groupData = new GroupData(
-            groupData: Map<String, dynamic>.from(
-                (await crud0.getDocument(pathGroups, groupID)).data()!),
-            groupUserData: Map<String, dynamic>.from((await crud0.getDocument(
+            groupData: (await crud0.getDocument(pathGroups, groupID)).data()!
+                as Map<String, dynamic>,
+            groupUserData: (await crud0.getDocument(
                     '$pathGroups/$groupID/$pathPriviledge', this.userID!))
-                .data()!));
+                .data()! as Map<String, dynamic>);
 
         subscribedGroups![groupID] = groupData;
       }
@@ -233,8 +233,9 @@ class User {
       Map<String, String> childs) async {
     Map<String, Map<String, String>> childMap = new Map();
     for (String childUID in childs.keys) {
-      Map<String, dynamic> childUserDat = Map<String, dynamic>.from(
-          (await crud0.getDocument(pathUser, childUID)).data()!);
+      Map<String, dynamic> childUserDat =
+          (await crud0.getDocument(pathUser, childUID)).data()!
+              as Map<String, dynamic>;
       print(childUserDat);
 
       for (String groupID in childUserDat[userMapGroupIDs]) {
@@ -250,10 +251,10 @@ class User {
 
   parentGroupPrivilege(Map<String, Map<String, String>> childMap) async {
     for (String groupID in childMap.keys) {
-      GroupData groupData = new GroupData(
-          groupData: Map<String, dynamic>.from(
-              (await crud0.getDocument(pathGroups, groupID)).data()!));
-      if (groupData.groupOption.parentialControl.enabled) {
+      GroupData groupData = GroupData(
+          groupData: (await crud0.getDocument(pathGroups, groupID)).data()!
+              as Map<String, dynamic>);
+      if (groupData.groupOption!.parentialControl.enabled!) {
         if (!this.groupIDs!.contains(groupID)) this.groupIDs!.add(groupID);
         groupData.setParentPriviledge();
         this.subscribedGroups![groupID] = groupData;

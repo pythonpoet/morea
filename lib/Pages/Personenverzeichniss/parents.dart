@@ -202,14 +202,15 @@ class MergeChildParent extends BaseMergeChildParent {
               ),
             );
           });
-      await childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
+      await childParendPend.parentSendsRequestString(qrCode.qrResult!, userMap);
       DocumentSnapshot userSnap = await moreafire.firestore
           .collection(pathUser)
           .doc(userMap[userMapUID])
           .get();
       List<String> groupIDs = <String>[];
       print(userSnap.data().toString());
-      (userSnap.data() as Map<String, dynamic>)[userMapKinder].forEach((key, value) async {
+      (userSnap.data() as Map<String, dynamic>)[userMapKinder]
+          .forEach((key, value) async {
         DocumentSnapshot childSnap =
             await moreafire.firestore.collection(pathUser).doc(key).get();
         groupIDs.add(childSnap[userMapGroupIDs][0]);
@@ -255,7 +256,7 @@ class MergeChildParent extends BaseMergeChildParent {
               SizedBox(
                 height: 30,
               ),
-              Text(qrCode.germanError),
+              Text(qrCode.germanError!),
               SizedBox(
                 height: 30,
               ),

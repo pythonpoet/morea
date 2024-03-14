@@ -105,8 +105,8 @@ class PriviledgeEntry extends RoleEntry {
   late Map<String, dynamic> customInfo;
   late Map<String, dynamic> rawPriviledge;
   late RoleEntry role;
-  PriviledgeEntry({required Map<String, dynamic> data}) : super(data: data) {
-    this.readPriviledgeEntry(Map<String, dynamic>.from(data));
+  PriviledgeEntry({Map<String, dynamic>? data}) {
+    this.readPriviledgeEntry(Map<String, dynamic>.from(data!));
   }
 
   void readPriviledgeEntry(Map<String, dynamic> data) {
@@ -153,8 +153,8 @@ class RoleEntry {
   late bool seeMembersDetail;
   int? teleblitzPriviledge;
 
-  RoleEntry({required Map<String, dynamic> data}) {
-    this.read(data);
+  RoleEntry({Map<String, dynamic>? data}) {
+    this.read(data!);
   }
   void read(Map<String, dynamic> data) {
     if (data.containsKey(groupMapgroupPriviledge))

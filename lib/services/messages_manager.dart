@@ -8,35 +8,38 @@ class MessagesManager {
 
   StreamController<List<QueryDocumentSnapshot>> _messagesStreamController =
       StreamController();
-  Stream<List<QueryDocumentSnapshot>> get stream => _messagesStreamController.stream;
+  Stream<List<QueryDocumentSnapshot>> get stream =>
+      _messagesStreamController.stream;
 
-  StreamSubscription _subscription;
+  StreamSubscription? _subscription;
 
   MessagesManager(this.crud0);
 
   dispose() {
     _messagesStreamController.close();
-    _subscription.cancel();
+    _subscription!.cancel();
   }
 
   pause() {
-    _subscription.pause();
+    _subscription!.pause();
   }
 
   resume() {
-    _subscription.resume();
+    _subscription!.resume();
   }
 
   getMessages(List<String> subscribedGroups) {
-
     _subscription = crud0.streamCollection('messages').listen((messages) {
       List<QueryDocumentSnapshot> messagesDocuments = messages.docs;
       messagesDocuments.retainWhere((document) {
-        return document.data()['receivers'].any((receiver) {
+        return (document.data()! as Map<String, dynamic>)['receivers']
+            .any((receiver) {
           return subscribedGroups.contains(receiver);
         });
       });
-      messagesDocuments.sort((a, b) => b.data()['timestamp'].toDate().compareTo(a.data()['timestamp'].toDate()));
+      messagesDocuments.sort((a, b) =>
+          (b.data()! as Map<String, dynamic>)['timestamp'].toDate().compareTo(
+              (a.data()! as Map<String, dynamic>)['timestamp'].toDate()));
       _messagesStreamController.sink.add(messagesDocuments);
     });
   }
