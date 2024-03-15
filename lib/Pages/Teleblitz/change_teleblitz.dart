@@ -648,7 +648,7 @@ class TeleblitzManager {
           .patch(
         Uri.https(
             'api.webflow.com',
-            "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + id,
+            "/collections/5bdc72fc8b5047778cbb1296/items/" + id,
             {'live': 'true'}),
         headers: header,
         body: jsonStr,

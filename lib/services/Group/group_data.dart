@@ -66,6 +66,8 @@ class GroupData {
   Map<String, dynamic>? groupUserData;
   String? groupID, groupNickName;
   GroupData({required this.groupData, this.groupUserData}) {
+    print('GroupData groupData ' + this.groupData.toString());
+    print('GroupData groupUserData ' + this.groupUserData.toString());
     readGroup(this.groupData, this.groupUserData);
   }
 
@@ -101,6 +103,7 @@ class GroupData {
         throw "$groupMapRoles has to be non-null";
 
       if (groupUserData != null) {
+        print('reading group');
         this.priviledge = PriviledgeEntry(data: groupUserData);
         priviledge!.readRole(globalConfigRoles, this.roles);
         if (groupMap.containsKey(groupMapGroupLicence))

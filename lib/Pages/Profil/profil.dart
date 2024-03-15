@@ -53,8 +53,14 @@ class _ProfileState extends State<Profile> {
     }
     return Scaffold(
       backgroundColor: MoreaColors.bottomAppBar,
-      drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName!,
-          this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
+      drawer: moreaDrawer(
+          this.userInfo['Pos'],
+          widget.moreaFire.getDisplayName!,
+          this.userInfo['Email'],
+          context,
+          widget.moreaFire,
+          crud0,
+          _signedOut),
       floatingActionButtonLocation: _locationFloatingActionButton(),
       floatingActionButton: Showcase(
         key: _floatingActionButtonKey,
@@ -253,6 +259,7 @@ class _ProfileState extends State<Profile> {
       ),
       appBar: AppBar(
         title: Text('Profil'),
+        backgroundColor: MoreaColors.orange,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help_outline),
@@ -283,7 +290,8 @@ class _ProfileState extends State<Profile> {
 
   BottomAppBar _bottomAppBarBuilder() {
     if (widget.moreaFire.getPos == "Leiter") {
-      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.profile);
+      return moreaLeiterBottomAppBar(
+          widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.profile);
     } else {
       return moreaChildBottomAppBar(widget.navigationMap);
     }

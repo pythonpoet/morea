@@ -9,11 +9,11 @@ Map<String, RoleEntry> globalConfigRoles = Map<String, RoleEntry>();
 
 Future<AuthStatus> check4BlockedAuthStatus(
     String? userID, FirebaseFirestore firestore) async {
-  Map<String, dynamic>? init = (await FirebaseFirestore.instance
+  Map<String, dynamic> init = (await FirebaseFirestore.instance
           .collection(pathConfig)
           .doc(pathInit)
           .get())
-      .data();
+      .data()!;
   print(init.runtimeType);
   if (init == null) throw "No init doc exists";
   initGetGroupConfigRoles(data: init);
