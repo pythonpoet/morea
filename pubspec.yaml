@@ -7,122 +7,115 @@ description: Teleblitz app
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.3+9
+version: 1.1.0+10
 
 environment:
-    sdk: ^3.1.1
+  sdk: ^3.1.1
 
 dependencies:
-    flutter_localizations:
-        sdk: flutter
-    flutter:
-        sdk: flutter
-    chewie: ^1.0.0
-    flutter_html: any
-    http: any
-    intl: any
-    url_launcher: ^6.0.2
-    share: any
-    expandable: any
-    qr_flutter: any
-    random_string: any
-    barcode_scan2: ^4.3.0
-    rxdart: ^0.27.7
-    flip_card: ^0.7.0
-    showcaseview: ^2.0.3
-    device_info_plus: ^9.1.2
-    shared_preferences: any
-    google_maps_place_picker: ^2.0.0-nullsafety.3
-    flutter_masked_text2: ^0.9.1
+  flutter_localizations:
+    sdk: flutter
+  flutter:
+    sdk: flutter
+  chewie: ^1.0.0
+  flutter_html: any
+  http: any
+  intl: any
+  url_launcher: ^6.0.2
+  share: any
+  expandable: any
+  qr_flutter: any
+  random_string: any
+  barcode_scan2: ^4.3.0
+  rxdart: ^0.27.7
+  flip_card: ^0.7.0
+  showcaseview: ^2.0.3
+  device_info_plus: ^9.1.2
+  shared_preferences: any
+  google_maps_place_picker_mb: ^3.1.2
+  flutter_masked_text2: ^0.9.1
+  platform: ^3.1.0
 
-
-    # The following adds the Cupertino Icons font to your application.
-    # Use with the CupertinoIcons class for iOS style icons.
-    cupertino_icons: ^1.0.2
-    firebase_core: ^2.27.0
-    firebase_auth: ^4.17.8
-    cloud_firestore: ^4.15.8
-    cloud_functions: ^4.6.8
-    firebase_messaging: ^14.7.19
-    flutter_datetime_picker_plus: ^2.1.0
-
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.8
+  cloud_firestore: ^4.15.8
+  cloud_functions: ^4.6.8
+  firebase_messaging: ^14.7.19
+  flutter_datetime_picker_plus: ^2.1.0
 
 dev_dependencies:
-    flutter_launcher_icons: "^0.9.0"
-    flutter_test:
-        sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+  change_app_package_name: ^1.1.0
+  flutter_test:
+    sdk: flutter
 
-flutter_icons:
-    android: "launcher_icon"
-    ios: true
-    image_path_ios: "assets/icon/Logo_morea_productions_icon_dark.png"
-    image_path_android: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path_ios: "assets/icon/Logo_morea_productions_icon_dark.png"
+  image_path_android: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
 
-    adaptive_icon_background: "#323232"
-    adaptive_icon_foreground: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
-
-
-
-
-
-
+  adaptive_icon_background: "#323232"
+  adaptive_icon_foreground: "assets/icon/Logo_morea_productions_icon_dark_spacing.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  fonts:
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway-Light.ttf
+          weight: 300
+        - asset: fonts/Raleway-Regular.ttf
+          weight: 400
+        - asset: fonts/Raleway-Medium.ttf
+          weight: 500
+        - asset: fonts/Raleway-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Raleway-Bold.ttf
+          weight: 700
 
-    # The following line ensures that the Material Icons font is
-    # included with your application, so that you can use the icons in
-    # the material Icons class.
-    uses-material-design: true
-    fonts:
-        -   family: Raleway
-            fonts:
-                -   asset: fonts/Raleway-Light.ttf
-                    weight: 300
-                -   asset: fonts/Raleway-Regular.ttf
-                    weight: 400
-                -   asset: fonts/Raleway-Medium.ttf
-                    weight: 500
-                -   asset: fonts/Raleway-SemiBold.ttf
-                    weight: 600
-                -   asset: fonts/Raleway-Bold.ttf
-                    weight: 700
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/Logo_gross_weiss.jpeg
+    - assets/images/
+    - assets/images/logo.jpeg
+    - assets/images/background.png
+    - assets/icon/logo_loading.png
+    - assets/icon/logo_app_ios.png
+    - assets/icon/Logo_morea_productions_icon_dark_spacing.png
 
-    # To add assets to your application, add an assets section, like this:
-    assets:
-        - assets/images/Logo_gross_weiss.jpeg
-        - assets/images/
-        - assets/images/logo.jpeg
-        - assets/images/background.png
-        - assets/icon/logo_loading.png
-        - assets/icon/logo_app_ios.png
-        - assets/icon/Logo_morea_productions_icon_dark_spacing.png
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.io/assets-and-images/#resolution-aware.
 
-    # An image asset can refer to one or more resolution-specific "variants", see
-    # https://flutter.io/assets-and-images/#resolution-aware.
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.io/assets-and-images/#from-packages
 
-    # For details regarding adding assets from package dependencies, see
-    # https://flutter.io/assets-and-images/#from-packages
-
-    # To add custom fonts to your application, add a fonts section here,
-    # in this "flutter" section. Each entry in this list should have a
-    # "family" key with the font family name, and a "fonts" key with a
-    # list giving the asset and other descriptors for the font. For
-    # example:
-    # fonts:
-    #   - family: Schyler
-    #     fonts:
-    #       - asset: fonts/Schyler-Regular.ttf
-    #       - asset: fonts/Schyler-Italic.ttf
-    #         style: italic
-    #   - family: Trajan Pro
-    #     fonts:
-    #       - asset: fonts/TrajanPro.ttf
-    #       - asset: fonts/TrajanPro_Bold.ttf
-    #         weight: 700
-    #
-    # For details regarding fonts from package dependencies,
-    # see https://flutter.io/custom-fonts/#from-packages
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.io/custom-fonts/#from-packages

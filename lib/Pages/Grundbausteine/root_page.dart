@@ -110,7 +110,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   Future authStatusInit() async {
     authStatus =
-        await check4BlockedAuthStatus(auth.currentUser()!, widget.firestore);
+        await check4BlockedAuthStatus(auth.currentUser(), widget.firestore);
     if (authStatus == AuthStatus.loading) {
       initMoreaFire();
     }

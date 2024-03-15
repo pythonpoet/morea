@@ -154,10 +154,10 @@ class RoleEntry {
   int? teleblitzPriviledge;
 
   RoleEntry({Map<String, dynamic>? data}) {
-    this.read(data!);
+    this.read(data);
   }
-  void read(Map<String, dynamic> data) {
-    if (data.containsKey(groupMapgroupPriviledge))
+  void read(Map<String, dynamic>? data) {
+    if (data!.containsKey(groupMapgroupPriviledge))
       this.groupPriviledge = data[groupMapgroupPriviledge];
     if (data.containsKey(groupMapRolesCustomInfoTypes))
       this.customInfoTypes = data[groupMapRolesCustomInfoTypes];
