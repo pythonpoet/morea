@@ -80,6 +80,7 @@ class MoreaGroup extends BaseMoreGroup {
       Map<String, dynamic> groupUserData =
           await getUserPriviledge(groupID, userID);
       this.priviledge = PriviledgeEntry(data: groupUserData);
+      print('reding group mam');
       priviledge.readRole(globalConfigRoles, this.roles!);
     }
   }
@@ -105,8 +106,8 @@ class PriviledgeEntry extends RoleEntry {
   late Map<String, dynamic> customInfo;
   late Map<String, dynamic> rawPriviledge;
   late RoleEntry role;
-  PriviledgeEntry({Map<String, dynamic>? data}) {
-    this.readPriviledgeEntry(Map<String, dynamic>.from(data!));
+  PriviledgeEntry({Map<String, dynamic>? data}) : super(data: data!) {
+    this.readPriviledgeEntry(Map<String, dynamic>.from(data));
   }
 
   void readPriviledgeEntry(Map<String, dynamic> data) {
@@ -147,16 +148,17 @@ class RoleEntry {
   //General Priviledge: 0 no w/r, 1 no w but r access, 2  w/r access, 3 w/r acces able to change general for all users.
   int groupPriviledge = 0;
   Map<String, dynamic>? customInfoTypes;
-  late String roleName;
+  String? roleName;
 
-  late bool seeMembers;
-  late bool seeMembersDetail;
+  bool? seeMembers;
+  bool? seeMembersDetail;
   int? teleblitzPriviledge;
 
   RoleEntry({Map<String, dynamic>? data}) {
     this.read(data);
   }
   void read(Map<String, dynamic>? data) {
+    print("data: " + data.toString());
     if (data!.containsKey(groupMapgroupPriviledge))
       this.groupPriviledge = data[groupMapgroupPriviledge];
     if (data.containsKey(groupMapRolesCustomInfoTypes))
@@ -168,8 +170,8 @@ class RoleEntry {
       this.teleblitzPriviledge = data[eventTeleblitzPriviledge];
     else if (data[eventTeleblitzPriviledge] is String)
       this.teleblitzPriviledge = int.parse(data[eventTeleblitzPriviledge]);
-    else
+    /*else
       throw "Runtype: ${data[eventTeleblitzPriviledge].runtimeType} for teleblitzPriviledge is not supported";
-    print(this.teleblitzPriviledge);
+    print(this.teleblitzPriviledge);*/
   }
 }

@@ -182,7 +182,7 @@ class User {
     // Add parents groups to subscribedgroups
     if (this.groupIDs!.length > 0) {
       for (String groupID in groupIDs!) {
-        GroupData groupData = new GroupData(
+        GroupData groupData = GroupData(
             groupData: (await crud0.getDocument(pathGroups, groupID)).data()!
                 as Map<String, dynamic>,
             groupUserData: (await crud0.getDocument(

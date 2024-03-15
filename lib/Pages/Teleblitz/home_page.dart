@@ -167,6 +167,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       backgroundColor: MoreaColors.bottomAppBar,
       appBar: AppBar(
         title: Text('Teleblitz'),
+        backgroundColor: MoreaColors.orange,
       ),
       drawer: moreaDrawer(moreafire.getPos!, moreafire.getDisplayName!,
           moreafire.getEmail!, context, moreafire, crud0, _signedOut),
