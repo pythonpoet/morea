@@ -547,35 +547,49 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
   }
 
   void setBeginn(String ort, String zeit, String map) {
-    this.antreten = zeit + ' Uhr, ' + ort;
-    this.mapAntreten = map;
-    this.startTime = zeit;
+    setState(() {
+      this.antreten = zeit + ' Uhr, ' + ort;
+      this.mapAntreten = map;
+      this.startTime = zeit;
+    });
   }
 
   void setEnde(String ort, String zeit, String map) {
-    this.abtreten = zeit + ' Uhr, ' + ort;
-    this.mapAbtreten = map;
-    this.endTime = zeit;
+    setState(() {
+      this.abtreten = zeit + ' Uhr, ' + ort;
+      this.mapAbtreten = map;
+      this.endTime = zeit;
+    });
   }
 
   void setMitnehmen(List<String> mitnehmen) {
-    this.mitnehmen = mitnehmen;
+    setState(() {
+      this.mitnehmen = mitnehmen;
+    });
   }
 
   void setBemerkung(String bemerkung) {
-    this.bemerkung = bemerkung;
+    setState(() {
+      this.bemerkung = bemerkung;
+    });
   }
 
   void setSender(String sender) {
-    this.sender = sender;
+    setState(() {
+      this.sender = sender;
+    });
   }
 
   void setGrund(String grund) {
-    this.grund = grund;
+    setState(() {
+      this.grund = grund;
+    });
   }
 
   void setEndeFerien(String endeFerien) {
-    this.endeFerien = endeFerien;
+    setState(() {
+      this.endeFerien = endeFerien;
+    });
   }
 }
 
@@ -642,13 +656,13 @@ class TeleblitzManager {
       print(jsonStr);
       Map<String, String> header = Map();
       header["Authorization"] = "Bearer $apiKey";
-      header["accept-version"] = "1.0.0";
-      header["Content-Type"] = "application/json";
+      header["accept"] = "application/json";
+      header["content-type"] = "application/json";
       http
           .patch(
         Uri.https(
             'api.webflow.com',
-            "/collections/5bdc72fc8b5047778cbb1296/items/" + id,
+            "/collections/6353f0b7afc1660f42f42ba7/items/" + id,
             {'live': 'true'}),
         headers: header,
         body: jsonStr,
