@@ -18,7 +18,8 @@ import 'package:morea/services/utilities/moreaInputValidator.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({required this.auth, required this.onSignedIn, required this.firestore});
+  LoginPage(
+      {required this.auth, required this.onSignedIn, required this.firestore});
 
   final Auth auth;
   final Function onSignedIn;
@@ -29,6 +30,7 @@ class LoginPage extends StatefulWidget {
 }
 
 enum FormType { login, register, registereltern }
+
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
@@ -103,8 +105,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
-                  ((await crud.getDocument(pathConfig, "init"))
-                      .data()! as Map<String, dynamic>)["Datenschutz"]);
+                  ((await crud.getDocument(pathConfig, "init")).data()!
+                      as Map<String, dynamic>)["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
@@ -141,8 +143,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
-                  ((await crud.getDocument(pathConfig, "init"))
-                      .data()! as Map<String, dynamic>)["Datenschutz"]);
+                  ((await crud.getDocument(pathConfig, "init")).data()!
+                      as Map<String, dynamic>)["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
@@ -165,7 +167,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           _load = false;
         });
         widget.auth.displayAuthError(
-            widget.auth.checkForAuthErrors(context, (e is PlatformException)?e:null), context);
+            widget.auth.checkForAuthErrors(
+                context, (e is PlatformException) ? e : null),
+            context);
         print(e);
       }
     }
@@ -269,6 +273,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       return new Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
+            backgroundColor: Colors.white,
           ),
           body: Container(
               color: Colors.white70,
@@ -396,7 +401,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: buildMenuBar(context),
         ),
         SizedBox(
-          height: 1050,
+          height: 1100,
           child: Column(
             children: <Widget>[
               Flexible(

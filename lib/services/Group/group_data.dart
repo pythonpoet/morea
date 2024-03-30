@@ -92,6 +92,7 @@ class GroupData {
             .readMap(Map<String, dynamic>.from(groupMap[groupMapHomeFeed]));
       } else
         throw "$groupMapHomeFeed has to be non-null";
+
       if (groupMap.containsKey(groupMapRoles)) {
         Map<String, dynamic> chash =
             Map<String, dynamic>.from(groupMap[groupMapRoles]);
@@ -169,32 +170,34 @@ class HomeFeed {
 
   void readMap(Map<String, dynamic> data) {
     print("TP1");
-    for (String eventID in data.keys) {
-      print("TP2");
-      this.homeFeed[eventID] = HomeFeedEntry();
-      if (data[eventID].containsKey(groupMapUploadeByUserID))
-        this.homeFeed[eventID]!.uploadedByUserID =
-            List<String>.from(data[eventID][groupMapUploadeByUserID]);
-      else
-        throw "$groupMapUploadeByUserID of event: $eventID has to be non-null";
+    if (!data.isEmpty) {
+      for (String eventID in data.keys) {
+        print("TP2");
+        this.homeFeed[eventID] = HomeFeedEntry();
+        if (data[eventID].containsKey(groupMapUploadeByUserID))
+          this.homeFeed[eventID]!.uploadedByUserID =
+              List<String>.from(data[eventID][groupMapUploadeByUserID]);
+        else
+          throw "$groupMapUploadeByUserID of event: $eventID has to be non-null";
 
-      if (data[eventID].containsKey(groupMapUploadedTimeStamp))
-        this.homeFeed[eventID]!.uploadedTimeStamp =
-            List<String>.from(data[eventID][groupMapUploadedTimeStamp]);
-      else
-        throw "$groupMapUploadedTimeStamp of event: $eventID has to be non-null";
+        if (data[eventID].containsKey(groupMapUploadedTimeStamp))
+          this.homeFeed[eventID]!.uploadedTimeStamp =
+              List<String>.from(data[eventID][groupMapUploadedTimeStamp]);
+        else
+          throw "$groupMapUploadedTimeStamp of event: $eventID has to be non-null";
 
-      if (data[eventID].containsKey(groupMapEventStartTimeStamp))
-        this.homeFeed[eventID]!.eventStartTimeStamp =
-            data[eventID][groupMapEventStartTimeStamp];
-      else
-        throw "$groupMapEventStartTimeStamp of event: $eventID has to be non-null";
+        if (data[eventID].containsKey(groupMapEventStartTimeStamp))
+          this.homeFeed[eventID]!.eventStartTimeStamp =
+              data[eventID][groupMapEventStartTimeStamp];
+        else
+          throw "$groupMapEventStartTimeStamp of event: $eventID has to be non-null";
 
-      if (data[eventID].containsKey(groupMapEventEndTimeStamp))
-        this.homeFeed[eventID]!.eventEndTimeStamp =
-            data[eventID][groupMapEventEndTimeStamp];
-      else
-        throw "$groupMapEventEndTimeStamp of event: $eventID has to be non-null";
+        if (data[eventID].containsKey(groupMapEventEndTimeStamp))
+          this.homeFeed[eventID]!.eventEndTimeStamp =
+              data[eventID][groupMapEventEndTimeStamp];
+        else
+          throw "$groupMapEventEndTimeStamp of event: $eventID has to be non-null";
+      }
     }
   }
 

@@ -33,12 +33,12 @@ class MyApp extends StatelessWidget {
       title: 'Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
-        colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: MaterialColor(
-                MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
-            backgroundColor: Colors.white),
-        fontFamily: 'Raleway',
-      ),
+          colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: MaterialColor(
+                  MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
+              backgroundColor: Colors.white),
+          fontFamily: 'Raleway',
+          appBarTheme: AppBarTheme(backgroundColor: MoreaColors.orange)),
       initialRoute: '/',
       routes: {
         '/': (context) => Container(
