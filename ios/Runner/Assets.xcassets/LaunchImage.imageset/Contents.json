@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Logo_morea_productions_icon.png",
+      "filename" : "logo_loading.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Logo_morea_productions_icon 1.png",
+      "filename" : "logo_loading 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Logo_morea_productions_icon 2.png",
+      "filename" : "logo_loading 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
