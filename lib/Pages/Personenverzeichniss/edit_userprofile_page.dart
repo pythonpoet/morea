@@ -1,4 +1,5 @@
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart' as picker;
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
+    as picker;
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_address.dart';
 import 'package:morea/Pages/Profil/change_email.dart';
@@ -17,7 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 class EditUserProfilePage extends StatefulWidget {
-  EditUserProfilePage({required this.profile, required this.moreaFire, required this.crud0});
+  EditUserProfilePage(
+      {required this.profile, required this.moreaFire, required this.crud0});
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
@@ -59,7 +61,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       await moreafire
           .goToNewGroup(
               userdata['UID'],
-              (userdata[userMapPfadiName] == " ")
+              (userdata[userMapPfadiName] == " " ||
+                      userdata[userMapPfadiName] == '' ||
+                      userdata[userMapPfadiName] == null)
                   ? userdata[userMapVorName]
                   : userdata[userMapPfadiName],
               oldGroup!,
@@ -122,14 +126,18 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     }
     if (widget.profile[userMapEltern] != null) {
       for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
-        Map<String, dynamic> elternMap = (await crud0.getDocument(pathUser, elternUID)).data() as Map<String, dynamic>;
+        Map<String, dynamic> elternMap =
+            (await crud0.getDocument(pathUser, elternUID)).data()
+                as Map<String, dynamic>;
         elternMap[userMapKinder].remove(widget.profile[userMapUID]);
         await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
       }
     }
     if (widget.profile[userMapKinder] != null) {
       for (var childUID in widget.profile[userMapKinder].keys.toList()) {
-        Map<String, dynamic> childMap = (await crud0.getDocument(pathUser, childUID)).data() as Map<String, dynamic>;
+        Map<String, dynamic> childMap =
+            (await crud0.getDocument(pathUser, childUID)).data()
+                as Map<String, dynamic>;
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(widget.profile[userMapUID]);
           await moreafire.updateUserInformation(childMap[userMapUID], childMap);
@@ -224,7 +232,8 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, moreaGroupID)).data() as Map<String, dynamic>;
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data()
+            as Map<String, dynamic>;
     print(
         "test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
     this._stufenselect = <Map>[];
