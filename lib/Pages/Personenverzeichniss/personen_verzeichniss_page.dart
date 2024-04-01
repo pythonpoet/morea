@@ -86,21 +86,25 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                       shrinkWrap: true,
                       itemCount: groupSnap.data!.docs.length,
                       itemBuilder: (context, int index) {
-                        String name = (groupSnap.data!.docs[index].data()
-                            as Map<String, dynamic>)[groupMapDisplayName];
+                        Map<String, dynamic> groupUserData =
+                            groupSnap.data!.docs[index].data()
+                                as Map<String, dynamic>;
 
-                        return ListTile(
-                          title: new Text(
-                            name,
-                            style: MoreaTextStyle.lable,
-                          ),
-                          onTap: () =>
-                              navigatetoprofile(groupSnap.data!.docs[index].id),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        );
+                        if (groupUserData[groupMapDisplayName] != null) {
+                          String name = groupUserData[groupMapDisplayName];
+                          return ListTile(
+                            title: new Text(
+                              name,
+                              style: MoreaTextStyle.lable,
+                            ),
+                            onTap: () => navigatetoprofile(
+                                groupSnap.data!.docs[index].id),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.black,
+                            ),
+                          );
+                        }
                       },
                       separatorBuilder: (context, int index) {
                         return Padding(
