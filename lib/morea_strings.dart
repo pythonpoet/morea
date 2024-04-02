@@ -13,10 +13,12 @@ final String meitliwebflowname = 'Nahani (Meitli)';
 final String buebewebflowname = 'Drason (Buebe)';
 
 //groupID's
-final String midatanamebiber = '3775';
-final String midatanamewoelf = '3776';
-final String midatanamemeitli = '3779';
+final String midatanamebiber = 'hjZL6PT8t8MCfxf5GOko';
+final String midatanamewoelf = 'TJNO3BHaPnBZE33anezc';
+final String midatanamewoelf2 = 'UisNaofVTp924gvx6Kcf';
+final String midatanamemeitli = 'VVy3DAlQLmbw9oGuRwvZ';
 final String midatanamebuebe = 'Op3qqioWs36MCeoWgDYL';
+final String midatanamepio = 'iRHtWXGhstTpMwmceqaF';
 
 //collection-paths for FirebaseFirestore
 final String pathEvents = "events";
