@@ -60,11 +60,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDaNCEZXwSgJgugD5FnCD-OcoN5FvdjLsI',
-    appId: '1:891584307361:ios:634d68769a9146fed010e0',
+    appId: '1:891584307361:ios:d9a90621eaab64ead010e0',
     messagingSenderId: '891584307361',
     projectId: 'morea-8f840',
     databaseURL: 'https://morea-8f840.firebaseio.com',
     storageBucket: 'morea-8f840.appspot.com',
-    iosBundleId: 'com.example.morea',
+    iosClientId: '891584307361-eg7gmf0975qnufrkgmsita1uh4jnf8ij.apps.googleusercontent.com',
+    iosBundleId: 'productions.morea.app',
   );
 }
