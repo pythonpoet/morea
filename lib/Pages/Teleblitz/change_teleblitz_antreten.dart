@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/utilities/moreaInputValidator.dart';
-import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+
+import '../../morea_strings.dart';
 
 class ChangeAntreten extends StatefulWidget {
   final String antreten, mapAntreten;
@@ -163,7 +163,110 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                         ),
                         Padding(
                             padding: const EdgeInsets.only(top: 10.0),
-                            child: moreaRaisedButton(this.nameMapAntreten, () {
+                            child: Column(
+                              children: [
+                                TextButton(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                        minWidth: viewportConstraints.maxWidth,
+                                        maxWidth: viewportConstraints.maxWidth),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Lokal',
+                                        style: MoreaTextStyle.textField,
+                                      ),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                              side: BorderSide(color: Colors.black45))),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                          EdgeInsets.only(
+                                              top: 10, bottom: 10, left: 5, right: 5)),
+                                      overlayColor: MaterialStateProperty.resolveWith(
+                                              (Set<MaterialState> states) {
+                                            if (states.contains(MaterialState.focused))
+                                              return MoreaColors.violett;
+                                            return null;
+                                          })),
+                                  onPressed: () {
+                                    this.urlMapAntreten = urlGoogleMapsLokal;
+                                    this.nameMapAntreten = 'Lokal';
+                                  },
+                                ),
+                                TextButton(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                        minWidth: viewportConstraints.maxWidth,
+                                        maxWidth: viewportConstraints.maxWidth),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Waldrand',
+                                        style: MoreaTextStyle.textField,
+                                      ),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                              side: BorderSide(color: Colors.black45))),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                          EdgeInsets.only(
+                                              top: 10, bottom: 10, left: 5, right: 5)),
+                                      overlayColor: MaterialStateProperty.resolveWith(
+                                              (Set<MaterialState> states) {
+                                            if (states.contains(MaterialState.focused))
+                                              return MoreaColors.violett;
+                                            return null;
+                                          })),
+                                  onPressed: () {
+                                    this.urlMapAntreten = urlGoogleMapsWaldrand;
+                                    this.nameMapAntreten = 'Waldrand';
+                                  },
+                                ),
+                                TextButton(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                        minWidth: viewportConstraints.maxWidth,
+                                        maxWidth: viewportConstraints.maxWidth),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Alle anderen Orte',
+                                        style: MoreaTextStyle.textField,
+                                      ),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                              side: BorderSide(color: Colors.black45))),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                          EdgeInsets.only(
+                                              top: 10, bottom: 10, left: 5, right: 5)),
+                                      overlayColor: MaterialStateProperty.resolveWith(
+                                              (Set<MaterialState> states) {
+                                            if (states.contains(MaterialState.focused))
+                                              return MoreaColors.violett;
+                                            return null;
+                                          })),
+                                  onPressed: () {
+                                    this.urlMapAntreten = urlGoogleMapsEmpty;
+                                    this.nameMapAntreten = 'Alle anderen Orte';
+                                  },
+                                ),
+                              ],
+                            )
+                            /*moreaRaisedButton(this.nameMapAntreten, () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -186,7 +289,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                                               print(val);
                                             },
                                           )));
-                            })),
+                            })*/),
                       ],
                     ),
                   ),
