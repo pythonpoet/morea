@@ -48,7 +48,7 @@ Future<dynamic> makeLeiterWidget(
                   await qrCode.germanScanQR();
                   stream.add(666);
                   print(qrCode.germanError);
-                  if (qrCode.germanError ==
+                  if (qrCode.germanError !=
                       'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
                     print('making Leiter');
                     makeLeiter(userID, qrCode.qrResult!, groupID)

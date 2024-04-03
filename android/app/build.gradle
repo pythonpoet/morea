@@ -24,7 +24,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "productions.morea.app"
-    compileSdk flutter.compileSdkVersion
+    // compileSdk flutter.compileSdkVersion
+    compileSdk 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -35,6 +36,8 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
