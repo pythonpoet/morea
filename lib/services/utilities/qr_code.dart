@@ -1,4 +1,4 @@
-import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +21,7 @@ class QrCode implements BaseQrCode {
     );
   }
 
-  Future<void> germanScanQR() async {
+  /* Future<void> germanScanQR() async {
     try {
       qrResult = await BarcodeScanner.scan().toString();
       return;
@@ -38,5 +38,15 @@ class QrCode implements BaseQrCode {
           "Etwas ist hat nicht funktioniert, bitte kontaktiere ein Leiter: $e";
     }
     return;
+  } */
+
+  Future<void> germanScanQR() async {
+    try {
+      qrResult = await FlutterBarcodeScanner.scanBarcode(
+          '#FF0000', 'Abbrechen', true, ScanMode.QR);
+      return;
+    } on PlatformException catch (e) {
+      print(e);
+    }
   }
 }
