@@ -59,6 +59,6 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>task-identifier</string>
-  </array>
+	</array>
 </dict>
 </plist>
