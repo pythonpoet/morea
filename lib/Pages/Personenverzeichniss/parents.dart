@@ -29,21 +29,17 @@ abstract class BaseMergeChildParent {
 
 class MergeChildParent extends BaseMergeChildParent {
   QrCode qrCode = new QrCode();
-  MoreaFirebase moreafire;
-  CrudMedthods crud0;
-  ChildParendPend childParendPend;
-  User moreaUser;
-  Register register;
+  late MoreaFirebase moreafire;
+  late CrudMedthods crud0;
+  late ChildParendPend childParendPend;
+  late User moreaUser;
+  late Register register;
   bool parentReaderror = false, allowScanner = true;
   final formKey = new GlobalKey<FormState>();
   StreamController<bool> streamRegisterStatus = new BehaviorSubject();
   bool loading = false;
   Widget widget = new Container();
-  String userId, error;
-  List someList;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
-
-  BuildContext showDialogcontext;
 
   MergeChildParent(CrudMedthods crudMedthods, MoreaFirebase moreaFirebase) {
     this.moreafire = moreaFirebase;
@@ -145,7 +141,7 @@ class MergeChildParent extends BaseMergeChildParent {
                 future: qrCodeString,
                 builder: (BuildContext context, snap) {
                   if (snap.hasData)
-                    return qrCode.generate(snap.data);
+                    return qrCode.generate(snap.data!);
                   else
                     return Container(
                       child: Center(child: simpleMoreaLoadingIndicator()),
@@ -206,14 +202,15 @@ class MergeChildParent extends BaseMergeChildParent {
               ),
             );
           });
-      await childParendPend.parentSendsRequestString(qrCode.qrResult, userMap);
+      await childParendPend.parentSendsRequestString(qrCode.qrResult!, userMap);
       DocumentSnapshot userSnap = await moreafire.firestore
           .collection(pathUser)
           .doc(userMap[userMapUID])
           .get();
       List<String> groupIDs = <String>[];
       print(userSnap.data().toString());
-      userSnap.data()[userMapKinder].forEach((key, value) async {
+      (userSnap.data() as Map<String, dynamic>)[userMapKinder]
+          .forEach((key, value) async {
         DocumentSnapshot childSnap =
             await moreafire.firestore.collection(pathUser).doc(key).get();
         groupIDs.add(childSnap[userMapGroupIDs][0]);
@@ -259,7 +256,7 @@ class MergeChildParent extends BaseMergeChildParent {
               SizedBox(
                 height: 30,
               ),
-              Text(qrCode.germanError),
+              Text(qrCode.germanError!),
               SizedBox(
                 height: 30,
               ),
@@ -624,7 +621,7 @@ class MergeChildParent extends BaseMergeChildParent {
 
   bool validateAndSave(context) {
     final form = formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {
@@ -669,9 +666,9 @@ class MergeChildParent extends BaseMergeChildParent {
         print(childUID);
         print(moreaUser.displayName);
         print(moreaUser.generateAndValitateUserMap().toString());
-        for (var groupID in moreaUser.groupIDs) {
+        for (var groupID in moreaUser.groupIDs!) {
           await moreafire.groupPriviledgeTN(groupID, childUID,
-              moreaUser.displayName, moreaUser.generateAndValitateUserMap());
+              moreaUser.displayName!, moreaUser.generateAndValitateUserMap());
         }
 
         return true;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 
-Widget moreaEditActionbutton({@required Function route, Key key}) {
+FloatingActionButton moreaEditActionbutton({required Function route, Key? key}) {
   return new FloatingActionButton(
     key: key == null ? null : key,
     elevation: 1.0,
@@ -13,7 +13,7 @@ Widget moreaEditActionbutton({@required Function route, Key key}) {
   );
 }
 
-Widget moreaRaisedButton(String text, Function action) {
+Widget moreaRaisedButton(String text, void Function() action){
   return ElevatedButton(
     style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(MoreaColors.violett),
@@ -27,7 +27,7 @@ Widget moreaRaisedButton(String text, Function action) {
   );
 }
 
-Widget moreaRaisedIconButton(String text, Function action, Icon icon) {
+Widget moreaRaisedIconButton(String text, void Function() action, Icon icon) {
   return ElevatedButton.icon(
     style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(MoreaColors.violett),
@@ -42,7 +42,7 @@ Widget moreaRaisedIconButton(String text, Function action, Icon icon) {
   );
 }
 
-Widget moreaFlatRedButton(String text, Function action) {
+Widget moreaFlatRedButton(String text, void Function() action) {
   return TextButton(
     style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
@@ -57,7 +57,7 @@ Widget moreaFlatRedButton(String text, Function action) {
   );
 }
 
-Widget moreaFlatIconButton(String text, Function action, Icon icon) {
+Widget moreaFlatIconButton(String text, void Function() action, Icon icon) {
   return TextButton.icon(
     onPressed: action,
     icon: icon,
@@ -76,7 +76,7 @@ Widget moreaFlatIconButton(String text, Function action, Icon icon) {
   );
 }
 
-Widget moreaFlatButton(String text, Function action) {
+Widget moreaFlatButton(String text, void Function() action) {
   return TextButton(
     onPressed: action,
     child: Padding(

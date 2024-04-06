@@ -10,13 +10,13 @@ import 'parents.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ProfilePageState extends StatefulWidget {
-  ProfilePageState({this.profile, this.moreaFire, this.crud0, this.signOut});
+  ProfilePageState({required this.profile, required this.moreaFire, required this.crud0, required this.signOut});
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
   final Function signOut;
 
-  Map<String, dynamic> profile;
+  final Map<String, dynamic> profile;
 
   // MergeChildParent mergeChildParent = new MergeChildParent(firestore);
 
@@ -31,35 +31,33 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   ProfilePageStatePage._();*/
 
-  MergeChildParent mergeChildParent;
-  MoreaFirebase moreaFire;
-  CrudMedthods crud0;
-  ChildParendPend childParendPend;
+  late MergeChildParent mergeChildParent;
+  late MoreaFirebase moreaFire;
+  late CrudMedthods crud0;
+  late ChildParendPend childParendPend;
   bool hatEltern = false,
       hatKinder = false,
       display = false,
       upgradeKidDisplay = false,
       newKidDisplay = false;
-  Stream<bool> value;
   var controller = new StreamController<bool>();
-  Future<String> qrCodeString;
   List elternMapList = ['Liam Bebecho'], kinderMapList = ['Walter'];
-  Map<String, dynamic> childToUpgradeMap;
+  late Map<String, dynamic> childToUpgradeMap;
+  late Map<String, dynamic> profile;
 
   void reload() async {
-    value = controller.stream;
     controller.add(false);
 
-    var newData = await moreaFire.getUserInformation(widget.profile['UID']);
-    if (newData.data != widget.profile) {
-      widget.profile = newData.data();
+    var newData = await moreaFire.getUserInformation(this.profile['UID']);
+    if (newData.data != this.profile) {
+      this.profile = newData.data()! as Map<String, dynamic>;
       erziungsberechtigte();
     }
   }
 
   Future<void> erziungsberechtigte() async {
-    if ((widget.profile.containsKey("Eltern")) &&
-        (widget.profile['Eltern'].length != 0)) {
+    if ((this.profile.containsKey("Eltern")) &&
+        (this.profile['Eltern'].length != 0)) {
       await getElternMap();
       hatEltern = true;
       setState(() {});
@@ -69,9 +67,9 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getkinder() async {
-    widget.profile = (await crud0.getDocument(pathUser, widget.profile[userMapUID])).data();
-    if ((widget.profile['Kinder'] != null) &&
-        (widget.profile['Kinder'].length != 0)) {
+    this.profile = (await crud0.getDocument(pathUser, this.profile[userMapUID])).data()! as Map<String, dynamic>;
+    if ((this.profile['Kinder'] != null) &&
+        (this.profile['Kinder'].length != 0)) {
       await getKindernMap();
       hatKinder = true;
       setState(() {});
@@ -83,10 +81,6 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   void childaktuallisieren() async {
     if (display) {
       display = false;
-      if (qrCodeString != null) {
-        childParendPend.deleteRequest(await qrCodeString);
-        qrCodeString = null;
-      }
     } else {
       display = true;
       documentChangeListender();
@@ -96,7 +90,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   void documentChangeListender() async {
     await Future.delayed(Duration(seconds: 2));
-    await childParendPend.waitOnUserDataChange(widget.profile[userMapUID]);
+    await childParendPend.waitOnUserDataChange(this.profile[userMapUID]);
     display = false;
     setState(() {});
     showDialog(
@@ -126,7 +120,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     setState(() {});
   }
 
-  void upgradeKid(Map childMap) {
+  void upgradeKid(Map<String, dynamic> childMap) {
     if (upgradeKidDisplay) {
       upgradeKidDisplay = false;
     } else {
@@ -137,7 +131,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getElternMap() async {
-    List elternUID = List.from(widget.profile['Eltern'].keys);
+    List elternUID = List.from(this.profile['Eltern'].keys);
     for (int i = 0; i < elternUID.length; i++) {
       var elternData = await moreaFire.getUserInformation(elternUID[i]);
       if (i == 0) {
@@ -150,8 +144,8 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   }
 
   Future<void> getKindernMap() async {
-    print("kinder: " + widget.profile['Kinder'].toString());
-    List kinderUID = List.from(widget.profile['Kinder'].keys);
+    print("kinder: " + this.profile['Kinder'].toString());
+    List kinderUID = List.from(this.profile['Kinder'].keys);
     for (int i = 0; i < kinderUID.length; i++) {
       var kinderData = await moreaFire.getUserInformation(kinderUID[i]);
       if (i == 0) {
@@ -179,12 +173,13 @@ class ProfilePageStatePage extends State<ProfilePageState> {
   @override
   void initState() {
     super.initState();
-    mergeChildParent = new MergeChildParent(widget.crud0, widget.moreaFire);
+    this.profile = widget.profile;
+    mergeChildParent = MergeChildParent(widget.crud0, widget.moreaFire);
     moreaFire = widget.moreaFire;
     crud0 = widget.crud0;
-    childParendPend = new ChildParendPend(
+    childParendPend = ChildParendPend(
         crud0: widget.crud0, moreaFirebase: widget.moreaFire);
-    if (widget.profile['Pos'] == 'Teilnehmer') {
+    if (this.profile['Pos'] == 'Teilnehmer') {
       reload();
       erziungsberechtigte();
     } else {
@@ -194,11 +189,11 @@ class ProfilePageStatePage extends State<ProfilePageState> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.profile['Pos'] == 'Teilnehmer') {
+    if (this.profile['Pos'] == 'Teilnehmer') {
       return Container(
           child: Scaffold(
               appBar: AppBar(
-                title: Text(widget.profile['Vorname'].toString()),
+                title: Text(this.profile['Vorname'].toString()),
               ),
               body: Stack(
                 children: <Widget>[
@@ -211,7 +206,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   Align(
                     child: display
                         ? mergeChildParent.childShowQrCode(
-                            widget.profile,
+                            this.profile,
                             context,
                             this.childaktuallisieren,
                             childParendPend.deleteRequest)
@@ -223,7 +218,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
       return Container(
           child: Scaffold(
               appBar: AppBar(
-                title: Text(widget.profile['Vorname'].toString()),
+                title: Text(this.profile['Vorname'].toString()),
               ),
               body: Stack(
                 children: <Widget>[
@@ -234,14 +229,14 @@ class ProfilePageStatePage extends State<ProfilePageState> {
                   ),
                   new Align(
                     child: display
-                        ? mergeChildParent.parentScannsQrCode(widget.profile,
+                        ? mergeChildParent.parentScannsQrCode(this.profile,
                             this.parentaktuallisieren, context, widget.signOut)
                         : Container(),
                   ),
                   new Align(
                       child: newKidDisplay
                           ? mergeChildParent.registernewChild(
-                              widget.profile,
+                              this.profile,
                               context,
                               this.setProfileState,
                               this.newKidakt,
@@ -496,7 +491,7 @@ class ProfilePageStatePage extends State<ProfilePageState> {
     }
   }
 
-  showUpgradeWarning(Map childMap) {
+  showUpgradeWarning(Map<String, dynamic> childMap) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(

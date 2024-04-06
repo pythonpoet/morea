@@ -81,7 +81,7 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else if (!MoreaInputValidator.phoneNumber(value)) {
                             return 'Bitte gültige Telefonnummer wählen';
@@ -103,7 +103,7 @@ class _ChangePhoneNumberState extends State<ChangePhoneNumber> {
 
   bool _validateAndSave() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {

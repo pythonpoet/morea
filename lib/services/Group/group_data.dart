@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:morea/morea_strings.dart';
@@ -10,7 +9,7 @@ Stream<Map<String, dynamic>> getGroupData(
     CrudMedthods crudMedthods, String groupID) async* {
   await for (DocumentSnapshot dsEventData
       in crudMedthods.streamDocument(pathGroups, groupID)) {
-    yield dsEventData.data();
+    yield dsEventData.data()! as Map<String, dynamic>;
   }
 }
 
@@ -18,16 +17,16 @@ List<String> sortHomeFeedByStartDate(Map<String, GroupData> mapGroupData) {
   List<String> sort = <String>[];
   Map<String, String> unsorted = Map<String, String>();
   mapGroupData.forEach((String groupID, GroupData groupData) {
-    if (groupData.homeFeed.homeFeed != null)
-      groupData.homeFeed.homeFeed.forEach((eventID, homeFeedEntry) {
-        unsorted[eventID] = homeFeedEntry.eventStartTimeStamp;
+    if (groupData.homeFeed!.homeFeed != null)
+      groupData.homeFeed!.homeFeed.forEach((eventID, homeFeedEntry) {
+        unsorted[eventID] = homeFeedEntry.eventStartTimeStamp!;
       });
   });
   if (unsorted == null) return [];
   unsorted.forEach((String eventID, strTimestamp) {
     if (sort.length == 0)
       sort.add(eventID);
-    else if (sort.length == 1) if (DateTime.parse(unsorted[sort[0]])
+    else if (sort.length == 1) if (DateTime.parse(unsorted[sort[0]]!)
             .difference(DateTime.parse(strTimestamp))
             .inMinutes >=
         0)
@@ -36,11 +35,11 @@ List<String> sortHomeFeedByStartDate(Map<String, GroupData> mapGroupData) {
       sort.insert(0, eventID);
     else {
       for (int i = 0; i < sort.length - 1; i++)
-        if (DateTime.parse(unsorted[[i]])
+        if (DateTime.parse(unsorted[[i]]!)
                 .difference(DateTime.parse(strTimestamp))
                 .inMinutes >=
             0) if (DateTime.parse(strTimestamp)
-                .difference(DateTime.parse(unsorted[sort[i + 1]]))
+                .difference(DateTime.parse(unsorted[sort[i + 1]]!))
                 .inMinutes >=
             0) {
           sort.insert(i + 1, eventID);
@@ -56,22 +55,24 @@ enum GroupLicenceType { premium, standart, anarchy }
 
 class GroupData {
   //Objects
-  CrudMedthods crud0;
+  CrudMedthods? crud0;
   //Attributes
-  GroupLicence groupLicence;
-  GroupOption groupOption;
-  HomeFeed homeFeed;
-  PriviledgeEntry priviledge;
+  GroupLicence? groupLicence;
+  GroupOption? groupOption;
+  HomeFeed? homeFeed;
+  PriviledgeEntry? priviledge;
   Map<String, dynamic> groupData;
   Map<String, RoleEntry> roles = Map<String, RoleEntry>();
-  Map<String, dynamic> groupUserData;
-  String groupID, groupNickName;
-  GroupData({this.groupData, this.groupUserData}) {
-    if (this.groupData != null) readGroup(this.groupData, this.groupUserData);
+  Map<String, dynamic>? groupUserData;
+  String? groupID, groupNickName;
+  GroupData({required this.groupData, this.groupUserData}) {
+    print('GroupData groupData ' + this.groupData.toString());
+    print('GroupData groupUserData ' + this.groupUserData.toString());
+    readGroup(this.groupData, this.groupUserData);
   }
 
-  Future<void> readGroup(
-      Map<String, dynamic> groupMap, Map<String, dynamic> groupUserData) {
+  void readGroup(
+      Map<String, dynamic> groupMap, Map<String, dynamic>? groupUserData) {
     //turnOn/OFF groupMapTest
     if (true) {
       if (groupMap.containsKey("groupID"))
@@ -87,10 +88,11 @@ class GroupData {
       if (groupMap.containsKey(groupMapHomeFeed)) {
         this.homeFeed = HomeFeed();
         this
-            .homeFeed
+            .homeFeed!
             .readMap(Map<String, dynamic>.from(groupMap[groupMapHomeFeed]));
       } else
         throw "$groupMapHomeFeed has to be non-null";
+
       if (groupMap.containsKey(groupMapRoles)) {
         Map<String, dynamic> chash =
             Map<String, dynamic>.from(groupMap[groupMapRoles]);
@@ -102,8 +104,9 @@ class GroupData {
         throw "$groupMapRoles has to be non-null";
 
       if (groupUserData != null) {
+        print('reading group');
         this.priviledge = PriviledgeEntry(data: groupUserData);
-        priviledge.readRole(globalConfigRoles, this.roles);
+        priviledge!.readRole(globalConfigRoles, this.roles);
         if (groupMap.containsKey(groupMapGroupLicence))
           this.groupLicence = GroupLicence(
               Map<String, dynamic>.from(groupMap[groupMapGroupLicence]));
@@ -124,21 +127,21 @@ class GroupData {
       String eventEndTimeStamp,
       String eventStartTimeStamp,
       Map<String, dynamic> data,
-      CrudMedthods crudMedthods) {
+      CrudMedthods crudMedthods) async {
     HomeFeedEntry homeFeedEntry = HomeFeedEntry(
         uploadedByUserID: [userID],
         uploadedTimeStamp: [DateTime.now().toString()],
         eventEndTimeStamp: eventEndTimeStamp,
         eventStartTimeStamp: eventStartTimeStamp);
-    this.homeFeed.homeFeed = {eventID: homeFeedEntry};
+    this.homeFeed!.homeFeed = {eventID: homeFeedEntry};
     //Upload the HomeFeed
-    Map<String, dynamic> map = homeFeed.pack();
-    return crudMedthods.runTransaction(
+    Map<String, dynamic> map = homeFeed!.pack();
+    return await crudMedthods.runTransaction(
       pathGroups,
-      this.groupID,
+      this.groupID!,
       {},
       function: (snap) {
-        Map<String, dynamic> snapData = snap.data();
+        Map<String, dynamic> snapData = snap.data()! as Map<String, dynamic>;
         snapData[groupMapHomeFeed] = map;
         return snapData;
       },
@@ -146,12 +149,12 @@ class GroupData {
   }
 
   setParentPriviledge() {
-    if (this.groupOption.parentialControl.enabled) {
+    if (this.groupOption!.parentialControl.enabled!) {
       this.priviledge = PriviledgeEntry();
-      this.priviledge.roleLocation =
-          this.groupOption.parentialControl.roleLocation;
-      this.priviledge.roleType = this.groupOption.parentialControl.roleType;
-      this.priviledge.readRole(globalConfigRoles, this.roles);
+      this.priviledge!.roleLocation =
+          this.groupOption!.parentialControl.roleLocation!;
+      this.priviledge!.roleType = this.groupOption!.parentialControl.roleType!;
+      this.priviledge!.readRole(globalConfigRoles, this.roles);
     }
   }
 }
@@ -162,37 +165,39 @@ class HomeFeed {
   Iterable<HomeFeedEntry> get values => homeFeed.values;
 
   String getEventStartDate(String eventID) {
-    return homeFeed[eventID].eventStartTimeStamp;
+    return homeFeed[eventID]!.eventStartTimeStamp!;
   }
 
   void readMap(Map<String, dynamic> data) {
     print("TP1");
-    for (String eventID in data.keys) {
-      print("TP2");
-      this.homeFeed[eventID] = HomeFeedEntry();
-      if (data[eventID].containsKey(groupMapUploadeByUserID))
-        this.homeFeed[eventID].uploadedByUserID =
-            List<String>.from(data[eventID][groupMapUploadeByUserID]);
-      else
-        throw "$groupMapUploadeByUserID of event: $eventID has to be non-null";
+    if (!data.isEmpty) {
+      for (String eventID in data.keys) {
+        print("TP2");
+        this.homeFeed[eventID] = HomeFeedEntry();
+        if (data[eventID].containsKey(groupMapUploadeByUserID))
+          this.homeFeed[eventID]!.uploadedByUserID =
+              List<String>.from(data[eventID][groupMapUploadeByUserID]);
+        else
+          throw "$groupMapUploadeByUserID of event: $eventID has to be non-null";
 
-      if (data[eventID].containsKey(groupMapUploadedTimeStamp))
-        this.homeFeed[eventID].uploadedTimeStamp =
-            List<String>.from(data[eventID][groupMapUploadedTimeStamp]);
-      else
-        throw "$groupMapUploadedTimeStamp of event: $eventID has to be non-null";
+        if (data[eventID].containsKey(groupMapUploadedTimeStamp))
+          this.homeFeed[eventID]!.uploadedTimeStamp =
+              List<String>.from(data[eventID][groupMapUploadedTimeStamp]);
+        else
+          throw "$groupMapUploadedTimeStamp of event: $eventID has to be non-null";
 
-      if (data[eventID].containsKey(groupMapEventStartTimeStamp))
-        this.homeFeed[eventID].eventStartTimeStamp =
-            data[eventID][groupMapEventStartTimeStamp];
-      else
-        throw "$groupMapEventStartTimeStamp of event: $eventID has to be non-null";
+        if (data[eventID].containsKey(groupMapEventStartTimeStamp))
+          this.homeFeed[eventID]!.eventStartTimeStamp =
+              data[eventID][groupMapEventStartTimeStamp];
+        else
+          throw "$groupMapEventStartTimeStamp of event: $eventID has to be non-null";
 
-      if (data[eventID].containsKey(groupMapEventEndTimeStamp))
-        this.homeFeed[eventID].eventEndTimeStamp =
-            data[eventID][groupMapEventEndTimeStamp];
-      else
-        throw "$groupMapEventEndTimeStamp of event: $eventID has to be non-null";
+        if (data[eventID].containsKey(groupMapEventEndTimeStamp))
+          this.homeFeed[eventID]!.eventEndTimeStamp =
+              data[eventID][groupMapEventEndTimeStamp];
+        else
+          throw "$groupMapEventEndTimeStamp of event: $eventID has to be non-null";
+      }
     }
   }
 
@@ -202,11 +207,11 @@ class HomeFeed {
 }
 
 class HomeFeedEntry {
-  List<String> uploadedByUserID;
-  List<String> uploadedTimeStamp;
-  List<String> participatingGroups;
-  String eventStartTimeStamp;
-  String eventEndTimeStamp;
+  List<String>? uploadedByUserID;
+  List<String>? uploadedTimeStamp;
+  List<String>? participatingGroups;
+  String? eventStartTimeStamp;
+  String? eventEndTimeStamp;
 
   HomeFeedEntry(
       {this.uploadedByUserID,
@@ -215,7 +220,7 @@ class HomeFeedEntry {
       this.eventStartTimeStamp});
 
   // ignore: missing_return
-  Map<String, dynamic> pack() {
+  Map<String, dynamic>? pack() {
     if (_validate())
       return Map.from({
         groupMapUploadeByUserID: this.uploadedByUserID,
@@ -223,6 +228,7 @@ class HomeFeedEntry {
         groupMapEventEndTimeStamp: this.eventEndTimeStamp,
         groupMapEventStartTimeStamp: this.eventStartTimeStamp
       });
+    return null;
   }
 
   bool _validate() {
@@ -239,19 +245,19 @@ class HomeFeedEntry {
 }
 
 class GroupOption {
-  List<String> groupUpperClass;
-  Map<String, GroupLowerHirarchyEntry> groupLowerClass;
+  List<String>? groupUpperClass;
+  Map<String, GroupLowerHirarchyEntry>? groupLowerClass;
 
   ParentialControl parentialControl = ParentialControl();
 
   //Admin
-  bool adminGroupMemberBrowser;
-  bool enableDisplayName;
+  bool? adminGroupMemberBrowser;
+  bool? enableDisplayName;
 
   //Events
-  bool eventTeleblitzEnable;
+  bool? eventTeleblitzEnable;
   //Chat
-  bool chatEnable;
+  bool? chatEnable;
   GroupOption(Map<String, dynamic> data) {
     if (data.containsKey(groupMapGroupUpperClass))
       groupUpperClass = List<String>.from(data[groupMapGroupUpperClass]);
@@ -284,25 +290,27 @@ class GroupOption {
   }
   List<String> getLowerGroupsNickNames() {
     List<String> list = <String>[];
-    this.groupLowerClass.forEach((key, value) => list.add(value.groupNickName));
+    this
+        .groupLowerClass!
+        .forEach((key, value) => list.add(value.groupNickName!));
     return list;
   }
 
   List<String> getLowerGroupsIDs() {
     List<String> list = <String>[];
-    this.groupLowerClass.forEach((key, value) => list.add(value.groupID));
+    this.groupLowerClass!.forEach((key, value) => list.add(value.groupID!));
     return list;
   }
 }
 
 class ParentialControl {
-  String roleLocation, roleType;
-  bool enabled;
+  String? roleLocation, roleType;
+  bool? enabled;
 }
 
 class GroupLicence {
-  String path, document;
-  GroupLicenceType groupLicenceType;
+  String? path, document;
+  GroupLicenceType? groupLicenceType;
   GroupLicence(Map data_old) {
     Map<String, dynamic> data = Map<String, dynamic>.from(data_old);
     if (!data.containsKey(groupMapGroupLicenceType))
@@ -331,7 +339,7 @@ class GroupLicence {
 }
 
 class GroupLowerHirarchyEntry {
-  String groupID, groupNickName;
+  String? groupID, groupNickName;
   GroupLowerHirarchyEntry(Map data) {
     Map<String, dynamic> data2 = Map<String, dynamic>.from(data);
     groupID = data2[userMapgroupID];

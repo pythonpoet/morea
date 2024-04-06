@@ -1,4 +1,5 @@
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
+    as picker;
 import 'package:intl/intl.dart';
 import 'package:morea/Pages/Profil/change_address.dart';
 import 'package:morea/Pages/Profil/change_email.dart';
@@ -17,11 +18,12 @@ import 'package:flutter/material.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 class EditUserProfilePage extends StatefulWidget {
-  EditUserProfilePage({this.profile, this.moreaFire, this.crud0});
+  EditUserProfilePage(
+      {required this.profile, required this.moreaFire, required this.crud0});
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
-  final Map profile;
+  final Map<String, dynamic> profile;
 
   @override
   State<StatefulWidget> createState() => new EditUserPoriflePageState();
@@ -29,13 +31,13 @@ class EditUserProfilePage extends StatefulWidget {
 
 class EditUserPoriflePageState extends State<EditUserProfilePage>
     with TickerProviderStateMixin {
-  MoreaFirebase moreafire;
-  CrudMedthods crud0;
+  late MoreaFirebase moreafire;
+  late CrudMedthods crud0;
 
   MailChimpAPIManager mailchimpApiManager = MailChimpAPIManager();
 
-  String _email, _pfadinamen = ' ', _vorname, _nachname, _geburtstag, _pos;
-  String _adresse,
+  String? _email, _pfadinamen = ' ', _vorname, _nachname, _geburtstag, _pos;
+  String? _adresse,
       _ort,
       _plz,
       _handynummer,
@@ -43,10 +45,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       error,
       selectedrolle,
       _geschlecht;
-  List<String> _stufe, oldGroup;
+  List<String>? _stufe, oldGroup;
   List<Map> _stufenselect = [];
   List<String> _rollenselect = ['Teilnehmer', 'Leiter'];
-  MoreaLoading moreaLoading;
+  late MoreaLoading moreaLoading;
   bool loading = true;
 
   void validateAndSubmit() async {
@@ -59,11 +61,13 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
       await moreafire
           .goToNewGroup(
               userdata['UID'],
-              (userdata[userMapPfadiName] == " ")
+              (userdata[userMapPfadiName] == " " ||
+                      userdata[userMapPfadiName] == '' ||
+                      userdata[userMapPfadiName] == null)
                   ? userdata[userMapVorName]
                   : userdata[userMapPfadiName],
-              oldGroup,
-              _stufe)
+              oldGroup!,
+              _stufe!)
           .then((onValue) => setState);
       //mailchimpApiManager.updateUserInfo(
       //    _email, _vorname, _nachname, _geschlecht, _stufe, moreafire);
@@ -122,14 +126,18 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     }
     if (widget.profile[userMapEltern] != null) {
       for (var elternUID in widget.profile[userMapEltern].keys.toList()) {
-        var elternMap = (await crud0.getDocument(pathUser, elternUID)).data();
+        Map<String, dynamic> elternMap =
+            (await crud0.getDocument(pathUser, elternUID)).data()
+                as Map<String, dynamic>;
         elternMap[userMapKinder].remove(widget.profile[userMapUID]);
         await moreafire.updateUserInformation(elternMap[userMapUID], elternMap);
       }
     }
     if (widget.profile[userMapKinder] != null) {
       for (var childUID in widget.profile[userMapKinder].keys.toList()) {
-        Map childMap = (await crud0.getDocument(pathUser, childUID)).data();
+        Map<String, dynamic> childMap =
+            (await crud0.getDocument(pathUser, childUID)).data()
+                as Map<String, dynamic>;
         if (childMap[userMapChildUID] == null) {
           childMap[userMapEltern].remove(widget.profile[userMapUID]);
           await moreafire.updateUserInformation(childMap[userMapUID], childMap);
@@ -186,7 +194,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
     Navigator.of(context).pop();
   }
 
-  Map mapUserData() {
+  Map<String, dynamic> mapUserData() {
     Map<String, dynamic> userInfo = widget.profile;
     userInfo[userMapPfadiName] = this._pfadinamen;
     userInfo[userMapVorName] = this._vorname;
@@ -224,7 +232,8 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
 
   initSubgoup() async {
     Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, moreaGroupID)).data();
+        (await crud0.getDocument(pathGroups, moreaGroupID)).data()
+            as Map<String, dynamic>;
     print(
         "test" + data[groupMapGroupOption][groupMapGroupLowerClass].toString());
     this._stufenselect = <Map>[];
@@ -308,7 +317,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
             : '$_vorname $_nachname v/o $_pfadinamen'),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
-                ChangeName(_vorname, _nachname, _pfadinamen, changeName))),
+                ChangeName(_vorname!, _nachname!, _pfadinamen!, changeName))),
         trailing: Icon(
           Icons.arrow_forward_ios,
           color: Colors.black,
@@ -326,7 +335,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
         subtitle: Text('$_adresse, $_plz $_ort'),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
-                ChangeAddress(_adresse, _plz, _ort, changeAdress))),
+                ChangeAddress(_adresse!, _plz!, _ort!, changeAdress))),
         trailing: Icon(
           Icons.arrow_forward_ios,
           color: Colors.black,
@@ -341,10 +350,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'E-Mail-Adresse',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: _email == null ? null : Text(_email),
+        subtitle: _email == null ? null : Text(_email!),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
-                ChangeEmail(_email, changeEmail))),
+                ChangeEmail(_email!, changeEmail))),
         trailing: Icon(
           Icons.arrow_forward_ios,
           color: Colors.black,
@@ -359,10 +368,10 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'Handynummer',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: _handynummer == null ? null : Text(_handynummer),
+        subtitle: _handynummer == null ? null : Text(_handynummer!),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
-                ChangePhoneNumber(_handynummer, changePhoneNumber))),
+                ChangePhoneNumber(_handynummer!, changePhoneNumber))),
         trailing: Icon(
           Icons.arrow_forward_ios,
           color: Colors.black,
@@ -377,7 +386,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'Geschlecht',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: Text(_geschlecht),
+        subtitle: Text(_geschlecht!),
         onTap: () => _selectGeschlecht(),
         trailing: Icon(
           Icons.arrow_forward_ios,
@@ -393,11 +402,11 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'Geburtstag',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: _geburtstag == null ? Text('') : Text(_geburtstag),
+        subtitle: _geburtstag == null ? Text('') : Text(_geburtstag!),
         onTap: () async {
-          await DatePicker.showDatePicker(context,
+          await picker.DatePicker.showDatePicker(context,
               showTitleActions: true,
-              theme: DatePickerTheme(
+              theme: picker.DatePickerTheme(
                   doneStyle: TextStyle(
                       color: MoreaColors.violett,
                       fontSize: 16,
@@ -406,7 +415,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
               maxTime: DateTime.now().add(new Duration(days: -365 * 3)),
               onConfirm: (date) {
             _geburtstag = DateFormat('dd.MM.yyy', 'de').format(date).toString();
-          }, currentTime: DateTime.now(), locale: LocaleType.de);
+          }, currentTime: DateTime.now(), locale: picker.LocaleType.de);
 
           setState(() {});
         },
@@ -431,9 +440,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
               ),
               subtitle: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: _stufe.length,
+                  itemCount: _stufe!.length,
                   itemBuilder: (context, index) {
-                    return Text(convMiDatatoWebflow(_stufe[index]));
+                    return Text(convMiDatatoWebflow(_stufe![index]));
                   }),
               onTap: () => _selectStufe(),
               trailing: Icon(
@@ -455,7 +464,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
           'Rolle',
           style: MoreaTextStyle.lable,
         ),
-        subtitle: Text(_pos),
+        subtitle: Text(_pos!),
         onTap: () => _selectRolle(),
         trailing: Icon(
           Icons.arrow_forward_ios,
@@ -509,7 +518,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                   DropdownMenuItem(value: "Weiblich", child: Text('weiblich')),
                   DropdownMenuItem(value: 'Männlich', child: Text('männlich'))
                 ],
-                hint: Text(_geschlecht),
+                hint: Text(_geschlecht!),
                 onChanged: (newVal) {
                   _geschlecht = newVal;
                   this.setState(() {});
@@ -555,9 +564,9 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     child: new Text(group[groupMapgroupNickName]),
                   );
                 }).toList(),
-                hint: Text(convMiDatatoWebflow(_stufe[0])),
+                hint: Text(convMiDatatoWebflow(_stufe![0])),
                 onChanged: (newVal) {
-                  _stufe = [newVal];
+                  _stufe = [newVal!];
                   this.setState(() {});
                   Navigator.of(context).pop();
                 }),
@@ -600,7 +609,7 @@ class EditUserPoriflePageState extends State<EditUserProfilePage>
                     child: new Text(val),
                   );
                 }).toList(),
-                hint: Text(_pos),
+                hint: Text(_pos!),
                 onChanged: (newVal) {
                   _pos = newVal;
                   this.setState(() {});

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:morea/services/Group/group_data.dart';
 
 class GroupPreview extends CircleAvatar {
-  GroupData groupData;
+  final GroupData groupData;
   @override
-  Widget child;
+  late final Widget child;
   @override
-  double radius;
-  GroupPreview({@required this.groupData, this.radius}) {
-    this.child = Text(this.groupData.groupNickName.substring(0, 1));
+  final double radius;
+  GroupPreview({required this.groupData, required this.radius}) {
+    this.child = Text(this.groupData.groupNickName!.substring(0, 1));
   }
 }

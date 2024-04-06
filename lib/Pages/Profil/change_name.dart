@@ -85,7 +85,7 @@ class _ChangeNameState extends State<ChangeName> {
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else {
                             return null;
@@ -114,7 +114,7 @@ class _ChangeNameState extends State<ChangeName> {
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else {
                             return null;
@@ -156,7 +156,7 @@ class _ChangeNameState extends State<ChangeName> {
 
   bool _validateAndSave() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {

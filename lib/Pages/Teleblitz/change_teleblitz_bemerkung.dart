@@ -16,7 +16,7 @@ class ChangeBemerkung extends StatefulWidget {
 }
 
 class _ChangeBemerkungState extends State<ChangeBemerkung> {
-  String bemerkung;
+  late String bemerkung;
   final _formKey = GlobalKey<FormState>();
   TextEditingController bemerkungController = TextEditingController();
 
@@ -79,12 +79,15 @@ class _ChangeBemerkungState extends State<ChangeBemerkung> {
                             style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
-                              errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
                               border: OutlineInputBorder(),
-                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
-                              if (value.isEmpty) {
+                              if (value!.isEmpty) {
                                 return 'Bitte nicht leer lassen';
                               } else {
                                 return null;
@@ -106,7 +109,7 @@ class _ChangeBemerkungState extends State<ChangeBemerkung> {
 
   bool saveAndSubmit() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {

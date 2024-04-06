@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
@@ -7,26 +8,16 @@ import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ViewEventPageState extends StatelessWidget {
-  ViewEventPageState({this.info, this.pos, this.moreaFire, this.agenda});
+  ViewEventPageState({required this.info, required this.pos, required this.moreaFire, required this.agenda, required this.fireStore});
 
   final MoreaFirebase moreaFire;
   final Agenda agenda;
-  final Map info;
+  final Map<String, dynamic> info;
   final String pos;
+  final FirebaseFirestore fireStore;
 
   @override
   Widget build(BuildContext context) {
-    if (info == null)
-      return Card(
-        child: Center(
-          child: Container(
-              padding: EdgeInsets.all(15),
-              child: Text(
-                "Dieses Event ist nicht eingetragen, wende dich an deine Leiter",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              )),
-        ),
-      );
     return Scaffold(
       appBar: AppBar(
         title: Text(info['Eventname'].toString()),
@@ -200,13 +191,14 @@ class ViewEventPageState extends StatelessWidget {
                   agendaModus: AgendaModus.event,
                   moreaFire: moreaFire,
                   agenda: agenda,
+                  firestore: fireStore,
                 )))
         .then((onValue) {
       Navigator.of(context).pop();
     });
   }
 
-  FloatingActionButton floatingActionButton(context) {
+  FloatingActionButton? floatingActionButton(context) {
     if (istLeiter()) {
       return moreaEditActionbutton(route: () => routeToLagerbearb(context));
     } else {

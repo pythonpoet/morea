@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
+    as picker;
 import 'package:intl/intl.dart';
 import 'package:morea/Widgets/standart/info.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
@@ -13,7 +14,7 @@ abstract class BaseRegister {}
 
 class Register implements BaseRegister {
   String get getPassword => _password;
-  String _alter = "[Datum auswählen]",
+  late String _alter = "[Datum auswählen]",
       _selectedstufe = 'Stufe wählen',
       _selectedverwandtschaft = 'Verwandtschaftsgrad wählen',
       _password,
@@ -21,7 +22,7 @@ class Register implements BaseRegister {
       userId,
       error,
       _geschlecht = 'Geschlecht wählen';
-  GroupData groupdata;
+  late GroupData groupdata;
   List<String> _verwandtschaft = [
     'Mutter',
     'Vater',
@@ -31,7 +32,7 @@ class Register implements BaseRegister {
   User moreaUser;
   Future<DocumentSnapshot> docSnapAbteilung;
 
-  Register({@required this.moreaUser, @required this.docSnapAbteilung});
+  Register({required this.moreaUser, required this.docSnapAbteilung});
 
   validateTeilnehmer(BuildContext context) async {
     try {
@@ -167,8 +168,8 @@ class Register implements BaseRegister {
                 style: MoreaTextStyle.normal,
               ),
               value: mailchimp,
-              onChanged: (bool value) {
-                mailchimp = value;
+              onChanged: (bool? value) {
+                mailchimp = value!;
                 changeMailchimp(mailchimp);
                 print(mailchimp);
               },
@@ -188,8 +189,8 @@ class Register implements BaseRegister {
         future: docSnapAbteilung,
         builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap) {
           if (!snap.hasData) return simpleMoreaLoadingIndicator();
-          print("type= " + snap.data.data.runtimeType.toString());
-          Map<String, dynamic> groupData2 = snap.data.data();
+          Map<String, dynamic> groupData2 =
+              snap.data!.data()! as Map<String, dynamic>;
           this.groupdata = new GroupData(groupData: groupData2);
 
           return Container(
@@ -222,8 +223,8 @@ class Register implements BaseRegister {
                       style: MoreaTextStyle.normal,
                     ),
                     value: mailchimp,
-                    onChanged: (bool value) {
-                      mailchimp = value;
+                    onChanged: (bool? value) {
+                      mailchimp = value!;
                       changeMailchimp(mailchimp);
                       print(mailchimp);
                     },
@@ -243,7 +244,8 @@ class Register implements BaseRegister {
       future: docSnapAbteilung,
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snap) {
         if (!snap.hasData) return simpleMoreaLoadingIndicator();
-        this.groupdata = new GroupData(groupData: snap.data.data());
+        this.groupdata = new GroupData(
+            groupData: snap.data!.data()! as Map<String, dynamic>);
         return Container(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -285,8 +287,7 @@ class Register implements BaseRegister {
     );
   }
 
-  Widget registerSection(
-      {@required Icon icon, @required List<Widget> widgets}) {
+  Widget registerSection({required Icon icon, required List<Widget> widgets}) {
     return Container(
       padding: EdgeInsets.all(10),
       child: Row(
@@ -328,7 +329,7 @@ class Register implements BaseRegister {
       decoration: new InputDecoration(
           border: UnderlineInputBorder(), filled: true, labelText: 'Vorname'),
       validator: (value) =>
-          value.isEmpty ? 'Vornamen darf nicht leer sein' : null,
+          value!.isEmpty ? 'Vornamen darf nicht leer sein' : null,
       keyboardType: TextInputType.text,
       onSaved: (value) => moreaUser.vorName = value,
     );
@@ -339,7 +340,7 @@ class Register implements BaseRegister {
       decoration: new InputDecoration(
           border: UnderlineInputBorder(), filled: true, labelText: 'Nachname'),
       validator: (value) =>
-          value.isEmpty ? 'Nachname darf nicht leer sein' : null,
+          value!.isEmpty ? 'Nachname darf nicht leer sein' : null,
       keyboardType: TextInputType.text,
       onSaved: (value) => moreaUser.nachName = value,
     );
@@ -406,9 +407,9 @@ class Register implements BaseRegister {
                 child: Text(_alter,
                     style: TextStyle(color: Colors.grey[500], fontSize: 16)),
                 onPressed: () async {
-                  await DatePicker.showDatePicker(context,
+                  await picker.DatePicker.showDatePicker(context,
                       showTitleActions: true,
-                      theme: DatePickerTheme(
+                      theme: picker.DatePickerTheme(
                           doneStyle: TextStyle(
                               color: MoreaColors.violett,
                               fontSize: 16,
@@ -421,7 +422,7 @@ class Register implements BaseRegister {
                         DateFormat('dd.MM.yyy', 'de').format(date).toString();
                     _alter =
                         DateFormat('dd.MM.yyy', 'de').format(date).toString();
-                  }, currentTime: DateTime.now(), locale: LocaleType.de);
+                  }, currentTime: DateTime.now(), locale: picker.LocaleType.de);
 
                   setState();
                 },
@@ -448,22 +449,22 @@ class Register implements BaseRegister {
                   underline: SizedBox(),
                   items: this
                       .groupdata
-                      .groupOption
-                      .groupLowerClass
+                      .groupOption!
+                      .groupLowerClass!
                       .values
                       .map((GroupLowerHirarchyEntry entry) =>
                           DropdownMenuItem<String>(
                               value: entry.groupID,
-                              child: Text(entry.groupNickName)))
+                              child: Text(entry.groupNickName!)))
                       .toList(),
                   hint: Text(_selectedstufe),
                   onChanged: (newVal) {
                     _selectedstufe = this
                         .groupdata
-                        .groupOption
-                        .groupLowerClass[newVal]
-                        .groupNickName;
-                    moreaUser.groupIDs = [newVal];
+                        .groupOption!
+                        .groupLowerClass![newVal]!
+                        .groupNickName!;
+                    moreaUser.groupIDs = [newVal!];
                     setState();
                   }),
             ],
@@ -495,7 +496,7 @@ class Register implements BaseRegister {
                     }).toList(),
                     hint: Text(_selectedverwandtschaft),
                     onChanged: (newVal) {
-                      _selectedverwandtschaft = newVal;
+                      _selectedverwandtschaft = newVal!;
                       moreaUser.pos = newVal;
                       setState();
                     }),
@@ -513,7 +514,7 @@ class Register implements BaseRegister {
           border: UnderlineInputBorder(), filled: true, labelText: 'Adresse'),
       keyboardType: TextInputType.text,
       onSaved: (value) => moreaUser.adresse = value,
-      validator: (value) => value.isEmpty ? 'Bitte nicht leer lassen' : null,
+      validator: (value) => value!.isEmpty ? 'Bitte nicht leer lassen' : null,
     );
   }
 
@@ -527,7 +528,7 @@ class Register implements BaseRegister {
           keyboardType: TextInputType.number,
           onSaved: (value) => moreaUser.plz = value,
           validator: (value) {
-            if (value.isEmpty) {
+            if (value!.isEmpty) {
               return 'Bitte nicht leer lassen';
             } else if (!MoreaInputValidator.number(value)) {
               return 'Bitte gülitge PLZ verwenden';
@@ -543,7 +544,7 @@ class Register implements BaseRegister {
             keyboardType: TextInputType.text,
             onSaved: (value) => moreaUser.ort = value,
             validator: (value) =>
-                value.isEmpty ? 'Bitte nicht leer lassen' : null,
+                value!.isEmpty ? 'Bitte nicht leer lassen' : null,
           ),
         ),
       ],
@@ -558,7 +559,7 @@ class Register implements BaseRegister {
           helperText: 'Format "+4179xxxxxxx" oder "004179xxxxxxx"',
           labelText: 'Handynummer'),
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           return 'Bitte nicht leer lassen';
         } else if (!MoreaInputValidator.phoneNumber(value)) {
           return 'Bitte gültige Telefonnummer verwenden';
@@ -575,7 +576,7 @@ class Register implements BaseRegister {
     return new TextFormField(
       decoration: new InputDecoration(filled: true, labelText: 'Email'),
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           return 'Bitte nicht leer lassen';
         } else if (!MoreaInputValidator.email(value)) {
           return 'Bitte gültige E-Mail verwenden';
@@ -593,9 +594,9 @@ class Register implements BaseRegister {
       decoration: new InputDecoration(
           border: UnderlineInputBorder(), filled: true, labelText: 'Passwort'),
       validator: (value) =>
-          value.isEmpty ? 'Passwort darf nicht leer sein' : null,
+          value!.isEmpty ? 'Passwort darf nicht leer sein' : null,
       obscureText: true,
-      onSaved: (value) => _password = value,
+      onSaved: (value) => _password = value!,
     );
   }
 
@@ -606,9 +607,9 @@ class Register implements BaseRegister {
           filled: true,
           labelText: 'Passwort erneut eingeben'),
       validator: (value) =>
-          value.isEmpty ? 'Passwort darf nicht leer sein' : null,
+          value!.isEmpty ? 'Passwort darf nicht leer sein' : null,
       obscureText: true,
-      onSaved: (value) => _passwordneu = value,
+      onSaved: (value) => _passwordneu = value!,
     );
   }
 

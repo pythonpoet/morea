@@ -4,16 +4,16 @@ import 'dart:convert';
 import 'package:morea/services/morea_firestore.dart';
 
 class TeleblitzManager {
-  String slug;
-  String name;
-  String id;
+  String? slug;
+  String? name;
+  String? id;
   bool archived = false;
   bool draft = false;
 
-  MoreaFirebase moreafire;
+  late MoreaFirebase moreafire;
 
   TeleblitzManager(FirebaseFirestore firestore) {
-    moreafire = new MoreaFirebase(firestore);
+    moreafire = MoreaFirebase(firestore);
   }
 
   Future<bool> uploadTeleblitz(
@@ -30,7 +30,7 @@ class TeleblitzManager {
       bool ferien,
       String endeFerien) async {
     Teleblitz upload = Teleblitz.fromString(
-        this.name,
+        this.name!,
         datum,
         antreten,
         mapAntreten,
@@ -43,8 +43,8 @@ class TeleblitzManager {
         grund,
         ferien,
         endeFerien,
-        this.id,
-        this.slug);
+        this.id!,
+        this.slug!);
     var jsonMap = {"fields": upload.toJson()};
     String jsonStr = jsonEncode(jsonMap);
     Map<String, String> header = Map();
@@ -56,7 +56,7 @@ class TeleblitzManager {
         .put(
       Uri.https(
           "api.webflow.com",
-          "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + this.id,
+          "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + this.id!,
           {'live': 'true'}),
       headers: header,
       body: jsonStr,
@@ -81,13 +81,13 @@ class TeleblitzManager {
       'ferien': ferien,
       'ende-ferien': endeFerien,
     };
-    await moreafire.uploadteleblitz(name, data);
+    await moreafire.uploadteleblitz(name!, data);
     return true;
   }
 }
 
 class Teleblitz {
-  String _name,
+  late String _name,
       _datum,
       _antreten,
       _abtreten,
@@ -101,8 +101,8 @@ class Teleblitz {
       _grund,
       _endeFerien;
 
-  List<String> _mitnehmen;
-  bool _keineaktivitaet, _ferien;
+  late List<String> _mitnehmen;
+  late bool _keineaktivitaet, _ferien;
 
   Teleblitz();
 

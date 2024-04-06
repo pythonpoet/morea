@@ -76,7 +76,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else {
                             return null;
@@ -99,7 +99,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                           focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
                         ),
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return 'Bitte nicht leer lassen';
                           } else if (value != passwordController.text) {
                             return 'Die Passwörter stimmen nicht überein';
@@ -121,7 +121,7 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   bool _validateAndSave() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {

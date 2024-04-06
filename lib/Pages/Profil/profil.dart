@@ -18,24 +18,22 @@ class Profile extends StatefulWidget {
   final FirebaseFirestore firestore;
 
   Profile(
-      {@required this.auth,
-      @required this.moreaFire,
-      @required this.navigationMap,
-      @required this.firestore});
+      {required this.auth,
+      required this.moreaFire,
+      required this.navigationMap,
+      required this.firestore});
 
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  Map userInfo;
+  late Map userInfo;
   List nachrichtenGruppen = [];
   Auth auth0 = Auth();
   TextEditingController password = TextEditingController();
-  String oldEmail;
-  String newPassword;
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
-  CrudMedthods crud0;
+  late CrudMedthods crud0;
   GlobalKey _floatingActionButtonKey = GlobalKey();
   GlobalKey _floatingActionButtonKey2 = GlobalKey();
 
@@ -55,18 +53,24 @@ class _ProfileState extends State<Profile> {
     }
     return Scaffold(
       backgroundColor: MoreaColors.bottomAppBar,
-      drawer: moreaDrawer(this.userInfo['Pos'], widget.moreaFire.getDisplayName,
-          this.userInfo['Email'], context, widget.moreaFire, crud0, _signedOut),
+      drawer: moreaDrawer(
+          this.userInfo['Pos'],
+          widget.moreaFire.getDisplayName!,
+          this.userInfo['Email'],
+          context,
+          widget.moreaFire,
+          crud0,
+          _signedOut),
       floatingActionButtonLocation: _locationFloatingActionButton(),
       floatingActionButton: Showcase(
         key: _floatingActionButtonKey,
-        shapeBorder: CircleBorder(),
+        targetShapeBorder: CircleBorder(),
         description: 'Hier kannst du dein Profil ändern',
-        disableAnimation: true,
+        disableMovingAnimation: true,
         child: Showcase.withWidget(
           key: _floatingActionButtonKey2,
-          disableAnimation: true,
-          shapeBorder: CircleBorder(),
+          disableMovingAnimation: true,
+          targetShapeBorder: CircleBorder(),
           height: 300,
           width: 150,
           container: Container(
@@ -255,6 +259,7 @@ class _ProfileState extends State<Profile> {
       ),
       appBar: AppBar(
         title: Text('Profil'),
+        backgroundColor: MoreaColors.orange,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help_outline),
@@ -267,7 +272,7 @@ class _ProfileState extends State<Profile> {
   }
 
   void _signedOut() {
-    widget.navigationMap[signedOut]();
+    widget.navigationMap[signedOut]!();
   }
 
   void updateProfile() async {
@@ -285,7 +290,8 @@ class _ProfileState extends State<Profile> {
 
   BottomAppBar _bottomAppBarBuilder() {
     if (widget.moreaFire.getPos == "Leiter") {
-      return moreaLeiterBottomAppBar(widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.profile);
+      return moreaLeiterBottomAppBar(
+          widget.navigationMap, 'Ändern', MoreaBottomAppBarActivePage.profile);
     } else {
       return moreaChildBottomAppBar(widget.navigationMap);
     }

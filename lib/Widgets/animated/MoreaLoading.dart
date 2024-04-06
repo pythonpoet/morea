@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 class MoreaLoading {
-  AnimationController _loadingController;
-  Animation<int> _loadingAnimation;
-  AnimationController _controller;
-  Animation _curve;
-  Animation<double> _animation;
+  late AnimationController _loadingController;
+  late Animation<int> _loadingAnimation;
+  late AnimationController _controller;
+  late Animation<double> _curve;
+  late Animation<double> _animation;
   List<String> _loadingList = [
     'Loading.',
     'Loading..',
@@ -44,7 +44,7 @@ class MoreaLoading {
           AnimatedBuilder(
             animation: _controller,
             child: Image(image: AssetImage('assets/icon/logo_loading.png')),
-            builder: (BuildContext context, Widget child) {
+            builder: (BuildContext context, Widget? child) {
               return Transform.rotate(
                 angle: _animation.value,
                 child: child,
@@ -57,7 +57,7 @@ class MoreaLoading {
           AnimatedBuilder(
             animation: _loadingController,
             child: Text('Loading'),
-            builder: (BuildContext context, Widget child) {
+            builder: (BuildContext context, Widget? child) {
               return Text(
                 _loadingList[_loadingAnimation.value],
                 style: TextStyle(
@@ -93,7 +93,7 @@ class MoreaLoadingWidget extends StatefulWidget {
 
 class _MoreaLoadingWidgetState extends State<MoreaLoadingWidget>
     with TickerProviderStateMixin {
-  MoreaLoading moreaLoading;
+  late MoreaLoading moreaLoading;
 
   @override
   void initState() {

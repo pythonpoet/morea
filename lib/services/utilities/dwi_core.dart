@@ -12,13 +12,11 @@ class DWICore extends BaseDWICore {
     switch (os) {
       case 'android':
         return PlatformType.isAndroid;
-        break;
       case 'ios':
         return PlatformType.isIOS;
-        break;
       default:
         print('Platform is not implemented');
+        throw 'Error';
     }
-    return null;
   }
 }

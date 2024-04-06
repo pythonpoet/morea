@@ -16,10 +16,10 @@ import 'single_message_page.dart';
 
 class MessagesPage extends StatefulWidget {
   MessagesPage(
-      {@required this.auth,
-      @required this.moreaFire,
-      @required this.navigationMap,
-      @required this.firestore});
+      {required this.auth,
+      required this.moreaFire,
+      required this.navigationMap,
+      required this.firestore});
 
   final FirebaseFirestore firestore;
   final MoreaFirebase moreaFire;
@@ -32,7 +32,7 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage>
     with TickerProviderStateMixin {
-  CrudMedthods crud0;
+  late CrudMedthods crud0;
   var date;
   var uid;
   var stufe;
@@ -40,10 +40,10 @@ class _MessagesPageState extends State<MessagesPage>
   GlobalKey _floatingActionButtonKey = GlobalKey();
   GlobalKey _bottomAppBarLeiterKey = GlobalKey();
   GlobalKey _bottomAppBarTNKey = GlobalKey();
-  String anzeigename;
-  MoreaFirebase moreaFire;
-  MoreaLoading moreaLoading;
-  MessagesManager messagesManager;
+  late String anzeigename;
+  late MoreaFirebase moreaFire;
+  late MoreaLoading moreaLoading;
+  late MessagesManager messagesManager;
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class _MessagesPageState extends State<MessagesPage>
     this.moreaFire = widget.moreaFire;
     crud0 = CrudMedthods(widget.firestore);
     messagesManager = MessagesManager(crud0);
-    messagesManager.getMessages(moreaFire.getGroupIDs);
+    messagesManager.getMessages(moreaFire.getGroupIDs!);
     uid = widget.auth.getUserID;
   }
 
@@ -74,24 +74,24 @@ class _MessagesPageState extends State<MessagesPage>
   Widget build(BuildContext context) {
     if (moreaFire.getPos == 'Leiter') {
       if (moreaFire.getPfandiName == null) {
-        this.anzeigename = moreaFire.getVorName;
+        this.anzeigename = moreaFire.getVorName!;
       } else {
-        this.anzeigename = moreaFire.getPfandiName;
+        this.anzeigename = moreaFire.getPfandiName!;
       }
       return Scaffold(
         backgroundColor: MoreaColors.bottomAppBar,
-        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
-            moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
+        drawer: moreaDrawer(moreaFire.getPos!, moreaFire.getDisplayName!,
+            moreaFire.getEmail!, context, widget.moreaFire, crud0, _signedOut),
         appBar: AppBar(
           title: Text('Nachrichten'),
           actions: tutorialButton(),
         ),
         floatingActionButton: Showcase.withWidget(
             key: _floatingActionButtonKey,
-            disableAnimation: true,
+            disableMovingAnimation: true,
             width: 150,
             height: 300,
-            shapeBorder: CircleBorder(),
+            targetShapeBorder: CircleBorder(),
             container: Container(
               padding: EdgeInsets.all(5),
               constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
@@ -109,7 +109,7 @@ class _MessagesPageState extends State<MessagesPage>
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: Showcase.withWidget(
             key: _bottomAppBarLeiterKey,
-            disableAnimation: true,
+            disableMovingAnimation: true,
             height: 300,
             width: 150,
             container: Container(
@@ -127,7 +127,7 @@ class _MessagesPageState extends State<MessagesPage>
             ),
             child: moreaLeiterBottomAppBar(widget.navigationMap, 'Verfassen', MoreaBottomAppBarActivePage.messages)),
         body: Showcase(
-          disableAnimation: true,
+          disableMovingAnimation: true,
           key: _messagesKeyLeiter,
           description: 'Hier siehst du alle deine Nachrichten',
           child: StreamBuilder(
@@ -172,7 +172,7 @@ class _MessagesPageState extends State<MessagesPage>
                       ),
                     ),
                   );
-                } else if (snapshot.data.length == 0) {
+                } else if (snapshot.data!.length == 0) {
                   return MoreaBackgroundContainer(
                     child: SingleChildScrollView(
                       child: MoreaShadowContainer(
@@ -222,7 +222,7 @@ class _MessagesPageState extends State<MessagesPage>
                             ),
                             ListView.separated(
                                 physics: NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data.length,
+                                itemCount: snapshot.data!.length,
                                 shrinkWrap: true,
                                 separatorBuilder: (context, index) {
                                   return Padding(
@@ -232,7 +232,7 @@ class _MessagesPageState extends State<MessagesPage>
                                   );
                                 },
                                 itemBuilder: (context, index) {
-                                  var document = snapshot.data[index];
+                                  var document = snapshot.data![index];
                                   return _buildListItem(context, document);
                                 }),
                             Padding(
@@ -249,9 +249,9 @@ class _MessagesPageState extends State<MessagesPage>
       );
     } else {
       if (moreaFire.getPfandiName == null) {
-        this.anzeigename = moreaFire.getVorName;
+        this.anzeigename = moreaFire.getVorName!;
       } else {
-        this.anzeigename = moreaFire.getPfandiName;
+        this.anzeigename = moreaFire.getPfandiName!;
       }
       return Scaffold(
         backgroundColor: MoreaColors.bottomAppBar,
@@ -259,11 +259,11 @@ class _MessagesPageState extends State<MessagesPage>
           title: Text('Nachrichten'),
           actions: tutorialButton(),
         ),
-        drawer: moreaDrawer(moreaFire.getPos, moreaFire.getDisplayName,
-            moreaFire.getEmail, context, widget.moreaFire, crud0, _signedOut),
+        drawer: moreaDrawer(moreaFire.getPos!, moreaFire.getDisplayName!,
+            moreaFire.getEmail!, context, widget.moreaFire, crud0, _signedOut),
         bottomNavigationBar: Showcase.withWidget(
             key: _bottomAppBarTNKey,
-            disableAnimation: true,
+            disableMovingAnimation: true,
             height: 300,
             width: 150,
             container: Container(
@@ -319,7 +319,7 @@ class _MessagesPageState extends State<MessagesPage>
                     ),
                   ),
                 );
-              } else if (snapshot.data.length == 0) {
+              } else if (snapshot.data!.length == 0) {
                 return MoreaBackgroundContainer(
                   child: SingleChildScrollView(
                     child: MoreaShadowContainer(
@@ -373,9 +373,9 @@ class _MessagesPageState extends State<MessagesPage>
                                       child: MoreaDivider(),
                                     );
                                   },
-                                  itemCount: snapshot.data.length,
+                                  itemCount: snapshot.data!.length,
                                   itemBuilder: (context, index) {
-                                    var document = snapshot.data[index];
+                                    var document = snapshot.data![index];
                                     return _buildListItem(context, document);
                                   }),
                               Padding(

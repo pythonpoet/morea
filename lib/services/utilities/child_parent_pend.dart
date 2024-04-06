@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/auth.dart';
 import 'package:morea/services/cloud_functions.dart';
@@ -13,12 +14,11 @@ class ChildParendPend extends BaseChildParendPend {
   CrudMedthods crud0;
   MoreaFirebase moreaFirebase;
 
-  ChildParendPend({this.crud0, this.moreaFirebase});
+  ChildParendPend({required this.crud0, required this.moreaFirebase});
 
   Future<String> childGenerateRequestString(
       Map<String, dynamic> userMap) async {
-    var someData = (await callFunction(
-            getcallable("childPendRequest"),
+    var someData = (await callFunction(getcallable("childPendRequest"),
             param: Map<String, dynamic>.from({
               userMapPos: userMap[userMapPos],
               userMapUID: userMap[userMapUID],
@@ -39,19 +39,18 @@ class ChildParendPend extends BaseChildParendPend {
 
   Future<void> parentSendsRequestString(
       String requestStr, Map<String, dynamic> userMap) async {
-    return (await callFunction(
-        getcallable("parendPendAccept"),
+    callFunction(getcallable("parendPendAccept"),
         param: Map.from({
           userMapPos: userMap[userMapPos],
           userMapUID: userMap[userMapUID],
           pathRequest: requestStr,
           mapTimestamp: DateTime.now().toIso8601String()
-        })));
+        }));
+    return null;
   }
 
   Future<String> parentCreatesUser(String _email, String _password) async {
-    return (await callFunction(
-            getcallable("createAccount"),
+    return (await callFunction(getcallable("createAccount"),
             param: Map.from({"email": _email, "password": _password})))
         .data;
   }
@@ -81,7 +80,8 @@ class ChildParendPend extends BaseChildParendPend {
       String requestStr = await this.childGenerateRequestString(childData);
       return parentSendsRequestString(requestStr, parentData);
     } catch (error) {
-      AuthProblems problem = childAuth.checkForAuthErrors(context, error);
+      AuthProblems problem =
+          childAuth.checkForAuthErrors(context, error as PlatformException);
       childAuth.displayAuthError(problem, context);
       return null;
     }

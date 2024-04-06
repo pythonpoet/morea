@@ -10,7 +10,7 @@ import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/MiData.dart';
 
 class PersonenVerzeichnisState extends StatefulWidget {
-  PersonenVerzeichnisState({this.moreaFire, this.crud0});
+  PersonenVerzeichnisState(this.moreaFire, this.crud0);
 
   final MoreaFirebase moreaFire;
   final CrudMedthods crud0;
@@ -21,7 +21,7 @@ class PersonenVerzeichnisState extends StatefulWidget {
 
 class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
     with TickerProviderStateMixin {
-  MoreaLoading moreaLoading;
+  late MoreaLoading moreaLoading;
 
   @override
   void initState() {
@@ -38,13 +38,13 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: widget.moreaFire.getGroupIDs.length,
+      length: widget.moreaFire.getGroupIDs!.length,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Personen'),
           bottom: TabBar(
             tabs: <Widget>[
-              ...widget.moreaFire.getGroupIDs.map((groupID) => Tab(
+              ...widget.moreaFire.getGroupIDs!.map((groupID) => Tab(
                     text: convMiDatatoWebflow(groupID),
                   ))
             ],
@@ -52,7 +52,7 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
         ),
         body: TabBarView(
           children: <Widget>[
-            ...widget.moreaFire.getGroupIDs.map((groupID) => personen(groupID))
+            ...widget.moreaFire.getGroupIDs!.map((groupID) => personen(groupID))
           ],
         ),
       ),
@@ -65,8 +65,9 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
             widget.crud0.getCollection('$pathGroups/$groupID/$pathPriviledge'),
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> groupSnap) {
-          if (!groupSnap.hasData) return moreaLoading.loading();
-          else if (groupSnap.data.docs.length > 0) {
+          if (!groupSnap.hasData)
+            return moreaLoading.loading();
+          else if (groupSnap.data!.docs.length > 0) {
             return MoreaBackgroundContainer(
                 child: SingleChildScrollView(
               child: MoreaShadowContainer(
@@ -83,23 +84,27 @@ class PersonenVerzeichnisStatePage extends State<PersonenVerzeichnisState>
                     ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: groupSnap.data.docs.length,
+                      itemCount: groupSnap.data!.docs.length,
                       itemBuilder: (context, int index) {
-                        String name = groupSnap.data.docs[index]
-                            .data()[groupMapDisplayName];
+                        Map<String, dynamic> groupUserData =
+                            groupSnap.data!.docs[index].data()
+                                as Map<String, dynamic>;
 
-                        return ListTile(
-                          title: new Text(
-                            name,
-                            style: MoreaTextStyle.lable,
-                          ),
-                          onTap: () =>
-                              navigatetoprofile(groupSnap.data.docs[index].id),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                          ),
-                        );
+                        if (groupUserData[groupMapDisplayName] != null) {
+                          String name = groupUserData[groupMapDisplayName];
+                          return ListTile(
+                            title: new Text(
+                              name,
+                              style: MoreaTextStyle.lable,
+                            ),
+                            onTap: () => navigatetoprofile(
+                                groupSnap.data!.docs[index].id),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.black,
+                            ),
+                          );
+                        }
                       },
                       separatorBuilder: (context, int index) {
                         return Padding(

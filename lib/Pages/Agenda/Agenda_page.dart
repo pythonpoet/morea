@@ -17,10 +17,10 @@ import 'package:morea/services/morea_firestore.dart';
 
 class AgendaState extends StatefulWidget {
   AgendaState(
-      {@required this.firestore,
-      @required this.moreaFire,
-      @required this.auth,
-      @required this.navigationMap});
+      {required this.firestore,
+      required this.moreaFire,
+      required this.auth,
+      required this.navigationMap});
 
   final MoreaFirebase moreaFire;
   final FirebaseFirestore firestore;
@@ -33,12 +33,12 @@ class AgendaState extends StatefulWidget {
 
 class _AgendaStatePage extends State<AgendaState>
     with TickerProviderStateMixin {
-  MoreaFirebase moreafire;
+  late MoreaFirebase moreafire;
   DWIFormat dwiformat = new DWIFormat();
-  CrudMedthods crud0;
-  prefix0.Agenda agenda;
+  late CrudMedthods crud0;
+  late prefix0.Agenda agenda;
   String pos = 'Teilnehmer';
-  Stream<List> sLagenda;
+  /*Stream<List> sLagenda;*/
   GlobalKey _agendaLeiterKey = GlobalKey();
   GlobalKey _agendaLeiterKey2 = GlobalKey();
   GlobalKey _floatingActionButtonKey = GlobalKey();
@@ -68,9 +68,9 @@ class _AgendaStatePage extends State<AgendaState>
     'Mitnehmen': '',
     'Lagername': ''
   };
-  MoreaLoading moreaLoading;
+  late MoreaLoading moreaLoading;
 
-  void _getAgenda(List<dynamic> groupIDs) {
+  void _getAgenda(List<String> groupIDs) {
     agenda.getTotalAgendaOverview(groupIDs);
   }
 
@@ -79,17 +79,17 @@ class _AgendaStatePage extends State<AgendaState>
       DateTime _agdatum = DateTime.parse(event["DeleteDate"]);
       DateTime now = DateTime.now();
       if (_agdatum.difference(now).inDays < 0) {
-        Map fullevent =
-            (await agenda.getAgendaTitle(event[groupMapEventID])).data();
-        if (fullevent != null)
+        Map<String, dynamic>? fullevent =
+            (await agenda.getAgendaTitle(event[groupMapEventID])).data() as Map<String, dynamic>;
+        if (!(fullevent.isEmpty))
           agenda.deleteAgendaEvent(fullevent);
         else
           agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
       }
     } else {
-      Map fullevent =
-          (await agenda.getAgendaTitle(event[groupMapEventID])).data();
-      if (fullevent != null)
+      Map<String, dynamic>? fullevent =
+          (await agenda.getAgendaTitle(event[groupMapEventID])).data() as Map<String, dynamic>;
+      if (!fullevent.isEmpty)
         agenda.deleteAgendaEvent(fullevent);
       else
         agenda.deleteAgendaOverviewTitle(groupID, event[groupMapEventID]);
@@ -149,7 +149,7 @@ class _AgendaStatePage extends State<AgendaState>
     quickfix['Kontakt'] = kontakt;
     quickfix['Mitnehmen'] = mitnehmen;
     pos = moreafire.getUserMap['Pos'];
-    _getAgenda(moreafire.getGroupIDs);
+    _getAgenda(moreafire.getGroupIDs!);
   }
 
   @override
@@ -184,9 +184,9 @@ class _AgendaStatePage extends State<AgendaState>
                 ],
               ),
             ),
-            disableAnimation: true,
+            disableMovingAnimation: true,
             child: Showcase.withWidget(
-                disableAnimation: true,
+                disableMovingAnimation: true,
                 key: _agendaLeiterKey2,
                 height: 300,
                 width: 150,
@@ -208,7 +208,7 @@ class _AgendaStatePage extends State<AgendaState>
                     aAgenda(moreafire.getUserMap[userMapGroupIDs], context))),
         floatingActionButton: Showcase(
           key: _floatingActionButtonKey,
-          disableAnimation: true,
+          disableMovingAnimation: true,
           description: 'Hier kannst du Events/Lager hinzufügen',
           child: new FloatingActionButton(
             elevation: 1,
@@ -219,13 +219,13 @@ class _AgendaStatePage extends State<AgendaState>
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        drawer: moreaDrawer(pos, moreafire.getDisplayName, moreafire.getEmail,
+        drawer: moreaDrawer(pos, moreafire.getDisplayName!, moreafire.getEmail!,
             context, moreafire, crud0, _signedOut),
         bottomNavigationBar: Showcase.withWidget(
             key: _bottomAppBarLeiterKey,
             height: 300,
             width: 150,
-            disableAnimation: true,
+            disableMovingAnimation: true,
             container: Container(
               padding: EdgeInsets.all(5),
               constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
@@ -252,7 +252,7 @@ class _AgendaStatePage extends State<AgendaState>
             key: _bottomAppBarTNKey,
             height: 300,
             width: 150,
-            disableAnimation: true,
+            disableMovingAnimation: true,
             container: Container(
               padding: EdgeInsets.all(5),
               constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
@@ -267,8 +267,8 @@ class _AgendaStatePage extends State<AgendaState>
               ),
             ),
             child: moreaChildBottomAppBar(widget.navigationMap)),
-        drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
-            moreafire.getEmail, context, moreafire, crud0, _signedOut),
+        drawer: moreaDrawer(moreafire.getPos!, moreafire.getDisplayName!,
+            moreafire.getEmail!, context, moreafire, crud0, _signedOut),
         body: aAgenda(moreafire.getGroupIDs, context),
       );
     }
@@ -276,11 +276,12 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewLager(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data();
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data() as Map<String, dynamic>;
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewLagerPageState(
                 moreaFire: moreafire,
+                firestore: widget.firestore,
                 agenda: agenda,
                 info: info,
                 pos: moreafire.getUserMap['Pos'])))
@@ -291,7 +292,7 @@ class _AgendaStatePage extends State<AgendaState>
 
   viewEvent(BuildContext context, Map<String, dynamic> agendaTitle) async {
     Map<String, dynamic> info =
-        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data();
+        (await agenda.getAgendaTitle(agendaTitle[groupMapEventID])).data() as Map<String, dynamic>;
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => new ViewEventPageState(
@@ -299,13 +300,14 @@ class _AgendaStatePage extends State<AgendaState>
                   agenda: agenda,
                   info: info,
                   pos: moreafire.getUserMap['Pos'],
+                  fireStore: widget.firestore,
                 )))
         .then((result) {
       setState(() {});
     });
   }
 
-  Widget aAgenda(List<dynamic> groupID, BuildContext context) {
+  Widget aAgenda(List<dynamic>? groupID, BuildContext context) {
     return StreamBuilder(
         stream: agenda.eventstream.asBroadcastStream(),
         builder: (context, AsyncSnapshot<List> slagenda) {
@@ -328,7 +330,7 @@ class _AgendaStatePage extends State<AgendaState>
                 )),
               ),
             );
-          else if (slagenda.data.length == 0) {
+          else if (slagenda.data!.length == 0) {
             return MoreaBackgroundContainer(
               child: MoreaShadowContainer(
                 child: Center(
@@ -354,7 +356,7 @@ class _AgendaStatePage extends State<AgendaState>
                       ),
                       ListView.separated(
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: slagenda.data.length,
+                          itemCount: slagenda.data!.length,
                           shrinkWrap: true,
                           separatorBuilder: (context, int index) {
                             return Padding(
@@ -364,7 +366,7 @@ class _AgendaStatePage extends State<AgendaState>
                           },
                           itemBuilder: (context, int index) {
                             final Map<String, dynamic> _info =
-                                Map<String, dynamic>.from(slagenda.data[index]);
+                                Map<String, dynamic>.from(slagenda.data![index]);
                             altevernichten(_info['Datum'], groupID, _info);
 
                             if (_info['Event']) {
@@ -456,7 +458,7 @@ class _AgendaStatePage extends State<AgendaState>
   }
 
   void _signedOut() {
-    widget.navigationMap[signedOut]();
+    widget.navigationMap[signedOut]!();
   }
 
   List<Widget> tutorialButton() {

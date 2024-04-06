@@ -4,7 +4,7 @@ import 'package:morea/services/Event/event_data.dart';
 enum TeleblitzType { ferien, keineAktivitaet, teleblitz, notImplemented }
 
 class TeleblitzData extends EventData {
-  String timestamp,
+  late String timestamp,
       antreten,
       abtreten,
       bemerkung,
@@ -17,9 +17,9 @@ class TeleblitzData extends EventData {
       name,
       nameDesSenders,
       slug;
-  bool archived, draft, ferien;
-  List<String> mitnehmenTest;
-  TeleblitzType teleblitzType;
+  late bool archived, draft, ferien;
+  late List<String> mitnehmenTest;
+  late TeleblitzType teleblitzType;
 
   TeleblitzData(Map<String, dynamic> eventData) : super.init(eventData) {
     this.teleblitzType = readTeleblitzType(eventData);

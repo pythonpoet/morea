@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:morea/Widgets/Login/register.dart';
 import 'package:morea/Widgets/animated/MoreaLoading.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
@@ -17,9 +18,10 @@ import 'package:morea/services/utilities/moreaInputValidator.dart';
 import 'datenschutz.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({this.auth, this.onSignedIn, this.firestore});
+  LoginPage(
+      {required this.auth, required this.onSignedIn, required this.firestore});
 
-  final BaseAuth auth;
+  final Auth auth;
   final Function onSignedIn;
   final FirebaseFirestore firestore;
 
@@ -28,26 +30,26 @@ class LoginPage extends StatefulWidget {
 }
 
 enum FormType { login, register, registereltern }
+
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError }
 
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   DWIFormat dwiFormat = new DWIFormat();
-  MoreaFirebase moreafire;
+  late MoreaFirebase moreafire;
   Datenschutz datenschutz = new Datenschutz();
-  User moreaUser;
-  Register register;
-  CrudMedthods crud0;
-  MoreaLoading moreaLoading;
+  late User moreaUser;
+  late Register register;
+  late CrudMedthods crud0;
+  late MoreaLoading moreaLoading;
   final formKey = new GlobalKey<FormState>();
   final resetkey = new GlobalKey<FormState>();
 
-  String _password;
-  String error;
+  String? _password;
   FormType _formType = FormType.login;
   bool _load = false;
   bool _mailchimp = false;
 
-  PageController pageController;
+  late PageController pageController;
   Color left = Colors.black;
   Color right = Colors.white;
 
@@ -55,7 +57,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   MailChimpAPIManager mailChimpAPIManager = MailChimpAPIManager();
 
   bool validateAndSave() {
-    final form = formKey.currentState;
+    final form = formKey.currentState!;
     if (form.validate()) {
       form.save();
       return true;
@@ -65,7 +67,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   updatedevtoken() async {
-    moreafire.uploadDevTocken(moreaUser.userID);
+    moreafire.uploadDevTocken(moreaUser.userID!);
   }
 
   void validateAndSubmit() async {
@@ -80,11 +82,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             });
             //login firebase user
             moreaUser.userID = await widget.auth
-                .signInWithEmailAndPassword(moreaUser.email, _password);
+                .signInWithEmailAndPassword(moreaUser.email!, _password!);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               //upload deviceToken
-              moreafire.uploadDevTocken(moreaUser.userID);
+              moreafire.uploadDevTocken(moreaUser.userID!);
               widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
@@ -103,19 +105,19 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
-                  (await crud.getDocument(pathConfig, "init"))
-                      .data()["Datenschutz"]);
+                  ((await crud.getDocument(pathConfig, "init")).data()!
+                      as Map<String, dynamic>)["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 moreaUser.pos = "Teilnehmer";
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
                 await mailChimpAPIManager.updateUserInfo(
-                    moreaUser.email,
-                    moreaUser.vorName,
-                    moreaUser.nachName,
-                    moreaUser.geschlecht,
-                    moreaUser.groupIDs,
+                    moreaUser.email!,
+                    moreaUser.vorName!,
+                    moreaUser.nachName!,
+                    moreaUser.geschlecht!,
+                    moreaUser.groupIDs!,
                     moreafire);
               } else {
                 setState(() {
@@ -141,8 +143,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             if (_mailchimp) {
               await datenschutz.moreaDatenschutzerklaerung(
                   context,
-                  (await crud.getDocument(pathConfig, "init"))
-                      .data()["Datenschutz"]);
+                  ((await crud.getDocument(pathConfig, "init")).data()!
+                      as Map<String, dynamic>)["Datenschutz"]);
               if (datenschutz.akzeptiert) {
                 await moreaUser.createMoreaUser(widget.auth,
                     register.getPassword, moreafire, widget.onSignedIn,
@@ -165,7 +167,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           _load = false;
         });
         widget.auth.displayAuthError(
-            widget.auth.checkForAuthErrors(context, e), context);
+            widget.auth.checkForAuthErrors(
+                context, (e is PlatformException) ? e : null),
+            context);
         print(e);
       }
     }
@@ -221,7 +225,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                           title: new Text(
                               'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
                         ));
-                widget.auth.sendPasswordResetEmail(moreaUser.email);
+                widget.auth.sendPasswordResetEmail(moreaUser.email!);
               })
         ],
       ),
@@ -269,6 +273,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       return new Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
+            backgroundColor: Colors.white,
           ),
           body: Container(
               color: Colors.white70,
@@ -308,7 +313,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed))
                     return Colors.transparent;
-                  return null;
+                  return Colors.transparent;
                 })),
                 onPressed: _registerAsTeilnehmer,
                 child: Text('Teilnehmer',
@@ -323,7 +328,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed))
                     return Colors.transparent;
-                  return null;
+                  return Colors.transparent;
                 })),
                 onPressed: _registerAsElternteil,
                 child: Text('Elternteil',
@@ -358,7 +363,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     ),
                   ),
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return 'Bitte nicht leer lassen';
                     } else if (!MoreaInputValidator.email(value)) {
                       return 'Bitte gültige E-Mail verwenden';
@@ -376,7 +381,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         borderSide: new BorderSide(color: Colors.black)),
                   ),
                   validator: (value) =>
-                      value.isEmpty ? 'Passwort darf nicht leer sein' : null,
+                      value!.isEmpty ? 'Passwort darf nicht leer sein' : null,
                   obscureText: true,
                   onSaved: (value) => _password = value,
                 ),
@@ -396,7 +401,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: buildMenuBar(context),
         ),
         SizedBox(
-          height: 1050,
+          height: 1100,
           child: Column(
             children: <Widget>[
               Flexible(
@@ -480,7 +485,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   void _registerAsElternteil() {
-    pageController?.animateToPage(1,
+    pageController.animateToPage(1,
         duration: Duration(milliseconds: 700), curve: Curves.decelerate);
     _formType = FormType.registereltern;
   }

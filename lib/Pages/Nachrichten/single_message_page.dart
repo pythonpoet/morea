@@ -15,9 +15,10 @@ class SingleMessagePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     this.setMessageRead();
+    Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
     return Scaffold(
       appBar: AppBar(
-        title: Text(message.data()['title']),
+        title: Text(messageData['title']),
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -29,7 +30,7 @@ class SingleMessagePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Text(
-                    'Von: ' + message.data()['sender'],
+                    'Von: ' + messageData['sender'],
                     style: MoreaTextStyle.sender,
                   ),
                   MoreaDivider(),
@@ -37,7 +38,7 @@ class SingleMessagePage extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
-                    message.data()['title'],
+                    messageData['title'],
                     textAlign: TextAlign.center,
                     style: MoreaTextStyle.title,
                   ),
@@ -45,7 +46,7 @@ class SingleMessagePage extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                   ),
                   Text(
-                    message.data()['body'],
+                    messageData['body'],
                     style: MoreaTextStyle.normal,
                   ),
                 ],

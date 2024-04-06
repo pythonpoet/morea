@@ -23,15 +23,23 @@ class MailChimpAPIManager {
   updateUserInfo(String email, String vorname, String nachname,
       String geschlecht, List<String> stufe, MoreaFirebase moreafire) async {
     String apiKey = await moreafire.getMailChimpApiKey();
-    String biber = 'Nein', woelfe = 'Nein', meitli = 'Nein', buebe = 'Nein';
+    String biber = 'Nein',
+        woelfe = 'Nein',
+        meitli = 'Nein',
+        buebe = 'Nein',
+        pio = 'Nein';
     if (stufe.contains(midatanamebiber)) {
       biber = 'Ja';
     } else if (stufe.contains(midatanamewoelf)) {
+      woelfe = 'Ja';
+    } else if (stufe.contains(midatanamewoelf2)) {
       woelfe = 'Ja';
     } else if (stufe.contains(midatanamemeitli)) {
       meitli = 'Ja';
     } else if (stufe.contains(midatanamebuebe)) {
       buebe = 'Ja';
+    } else if (stufe.contains(midatanamepio)) {
+      pio = 'Ja';
     }
     String hash = generateMd5(email);
     String basicAuth =
@@ -46,7 +54,8 @@ class MailChimpAPIManager {
         'BIBER': biber,
         'WOELFE': woelfe,
         'MEITLI': meitli,
-        'BUEBE': buebe
+        'BUEBE': buebe,
+        'PIO': pio
       }
     };
     String bodyStr = jsonEncode(bodyMap);

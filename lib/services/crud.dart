@@ -104,7 +104,7 @@ class CrudMedthods implements BaseCrudMethods {
 
   Future<void> runTransaction(
       String path, String document, Map<String, dynamic> data,
-      {Map Function(DocumentSnapshot) function}) async {
+      {Map<String, dynamic> Function(DocumentSnapshot)? function}) async {
     DocumentReference docRef = db.collection(path).doc(document);
 
     try {
@@ -118,7 +118,9 @@ class CrudMedthods implements BaseCrudMethods {
           } else {
             tran.set(docRef, data);
           }
-        }).catchError((err) => {throw err});
+        }).catchError((err) {
+          throw err;
+        });
       };
       return await db.runTransaction(transactionHandler);
     } catch (e) {
@@ -149,7 +151,7 @@ class CrudMedthods implements BaseCrudMethods {
   }
 
   Future<void> updateMessage(
-      String path, String document, Map<dynamic, dynamic> data) async {
+      String path, String document, Map<String, dynamic> data) async {
     path = dwiformat.pathstring(path);
     await FirebaseFirestore.instance
         .collection(path)

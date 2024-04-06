@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/Group/Group_Roles.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
@@ -8,7 +7,7 @@ import 'package:morea/services/morea_firestore.dart';
 class GroupFace extends StatefulWidget {
   final MoreaFirebase moreaFire;
   final String groupID;
-  GroupFace({@required this.groupID, @required this.moreaFire});
+  GroupFace({required this.groupID, required this.moreaFire});
 
   @override
   GroupFaceState createState() => GroupFaceState();
@@ -86,7 +85,6 @@ class GroupFaceState extends State<GroupFace> {
             ),
           ],
         )));
-        break;
 
       default:
         return SingleChildScrollView(
@@ -109,7 +107,6 @@ class GroupFaceState extends State<GroupFace> {
             ),
           ],
         )));
-        break;
     }
   }
 
@@ -118,14 +115,14 @@ class GroupFaceState extends State<GroupFace> {
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
       alignment: Alignment.topLeft,
       child: Text(
-          widget.moreaFire.getMapGroupData[widget.groupID].groupNickName,
+          widget.moreaFire.getMapGroupData![widget.groupID]!.groupNickName!,
           style: MoreaTextStyle.title),
     );
   }
 
   Widget settings() {
     //validate if user has rights to edit group
-    if (widget.moreaFire.getMapGroupData[widget.groupID].priviledge.role
+    if (widget.moreaFire.getMapGroupData![widget.groupID]!.priviledge!.role
             .groupPriviledge >
         0)
       return IconButton(

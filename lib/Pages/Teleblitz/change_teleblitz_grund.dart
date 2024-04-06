@@ -16,7 +16,7 @@ class ChangeGrund extends StatefulWidget {
 }
 
 class _ChangeGrundState extends State<ChangeGrund> {
-  String grund;
+  late String grund;
   final _formKey = GlobalKey<FormState>();
   TextEditingController grundController = TextEditingController();
 
@@ -79,12 +79,15 @@ class _ChangeGrundState extends State<ChangeGrund> {
                             style: MoreaTextStyle.textField,
                             cursorColor: MoreaColors.violett,
                             decoration: InputDecoration(
-                              errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
                               border: OutlineInputBorder(),
-                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MoreaColors.violett)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
-                              if (value.isEmpty) {
+                              if (value!.isEmpty) {
                                 return 'Bitte nicht leer lassen';
                               } else {
                                 return null;
@@ -106,7 +109,7 @@ class _ChangeGrundState extends State<ChangeGrund> {
 
   bool saveAndSubmit() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       form.save();
       return true;
     } else {

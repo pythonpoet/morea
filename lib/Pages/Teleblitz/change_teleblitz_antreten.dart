@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_place_picker/google_maps_place_picker.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/Widgets/standart/moreaTextStyle.dart';
 import 'package:morea/morealayout.dart';
 import 'package:morea/services/utilities/moreaInputValidator.dart';
+
+import '../../morea_strings.dart';
 
 class ChangeAntreten extends StatefulWidget {
   final String antreten, mapAntreten;
@@ -20,10 +20,10 @@ class ChangeAntreten extends StatefulWidget {
 }
 
 class _ChangeAntretenState extends State<ChangeAntreten> {
-  String ortAntreten;
-  String zeitAntreten;
-  String urlMapAntreten;
-  String nameMapAntreten;
+  late String ortAntreten;
+  late String zeitAntreten;
+  late String urlMapAntreten;
+  late String nameMapAntreten;
   final _formKey = GlobalKey<FormState>();
   TextEditingController ortAntretenController = TextEditingController();
 
@@ -146,7 +146,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                                       BorderSide(color: MoreaColors.violett)),
                             ),
                             validator: (value) {
-                              if (value.isEmpty) {
+                              if (value!.isEmpty) {
                                 return 'Bitte nicht leer lassen';
                               } else {
                                 return null;
@@ -163,7 +163,110 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                         ),
                         Padding(
                             padding: const EdgeInsets.only(top: 10.0),
-                            child: moreaRaisedButton(this.nameMapAntreten, () {
+                            child: Column(
+                              children: [
+                                TextButton(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                        minWidth: viewportConstraints.maxWidth,
+                                        maxWidth: viewportConstraints.maxWidth),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Lokal',
+                                        style: MoreaTextStyle.textField,
+                                      ),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                              side: BorderSide(color: Colors.black45))),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                          EdgeInsets.only(
+                                              top: 10, bottom: 10, left: 5, right: 5)),
+                                      overlayColor: MaterialStateProperty.resolveWith(
+                                              (Set<MaterialState> states) {
+                                            if (states.contains(MaterialState.focused))
+                                              return MoreaColors.violett;
+                                            return null;
+                                          })),
+                                  onPressed: () {
+                                    this.urlMapAntreten = urlGoogleMapsLokal;
+                                    this.nameMapAntreten = 'Lokal';
+                                  },
+                                ),
+                                TextButton(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                        minWidth: viewportConstraints.maxWidth,
+                                        maxWidth: viewportConstraints.maxWidth),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Waldrand',
+                                        style: MoreaTextStyle.textField,
+                                      ),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                              side: BorderSide(color: Colors.black45))),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                          EdgeInsets.only(
+                                              top: 10, bottom: 10, left: 5, right: 5)),
+                                      overlayColor: MaterialStateProperty.resolveWith(
+                                              (Set<MaterialState> states) {
+                                            if (states.contains(MaterialState.focused))
+                                              return MoreaColors.violett;
+                                            return null;
+                                          })),
+                                  onPressed: () {
+                                    this.urlMapAntreten = urlGoogleMapsWaldrand;
+                                    this.nameMapAntreten = 'Waldrand';
+                                  },
+                                ),
+                                TextButton(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                        minWidth: viewportConstraints.maxWidth,
+                                        maxWidth: viewportConstraints.maxWidth),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Alle anderen Orte',
+                                        style: MoreaTextStyle.textField,
+                                      ),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(5),
+                                              side: BorderSide(color: Colors.black45))),
+                                      foregroundColor: MaterialStateProperty.all<Color>(
+                                          Colors.black),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                          EdgeInsets.only(
+                                              top: 10, bottom: 10, left: 5, right: 5)),
+                                      overlayColor: MaterialStateProperty.resolveWith(
+                                              (Set<MaterialState> states) {
+                                            if (states.contains(MaterialState.focused))
+                                              return MoreaColors.violett;
+                                            return null;
+                                          })),
+                                  onPressed: () {
+                                    this.urlMapAntreten = urlGoogleMapsEmpty;
+                                    this.nameMapAntreten = 'Alle anderen Orte';
+                                  },
+                                ),
+                              ],
+                            )
+                            /*moreaRaisedButton(this.nameMapAntreten, () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -174,9 +277,9 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                                                 47.40548228527181,
                                                 8.559394673386825),
                                             onPlacePicked: (result) {
-                                              this.urlMapAntreten = result.url;
+                                              this.urlMapAntreten = result.url!;
                                               this.nameMapAntreten =
-                                                  result.name;
+                                                  result.name!;
                                               Navigator.of(context).pop();
                                               setState(() {});
                                             },
@@ -186,7 +289,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
                                               print(val);
                                             },
                                           )));
-                            })),
+                            })*/),
                       ],
                     ),
                   ),
@@ -202,7 +305,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
   Future<Null> _selectTime(BuildContext context) async {
     String hour = zeitAntreten.split(':')[0];
     String minute = zeitAntreten.split(':')[1];
-    final TimeOfDay picked = await showTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: int.parse(hour), minute: int.parse(minute)),
     );
@@ -233,7 +336,7 @@ class _ChangeAntretenState extends State<ChangeAntreten> {
 
   bool saveAndSubmit() {
     final form = _formKey.currentState;
-    if (form.validate()) {
+    if (form!.validate()) {
       if (MoreaInputValidator.url(this.urlMapAntreten)) {
         form.save();
         return true;

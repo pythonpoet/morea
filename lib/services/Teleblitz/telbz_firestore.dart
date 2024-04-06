@@ -39,7 +39,7 @@ abstract class BaseTeleblitzFirestore {
 }
 
 class TeleblizFirestore implements BaseTeleblitzFirestore {
-  CrudMedthods crud0;
+  late CrudMedthods crud0;
   Map<String, dynamic> _teleblitze = new Map<String, dynamic>();
   Map<String, List<String>> mapHomeFeed = new Map<String, List<String>>();
 
@@ -67,7 +67,8 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
         crud0.streamDocument(pathGroups, groupID);
     await for (List<String> homeFeed
         in sDhomeFeed.map((DocumentSnapshot dsHomeFeed) {
-      return new List<String>.from(dsHomeFeed.data()[groupMapHomeFeed] ?? []);
+      return new List<String>.from(
+          (dsHomeFeed.data()! as Map<String, dynamic>)[groupMapHomeFeed] ?? []);
     })) {
       mapHomeFeed[groupID] = homeFeed;
       yield mapHomeFeed;
@@ -83,7 +84,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
 
   Stream<Map<String, dynamic>> steramTelebliz(eventID) async* {
     yield* crud0.streamDocument(pathEvents, eventID).map((dsEvent) {
-      return dsEvent.data();
+      return dsEvent.data()! as Map<String, dynamic>;
     });
   }
 
@@ -136,20 +137,20 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
     }
   }
 
-  Future<Map> getTelbz(String eventID) async {
+  Future<Map<String, dynamic>?> getTelbz(String eventID) async {
     if (this._teleblitze.isNotEmpty) if (this._teleblitze.containsKey(
         eventID)) if (DateTime(this._teleblitze[eventID]["Timestamp"])
             .difference(DateTime.now())
             .inMinutes <
         5) return this._teleblitze[eventID];
 
-    return await refeshTelbz(eventID);
+    return refeshTelbz(eventID);
   }
 
-  Future<Map> refeshTelbz(String eventID) async {
+  Future<Map<String, dynamic>?> refeshTelbz(String eventID) async {
     try {
-      Map<String, dynamic> tlbz = Map<String, dynamic>.from(
-          (await crud0.getDocument(pathGroups, eventID)).data());
+      Map<String, dynamic> tlbz = (await crud0.getDocument(pathGroups, eventID))
+          .data()! as Map<String, dynamic>;
       tlbz["Timestamp"] = DateTime.now();
       this._teleblitze[eventID] = tlbz;
       return tlbz;
@@ -166,7 +167,7 @@ class TeleblizFirestore implements BaseTeleblitzFirestore {
       if (!dSAnmeldung.exists)
         yield "un-initialized";
       else
-        yield dSAnmeldung.data()["AnmeldeStatus"];
+        yield (dSAnmeldung.data()! as Map<String, dynamic>)["AnmeldeStatus"];
     }
   }
 

@@ -13,10 +13,12 @@ final String meitliwebflowname = 'Nahani (Meitli)';
 final String buebewebflowname = 'Drason (Buebe)';
 
 //groupID's
-final String midatanamebiber = '3775';
-final String midatanamewoelf = '3776';
-final String midatanamemeitli = '3779';
+final String midatanamebiber = 'hjZL6PT8t8MCfxf5GOko';
+final String midatanamewoelf = 'TJNO3BHaPnBZE33anezc';
+final String midatanamewoelf2 = 'UisNaofVTp924gvx6Kcf';
+final String midatanamemeitli = 'VVy3DAlQLmbw9oGuRwvZ';
 final String midatanamebuebe = 'Op3qqioWs36MCeoWgDYL';
+final String midatanamepio = 'iRHtWXGhstTpMwmceqaF';
 
 //collection-paths for FirebaseFirestore
 final String pathEvents = "events";
@@ -151,3 +153,8 @@ final String toProfilePage = 'profilePage';
 final String urlInfoMailListMembers =
     'https://us13.api.mailchimp.com/3.0/lists/54c3988cea/members/';
 final String uIDInfoMailList = '54c3988cea';
+
+//Google Maps
+final String urlGoogleMapsLokal = 'https://www.google.com/maps/place/Pfadi+Morea/@47.406824,8.5497861,17z/data=!3m1!4b1!4m6!3m5!1s0x47900a8020c1923d:0x7a2ec6414e2b0d90!8m2!3d47.4068204!4d8.552361!16s%2Fg%2F1wn32l74?entry=ttu';
+final String urlGoogleMapsWaldrand = 'https://www.google.com/maps/place/Treffpunkt+Waldrand+Pfadi+Morea/@47.4032998,8.5576913,18z/data=!3m1!4b1!4m6!3m5!1s0x479aa1f5123a3067:0xbcb2cc988f55ca87!8m2!3d47.403298!4d8.5589805!16s%2Fg%2F11kz_ljzbv?entry=ttu';
+final String urlGoogleMapsEmpty = 'https://maps.google.com';

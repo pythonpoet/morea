@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/crud.dart';
 import 'package:morea/services/user.dart';
@@ -40,12 +39,12 @@ class MoreaGroup extends BaseMoreGroup {
   CrudMedthods crud0;
   //Attributes
   Stream<String> smGroupID;
-  Stream<DocumentSnapshot> _sDSGroupMap;
-  List<String> homeFeed;
-  PriviledgeEntry priviledge;
-  Map<String, RoleEntry> roles;
+  late Stream<DocumentSnapshot> _sDSGroupMap;
+  List<String>? homeFeed;
+  late PriviledgeEntry priviledge;
+  Map<String, RoleEntry>? roles;
 
-  MoreaGroup({this.smGroupID, @required this.crud0}) {
+  MoreaGroup({required this.smGroupID, required this.crud0}) {
     streamGroupMap(smGroupID);
   }
   void streamGroupMap(Stream<String> smGroupID) async {
@@ -53,15 +52,16 @@ class MoreaGroup extends BaseMoreGroup {
       _sDSGroupMap = crud0.streamDocument(pathGroups, groupID);
 
       await for (DocumentSnapshot dSGroupMap in _sDSGroupMap)
-        readGroupMap(dSGroupMap.data(), groupID, sessionUserID);
+        readGroupMap(dSGroupMap.data()! as Map<String, dynamic>, groupID,
+            sessionUserID!);
     }
   }
 
   Future<Map<String, dynamic>> getUserPriviledge(
       String groupID, String userID) async {
-    return Map<String, dynamic>.from((await crud0.getDocument(
+    return (await crud0.getDocument(
             '$pathGroups/$groupID/$pathPriviledge', userID))
-        .data());
+        .data()! as Map<String, dynamic>;
   }
 
   void readGroupMap(Map<String, dynamic> groupMap, groupID, userID) async {
@@ -74,31 +74,40 @@ class MoreaGroup extends BaseMoreGroup {
 
       if (groupMap.containsKey(groupMapRoles))
         groupMap[groupMapRoles].map((String key, dynamic value) => this
-            .roles[key] = RoleEntry(data: Map<String, dynamic>.from(value)));
+            .roles![key] = RoleEntry(data: Map<String, dynamic>.from(value)));
       else
         throw "$groupMapRoles has to be non-null";
       Map<String, dynamic> groupUserData =
           await getUserPriviledge(groupID, userID);
       this.priviledge = PriviledgeEntry(data: groupUserData);
-      priviledge.readRole(globalConfigRoles, this.roles);
+      print('reding group mam');
+      priviledge.readRole(globalConfigRoles, this.roles!);
     }
   }
 
-  Future<void> createGroup(Map<String, dynamic> groupMap) {}
-  Future<void> inviteUsers(List<String> luserIDs) {}
-  Future<void> joinGroup(String groupID) {}
+  Future<void> createGroup(Map<String, dynamic> groupMap) async {
+    return null;
+  }
+
+  Future<void> inviteUsers(List<String> luserIDs) async {
+    return null;
+  }
+
+  Future<void> joinGroup(String groupID) async {
+    return null;
+  }
 }
 
 class PriviledgeEntry extends RoleEntry {
-  String displayName;
-  String roleType;
-  String roleLocation;
-  List<String> groupJoinDate;
-  Map<String, dynamic> customInfo;
-  Map<String, dynamic> rawPriviledge;
-  RoleEntry role;
-  PriviledgeEntry({CrudMedthods crud0, Map data}) {
-    if (data != null) this.readPriviledgeEntry(Map<String, dynamic>.from(data));
+  late String displayName;
+  late String roleType;
+  late String roleLocation;
+  late List<String> groupJoinDate;
+  late Map<String, dynamic> customInfo;
+  late Map<String, dynamic> rawPriviledge;
+  late RoleEntry role;
+  PriviledgeEntry({Map<String, dynamic>? data}) : super(data: data!) {
+    this.readPriviledgeEntry(Map<String, dynamic>.from(data));
   }
 
   void readPriviledgeEntry(Map<String, dynamic> data) {
@@ -113,21 +122,21 @@ class PriviledgeEntry extends RoleEntry {
     if (this.roleLocation == 'local') {
       if (local.containsKey(this.roleType)) {
         if (local[groupMapPriviledgeEntryCustomInfo] != null)
-          local[this.roleType].customInfoTypes.forEach((key, value) {
+          local[this.roleType]!.customInfoTypes!.forEach((key, value) {
             this.customInfo[key] =
                 rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
           });
-        this.role = local[this.roleType];
+        this.role = local[this.roleType]!;
       }
       print("Role ${this.roleLocation} is not defined in $local");
     } else if (this.roleLocation == 'global') {
       if (global.containsKey(this.roleType)) {
-        if (global[this.roleType].customInfoTypes != null)
-          global[this.roleType].customInfoTypes.forEach((key, value) {
+        if (global[this.roleType]!.customInfoTypes != null)
+          global[this.roleType]!.customInfoTypes!.forEach((key, value) {
             this.customInfo[key] =
                 rawPriviledge[groupMapPriviledgeEntryCustomInfo][key];
           });
-        this.role = global[this.roleType];
+        this.role = global[this.roleType]!;
         print(this.role);
       } else
         print("Role ${this.roleType} is not defined in $global");
@@ -138,18 +147,19 @@ class PriviledgeEntry extends RoleEntry {
 class RoleEntry {
   //General Priviledge: 0 no w/r, 1 no w but r access, 2  w/r access, 3 w/r acces able to change general for all users.
   int groupPriviledge = 0;
-  Map<String, dynamic> customInfoTypes;
-  String roleName;
+  Map<String, dynamic>? customInfoTypes;
+  String? roleName;
 
-  bool seeMembers;
-  bool seeMembersDetail;
-  int teleblitzPriviledge;
+  bool? seeMembers;
+  bool? seeMembersDetail;
+  int? teleblitzPriviledge;
 
-  RoleEntry({Map<String, dynamic> data}) {
-    if (data != null) this.read(data);
+  RoleEntry({Map<String, dynamic>? data}) {
+    this.read(data);
   }
-  void read(Map<String, dynamic> data) {
-    if (data.containsKey(groupMapgroupPriviledge))
+  void read(Map<String, dynamic>? data) {
+    print("data: " + data.toString());
+    if (data!.containsKey(groupMapgroupPriviledge))
       this.groupPriviledge = data[groupMapgroupPriviledge];
     if (data.containsKey(groupMapRolesCustomInfoTypes))
       this.customInfoTypes = data[groupMapRolesCustomInfoTypes];
@@ -160,8 +170,8 @@ class RoleEntry {
       this.teleblitzPriviledge = data[eventTeleblitzPriviledge];
     else if (data[eventTeleblitzPriviledge] is String)
       this.teleblitzPriviledge = int.parse(data[eventTeleblitzPriviledge]);
-    else
+    /*else
       throw "Runtype: ${data[eventTeleblitzPriviledge].runtimeType} for teleblitzPriviledge is not supported";
-    print(this.teleblitzPriviledge);
+    print(this.teleblitzPriviledge);*/
   }
 }
