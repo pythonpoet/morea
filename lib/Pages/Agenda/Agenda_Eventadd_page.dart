@@ -13,14 +13,14 @@ import 'package:morea/services/utilities/dwi_format.dart';
 
 class EventAddPage extends StatefulWidget {
   EventAddPage(
-      {this.eventinfo,
-      this.agendaModus,
-      this.firestore,
-      this.agenda,
-      this.moreaFire});
+      {required this.eventinfo,
+      required this.agendaModus,
+      required this.firestore,
+      required this.agenda,
+      required this.moreaFire});
 
   final MoreaFirebase moreaFire;
-  final Map eventinfo;
+  final Map<String,dynamic> eventinfo;
   final AgendaModus agendaModus;
   final FirebaseFirestore firestore;
   final Agenda agenda;
@@ -33,9 +33,9 @@ enum AgendaModus { lager, event, beides }
 
 class EventAddPageState extends State<EventAddPage> {
   DWIFormat dwiFormat = new DWIFormat();
-  CrudMedthods crud0;
-  Agenda agenda;
-  MoreaFirebase moreafire;
+  CrudMedthods? crud0;
+  Agenda? agenda;
+  MoreaFirebase? moreafire;
   int value = 2;
   List<dynamic> mitnehmen = [];
   final _addEvent = new GlobalKey<FormState>(debugLabel: "_addEvent");
@@ -55,11 +55,11 @@ class EventAddPageState extends State<EventAddPage> {
       datumvon = 'Datum wählen',
       datumbis = 'Datum wählen',
       lagerort = ' ';
-  String order;
+  String? order;
   List<Map<String, dynamic>> subgroups = <Map<String, dynamic>>[];
 
-  Map<String, dynamic> event, lager;
-  Map<String, bool> groupCheckbox;
+  Map<String, dynamic>? event, lager;
+  Map<String, bool>? groupCheckbox;
 
   bool initDone = false;
 
@@ -93,7 +93,7 @@ class EventAddPageState extends State<EventAddPage> {
       ));
       return false;
     } else {
-      if (!groupCheckbox.values.any((element){return element;})) {
+      if (!groupCheckbox!.values.any((element){return element;})) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(
             children: [
@@ -127,14 +127,14 @@ class EventAddPageState extends State<EventAddPage> {
     groupCheckbox = Map<String, bool>();
     if (widget.eventinfo['eventID'] == null) {
       for (Map groupMap in subgroups) {
-        this.groupCheckbox[groupMap['groupID']] = false;
+        this.groupCheckbox![groupMap['groupID']] = false;
       }
     } else {
       for (Map groupMap in subgroups) {
         if (widget.eventinfo['groupIDs'].contains(groupMap[groupMapGroupID])) {
-          this.groupCheckbox[groupMap['groupID']] = true;
+          this.groupCheckbox![groupMap['groupID']] = true;
         } else {
-          this.groupCheckbox[groupMap['groupID']] = false;
+          this.groupCheckbox![groupMap['groupID']] = false;
         }
       }
     }
@@ -147,7 +147,7 @@ class EventAddPageState extends State<EventAddPage> {
       }
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
       Map<String, bool> finalGroupCheckbox =
-          Map<String, bool>.from(this.groupCheckbox);
+          Map<String, bool>.from(this.groupCheckbox!);
       finalGroupCheckbox.removeWhere((k, v) => v == false);
       event = {
         'Order': order,
@@ -166,7 +166,7 @@ class EventAddPageState extends State<EventAddPage> {
         'DeleteDate': order,
       };
 
-      agenda.uploadtoAgenda(widget.eventinfo, event);
+      agenda!.uploadtoAgenda(widget.eventinfo, event!);
 
       Navigator.popUntil(context, ModalRoute.withName('/'));
 
@@ -188,7 +188,7 @@ class EventAddPageState extends State<EventAddPage> {
       }
       Map<String, String> kontakt = {'Pfadiname': pfadiname, 'Email': email};
       Map<String, bool> finalGroupCheckbox =
-          Map<String, bool>.from(this.groupCheckbox);
+          Map<String, bool>.from(this.groupCheckbox!);
       finalGroupCheckbox.removeWhere((k, v) => v == false);
       lager = {
         'Order': order,
@@ -209,29 +209,29 @@ class EventAddPageState extends State<EventAddPage> {
         'DeleteDate': order,
       };
 
-      agenda.uploadtoAgenda(widget.eventinfo, lager);
+      agenda!.uploadtoAgenda(widget.eventinfo, lager!);
       Navigator.popUntil(context, ModalRoute.withName('/'));
     }
   }
 
   Future<Null> _selectDatum(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: now,
       firstDate: now,
       lastDate: now.add(new Duration(days: 9999)),
     );
-    if (picked != null)
+    if (picked != null){
       setState(() {
         datum = DateFormat('EEEE, dd.MM.yyyy', 'de').format(picked);
         order = DateFormat('yyyyMMdd').format(picked);
-      });
+      });};
   }
 
   Future<Null> _selectDatumvon(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: now,
       firstDate: now,
@@ -246,7 +246,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   Future<Null> _selectDatumbis(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked2 = await showDatePicker(
+    final DateTime? picked2 = await showDatePicker(
         context: context,
         initialDate: now,
         firstDate: now,
@@ -258,7 +258,7 @@ class EventAddPageState extends State<EventAddPage> {
   }
 
   Future<void> _selectAnfangszeit(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
@@ -291,7 +291,7 @@ class EventAddPageState extends State<EventAddPage> {
   }
 
   Future<void> _selectSchlusszeit(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
@@ -347,7 +347,7 @@ class EventAddPageState extends State<EventAddPage> {
       ),
     );
     if (delete) {
-      await agenda.deleteAgendaEvent(widget.eventinfo);
+      await agenda?.deleteAgendaEvent(widget.eventinfo);
       Navigator.pop(context);
     }
   }
@@ -376,14 +376,14 @@ class EventAddPageState extends State<EventAddPage> {
       ),
     );
     if (delete) {
-      await agenda.deleteAgendaEvent(widget.eventinfo);
+      await agenda?.deleteAgendaEvent(widget.eventinfo);
       Navigator.pop(context);
     }
   }
 
   initSubgoup() async {
-    Map<String, dynamic> data =
-        (await crud0.getDocument(pathGroups, moreaGroupID)).data();
+    Map<String, dynamic>? data =
+        (await crud0?.getDocument(pathGroups, moreaGroupID))?.data() as Map<String, dynamic>;
     data[groupMapGroupOption][groupMapGroupLowerClass]
         .forEach((key, value) => this.subgroups.add(value));
     this.groupCheckboxinit(this.subgroups);
@@ -414,7 +414,7 @@ class EventAddPageState extends State<EventAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (subgroups == null || !this.initDone)
+    if (subgroups.isEmpty || !this.initDone)
       return Card(
         child: Container(
           padding: EdgeInsets.all(100),
@@ -437,7 +437,6 @@ class EventAddPageState extends State<EventAddPage> {
             ),
           ),
         );
-        break;
       case AgendaModus.event:
         return Scaffold(
           appBar: new AppBar(
@@ -445,17 +444,19 @@ class EventAddPageState extends State<EventAddPage> {
           ),
           body: eventWidget(),
         );
-
-        break;
       case AgendaModus.lager:
         return Scaffold(
             appBar: new AppBar(
               title: new Text(widget.eventinfo['Eventname'] + ' bearbeiten'),
             ),
             body: lagerWidget());
-        break;
       default:
-        return null;
+        return Card(
+        child: Container(
+          padding: EdgeInsets.all(100),
+          child: simpleMoreaLoadingIndicator(),
+        ),
+      );
     }
   }
 
@@ -477,12 +478,8 @@ class EventAddPageState extends State<EventAddPage> {
             focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: MoreaColors.violett)),
           ),
-          validator: (value) {
-            if (value.isEmpty) {
-              return 'Bitte nicht leer lassen';
-            } else {
-              return null;
-            }
+          validator: (String? value) {
+            return (value != null) ? 'Bitte nicht leer lassen' : null;
           },
         ),
       ));
@@ -540,7 +537,8 @@ class EventAddPageState extends State<EventAddPage> {
                                             color: MoreaColors.violett)),
                                     filled: false,
                                   ),
-                                  onSaved: (value) => eventname = value,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
+                                  onSaved: (value) {if(value!=null){eventname = value;}},
                                 ),
                               )
                             ],
@@ -601,7 +599,8 @@ class EventAddPageState extends State<EventAddPage> {
                                     filled: false,
                                   ),
                                   keyboardType: TextInputType.text,
-                                  onSaved: (value) => lagerort = value,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
+                                  onSaved: (value) => lagerort = value!,
                                 ),
                               )
                             ],
@@ -635,7 +634,8 @@ class EventAddPageState extends State<EventAddPage> {
                                               color: MoreaColors.violett)),
                                       filled: false,
                                       hintText: 'Ort'),
-                                  onSaved: (value) => anfangort = value,
+                                  onSaved: (value) => anfangort = value!,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                                 ),
                               )
                             ],
@@ -669,14 +669,15 @@ class EventAddPageState extends State<EventAddPage> {
                                               color: MoreaColors.violett)),
                                       filled: false,
                                       hintText: 'Ort'),
-                                  onSaved: (value) => schlussort = value,
+                                  onSaved: (value) => schlussort = value!,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                                 ),
                               )
                             ],
                           )),
                       Container(
                           padding: EdgeInsets.all(10),
-                          height: (60 * groupCheckbox.length).toDouble(),
+                          height: (60 * groupCheckbox!.length).toDouble(),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -693,11 +694,11 @@ class EventAddPageState extends State<EventAddPage> {
                                           title: new Text(
                                               group[groupMapgroupNickName]),
                                           value:
-                                              groupCheckbox[group['groupID']],
-                                          onChanged: (bool value) {
+                                              groupCheckbox![group['groupID']],
+                                          onChanged: (bool? value) {
                                             setState(() {
-                                              groupCheckbox[group['groupID']] =
-                                                  value;
+                                              groupCheckbox![group['groupID']] =
+                                                  value!;
                                             });
                                           },
                                         );
@@ -728,7 +729,8 @@ class EventAddPageState extends State<EventAddPage> {
                                     filled: false,
                                   ),
                                   maxLines: 10,
-                                  onSaved: (value) => beschreibung = value,
+                                  onSaved: (value) => beschreibung = value!,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                                 ),
                               )
                             ],
@@ -757,7 +759,8 @@ class EventAddPageState extends State<EventAddPage> {
                                             color: MoreaColors.violett)),
                                     filled: false,
                                   ),
-                                  onSaved: (value) => pfadiname = value,
+                                  onSaved: (value) => pfadiname = value!,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                                 ),
                               ),
                               Expanded(
@@ -777,7 +780,8 @@ class EventAddPageState extends State<EventAddPage> {
                                             color: MoreaColors.violett)),
                                     filled: false,
                                   ),
-                                  onSaved: (value) => email = value,
+                                  onSaved: (value) => email = value!,
+                                  validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                                 ),
                               )
                             ],
@@ -858,7 +862,7 @@ class EventAddPageState extends State<EventAddPage> {
                             Expanded(
                               child: moreaRaisedButton(
                                 'Speichern',
-                                () => {this.lagerHinzufuegen(context)},
+                                () => this.lagerHinzufuegen(context),
                               ),
                             ),
                           ],
@@ -903,9 +907,9 @@ class EventAddPageState extends State<EventAddPage> {
                                       BorderSide(color: MoreaColors.violett)),
                               filled: false,
                             ),
-                            onSaved: (value) => eventname = value,
+                            onSaved: (value) => eventname = value!,
                             validator: (val) {
-                              if (val.isEmpty) {
+                              if (val == null) {
                                 return 'Bitte nicht leer lassen';
                               } else {
                                 return null;
@@ -959,7 +963,8 @@ class EventAddPageState extends State<EventAddPage> {
                                         BorderSide(color: MoreaColors.violett)),
                                 filled: false,
                                 hintText: 'Ort'),
-                            onSaved: (value) => anfangort = value,
+                            onSaved: (value) => anfangort = value!,
+                            validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                           ),
                         )
                       ],
@@ -992,14 +997,15 @@ class EventAddPageState extends State<EventAddPage> {
                                         BorderSide(color: MoreaColors.violett)),
                                 filled: false,
                                 hintText: 'Ort'),
-                            onSaved: (value) => schlussort = value,
+                            onSaved: (value) => schlussort = value!,
+                            validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                           ),
                         )
                       ],
                     )),
                 Container(
                     padding: EdgeInsets.all(10),
-                    height: (60 * groupCheckbox.length).toDouble(),
+                    height: (60 * groupCheckbox!.length).toDouble(),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -1014,10 +1020,10 @@ class EventAddPageState extends State<EventAddPage> {
                                     .map((Map<dynamic, dynamic> group) {
                                   return CheckboxListTile(
                                     title: Text(group[groupMapgroupNickName]),
-                                    value: groupCheckbox[group["groupID"]],
-                                    onChanged: (bool value) {
+                                    value: groupCheckbox![group["groupID"]],
+                                    onChanged: (bool? value) {
                                       setState(() {
-                                        groupCheckbox[group["groupID"]] = value;
+                                        groupCheckbox![group["groupID"]] = value!;
                                       });
                                     },
                                   );
@@ -1046,7 +1052,8 @@ class EventAddPageState extends State<EventAddPage> {
                               filled: false,
                             ),
                             maxLines: 10,
-                            onSaved: (value) => beschreibung = value,
+                            onSaved: (value) => beschreibung = value!,
+                            validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                           ),
                         )
                       ],
@@ -1074,7 +1081,8 @@ class EventAddPageState extends State<EventAddPage> {
                                       BorderSide(color: MoreaColors.violett)),
                               filled: false,
                             ),
-                            onSaved: (value) => pfadiname = value,
+                            onSaved: (value) => pfadiname = value!,
+                            validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                           ),
                         ),
                         Expanded(
@@ -1092,7 +1100,8 @@ class EventAddPageState extends State<EventAddPage> {
                                       BorderSide(color: MoreaColors.violett)),
                               filled: false,
                             ),
-                            onSaved: (value) => email = value,
+                            onSaved: (value) => email = value!,
+                            validator: (value) => (value != null) ? 'Bitte nicht leer lassen' : null,
                           ),
                         )
                       ],
@@ -1170,7 +1179,7 @@ class EventAddPageState extends State<EventAddPage> {
                       Expanded(
                         child: moreaRaisedButton(
                           'Speichern',
-                          () => {this.eventHinzufuegen(context)},
+                          () => this.eventHinzufuegen(context),
                         ),
                       ),
                     ],

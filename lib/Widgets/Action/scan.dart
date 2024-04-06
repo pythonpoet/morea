@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Widgets/standart/dialog.dart';
 import 'package:morea/Widgets/standart/info.dart';
@@ -7,8 +6,8 @@ import 'package:morea/services/utilities/morea_functions.dart';
 import 'package:morea/services/utilities/qr_code.dart';
 import 'package:rxdart/rxdart.dart';
 
-Future<Widget> makeLeiterWidget(BuildContext context, String userID,
-    String groupID) {
+Future<dynamic> makeLeiterWidget(
+    BuildContext context, String userID, String groupID) {
   QrCode qrCode = new QrCode();
   StreamController stream = new BehaviorSubject();
   bool buttonPressed = false;
@@ -49,15 +48,14 @@ Future<Widget> makeLeiterWidget(BuildContext context, String userID,
                   await qrCode.germanScanQR();
                   stream.add(666);
                   print(qrCode.germanError);
-                  if (qrCode.germanError ==
+                  if (qrCode.germanError !=
                       'Um den Kopplungsvorgang mit deinem Kind abzuschliessen, scanne den Qr-Code, der im Profil deines Kindes ersichtlich ist.') {
                     print('making Leiter');
-                    makeLeiter(userID, qrCode.qrResult, groupID)
+                    makeLeiter(userID, qrCode.qrResult!, groupID)
                         .then((onValue) {
                       stream.add("nicht dicht!");
                     });
-                  }
-                  else
+                  } else
                     buttonPressed = false;
                 },
                 style: ButtonStyle(
@@ -65,24 +63,24 @@ Future<Widget> makeLeiterWidget(BuildContext context, String userID,
                       RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   backgroundColor:
-                  MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
                   foregroundColor:
-                  MaterialStateProperty.all<Color>(Colors.white),
+                      MaterialStateProperty.all<Color>(Colors.white),
                 ),
               ),
               ElevatedButton(
                 child:
-                new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
+                    new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () async =>
-                {stream.close(), Navigator.of(context).pop()},
+                    {stream.close(), Navigator.of(context).pop()},
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all<OutlinedBorder>(
                       RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   backgroundColor:
-                  MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
                   foregroundColor:
-                  MaterialStateProperty.all<Color>(Colors.white),
+                      MaterialStateProperty.all<Color>(Colors.white),
                 ),
               ),
             ],
@@ -108,21 +106,20 @@ Future<Widget> makeLeiterWidget(BuildContext context, String userID,
               ),
               ElevatedButton(
                 child:
-                new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
+                    new Text('Abbrechen', style: new TextStyle(fontSize: 20)),
                 onPressed: () async =>
-                {stream.close(), Navigator.of(context).pop()},
+                    {stream.close(), Navigator.of(context).pop()},
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all<OutlinedBorder>(
                       RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   backgroundColor:
-                  MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
+                      MaterialStateProperty.all<Color>(Color(0xff7a62ff)),
                   foregroundColor:
-                  MaterialStateProperty.all<Color>(Colors.white),
+                      MaterialStateProperty.all<Color>(Colors.white),
                 ),
               ),
-            ]
-            ,
+            ],
           );
       },
     ),

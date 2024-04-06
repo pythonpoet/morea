@@ -8,12 +8,12 @@ import 'package:morea/services/group.dart';
 Map<String, RoleEntry> globalConfigRoles = Map<String, RoleEntry>();
 
 Future<AuthStatus> check4BlockedAuthStatus(
-    String userID, FirebaseFirestore firestore) async {
+    String? userID, FirebaseFirestore firestore) async {
   Map<String, dynamic> init = (await FirebaseFirestore.instance
           .collection(pathConfig)
           .doc(pathInit)
           .get())
-      .data();
+      .data()!;
   print(init.runtimeType);
   if (init == null) throw "No init doc exists";
   initGetGroupConfigRoles(data: init);
@@ -31,7 +31,7 @@ Future<AuthStatus> check4BlockedAuthStatus(
   return userID == null ? AuthStatus.notSignedIn : AuthStatus.loading;
 }
 
-Map<String, RoleEntry> initGetGroupConfigRoles({Map<String, dynamic> data}) {
+Map<String, RoleEntry> initGetGroupConfigRoles({Map<String, dynamic>? data}) {
   if (data != null) {
     if (data.containsKey(groupMapRoles))
       for (String key in Map<String, dynamic>.from(data[groupMapRoles]).keys)

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_Eventadd_page.dart';
 import 'package:morea/Widgets/standart/buttons.dart';
@@ -7,12 +8,13 @@ import 'package:morea/services/agenda.dart';
 import 'package:morea/services/morea_firestore.dart';
 
 class ViewLagerPageState extends StatelessWidget {
-  ViewLagerPageState({this.info, this.pos, this.moreaFire, this.agenda});
+  ViewLagerPageState({this.info, required this.pos, required this.moreaFire, required this.agenda, required this.firestore});
 
   final MoreaFirebase moreaFire;
   final Agenda agenda;
-  final Map info;
+  final Map<String, dynamic>? info;
   final String pos;
+  final FirebaseFirestore firestore;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class ViewLagerPageState extends StatelessWidget {
       );
     return Scaffold(
       appBar: AppBar(
-        title: Text(info['Eventname'].toString()),
+        title: Text(info!['Eventname'].toString()),
       ),
       body: MoreaBackgroundContainer(
         child: SingleChildScrollView(
@@ -47,7 +49,7 @@ class ViewLagerPageState extends StatelessWidget {
       children: <Widget>[
         ListTile(
           title: Text(
-            info['Eventname'],
+            info!['Eventname'],
             style: MoreaTextStyle.title,
           ),
           trailing: Text(
@@ -70,14 +72,14 @@ class ViewLagerPageState extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
-                    'von: ' + info['Datum'],
+                    'von: ' + info!['Datum'],
                     style: MoreaTextStyle.subtitle,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 10),
                   child: Text(
-                    'bis: ' + info['Datum bis'],
+                    'bis: ' + info!['Datum bis'],
                     style: MoreaTextStyle.subtitle,
                   ),
                 )
@@ -95,7 +97,7 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Lagerort'],
+              info!['Lagerort'],
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -112,13 +114,13 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              (info['Anfangszeit'] == 'Zeit wählen'
+              (info!['Anfangszeit'] == 'Zeit wählen'
                       ? 'Zeitpunkt noch nicht entschieden'
-                      : info['Anfangszeit'] + ' Uhr') +
+                      : info!['Anfangszeit'] + ' Uhr') +
                   ', ' +
-                  (info['Anfangsort'] == ''
+                  (info!['Anfangsort'] == ''
                       ? 'Ort noch nicht entschieden'
-                      : info['Anfangsort']),
+                      : info!['Anfangsort']),
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -135,13 +137,13 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              (info['Schlusszeit'] == 'Zeit wählen'
+              (info!['Schlusszeit'] == 'Zeit wählen'
                       ? 'Zeitpunkt noch nicht entschieden'
-                      : info['Schlusszeit'] + ' Uhr') +
+                      : info!['Schlusszeit'] + ' Uhr') +
                   ', ' +
-                  (info['Schlussort'] == ''
+                  (info!['Schlussort'] == ''
                       ? 'Ort noch nicht entschieden'
-                      : info['Schlussort']),
+                      : info!['Schlussort']),
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -158,7 +160,7 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Beschreibung'],
+              info!['Beschreibung'],
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -175,14 +177,14 @@ class ViewLagerPageState extends StatelessWidget {
           contentPadding:
               EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
           subtitle: ListView.builder(
-              itemCount: info['Mitnehmen'].length,
+              itemCount: info!['Mitnehmen'].length,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
-                    '- ' + info['Mitnehmen'][index],
+                    '- ' + info!['Mitnehmen'][index],
                     style: MoreaTextStyle.subtitle,
                   ),
                 );
@@ -200,7 +202,7 @@ class ViewLagerPageState extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Text(
-              info['Kontakt']['Pfadiname'] + ': ' + info['Kontakt']['Email'],
+              info!['Kontakt']['Pfadiname'] + ': ' + info!['Kontakt']['Email'],
               style: MoreaTextStyle.subtitle,
             ),
           ),
@@ -221,18 +223,20 @@ class ViewLagerPageState extends StatelessWidget {
   }
 
   void routeToLagerbearb(context) {
+    if(info != null){
     Navigator.of(context)
         .push(new MaterialPageRoute(
             builder: (BuildContext context) => EventAddPage(
-                  eventinfo: info,
+                  eventinfo: info!,
                   agendaModus: AgendaModus.lager,
                   agenda: agenda,
                   moreaFire: moreaFire,
+                  firestore: firestore,
                 )))
-        .then((onValue) {});
+        .then((onValue) {});}
   }
 
-  FloatingActionButton floatingActionButton(BuildContext context) {
+  FloatingActionButton? floatingActionButton(BuildContext context) {
     if (istLeiter()) {
       return moreaEditActionbutton(route: () => routeToLagerbearb(context));
     } else {

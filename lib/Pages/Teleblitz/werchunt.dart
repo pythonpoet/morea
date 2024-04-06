@@ -19,7 +19,8 @@ class WerChunnt {
     this._controller.close();
   }
 
-  Stream<List<List<String>>> get stream => _controller.stream;
+  Stream<List<List<String>>> get stream =>
+      _controller.stream as Stream<List<List<String>>>;
 
   void initChunnt() {
     moreaFire.streamCollectionWerChunnt(eventID).listen((data) {
@@ -27,10 +28,11 @@ class WerChunnt {
       List<String> chunntNoed = [];
       List<DocumentSnapshot> documents = data.docs;
       for (DocumentSnapshot document in documents) {
-        if (document.data()['AnmeldeStatus'] == eventMapAnmeldeStatusPositiv) {
-          chunnt.add(document.data()['Name']);
+        if ((document.data()! as Map<String, dynamic>)['AnmeldeStatus'] ==
+            eventMapAnmeldeStatusPositiv) {
+          chunnt.add((document.data()! as Map<String, dynamic>)['Name']);
         } else {
-          chunntNoed.add(document.data()['Name']);
+          chunntNoed.add((document.data()! as Map<String, dynamic>)['Name']);
         }
       }
       _controller.add([chunnt, chunntNoed]);

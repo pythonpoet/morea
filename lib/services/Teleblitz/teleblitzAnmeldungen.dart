@@ -17,8 +17,8 @@ abstract class BaseTeleblitzAnmeldungen {
 class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
   StreamController<List<String>> _anmeldeController = new BehaviorSubject();
   StreamController<List<String>> _abmeldeController = new BehaviorSubject();
-  CrudMedthods crud0;
-  Stream<QuerySnapshot> sDSAnAbmeldungen;
+  late CrudMedthods crud0;
+  late Stream<QuerySnapshot> sDSAnAbmeldungen;
 
   Stream<List<String>> get getAnmeldungen => _anmeldeController.stream;
 
@@ -46,9 +46,10 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
       dsAnmeldungen = qSAnmeldungen.docs;
       lSAnmeldungen.removeRange(0, lSAnmeldungen.length);
       for (DocumentSnapshot dSAnmeldung in dsAnmeldungen) {
-        mAnmdeldungen = dSAnmeldung.data();
+        mAnmdeldungen = dSAnmeldung.data() as Map<String, dynamic>;
         if (mAnmdeldungen.containsValue(eventMapAnmeldeStatusPositiv))
-          lSAnmeldungen.add(dSAnmeldung.data()[eventMapAnmeldeUID]);
+          lSAnmeldungen.add(
+              (dSAnmeldung.data() as Map<String, dynamic>)[eventMapAnmeldeUID]);
       }
       return lSAnmeldungen;
     });
@@ -65,9 +66,10 @@ class TeleblitzAnmeldungen extends BaseTeleblitzAnmeldungen {
       dsAnmeldungen = qSAnmeldungen.docs;
       lSAnmeldungen.removeRange(0, lSAnmeldungen.length);
       for (DocumentSnapshot dSAnmeldung in dsAnmeldungen) {
-        mAnmdeldungen = dSAnmeldung.data();
+        mAnmdeldungen = dSAnmeldung.data() as Map<String, dynamic>;
         if (mAnmdeldungen.containsValue(eventMapAnmeldeStatusNegativ))
-          lSAnmeldungen.add(dSAnmeldung.data()[eventMapAnmeldeUID]);
+          lSAnmeldungen.add(
+              (dSAnmeldung.data() as Map<String, dynamic>)[eventMapAnmeldeUID]);
       }
       return lSAnmeldungen;
     });

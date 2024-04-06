@@ -30,13 +30,11 @@ enum FormType { keineAktivitaet, ferien, normal }
 
 class _ChangeTeleblitzState extends State<ChangeTeleblitz>
     with TickerProviderStateMixin {
-  FormType formType;
-  MoreaFirebase moreaFire;
+  late FormType formType;
+  late MoreaFirebase moreaFire;
 
   //Variabeln vom Teleblitz
-  String name,
-      startTime,
-      endTime,
+  late String name,
       datum,
       antreten,
       mapAntreten,
@@ -45,20 +43,18 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
       bemerkung,
       sender,
       grund,
-      endeFerien,
-      id,
-      slug,
-      rawDate;
-  Map<String, dynamic> stufe;
-  List<dynamic> mitnehmen;
-  bool keineAktivitaet, ferien;
+      endeFerien;
+  String? startTime, endTime, rawDate;
+  late Map<String, dynamic> stufe;
+  late List<dynamic> mitnehmen;
+  late bool keineAktivitaet, ferien;
   bool archived = false;
   bool draft = false;
-  var oldTeleblitz;
-  MoreaLoading moreaLoading;
-  DocumentSnapshot groupDoc;
+  late Future<Map<String, dynamic>> oldTeleblitz;
+  late MoreaLoading moreaLoading;
+  late DocumentSnapshot groupDoc;
 
-  TeleblitzManager teleblitzManager;
+  late TeleblitzManager teleblitzManager;
 
   @override
   void initState() {
@@ -175,7 +171,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                   },
                 ),
               );
-              break;
             case FormType.ferien:
               return Scaffold(
                 appBar: AppBar(
@@ -224,7 +219,6 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                   },
                 ),
               );
-              break;
             case FormType.normal:
               return Scaffold(
                 appBar: AppBar(
@@ -417,18 +411,25 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
                   },
                 ),
               );
-              break;
           }
+        } else {
+          return Scaffold(
+              appBar: AppBar(
+                title: Text('Fehler'),
+              ),
+              body: MoreaBackgroundContainer(
+                  child: Center(
+                child: Text('Fehler'),
+              )));
         }
-        return null;
       },
     );
   }
 
-  Future<Map> downloadTeleblitz() async {
+  Future<Map<String, dynamic>> downloadTeleblitz() async {
     this.groupDoc =
         await widget.moreaFire.crud0.getDocument(pathGroups, stufe['groupID']);
-    var infos =
+    Map<String, dynamic> infos =
         await teleblitzManager.downloadTeleblitz(this.stufe, this.groupDoc);
     this.name = infos['name'];
     this.datum = infos['datum'];
@@ -518,7 +519,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 
   Future<Null> _selectDatum(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: now,
         firstDate: now,
@@ -533,7 +534,7 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
 
   Future<Null> _selectDatumEndeFerien(BuildContext context) async {
     DateTime now = DateTime.now();
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: now,
         firstDate: now,
@@ -546,47 +547,61 @@ class _ChangeTeleblitzState extends State<ChangeTeleblitz>
   }
 
   void setBeginn(String ort, String zeit, String map) {
-    this.antreten = zeit + ' Uhr, ' + ort;
-    this.mapAntreten = map;
-    this.startTime = zeit;
+    setState(() {
+      this.antreten = zeit + ' Uhr, ' + ort;
+      this.mapAntreten = map;
+      this.startTime = zeit;
+    });
   }
 
   void setEnde(String ort, String zeit, String map) {
-    this.abtreten = zeit + ' Uhr, ' + ort;
-    this.mapAbtreten = map;
-    this.endTime = zeit;
+    setState(() {
+      this.abtreten = zeit + ' Uhr, ' + ort;
+      this.mapAbtreten = map;
+      this.endTime = zeit;
+    });
   }
 
   void setMitnehmen(List<String> mitnehmen) {
-    this.mitnehmen = mitnehmen;
+    setState(() {
+      this.mitnehmen = mitnehmen;
+    });
   }
 
   void setBemerkung(String bemerkung) {
-    this.bemerkung = bemerkung;
+    setState(() {
+      this.bemerkung = bemerkung;
+    });
   }
 
   void setSender(String sender) {
-    this.sender = sender;
+    setState(() {
+      this.sender = sender;
+    });
   }
 
   void setGrund(String grund) {
-    this.grund = grund;
+    setState(() {
+      this.grund = grund;
+    });
   }
 
   void setEndeFerien(String endeFerien) {
-    this.endeFerien = endeFerien;
+    setState(() {
+      this.endeFerien = endeFerien;
+    });
   }
 }
 
 class TeleblitzManager {
-  MoreaFirebase moreaFirebase;
-  DocumentSnapshot groupDoc;
+  late MoreaFirebase moreaFirebase;
+  DocumentSnapshot? groupDoc;
 
   TeleblitzManager(MoreaFirebase moreaFirebase) {
     this.moreaFirebase = moreaFirebase;
   }
 
-  Future<Map> downloadTeleblitz(
+  Future<Map<String, dynamic>> downloadTeleblitz(
       Map<String, dynamic> stufe, DocumentSnapshot groupDoc) async {
     this.groupDoc = groupDoc;
     if (groupDoc.get(groupMapGroupOption)['teleblitzID'] != null) {
@@ -595,7 +610,7 @@ class TeleblitzManager {
           .crud0
           .getDocument(
               pathEvents, groupDoc.get(groupMapGroupOption)['teleblitzID']);
-      return teleblitzDoc.data();
+      return teleblitzDoc.data() as Map<String, dynamic>;
     } else {
       Map<String, dynamic> teleblitz = {
         '_archived': false,
@@ -619,7 +634,7 @@ class TeleblitzManager {
   }
 
   void uploadTeleblitz(Map newTeleblitz, String id) async {
-    if (this.groupDoc.get(groupMapGroupOption)['webflowCMSID'] != null) {
+    if (this.groupDoc!.get(groupMapGroupOption)['webflowCMSID'] != null) {
       String apiKey = await moreaFirebase.getWebflowApiKey();
       String formatedMitnehmen = '<ul>';
       for (String u in newTeleblitz['mitnehmen-test']) {
@@ -641,13 +656,13 @@ class TeleblitzManager {
       print(jsonStr);
       Map<String, String> header = Map();
       header["Authorization"] = "Bearer $apiKey";
-      header["accept-version"] = "1.0.0";
-      header["Content-Type"] = "application/json";
+      header["accept"] = "application/json";
+      header["content-type"] = "application/json";
       http
           .patch(
         Uri.https(
             'api.webflow.com',
-            "/collections/5be4a9a6dbcc0a24d7cb0ee9/items/" + id,
+            "/collections/6353f0b7afc1660f42f42ba7/items/" + id,
             {'live': 'true'}),
         headers: header,
         body: jsonStr,

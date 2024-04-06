@@ -6,23 +6,19 @@ import 'package:morea/Widgets/standart/buttons.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Event/event_Widget.dart';
 import 'package:morea/services/Group/group_data.dart';
-import 'package:morea/services/auth.dart';
 import 'package:morea/services/crud.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'select_stufe.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/morealayout.dart';
-import 'package:morea/Widgets/home/teleblitz.dart';
 
 class HomePage extends StatefulWidget {
   HomePage(
-      {this.auth,
-      this.firestore,
-      this.navigationMap,
-      this.moreafire,
-      this.tutorial});
+      {required this.firestore,
+      required this.navigationMap,
+      required this.moreafire,
+      required this.tutorial});
 
-  final BaseAuth auth;
   final FirebaseFirestore firestore;
   final Map<String, Function> navigationMap;
   final MoreaFirebase moreafire;
@@ -37,10 +33,9 @@ enum FormType { leiter, teilnehmer, eltern, loading }
 enum Anmeldung { angemolden, abgemolden, verchilt }
 
 class HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  CrudMedthods crud0;
-  MoreaFirebase moreafire;
-  Teleblitz teleblitz;
-  MoreaLoading moreaLoading;
+  late CrudMedthods crud0;
+  late MoreaFirebase moreafire;
+  late MoreaLoading moreaLoading;
   GlobalKey _changeTeleblitzKey = GlobalKey();
   GlobalKey _bottomAppBarLeiterKey = GlobalKey();
   GlobalKey _drawerKey = GlobalKey();
@@ -54,18 +49,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   //Dekleration welche ansicht gewählt wird für TN's Eltern oder Leiter
   FormType _formType = FormType.loading;
 
-  Map<String, dynamic> anmeldeDaten, groupInfo;
   bool chunnt = false;
   var messagingGroups;
 
   void getuserinfo() async {
     forminit();
-    teleblitz = new Teleblitz(moreafire, crud0);
     setState(() {});
   }
 
   void _signedOut() {
-    widget.navigationMap[signedOut]();
+    widget.navigationMap[signedOut]!();
   }
 
   void forminit() {
@@ -156,14 +149,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       maxHeight: MediaQuery.of(context).size.height - 220),
                   child: Center(child: moreaLoading.loading())));
 
-        List<String> sortedEvents = sortHomeFeedByStartDate(aSData.data);
+        List<String> sortedEvents = sortHomeFeedByStartDate(aSData.data!);
         if (sortedEvents.length == 0) return requestPrompttoParent();
         return Column(children: [
           ...sortedEvents.map((String eventID) => EventWidget(
               moreaFirebase: this.moreafire,
               crudMedthods: this.crud0,
               eventID: eventID,
-              function: moreafire.tbz.anmeldeStatus))
+              function: moreafire.tbz!.anmeldeStatus))
         ]);
       },
     );
@@ -174,14 +167,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       backgroundColor: MoreaColors.bottomAppBar,
       appBar: AppBar(
         title: Text('Teleblitz'),
+        backgroundColor: MoreaColors.orange,
       ),
-      drawer: moreaDrawer(moreafire.getPos, moreafire.getDisplayName,
-          moreafire.getEmail, context, moreafire, crud0, _signedOut),
+      drawer: moreaDrawer(moreafire.getPos!, moreafire.getDisplayName!,
+          moreafire.getEmail!, context, moreafire, crud0, _signedOut),
       body: MoreaBackgroundContainer(child: scrollView()),
       floatingActionButton: (moreafire.getPos == "Leiter")
           ? Showcase(
               key: _changeTeleblitzKey,
-              disableAnimation: true,
+              disableMovingAnimation: true,
               description: 'Hier kannst du den Teleblitz ändern',
               child: moreaEditActionbutton(
                 route: routeEditTelebliz,
@@ -191,7 +185,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       bottomNavigationBar: (moreafire.getPos == "Leiter")
           ? Showcase.withWidget(
               key: _bottomAppBarLeiterKey,
-              disableAnimation: true,
+              disableMovingAnimation: true,
               height: 500,
               width: 150,
               container: Container(
@@ -208,12 +202,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              child: moreaLeiterBottomAppBar(widget.navigationMap, "Ändern", MoreaBottomAppBarActivePage.teleblitz))
+              child: moreaLeiterBottomAppBar(widget.navigationMap, "Ändern",
+                  MoreaBottomAppBarActivePage.teleblitz))
           : Showcase.withWidget(
               key: _bottomAppBarTNKey,
               height: 300,
               width: 150,
-              disableAnimation: true,
+              disableMovingAnimation: true,
               container: Container(
                 padding: EdgeInsets.all(5),
                 constraints: BoxConstraints(minWidth: 150, maxWidth: 150),
@@ -260,7 +255,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             onPressed: () => tutorialLeiter(),
           )
         ];
-        break;
       case FormType.teilnehmer:
         return [
           IconButton(
@@ -268,7 +262,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             onPressed: () => tutorialTN(),
           )
         ];
-        break;
       case FormType.eltern:
         return [
           IconButton(
@@ -276,10 +269,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             onPressed: () => tutorialEltern(),
           )
         ];
-        break;
       case FormType.loading:
         return [];
-        break;
       default:
         return [];
     }
@@ -308,16 +299,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     switch (_formType) {
       case FormType.leiter:
         return 'Hier kannst du als Leiter das Profil deiner TNs ändern, TNs zu Leitern machen und dich ausloggen.';
-        break;
       case FormType.teilnehmer:
         return 'Hier kannst du das Konto deiner Eltern verlinken, damit sie dich für Aktivitäten anmelden können, und dich ausloggen.';
-        break;
       case FormType.eltern:
         return 'Hier kannst du das Konto deiner Kinder verlinken, damit du sie für Aktivitäten anmelden kannst, und dich ausloggen.';
-        break;
       case FormType.loading:
         return 'Loading';
-        break;
       default:
         return 'Loading';
     }

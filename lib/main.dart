@@ -1,7 +1,7 @@
 import 'dart:async';
 //import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -15,7 +15,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   notificationGetPermission();
   runApp(RestartWidget(
     child: MyApp(),
@@ -31,11 +33,12 @@ class MyApp extends StatelessWidget {
       title: 'Morea',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
-        backgroundColor: Colors.white,
-        primarySwatch: MaterialColor(
-            MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
-        fontFamily: 'Raleway',
-      ),
+          colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: MaterialColor(
+                  MoreaColors.appBarInt, MoreaColors.violettMaterialColor),
+              backgroundColor: Colors.white),
+          fontFamily: 'Raleway',
+          appBarTheme: AppBarTheme(backgroundColor: MoreaColors.orange)),
       initialRoute: '/',
       routes: {
         '/': (context) => Container(

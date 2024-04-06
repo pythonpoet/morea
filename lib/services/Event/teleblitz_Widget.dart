@@ -7,11 +7,11 @@ import 'package:morea/services/morea_firestore.dart';
 
 class TeleblitzWidget extends StatelessWidget {
   TeleblitzWidget(
-      {@required this.eventData,
-      @required this.moreaFirebase,
-      @required this.crudMedthods,
-      @required this.eventID,
-      @required this.function});
+      {required this.eventData,
+      required this.moreaFirebase,
+      required this.crudMedthods,
+      required this.eventID,
+      required this.function});
 
   final TeleblitzData eventData;
   final MoreaFirebase moreaFirebase;

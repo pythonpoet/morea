@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_card/flip_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Teleblitz/home_page.dart';
 import 'package:morea/Pages/Teleblitz/werchunt.dart';
@@ -16,18 +15,15 @@ import 'package:morea/services/utilities/url_launcher.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
-import '../standart/moreaTextStyle.dart';
-
 enum ElementType { ferien, keineAktivitaet, teleblitz, notImplemented }
+
 enum HomeScreenType { loading, noElement, info }
 
 class Teleblitz {
-  MoreaFirebase moreaFire;
+  late MoreaFirebase moreaFire;
   Info info = new Info();
   GlobalKey<FlipCardState> teleblitzCardKey = GlobalKey<FlipCardState>();
-  String eventID;
-  CrudMedthods crud0;
-  Map<String, dynamic> anmeldeDaten, groupInfo;
+  late CrudMedthods crud0;
   bool chunnt = false;
   Map<String, Stream<String>> anmeldeStream = new Map();
   Map<String, StreamController<String>> anmeldeStreamController = new Map();
@@ -36,20 +32,20 @@ class Teleblitz {
     this.moreaFire = moreaFire;
     this.crud0 = crud0;
   }
-  int getHighestEventPriviledge(List<String> groupIDs) {
+  int getHighestEventPriviledge(List<String>? groupIDs) {
     if (groupIDs == null) return 0;
     int returnValue = 0;
     for (int i = 0; i < groupIDs.length; i++) {
-      if (moreaFire.getGroupIDs.contains(groupIDs[i])) {
-        if (moreaFire.getMapGroupData[groupIDs[i]].priviledge.role
+      if (moreaFire.getGroupIDs!.contains(groupIDs[i])) {
+        if (moreaFire.getMapGroupData![groupIDs[i]]!.priviledge!.role
                 .teleblitzPriviledge ==
             null)
           throw 'Teleblitz Priviledge cant be null';
-        else if (moreaFire.getMapGroupData[groupIDs[i]].priviledge.role
-                .teleblitzPriviledge >
+        else if (moreaFire.getMapGroupData![groupIDs[i]]!.priviledge!.role
+                .teleblitzPriviledge! >
             returnValue)
-          returnValue = moreaFire
-              .getMapGroupData[groupIDs[i]].priviledge.role.teleblitzPriviledge;
+          returnValue = moreaFire.getMapGroupData![groupIDs[i]]!.priviledge!
+              .role.teleblitzPriviledge!;
       }
     }
     return returnValue;
@@ -57,7 +53,7 @@ class Teleblitz {
 
   void submit(
       String anabmelden, List<String> groupIDs, String eventID, String uid,
-      {String name}) {
+      {String? name}) {
     HomePageState.homeScreenScrollController.animateTo(0.0,
         curve: Curves.easeOut, duration: const Duration(milliseconds: 400));
 
@@ -71,10 +67,10 @@ class Teleblitz {
     }
     if (this.getHighestEventPriviledge(groupIDs) < 2) {
       moreaFire.childAnmelden(eventID, moreaFire.getUserMap[userMapUID],
-          moreaFire.getUserMap[userMapUID], anabmelden, name);
+          moreaFire.getUserMap[userMapUID], anabmelden, name!);
     } else {
       moreaFire.parentAnmeldet(
-          eventID, uid, moreaFire.getUserMap[userMapUID], anabmelden, name);
+          eventID, uid, moreaFire.getUserMap[userMapUID], anabmelden, name!);
     }
   }
 
@@ -141,7 +137,7 @@ class Teleblitz {
     List<Widget> anmeldebuttons = [];
 
     groupIDs.forEach((String groupID) {
-      moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
+      moreaFire.getChildMap![groupID]!.forEach((String uid, vorname) {
         anmeldebuttons.add(
             anmeldebutton(groupIDs, eventID, uid, "ja", "nein", name: vorname));
       });
@@ -194,9 +190,9 @@ class Teleblitz {
 
   Widget anmeldebutton(List<String> groupIDs, String eventID, String uid,
       String anmelden, abmelden,
-      {String name}) {
+      {String? name}) {
     return StreamBuilder(
-      stream: anmeldeStreamController[uid].stream,
+      stream: anmeldeStreamController[uid]!.stream,
       builder: (BuildContext context, snap) {
         if (snap.connectionState == ConnectionState.active) {
           switch (snap.data) {
@@ -286,7 +282,6 @@ class Teleblitz {
                       )
                     ],
                   ));
-              break;
             case "ChuntNoed":
               return Container(
                 padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
@@ -397,7 +392,7 @@ class Teleblitz {
                 ),
               );
             default:
-              return Text(snap.data);
+              return Text(snap.data!);
           }
         } else {
           return Container();
@@ -410,9 +405,9 @@ class Teleblitz {
       Stream<String> Function(String userID, String eventID) function) {
     List<Widget> anmeldebuttons = [];
     groupIDs.forEach((String groupID) {
-      moreaFire.getChildMap[groupID].forEach((String uid, vorname) {
+      moreaFire.getChildMap![groupID]!.forEach((String uid, vorname) {
         anmeldeStreamController[uid] = new BehaviorSubject();
-        anmeldeStreamController[uid].addStream(function(uid, eventID));
+        anmeldeStreamController[uid]!.addStream(function(uid, eventID));
         anmeldebuttons.add(anmeldeIndicator(
           uid,
           eventID,
@@ -428,7 +423,7 @@ class Teleblitz {
   Widget childAnmeldeIndicator(String userID, String eventID,
       Stream<String> Function(String userID, String eventID) function) {
     anmeldeStreamController[userID] = new BehaviorSubject();
-    anmeldeStreamController[userID].addStream(function(userID, eventID));
+    anmeldeStreamController[userID]!.addStream(function(userID, eventID));
     return anmeldeIndicator(userID, eventID, function,
         "Du hast dich angemeldet", "Du hast dich abgemeldet");
   }
@@ -440,13 +435,12 @@ class Teleblitz {
       String angemolden,
       String abgemolden) {
     return StreamBuilder(
-      stream: anmeldeStreamController[userID].stream,
+      stream: anmeldeStreamController[userID]!.stream,
       builder: (BuildContext context, AsyncSnapshot<String> snap) {
         if (!snap.hasData) return simpleMoreaLoadingIndicator();
         switch (snap.data) {
           case "un-initialized":
             return Container();
-            break;
           case "ChuntNoed":
             return Container(
               height: 40,
@@ -480,7 +474,7 @@ class Teleblitz {
                   color: MoreaColors.violett),
             );
           default:
-            return Text(snap.data);
+            return Text(snap.data!);
         }
       },
     );
@@ -542,7 +536,7 @@ class Teleblitz {
                 info.getMitnehmen(),
                 info.getBemerkung(),
                 info.getSender(),
-                childListTitle(moreaFire.getDisplayName),
+                childListTitle(moreaFire.getDisplayName!),
                 childAnmeldeButton(groupIDs, eventID),
                 parentShare(name),
               ],
@@ -648,17 +642,17 @@ class Teleblitz {
                                 } else {
                                   return ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: snapshot.data[0].length + 1,
+                                      itemCount: snapshot.data![0].length + 1,
                                       itemBuilder: (context, i) {
-                                        if (i < snapshot.data[0].length) {
+                                        if (i < snapshot.data![0].length) {
                                           return Text(
-                                            snapshot.data[0][i],
+                                            snapshot.data![0][i],
                                             style: MoreaTextStyle.normal,
                                           );
                                         } else {
                                           return Text(
                                             'Total: ' +
-                                                snapshot.data[0].length
+                                                snapshot.data![0].length
                                                     .toString(),
                                             style: MoreaTextStyle.normal,
                                           );
@@ -694,12 +688,14 @@ class Teleblitz {
                                   return Text('Error');
                                 } else {
                                   List<DocumentSnapshot> documents =
-                                      snapshot.data.docs;
+                                      snapshot.data!.docs;
                                   List<String> chunntNoed = [];
                                   for (DocumentSnapshot document in documents) {
-                                    if (document.data()['AnmeldeStatus'] ==
+                                    if ((document.data()! as Map<String,
+                                            dynamic>)['AnmeldeStatus'] ==
                                         eventMapAnmeldeStatusNegativ) {
-                                      chunntNoed.add(document.data()['Name']);
+                                      chunntNoed.add((document.data()!
+                                          as Map<String, dynamic>)['Name']);
                                     }
                                   }
                                   return ListView.builder(
@@ -757,7 +753,7 @@ class Teleblitz {
 
   Widget turnFlipCardTeleblitz() {
     return MaterialButton(
-      onPressed: () => teleblitzCardKey.currentState.toggleCard(),
+      onPressed: () => teleblitzCardKey.currentState!.toggleCard(),
       child: Icon(
         Icons.autorenew,
         size: 20,
@@ -853,15 +849,12 @@ class Teleblitz {
     switch (eventData.teleblitzType) {
       case TeleblitzType.notImplemented:
         return notImplemented();
-        break;
       case TeleblitzType.ferien:
         defineInfo(eventData);
         return ferien();
-        break;
       case TeleblitzType.keineAktivitaet:
         defineInfo(eventData);
         return keineAktivitat();
-        break;
       case TeleblitzType.teleblitz:
         defineInfo(eventData);
         return teleblitz(eventData.name, eventData.groupIDs, eventID, function);
@@ -878,21 +871,21 @@ class Info {
 //
 //  Info._();
 
-  Urllauncher urllauncher = new Urllauncher();
+  Urllauncher urllauncher = Urllauncher();
 
-  String titel;
-  String antreten;
-  String antretenMap;
-  String abtreten;
-  String abtretenMap;
-  String datum;
-  String bemerkung;
-  String sender;
-  List<String> mitnehmen;
-  String keineaktivitat;
-  String grund;
-  String ferien;
-  String endeferien;
+  String? titel;
+  String? antreten;
+  String? antretenMap;
+  String? abtreten;
+  String? abtretenMap;
+  String? datum;
+  String? bemerkung;
+  String? sender;
+  List<String>? mitnehmen;
+  String? keineaktivitat;
+  String? grund;
+  String? ferien;
+  String? endeferien;
   double _sizeleft = 120;
 
   void setTitel(String titel) {
@@ -951,7 +944,7 @@ class Info {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
       alignment: Alignment.topLeft,
-      child: Text(this.titel, style: MoreaTextStyle.title),
+      child: Text(this.titel!, style: MoreaTextStyle.title),
     );
   }
 
@@ -972,7 +965,7 @@ class Info {
   }
 
   Container getAntreten() {
-    if (this?.antreten?.isNotEmpty ?? false) {
+    if (this.antreten?.isNotEmpty ?? false) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -984,11 +977,11 @@ class Info {
             Expanded(
               child: InkWell(
                 child: Text(
-                  this.antreten,
+                  this.antreten!,
                   style: MoreaTextStyle.link,
                 ),
                 onTap: () {
-                  urllauncher.openlinkMaps(this.antretenMap);
+                  urllauncher.openlinkMaps(this.antretenMap!);
                 },
               ),
             )
@@ -1001,7 +994,7 @@ class Info {
   }
 
   Container getAbtreten() {
-    if (this?.abtreten?.isNotEmpty ?? false) {
+    if (this.abtreten?.isNotEmpty ?? false) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Row(
@@ -1013,11 +1006,11 @@ class Info {
             Expanded(
                 child: InkWell(
               child: Text(
-                this.abtreten,
+                this.abtreten!,
                 style: MoreaTextStyle.link,
               ),
               onTap: () {
-                urllauncher.openlinkMaps(this.abtretenMap);
+                urllauncher.openlinkMaps(this.abtretenMap!);
               },
             ))
           ],
@@ -1048,7 +1041,7 @@ class Info {
               child: Text("Datum:", style: MoreaTextStyle.lable)),
           Expanded(
               child: Text(
-            this.datum,
+            this.datum!,
             style: MoreaTextStyle.normal,
           ))
         ],
@@ -1057,7 +1050,7 @@ class Info {
   }
 
   Container getBemerkung() {
-    if (this?.bemerkung?.isNotEmpty ?? false) {
+    if (this.bemerkung?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(
@@ -1084,7 +1077,7 @@ class Info {
                   children: <Widget>[
                     Expanded(
                         child: Text(
-                      this.bemerkung,
+                      this.bemerkung!,
                       style: MoreaTextStyle.normal,
                     ))
                   ],
@@ -1107,7 +1100,7 @@ class Info {
   }
 
   Container getSender() {
-    if (this?.sender?.isNotEmpty ?? false) {
+    if (this.sender?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Row(
@@ -1118,7 +1111,7 @@ class Info {
                   child: Text("", style: MoreaTextStyle.lable)),
               Expanded(
                   child: Text(
-                this.sender,
+                this.sender!,
                 style: MoreaTextStyle.normal,
               ))
             ],
@@ -1138,7 +1131,7 @@ class Info {
   }
 
   Container getMitnehmen() {
-    if (this?.antreten?.isNotEmpty ?? false) {
+    if (this.antreten?.isNotEmpty ?? false) {
       return Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
           child: Column(
@@ -1157,11 +1150,11 @@ class Info {
               ListView.builder(
                 padding: EdgeInsets.only(left: 15),
                 shrinkWrap: true,
-                itemCount: this.mitnehmen.length,
+                itemCount: this.mitnehmen!.length,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return Text(
-                    '- ' + this.mitnehmen[index],
+                    '- ' + this.mitnehmen![index],
                     style: MoreaTextStyle.normal,
                   );
                 },
@@ -1203,7 +1196,7 @@ class Info {
               children: <Widget>[
                 Expanded(
                     child: Text(
-                  this.grund,
+                  this.grund!,
                   style: MoreaTextStyle.normal,
                 ))
               ],
@@ -1243,7 +1236,7 @@ class Info {
   }
 
   Container getEndeFerien() {
-    String endeFerien = this.endeferien;
+    String endeFerien = this.endeferien!;
     return Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
         child: Column(

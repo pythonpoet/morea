@@ -1,7 +1,6 @@
-import 'package:device_info/device_info.dart';
 import 'dart:io' show Platform;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:morea/Pages/Agenda/Agenda_page.dart';
 import 'package:morea/Pages/Grundbausteine/blockedByAppVersion_page.dart';
@@ -18,12 +17,13 @@ import 'package:morea/services/cloud_functions.dart';
 import 'package:morea/services/morea_firestore.dart';
 import 'package:morea/services/utilities/blockedUserChecker.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../Widgets/standart/buttons.dart';
 import '../../morea_strings.dart';
 
 class RootPage extends StatefulWidget {
-  RootPage({this.auth, this.firestore});
+  RootPage({required this.auth, required this.firestore});
 
   final BaseAuth auth;
   final FirebaseFirestore firestore;
@@ -47,8 +47,8 @@ enum AuthStatus {
 class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   Auth auth = Auth();
   AuthStatus authStatus = AuthStatus.loading;
-  MoreaFirebase moreaFire;
-  Map<String, Function> navigationMap;
+  MoreaFirebase? moreaFire;
+  late Map<String, Function> navigationMap;
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   @override
@@ -75,12 +75,12 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
 
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
-    if (await this.moreaFire.getData(await auth.currentUser()) == false) {
+    if (await this.moreaFire!.getData(auth.currentUser()!) == false) {
       setState(() {
         this.signedOut();
       });
     }
-    await this.moreaFire.initTeleblitz();
+    await this.moreaFire!.initTeleblitz();
     FirebaseMessaging.onMessage.listen((message) {
       print("message recieved");
       if (message.data['typeMorea'] == 'Message') {
@@ -92,7 +92,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
               actions: <Widget>[
                 moreaRaisedButton('Ansehen', () {
                   Navigator.of(context).pop();
-                  navigationMap[toMessagePage]();
+                  navigationMap[toMessagePage]!();
                 }),
                 moreaRaisedButton('Später', () {
                   Navigator.of(context).pop();
@@ -105,12 +105,12 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     });
     authStatus = AuthStatus.homePage;
     setState(() {});
-    return true;
+    return null;
   }
 
   Future authStatusInit() async {
-    authStatus = await check4BlockedAuthStatus(
-        await auth.currentUser(), widget.firestore);
+    authStatus =
+        await check4BlockedAuthStatus(auth.currentUser(), widget.firestore);
     if (authStatus == AuthStatus.loading) {
       initMoreaFire();
     }
@@ -126,53 +126,47 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
         return new LoginPage(
           auth: auth,
           onSignedIn: this.signedIn,
+          firestore: widget.firestore,
         );
-        break;
 
       case AuthStatus.homePage:
         return ShowCaseWidget(
           builder: Builder(
             builder: (context) => HomePage(
-              auth: auth,
               firestore: widget.firestore,
               navigationMap: navigationMap,
-              moreafire: moreaFire,
+              moreafire: moreaFire!,
               tutorial: false,
             ),
           ),
         );
-        break;
       case AuthStatus.homePageTutorial:
         return ShowCaseWidget(
           builder: Builder(
               builder: (contex) => HomePage(
-                    auth: auth,
                     firestore: widget.firestore,
                     navigationMap: navigationMap,
-                    moreafire: moreaFire,
+                    moreafire: moreaFire!,
                     tutorial: true,
                   )),
         );
       case AuthStatus.blockedByAppVersion:
         return new BlockedByAppVersion();
-        break;
 
       case AuthStatus.blockedByDevToken:
         return new BlockedByDevToken();
-        break;
 
       case AuthStatus.messagePage:
         return ShowCaseWidget(
           builder: Builder(
             builder: (context) => MessagesPage(
               auth: auth,
-              moreaFire: moreaFire,
+              moreaFire: moreaFire!,
               navigationMap: this.navigationMap,
               firestore: widget.firestore,
             ),
           ),
         );
-        break;
 
       case AuthStatus.agendaPage:
         return ShowCaseWidget(
@@ -180,28 +174,25 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
             builder: (context) => AgendaState(
               auth: auth,
               navigationMap: navigationMap,
-              moreaFire: moreaFire,
+              moreaFire: moreaFire!,
               firestore: widget.firestore,
             ),
           ),
         );
-        break;
 
       case AuthStatus.profilePage:
         return ShowCaseWidget(
           builder: Builder(
             builder: (context) => Profile(
               auth: auth,
-              moreaFire: moreaFire,
+              moreaFire: moreaFire!,
               navigationMap: navigationMap,
               firestore: widget.firestore,
             ),
           ),
         );
-        break;
       case AuthStatus.loading:
         return MoreaLoadingWidget(this.signedOut);
-        break;
       default:
         return MoreaLoadingWidget(this.signedOut);
     }
@@ -210,7 +201,7 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
   //Functions for the Navigation
   //Switches authStatus and rebuilds RootPage
 
-  void signedIn({bool tutorialautostart}) async {
+  void signedIn({bool tutorialautostart = false}) async {
     await initMoreaFire();
     setState(() {
       if (tutorialautostart) {
@@ -271,10 +262,10 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     String deviceID;
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
-      deviceID = androidDeviceInfo.androidId;
-    } else if (Platform.isIOS) {
+      deviceID = androidDeviceInfo.id;
+    } else {
       IosDeviceInfo iosDeviceInfo = await deviceInfoPlugin.iosInfo;
-      deviceID = iosDeviceInfo.identifierForVendor;
+      deviceID = iosDeviceInfo.identifierForVendor!;
     }
     await callFunction(getcallable("deactivateDeviceNotification"),
         param: {'uid': (auth.getUserID), 'deviceID': deviceID});
