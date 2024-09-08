@@ -10,21 +10,20 @@ import 'package:morea/services/morea_firestore.dart';
 String? sessionUserID, sessionUserName;
 
 class User {
-  String? displayName,
-      pfadiName,
+  late String displayName,
       vorName,
       nachName,
       pos,
       email,
       adresse,
       geburtstag,
-      handynummer,
       ort,
       plz,
       geschlecht,
       userID;
+  String? pfadiName, handynummer;
   //List<String> subscribedGroups = new List<String>();
-  List<String>? groupIDs = <String>[];
+  List<String> groupIDs = <String>[];
   Map<String, RoleEntry>? groupPrivilege = new Map();
   Map<String, Map<String, String>>? childMap;
   Map<String, dynamic>? _userMap, groupMap, elternMap;
@@ -34,10 +33,8 @@ class User {
   User(this.crud0);
 
   getTeilnehmer() async {
-    if (_userMap!.containsKey("groupID")) throw "groupID is a depricaded key.";
-
     if (_userMap!.containsKey(userMapGroupIDs))
-      groupIDs = new List<String>.from(_userMap![userMapGroupIDs]);
+      groupIDs = List<String>.from(_userMap![userMapGroupIDs]);
     else
       throw "$userMapGroupIDs has to be non-null";
 
@@ -96,16 +93,16 @@ class User {
       if (_userMap![userMapPfadiName] != '' &&
           _userMap![userMapPfadiName] != null) {
         pfadiName = _userMap![userMapPfadiName];
-        displayName = pfadiName;
+        displayName = pfadiName!;
       } else {
         displayName = vorName;
       }
     } else {
       displayName = vorName;
     }
-    for (String groupID in groupIDs!) {
+    for (String groupID in groupIDs) {
       var someVar = (await crud0.getDocument(
-          '$pathGroups/$groupID/$pathPriviledge', this.userID!));
+          '$pathGroups/$groupID/$pathPriviledge', this.userID));
       GroupData groupData = new GroupData(
           groupData: (await crud0.getDocument(pathGroups, groupID)).data()!
               as Map<String, dynamic>,
@@ -172,7 +169,7 @@ class User {
       if (_userMap![userMapPfadiName] != '' &&
           _userMap![userMapPfadiName] != null) {
         pfadiName = _userMap![userMapPfadiName];
-        displayName = pfadiName;
+        displayName = pfadiName!;
       } else {
         displayName = vorName;
       }
@@ -180,13 +177,13 @@ class User {
       displayName = vorName;
     }
     // Add parents groups to subscribedgroups
-    if (this.groupIDs!.length > 0) {
-      for (String groupID in groupIDs!) {
+    if (this.groupIDs.length > 0) {
+      for (String groupID in groupIDs) {
         GroupData groupData = GroupData(
             groupData: (await crud0.getDocument(pathGroups, groupID)).data()!
                 as Map<String, dynamic>,
             groupUserData: (await crud0.getDocument(
-                    '$pathGroups/$groupID/$pathPriviledge', this.userID!))
+                    '$pathGroups/$groupID/$pathPriviledge', this.userID))
                 .data()! as Map<String, dynamic>);
 
         subscribedGroups![groupID] = groupData;

@@ -9,26 +9,30 @@ Map<String, RoleEntry> globalConfigRoles = Map<String, RoleEntry>();
 
 Future<AuthStatus> check4BlockedAuthStatus(
     String? userID, FirebaseFirestore firestore) async {
-  Map<String, dynamic> init = (await FirebaseFirestore.instance
+  Map<String, dynamic>? init = (await FirebaseFirestore.instance
           .collection(pathConfig)
           .doc(pathInit)
           .get())
-      .data()!;
+      .data();
   print(init.runtimeType);
-  if (init == null) throw "No init doc exists";
-  initGetGroupConfigRoles(data: init);
-  if (!init.containsKey(configMapBlockedDevToken))
-    throw "create $configMapBlockedDevToken in config --> init";
-  List<String> blockedDevTokens = new List.from(init[configMapBlockedDevToken]);
-  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  if (init == null) {
+    throw "No init doc exists";
+  } else {
+    initGetGroupConfigRoles(data: init);
+    if (!init.containsKey(configMapBlockedDevToken))
+      throw "create $configMapBlockedDevToken in config --> init";
+    List<String> blockedDevTokens =
+        new List.from(init[configMapBlockedDevToken]);
+    FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-  if (!init.containsKey(configMapMinAppVerson))
-    throw "create $configMapMinAppVerson in config --> init";
-  if (int.parse(init[configMapMinAppVerson]) > int.parse(appVersion))
-    return AuthStatus.blockedByAppVersion;
-  if (blockedDevTokens.contains(firebaseMessaging.getToken()))
-    return AuthStatus.blockedByDevToken;
-  return userID == null ? AuthStatus.notSignedIn : AuthStatus.loading;
+    if (!init.containsKey(configMapMinAppVerson))
+      throw "create $configMapMinAppVerson in config --> init";
+    if (int.parse(init[configMapMinAppVerson]) > int.parse(appVersion))
+      return AuthStatus.blockedByAppVersion;
+    if (blockedDevTokens.contains(firebaseMessaging.getToken()))
+      return AuthStatus.blockedByDevToken;
+    return userID == null ? AuthStatus.notSignedIn : AuthStatus.loading;
+  }
 }
 
 Map<String, RoleEntry> initGetGroupConfigRoles({Map<String, dynamic>? data}) {

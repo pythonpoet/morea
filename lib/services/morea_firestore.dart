@@ -114,17 +114,22 @@ class MoreaFirebase extends BaseMoreaFirebase {
 
   Stream<Map<String, GroupData>> get getGroupDataStream => sCGroupMaps.stream;
 
+  //Function to download User Map from Firestore and check if it exists
+  //Returns false if it doesnt exist
+  //Returns true if it exists
+  //Sets this._userMap
+
   Future<bool> getData(String userID) async {
     DocumentSnapshot userData = (await crud0.getDocument(pathUser, userID));
     if (!userData.exists) {
       auth0.deleteUserID();
       return false;
+    } else {
+      this._userMap =
+          Map<String, dynamic>.from(userData.data()! as Map<String, dynamic>);
+      await moreaUser.getUserData(_userMap);
+      return true;
     }
-
-    this._userMap =
-        Map<String, dynamic>.from(userData.data()! as Map<String, dynamic>);
-    await moreaUser.getUserData(_userMap);
-    return true;
   }
 
   initTeleblitz() async {
@@ -134,20 +139,41 @@ class MoreaFirebase extends BaseMoreaFirebase {
       sCGroupMaps.add(Map<String, GroupData>());
     else {
       Map<String, GroupData> mapGroupsData = <String, GroupData>{};
-      for (String groupID in this.getGroupIDs!) {
-        var someVar = (await crud0.getDocument(
-                '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID!))
-            .data();
-        crud0.streamDocument(pathGroups, groupID).listen((docSnap) {
-          mapGroupsData[groupID] = GroupData(
-              groupData: docSnap.data()! as Map<String, dynamic>,
-              groupUserData: someVar! as Map<String, dynamic>);
-          sCGroupMaps.add(mapGroupsData);
-        });
+      if (this.getPos == "Mutter" ||
+          this.getPos == "Vater" ||
+          this.getPos == "Erziehungsberechtigter" ||
+          this.getPos == "Erziehungsberechtigte") {
+        if (this.getChildMap != null) {
+          for (String groupID in this.getChildMap!.keys) {
+            var someVar = (await crud0.getDocument(
+                    '$pathGroups/$groupID/$pathPriviledge',
+                    this.getChildMap![groupID]!.keys.first))
+                .data();
+            crud0.streamDocument(pathGroups, groupID).listen((docSnap) {
+              mapGroupsData[groupID] = GroupData(
+                  groupData: docSnap.data()! as Map<String, dynamic>,
+                  groupUserData: someVar! as Map<String, dynamic>);
+              sCGroupMaps.add(mapGroupsData);
+            });
+          }
+        }
+      } else {
+        for (String groupID in this.getGroupIDs!) {
+          var someVar = (await crud0.getDocument(
+                  '$pathGroups/$groupID/$pathPriviledge', moreaUser.userID!))
+              .data();
+          crud0.streamDocument(pathGroups, groupID).listen((docSnap) {
+            mapGroupsData[groupID] = GroupData(
+                groupData: docSnap.data()! as Map<String, dynamic>,
+                groupUserData: someVar! as Map<String, dynamic>);
+            sCGroupMaps.add(mapGroupsData);
+          });
+        }
       }
     }
   }
 
+  //Function to create a new User Map on Firestore
   Future<void> createUserInformation(Map userInfo) async {
     try {
       String userUID = await auth0.currentUser()!;
@@ -160,7 +186,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
     }
   }
 
-  //Vorschlag an Maxi
+  //Function to update User Map on Firestore
   Future<void> updateUserInformation(
       String userUID, Map<String, dynamic> userInfo) async {
     if (userInfo[userMapAccountCreated] is Timestamp)

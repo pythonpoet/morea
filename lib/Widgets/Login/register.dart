@@ -331,7 +331,7 @@ class Register implements BaseRegister {
       validator: (value) =>
           value!.isEmpty ? 'Vornamen darf nicht leer sein' : null,
       keyboardType: TextInputType.text,
-      onSaved: (value) => moreaUser.vorName = value,
+      onSaved: (value) => moreaUser.vorName = value!,
     );
   }
 
@@ -342,7 +342,7 @@ class Register implements BaseRegister {
       validator: (value) =>
           value!.isEmpty ? 'Nachname darf nicht leer sein' : null,
       keyboardType: TextInputType.text,
-      onSaved: (value) => moreaUser.nachName = value,
+      onSaved: (value) => moreaUser.nachName = value!,
     );
   }
 
@@ -368,7 +368,7 @@ class Register implements BaseRegister {
                     ],
                     hint: Text(_geschlecht),
                     onChanged: (newVal) {
-                      moreaUser.geschlecht = newVal;
+                      moreaUser.geschlecht = newVal!;
                       if (newVal == 'Weiblich') {
                         _geschlecht = 'weiblich';
                       } else {
@@ -513,7 +513,7 @@ class Register implements BaseRegister {
       decoration: new InputDecoration(
           border: UnderlineInputBorder(), filled: true, labelText: 'Adresse'),
       keyboardType: TextInputType.text,
-      onSaved: (value) => moreaUser.adresse = value,
+      onSaved: (value) => moreaUser.adresse = value!,
       validator: (value) => value!.isEmpty ? 'Bitte nicht leer lassen' : null,
     );
   }
@@ -526,7 +526,7 @@ class Register implements BaseRegister {
           decoration: new InputDecoration(
               border: UnderlineInputBorder(), filled: true, labelText: 'PLZ'),
           keyboardType: TextInputType.number,
-          onSaved: (value) => moreaUser.plz = value,
+          onSaved: (value) => moreaUser.plz = value!,
           validator: (value) {
             if (value!.isEmpty) {
               return 'Bitte nicht leer lassen';
@@ -542,7 +542,7 @@ class Register implements BaseRegister {
             decoration: new InputDecoration(
                 border: UnderlineInputBorder(), filled: true, labelText: 'Ort'),
             keyboardType: TextInputType.text,
-            onSaved: (value) => moreaUser.ort = value,
+            onSaved: (value) => moreaUser.ort = value!,
             validator: (value) =>
                 value!.isEmpty ? 'Bitte nicht leer lassen' : null,
           ),
@@ -585,7 +585,7 @@ class Register implements BaseRegister {
         }
       },
       keyboardType: TextInputType.emailAddress,
-      onSaved: (value) => moreaUser.email = value,
+      onSaved: (value) => moreaUser.email = value!,
     );
   }
 

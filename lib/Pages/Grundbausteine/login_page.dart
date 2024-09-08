@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   updatedevtoken() async {
-    moreafire.uploadDevTocken(moreaUser.userID!);
+    moreafire.uploadDevTocken(moreaUser.userID);
   }
 
   void validateAndSubmit() async {
@@ -82,11 +82,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             });
             //login firebase user
             moreaUser.userID = await widget.auth
-                .signInWithEmailAndPassword(moreaUser.email!, _password!);
+                .signInWithEmailAndPassword(moreaUser.email, _password!);
             print('Sign in: ${moreaUser.userID}');
             if (moreaUser.userID != null) {
               //upload deviceToken
-              moreafire.uploadDevTocken(moreaUser.userID!);
+              moreafire.uploadDevTocken(moreaUser.userID);
               widget.onSignedIn(tutorialautostart: false);
             } else {
               setState(() {
@@ -113,11 +113,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     register.getPassword, moreafire, widget.onSignedIn,
                     tutorial: true);
                 await mailChimpAPIManager.updateUserInfo(
-                    moreaUser.email!,
-                    moreaUser.vorName!,
-                    moreaUser.nachName!,
-                    moreaUser.geschlecht!,
-                    moreaUser.groupIDs!,
+                    moreaUser.email,
+                    moreaUser.vorName,
+                    moreaUser.nachName,
+                    moreaUser.geschlecht,
+                    moreaUser.groupIDs,
                     moreafire);
               } else {
                 setState(() {
@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                           title: new Text(
                               'Es wurde dir eine E-Mail an ${moreaUser.email} gesendet, die einen Link enthält, mit dem du dein Passwort zurücksetzen kannst.'),
                         ));
-                widget.auth.sendPasswordResetEmail(moreaUser.email!);
+                widget.auth.sendPasswordResetEmail(moreaUser.email);
               })
         ],
       ),
@@ -372,7 +372,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     }
                   },
                   keyboardType: TextInputType.emailAddress,
-                  onSaved: (value) => moreaUser.email = value,
+                  onSaved: (value) => moreaUser.email = value!,
                 ),
                 new TextFormField(
                   decoration: new InputDecoration(

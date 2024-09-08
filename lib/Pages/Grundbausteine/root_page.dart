@@ -73,6 +73,16 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  //initializes MoreaFirebase and downloads User Data with getData()
+  Future authStatusInit() async {
+    authStatus =
+        await check4BlockedAuthStatus(auth.currentUser(), widget.firestore);
+    if (authStatus == AuthStatus.loading) {
+      initMoreaFire();
+    }
+    setState(() {});
+  }
+
   Future<void> initMoreaFire() async {
     this.moreaFire = new MoreaFirebase(widget.firestore);
     if (await this.moreaFire!.getData(auth.currentUser()!) == false) {
@@ -107,17 +117,6 @@ class _RootPageState extends State<RootPage> with TickerProviderStateMixin {
     setState(() {});
     return null;
   }
-
-  Future authStatusInit() async {
-    authStatus =
-        await check4BlockedAuthStatus(auth.currentUser(), widget.firestore);
-    if (authStatus == AuthStatus.loading) {
-      initMoreaFire();
-    }
-    setState(() {});
-  }
-
-  //initializes MoreaFirebase and downloads User Data with getData()
 
   @override
   Widget build(BuildContext context) {

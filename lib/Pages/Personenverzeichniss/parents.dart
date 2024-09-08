@@ -660,7 +660,7 @@ class MergeChildParent extends BaseMergeChildParent {
         if (moreaUser.pfadiName == null || moreaUser.pfadiName == '') {
           moreaUser.displayName = moreaUser.vorName;
         } else {
-          moreaUser.displayName = moreaUser.pfadiName;
+          moreaUser.displayName = moreaUser.pfadiName!;
         }
         print(moreaUser.groupIDs);
         print(childUID);
