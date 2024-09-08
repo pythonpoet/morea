@@ -148,9 +148,17 @@ class GroupData {
     );
   }
 
-  setParentPriviledge() {
+  setParentPriviledge(String displayName) {
     if (this.groupOption!.parentialControl.enabled!) {
-      this.priviledge = PriviledgeEntry();
+      Map<String, dynamic> data = {
+        groupMapDisplayName: displayName,
+        groupMapPriviledgeEntryType:
+            this.groupOption!.parentialControl.roleType!,
+        groupMapGroupJoinDate: ["Fri Sep 08 2023"],
+        groupMapPriviledgeEntryLocation:
+            this.groupOption!.parentialControl.roleLocation!,
+      };
+      this.priviledge = PriviledgeEntry(data: data);
       this.priviledge!.roleLocation =
           this.groupOption!.parentialControl.roleLocation!;
       this.priviledge!.roleType = this.groupOption!.parentialControl.roleType!;

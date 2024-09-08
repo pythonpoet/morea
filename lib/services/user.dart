@@ -256,7 +256,7 @@ class User {
               as Map<String, dynamic>);
       if (groupData.groupOption!.parentialControl.enabled!) {
         if (!this.groupIDs!.contains(groupID)) this.groupIDs!.add(groupID);
-        groupData.setParentPriviledge();
+        groupData.setParentPriviledge(this._userMap!['displayName']);
         this.subscribedGroups![groupID] = groupData;
       }
     }
