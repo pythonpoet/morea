@@ -8,42 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:20884476221:android:da0ee1d9ef987290793554",
-        "android_client_info": {
-          "package_name": "ch.morea.morea"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "20884476221-mggtj83cfup1et1cnep84qucs56b4vni.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD2a0cQBNwWtYY95mrAy99q-w_YD_PrYvY"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "20884476221-mggtj83cfup1et1cnep84qucs56b4vni.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "20884476221-6phoohimttd96sgg0m8c68a5u9d77e97.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "MCBK5KYUS5.MCBK5KYUS5.ch.morea.morea"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:20884476221:android:a247940575fdcba5793554",
         "android_client_info": {
           "package_name": "productions.morea.app"
