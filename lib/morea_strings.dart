@@ -3,6 +3,7 @@
 final String appVersion = "1";
 final String configMapMinAppVerson = "minAppVersion";
 final String configMapBlockedDevToken = "blockedDevTokens";
+final String mainGroupID = "mainGroupID";
 
 //Webflow
 final String teleblitzapiurl =
@@ -155,6 +156,15 @@ final String urlInfoMailListMembers =
 final String uIDInfoMailList = '54c3988cea';
 
 //Google Maps
-final String urlGoogleMapsLokal = 'https://www.google.com/maps/place/Pfadi+Morea/@47.406824,8.5497861,17z/data=!3m1!4b1!4m6!3m5!1s0x47900a8020c1923d:0x7a2ec6414e2b0d90!8m2!3d47.4068204!4d8.552361!16s%2Fg%2F1wn32l74?entry=ttu';
-final String urlGoogleMapsWaldrand = 'https://www.google.com/maps/place/Treffpunkt+Waldrand+Pfadi+Morea/@47.4032998,8.5576913,18z/data=!3m1!4b1!4m6!3m5!1s0x479aa1f5123a3067:0xbcb2cc988f55ca87!8m2!3d47.403298!4d8.5589805!16s%2Fg%2F11kz_ljzbv?entry=ttu';
+final String urlGoogleMapsLokal =
+    'https://www.google.com/maps/place/Pfadi+Morea/@47.406824,8.5497861,17z/data=!3m1!4b1!4m6!3m5!1s0x47900a8020c1923d:0x7a2ec6414e2b0d90!8m2!3d47.4068204!4d8.552361!16s%2Fg%2F1wn32l74?entry=ttu';
+final String urlGoogleMapsWaldrand =
+    'https://www.google.com/maps/place/Treffpunkt+Waldrand+Pfadi+Morea/@47.4032998,8.5576913,18z/data=!3m1!4b1!4m6!3m5!1s0x479aa1f5123a3067:0xbcb2cc988f55ca87!8m2!3d47.403298!4d8.5589805!16s%2Fg%2F11kz_ljzbv?entry=ttu';
 final String urlGoogleMapsEmpty = 'https://maps.google.com';
+
+//Priviledge Groups
+const String roleErziehungsperson = "Erziehungsperson";
+const String roleTN = "Teilnehmende";
+const String roleLeitung = "Leitungsperson";
+const String roleStaLei = "Stammleitung";
+const String roleAL = "Abteilungsleitung";

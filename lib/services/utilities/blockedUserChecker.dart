@@ -18,7 +18,6 @@ Future<AuthStatus> check4BlockedAuthStatus(
   if (init == null) {
     throw "No init doc exists";
   } else {
-    initGetGroupConfigRoles(data: init);
     if (!init.containsKey(configMapBlockedDevToken))
       throw "create $configMapBlockedDevToken in config --> init";
     List<String> blockedDevTokens =

@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:morea/constants/enums.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/Teleblitz/telbz_firestore.dart';
@@ -66,6 +67,8 @@ abstract class BaseMoreaFirebase {
   Future<Map<String, dynamic>> getSubgroups();
 
   Future<Map<String, dynamic>> getHomeFeed(String groupID);
+
+  void setUserPriviledges(PriviledgeGroup newPriviledgeGroup);
 }
 
 class MoreaFirebase extends BaseMoreaFirebase {
@@ -118,6 +121,7 @@ class MoreaFirebase extends BaseMoreaFirebase {
   //Returns false if it doesnt exist
   //Returns true if it exists
   //Sets this._userMap
+  //Sets user priviledges (Erziehungsperson, TN, Leitungsperson, StaLei, AL)
 
   Future<bool> getData(String userID) async {
     DocumentSnapshot userData = (await crud0.getDocument(pathUser, userID));
@@ -563,5 +567,10 @@ class MoreaFirebase extends BaseMoreaFirebase {
   Future<Map<String, dynamic>> getHomeFeed(String groupID) async {
     DocumentSnapshot doc = await crud0.getDocument('/$pathGroups', groupID);
     return Map<String, dynamic>.from(doc.get(groupMapHomeFeed));
+  }
+
+  //Sets the priviledgeGroup variable in moreaUser
+  void setUserPriviledges(PriviledgeGroup newPriviledgeGroup) {
+    this.moreaUser.setUserPriviledgeGroup(newPriviledgeGroup);
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:developer';
+import 'package:morea/constants/enums.dart';
 import 'package:morea/morea_strings.dart';
 import 'package:morea/services/Group/group_data.dart';
 import 'package:morea/services/auth.dart';
@@ -29,6 +30,7 @@ class User {
   Map<String, dynamic>? _userMap, groupMap, elternMap;
   CrudMedthods crud0;
   Map<String, GroupData>? subscribedGroups = new Map<String, GroupData>();
+  late PriviledgeGroup priviledgeGroup;
 
   User(this.crud0);
 
@@ -202,24 +204,26 @@ class User {
     if (!_userMap!.containsKey(userMapPos))
       throw "$userMapPos has to be non-null";
     pos = _userMap![userMapPos];
-    switch (pos) {
-      case "Teilnehmer":
+    switch (_userMap![userMapPos]) {
+      case roleTN:
         await getTeilnehmer();
+        this.priviledgeGroup = PriviledgeGroup.TN;
         break;
-      case "Mutter":
+      case roleErziehungsperson:
         await getElterData();
+        this.priviledgeGroup = PriviledgeGroup.Erziehungsperson;
         break;
-      case "Vater":
+      case roleLeitung:
         await getElterData();
+        this.priviledgeGroup = PriviledgeGroup.Leitung;
         break;
-      case "Erziehungsberechtigter":
+      case roleStaLei:
         await getElterData();
+        this.priviledgeGroup = PriviledgeGroup.StaLei;
         break;
-      case "Erziehungsberechtigte":
+      case roleAL:
         await getElterData();
-        break;
-      case "Leiter":
-        await getElterData();
+        this.priviledgeGroup = PriviledgeGroup.AL;
         break;
       default:
         throw "UserMap-pos value: $pos is not implemented";
@@ -413,5 +417,10 @@ class User {
     } catch (e) {
       throw e;
     }
+  }
+
+  //Sets variable priviledgeGroup to change the local priviledge group for example, when switching the account priviledge from TN to Leitung
+  void setUserPriviledgeGroup(PriviledgeGroup newPriviledgeGroup) {
+    this.priviledgeGroup = newPriviledgeGroup;
   }
 }

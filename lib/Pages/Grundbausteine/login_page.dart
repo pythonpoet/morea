@@ -244,9 +244,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   initSubgoup() async {
     crud0 = new CrudMedthods(widget.firestore);
     moreaUser = new User(crud0);
+    Map<String, dynamic> initDoc =
+        (await crud0.getDocument(pathConfig, pathInit)).data()!
+            as Map<String, dynamic>;
     register = new Register(
         moreaUser: moreaUser,
-        docSnapAbteilung: crud0.getDocument(pathGroups, moreaGroupID));
+        docSnapAbteilung: crud0.getDocument(pathGroups, initDoc[mainGroupID]));
   }
 
   @override
@@ -316,8 +319,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   return Colors.transparent;
                 })),
                 onPressed: _registerAsTeilnehmer,
-                child: Text('Teilnehmer',
-                    style: TextStyle(color: left, fontSize: 16.0)),
+                child:
+                    Text(roleTN, style: TextStyle(color: left, fontSize: 14.0)),
               ),
             ),
             Flexible(
@@ -331,8 +334,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   return Colors.transparent;
                 })),
                 onPressed: _registerAsElternteil,
-                child: Text('Elternteil',
-                    style: TextStyle(color: right, fontSize: 16.0)),
+                child: Text(roleErziehungsperson,
+                    style: TextStyle(color: right, fontSize: 14.0)),
               ),
             )
           ],
