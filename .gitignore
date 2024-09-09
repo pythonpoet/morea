@@ -80,3 +80,6 @@
 /.vscode/
 **/.vscode/launch.json
 .vscode/launch.json
+
+# Firebase
+**/lib/firebase_options.dart
